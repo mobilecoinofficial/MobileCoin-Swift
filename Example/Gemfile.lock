@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/mobilecoinofficial/cocoapods-binary.git
-  revision: 748a64cc890cfaee59cdd67e80d9ade82b1b179b
-  tag: v0.4.4.rev5
+  revision: 668abc78abdbe50cc912bf016da242ecf2a8ee66
+  tag: v0.4.4
   specs:
     cocoapods-binary (0.4.4)
       cocoapods (>= 1.5.0, < 2.0)
