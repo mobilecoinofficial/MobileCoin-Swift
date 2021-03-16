@@ -14,7 +14,9 @@ public struct AccountKey {
         fogReportId: String,
         fogAuthoritySpki: Data
     ) -> Result<AccountKey, InvalidInputError> {
+        logger.info("")
         guard let rootEntropy = Data32(rootEntropy) else {
+            logger.info("failure - rootEntropy must be 32 bytes in length")
             return .failure(InvalidInputError("rootEntropy must be 32 bytes in length"))
         }
 
@@ -34,7 +36,8 @@ public struct AccountKey {
         fogAuthoritySpki: Data,
         subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
     ) -> Result<AccountKey, InvalidInputError> {
-        FogInfo.make(
+        logger.info("")
+        return FogInfo.make(
             reportUrl: fogReportUrl,
             reportId: fogReportId,
             authoritySpki: fogAuthoritySpki
@@ -58,6 +61,7 @@ public struct AccountKey {
         fogInfo: FogInfo? = nil,
         subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
     ) {
+        logger.info("")
         let (viewPrivateKey, spendPrivateKey) = AccountKeyUtils.privateKeys(
             fromRootEntropy: rootEntropy)
         self.init(
@@ -73,6 +77,7 @@ public struct AccountKey {
         fogInfo: FogInfo? = nil,
         subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
     ) {
+        logger.info("")
         self.viewPrivateKey = viewPrivateKey
         self.spendPrivateKey = spendPrivateKey
         self.fogInfo = fogInfo
@@ -86,6 +91,7 @@ public struct AccountKey {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
+        logger.info("")
         guard let proto = try? External_AccountKey(serializedData: serializedData) else {
             return nil
         }
@@ -99,7 +105,7 @@ public struct AccountKey {
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
             logger.fatalError(
-                "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                "Error: Protobuf serialization failed: \(redacting: error.localizedDescription)")
         }
     }
 
@@ -133,6 +139,7 @@ extension AccountKey {
         _ proto: External_AccountKey,
         subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
     ) {
+        logger.info("")
         guard let viewPrivateKey = RistrettoPrivate(proto.viewPrivateKey.data),
               let spendPrivateKey = RistrettoPrivate(proto.spendPrivateKey.data)
         else {
@@ -163,6 +170,7 @@ extension AccountKey {
 
 extension External_AccountKey {
     init(_ accountKey: AccountKey) {
+        logger.info("")
         self.init()
         self.viewPrivateKey = External_RistrettoPrivate(accountKey.viewPrivateKey)
         self.spendPrivateKey = External_RistrettoPrivate(accountKey.spendPrivateKey)
@@ -199,6 +207,7 @@ extension AccountKey {
             reportId: String,
             authoritySpki: Data
         ) {
+            logger.info("")
             self.reportUrlString = reportUrlString
             self.reportUrl = reportUrl
             self.reportId = reportId
@@ -214,6 +223,7 @@ struct AccountKeyWithFog {
     let accountKey: AccountKey
 
     init?(accountKey: AccountKey) {
+        logger.info(accountKey.publicAddress.debugDescription)
         guard accountKey.fogInfo != nil else {
             return nil
         }
@@ -224,7 +234,7 @@ struct AccountKeyWithFog {
     var fogInfo: AccountKey.FogInfo {
         guard let fogInfo = accountKey.fogInfo else {
             // Safety: accountKey is guaranteed to have fogInfo.
-            logger.fatalError("\(Self.self).\(#function): accountKey doesn't have fogInfo.")
+            logger.fatalError("accountKey doesn't have fogInfo.")
         }
 
         return fogInfo

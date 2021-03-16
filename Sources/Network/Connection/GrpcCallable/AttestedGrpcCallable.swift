@@ -77,7 +77,7 @@ extension AttestedGrpcCallable
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`
             logger.fatalError(
-                "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                "Error: Protobuf serialization failed: \(error)")
         }
 
         return attestAkeCipher.encryptMessage(aad: aad, plaintext: plaintext)
@@ -131,7 +131,7 @@ extension AttestedGrpcCallable
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`
             logger.fatalError(
-                "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                "Error: Protobuf serialization failed: \(error)")
         }
 
         return attestAkeCipher.encryptMessage(aad: aad, plaintext: plaintext)

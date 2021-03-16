@@ -27,7 +27,8 @@ final class FogView {
         numOutputs: PositiveInt,
         minOutputsPerSelectedRng: Int
     ) -> FogSearchAttempt {
-        rngSet.searchAttempt(
+        logger.info("")
+        return rngSet.searchAttempt(
             requestedBlockCount: requestedBlockCount,
             numOutputs: numOutputs,
             minOutputsPerSelectedRng: minOutputsPerSelectedRng)
@@ -38,7 +39,8 @@ final class FogView {
         response: FogView_QueryResponse,
         accountKey: AccountKey
     ) -> Result<[KnownTxOut], ConnectionError> {
-        rngSet.processQueryResponse(
+        logger.info("")
+        return rngSet.processQueryResponse(
             searchAttempt: searchAttempt,
             queryResponse: response,
             accountKey: accountKey
@@ -49,7 +51,8 @@ final class FogView {
                 // Filter out TxOuts that don't belong to this account.
                 decryptedTxOuts.compactMap { txOut in
                     guard let knownTxOut = KnownTxOut(txOut, accountKey: accountKey) else {
-                        print("Warning: TxOut received from Fog View is not owned by this account.")
+                        logger.info(
+                            "Warning: TxOut received from Fog View is not owned by this account.")
                         return nil
                     }
                     return knownTxOut
@@ -62,17 +65,23 @@ final class FogView {
         searchResult: FogView_TxOutSearchResult,
         accountKey: AccountKey
     ) -> Result<LedgerTxOut, ConnectionError> {
-        FogViewUtils.decryptTxOutRecord(
+        logger.info("")
+        return FogViewUtils.decryptTxOutRecord(
             ciphertext: searchResult.ciphertext,
             accountKey: accountKey
         ).mapError { error in
             switch error {
             case .invalidInput(let reason):
-                print("Warning: could not decrypt TxOut returned from Fog View, base64 " +
-                    "ciphertext: \(searchResult.ciphertext.base64EncodedString()), " +
-                    "error: \(error)")
+                logger.info(
+                    "Warning: could not decrypt TxOut returned from Fog View, base64 " +
+                        "ciphertext: \(searchResult.ciphertext.base64EncodedString()), " +
+                        "error: \(redacting: error)")
                 return .invalidServerResponse(reason)
             case .unsupportedVersion(let reason):
+                logger.info(
+                    "Warning: could not decrypt TxOut returned from Fog View, base64 " +
+                        "ciphertext: \(searchResult.ciphertext.base64EncodedString()), " +
+                        "error: \(redacting: error)")
                 return .outdatedClient(reason)
             }
         }.flatMap { txOutRecord in
@@ -84,8 +93,9 @@ final class FogView {
                     // Safety: Protobuf binary serialization is no fail when not using proto2 or
                     // `Any`.
                     logger.fatalError(
-                        "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                        "Error: Protobuf serialization failed: \(error)")
                 }
+                logger.info("Invalid TxOut returned from Fog View.")
                 return .failure(.invalidServerResponse(
                     "Invalid TxOut returned from Fog View. Base64-encoded TxOutRecord: " +
                     "\(serializedTxOutRecord.base64EncodedString())"))

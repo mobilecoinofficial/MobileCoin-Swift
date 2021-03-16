@@ -36,6 +36,7 @@ struct NetworkConfig {
         fogUrl: FogUrl,
         attestation attestationConfig: AttestationConfig = .devMrSigner
     ) {
+        logger.info("consensusUrl: \(consensusUrl), fogUrl: \(fogUrl)")
         self.consensusUrl = consensusUrl
         self.fogUrl = fogUrl
         self.attestationConfig = attestationConfig
@@ -83,7 +84,7 @@ extension NetworkConfig {
             } catch {
                 // Safety: MrSigner is guaranteed to be 32 bytes in length, so Attestation.init
                 // should never fail.
-                logger.fatalError("\(Self.self).\(#function): invalid configuration: \(error)")
+                logger.fatalError("invalid configuration: \(error)")
             }
         }
 
@@ -120,7 +121,7 @@ extension NetworkConfig {
             } catch {
                 // Safety: MrSigner is guaranteed to be 32 bytes in length, so Attestation.init
                 // should never fail.
-                logger.fatalError("\(Self.self).\(#function): invalid configuration: \(error)")
+                logger.fatalError("invalid configuration: \(error)")
             }
         }
 

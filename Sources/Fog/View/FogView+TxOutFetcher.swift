@@ -22,6 +22,7 @@ extension FogView {
             fogQueryScalingStrategy: FogQueryScalingStrategy,
             targetQueue: DispatchQueue?
         ) {
+            logger.info("")
             self.serialQueue = DispatchQueue(
                 label: "com.mobilecoin.\(FogView.self).\(Self.self)",
                 target: targetQueue)
@@ -36,6 +37,7 @@ extension FogView {
                 ((newTxOuts: [KnownTxOut], missedBlocks: [Range<UInt64>])) -> Void,
             completion: @escaping (Result<(), ConnectionError>) -> Void
         ) {
+            logger.info("")
             let queryScaling = fogQueryScalingStrategy.create()
 
             func performSearchRound(targetBlockCount maybeTargetBlockCount: UInt64?) {
@@ -44,6 +46,7 @@ extension FogView {
                     numOutputs: queryScaling.next(),
                     partialResultsWithWriteLock: partialResultsWithWriteLock
                 ) {
+                    logger.info("")
                     guard let highestProcessedBlockCount = $0.successOr(completion: completion)
                     else { return }
 
@@ -82,6 +85,7 @@ extension FogView {
                 ((newTxOuts: [KnownTxOut], missedBlocks: [Range<UInt64>])) -> Void,
             completion: @escaping (Result<UInt64, ConnectionError>) -> Void
         ) {
+            logger.info("")
             let searchAttempt = fogView.readSync { fogView in
                 fogView.searchAttempt(
                     requestedBlockCount: targetBlockCount,
@@ -103,7 +107,8 @@ extension FogView {
                             response: response,
                             accountKey: self.accountKey
                         ).map { newTxOuts in
-                            print("processSearchResults: Found \(newTxOuts.count) new TxOuts")
+                            logger.info("processSearchResults: Found " +
+                                    "\(redacting: newTxOuts.count) new TxOuts")
                             var missedBlocks = response.missedBlockRanges.map { $0.range }
                             if let earliestRngStartBlockIndex = fogView.earliestRngStartBlockIndex {
                                 missedBlocks = missedBlocks.compactMap { range in
@@ -144,16 +149,16 @@ extension FogView {
         private func printFogQueryResponseDebug(response: FogView_QueryResponse) {
             let hits = response.txOutSearchResults.filter { $0.resultCodeEnum == .found }
 
-            print("rng record count: \(response.rngs.count)")
-            print("TxOutResult count: \(response.txOutSearchResults.count)")
-            print("TxOutResult success count: \(hits.count)")
-            print("highestProcessedBlockCount: \(response.highestProcessedBlockCount)")
-            print("missedBlockRanges.count: \(response.missedBlockRanges.count)")
-            print("lastKnownBlockCount: \(response.lastKnownBlockCount), " +
-                "lastKnownBlockCumulativeTxoCount: " +
-                "\(response.lastKnownBlockCumulativeTxoCount)")
-            print("txOutResults result codes: " +
-                "\(response.txOutSearchResults.map { $0.resultCode })")
+            logger.info("rng record count: \(response.rngs.count)")
+            logger.info("TxOutResult count: \(redacting: response.txOutSearchResults.count)")
+            logger.info("TxOutResult success count: \(redacting: hits.count)")
+            logger.info("highestProcessedBlockCount: \(response.highestProcessedBlockCount)")
+            logger.info("missedBlockRanges.count: \(response.missedBlockRanges.count)")
+            logger.info("lastKnownBlockCount: \(response.lastKnownBlockCount), " +
+                            "lastKnownBlockCumulativeTxoCount: " +
+                            "\(response.lastKnownBlockCumulativeTxoCount)")
+            logger.info("txOutResults result codes: " +
+                            "\(redacting: response.txOutSearchResults.map { $0.resultCode })")
         }
     }
 }
