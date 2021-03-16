@@ -2,6 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
+// swiftlint:disable empty_xctest_method
+
 import XCTest
 
 class PerformanceTestCase: XCTestCase {
