@@ -1,0 +1,8 @@
+disabled_rules:
+  - function_body_length
+  - closure_body_length
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - weak_delegate
+  - overridden_super_call
+  - force_try

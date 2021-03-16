@@ -1,0 +1,230 @@
+version: 2.1
+
+defaults:
+  default-xcode-version: &default-xcode-version "12.2.0"
+  default-ruby-version: &default-ruby-version "2.7"
+
+  default-environment: &default-environment
+    FASTLANE_SKIP_UPDATE_CHECK: "1"
+    mobilecoinDevAuthUsername:
+    mobilecoinDevAuthPassword:
+
+commands:
+  init-artifacts-submodule:
+    description: Initialize libmobilecoin-ios-artifacts submodule
+    steps:
+      - run:
+          name: Run git submodule update --init
+          working_directory: Vendor/libmobilecoin-ios-artifacts
+          command: git submodule update --init --depth 1 --recursive
+
+  print-tool-versions:
+    description: Print versions of various tools used
+    steps:
+      - run:
+          name: Print tool versions
+          command: |
+            set -x
+            brew config
+            brew list --versions
+            bundle env
+            bundle exec pod env
+            printenv
+
+  set-ruby-version:
+    description: Set Ruby Version
+    parameters:
+      ruby-version:
+        type: string
+        default: *default-ruby-version
+    steps:
+      - run:
+          name: Use Ruby << parameters.ruby-version >>
+          command: |
+            echo 'source /usr/local/share/chruby/chruby.sh' >> $BASH_ENV
+            echo 'chruby ruby-<< parameters.ruby-version >>' >> $BASH_ENV
+
+  install-gems:
+    description: Install Ruby gems
+    parameters:
+      ruby-version:
+        type: string
+        default: *default-ruby-version
+    steps:
+      - restore_cache:
+          name: Restore Ruby gem cache
+          keys:
+            - v0-ruby-<< parameters.ruby-version >>-gems-{{ checksum "Gemfile.lock" }}
+            - v0-ruby-<< parameters.ruby-version >>-gems-
+      - run:
+          name: Install root bundler dependencies
+          command: |
+            bundle config set --local deployment 'true'
+            bundle config set --local path '.vendor/bundle'
+            bundle config set --local clean 'true'
+            bundle check || bundle install
+      - save_cache:
+          name: Save Ruby gem cache
+          key: v0-ruby-<< parameters.ruby-version >>-gems-{{ checksum "Gemfile.lock" }}
+          paths:
+            - .vendor/bundle
+
+  install-example-gems:
+    description: Install gems for Example project
+    parameters:
+      ruby-version:
+        type: string
+        default: *default-ruby-version
+    steps:
+      - restore_cache:
+          name: Restore Ruby gem cache for Example project
+          keys:
+            - v0-example-ruby-<< parameters.ruby-version >>-gems-{{ checksum "Example/Gemfile.lock" }}
+            - v0-example-ruby-<< parameters.ruby-version >>-gems-
+      - run:
+          name: Install Example project bundler dependencies
+          working_directory: Example
+          command: |
+            bundle config set --local deployment 'true'
+            bundle config set --local path '.vendor/bundle'
+            bundle config set --local clean 'true'
+            bundle check || bundle install
+      - save_cache:
+          name: Save Ruby gem cache for Example project
+          key: v0-example-ruby-<< parameters.ruby-version >>-gems-{{ checksum "Example/Gemfile.lock" }}
+          paths:
+            - Example/.vendor/bundle
+
+  install-example-pods:
+    description: Install pods for Example project
+    parameters:
+      xcode-version:
+        type: string
+    steps:
+      - restore_cache:
+          name: Restore CocoaPods cache
+          keys:
+            - v0-xcode-<< parameters.xcode-version >>-example-pods-{{ checksum "Example/Podfile.lock" }}
+            - v0-xcode-<< parameters.xcode-version >>-example-pods-
+      - run: cd Example && bundle exec pod install --deployment
+      - save_cache:
+          name: Save CocoaPods cache
+          key: v0-xcode-<< parameters.xcode-version >>-example-pods-{{ checksum "Example/Podfile.lock" }}
+          paths:
+            - Example/Pods
+
+  install-gh-pages:
+    description: Install gh-pages npm package
+    steps:
+      - run:
+          name: Install and configure gh-pages
+          command: |
+            npm install --loglevel error gh-pages@2.2.0
+            git config user.email "mobilecoin-ci@mobilecoin.com"
+            git config user.name "mobilecoin-ci"
+
+  push-docs:
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "c2:90:32:ec:0e:38:09:a0:b0:d7:20:23:68:bc:8d:6f"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: |
+            mkdir -p docs/.circleci
+            echo "jobs: { build: {} }" > docs/.circleci/config.yml
+            ./node_modules/.bin/gh-pages --message "[skip ci] Update docs" --dist docs --dotfiles
+
+  check-dirty-git:
+    steps:
+      - run:
+          name: Check dirty git
+          command: |
+            if [[ -n $(git status --porcelain) ]]; then
+              echo "repo is dirty"
+              git status
+              exit 1
+            fi
+
+jobs:
+  build-and-test:
+    parameters:
+      xcode-version:
+        type: string
+        default: *default-xcode-version
+    macos:
+      xcode: << parameters.xcode-version >>
+    environment:
+      <<: *default-environment
+      FL_BUILDLOG_PATH: ../output/buildlogs
+      SCAN_OUTPUT_DIRECTORY: ../output/scan
+      SCAN_OUTPUT_TYPES: junit
+    steps:
+      - checkout
+      - init-artifacts-submodule
+      - set-ruby-version
+      - install-gems
+      - install-example-gems
+      - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
+      - print-tool-versions
+      - run: make build
+      - run: make test
+      - run: make docs
+      - run: make lint-docs
+      - store_artifacts: { path: output }
+      - store_test_results: { path: output/scan }
+      - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
+      - check-dirty-git
+
+  generate-docs:
+    parameters:
+      xcode-version:
+        type: string
+        default: *default-xcode-version
+    macos:
+      xcode: << parameters.xcode-version >>
+    environment:
+      <<: *default-environment
+    steps:
+      - checkout
+      - init-artifacts-submodule
+      - set-ruby-version
+      - install-example-gems
+      - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
+      - install-gems
+      - run:
+          name: Generate docs
+          command: make docs
+      - persist_to_workspace:
+          root: .
+          paths: docs
+
+  deploy-docs:
+    docker:
+      - image: cimg/node:12.18.2
+    environment:
+      <<: *default-environment
+    steps:
+      - checkout
+      - attach_workspace: { at: . }
+      - install-gh-pages
+      - push-docs
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-and-test:
+          name: build-and-test-xcode-<< matrix.xcode-version >>
+          matrix:
+            parameters:
+              xcode-version: ["11.7.0", *default-xcode-version]
+      - generate-docs:
+          filters:
+            branches: { only: master }
+      - deploy-docs:
+          requires: [ build-and-test, generate-docs ]
+          filters:
+            branches: { only: master }

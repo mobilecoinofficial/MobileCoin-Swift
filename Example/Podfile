@@ -1,0 +1,84 @@
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '10.0'
+
+plugin 'cocoapods-repo-update'
+plugin 'cocoapods-binary'
+keep_source_code_for_prebuilt_frameworks!
+plugin 'cocoapods-keys', {
+  :project => "MobileCoin",
+  :keys => [
+    "mobilecoinDevAuthUsername",
+    "mobilecoinDevAuthPassword",
+  ]}
+
+use_frameworks!
+
+ENV['MC_ENABLE_SWIFTLINT_SCRIPT'] = '1'
+ENV['MC_ENABLE_WARN_LONG_COMPILE_TIMES'] = '1'
+
+target 'Example' do
+  pod 'MobileCoin', path: '..'
+  pod 'MobileCoin/Core', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
+  # pod 'MobileCoin', podspec: '../MobileCoin.podspec'
+  # pod 'MobileCoin/Core', podspec: '../MobileCoin.podspec', testspecs: ['Tests', 'IntegrationTests']
+  # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
+  # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['Tests', 'IntegrationTests']
+
+  pod 'LibMobileCoin', '~> 1.0.1-pre1', binary: true
+  # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin-ios-artifacts'
+  # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
+  # pod 'LibMobileCoin', git: 'https://github.com/mobilecoinofficial/libmobilecoin-ios-artifacts.git'
+
+  pod 'gRPC-Swift', '~> 1.0.0', binary: true
+  pod 'SwiftProtobuf', binary: true
+  pod 'SwiftLint', binary: true
+end
+
+post_install do |installer|
+  # Enable building tests using Testable Release build configuration
+  installer.pods_project.targets.each do |target|
+    next unless target.name == 'MobileCoin'
+    target.build_configurations.each do |config|
+      next unless config.name == 'Testable Release'
+      config.build_settings['ENABLE_TESTABILITY'] = 'YES'
+    end
+  end
+
+  # Enable running performance tests on a physical device
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      if target.name == 'AppHost-MobileCoin-UI-Tests'
+        config.build_settings['DEVELOPMENT_TEAM'] = '8JT9JJD9Y5'
+      elsif target.name.start_with? 'MobileCoin-UI-'
+        config.build_settings['DEVELOPMENT_TEAM'] = '8JT9JJD9Y5'
+        config.build_settings.delete('CODE_SIGN_IDENTITY[sdk=iphoneos*]')
+      end
+    end
+  end
+
+  # Bump deployment target to 9.0 for pods that explicitly specify 8.0, since 9.0 is the minimum
+  # that Xcode 12 supports.
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      if Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']) < Gem::Version.new('9.0')
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+      end
+    end
+  end
+
+  # Add Keys framework to Integration Tests for injecting values using cocoapods-keys
+  installer.pods_project.targets.each do |target|
+    next unless target.name == 'MobileCoin-Unit-Core-IntegrationTests'
+    installer.pods_project.targets.each do |keys_target|
+      next unless keys_target.name == 'Keys'
+      target.add_dependency(keys_target)
+    end
+    target.build_configurations.each do |config|
+      config.build_settings["FRAMEWORK_SEARCH_PATHS"] ||= "$(inherited)"
+      config.build_settings["FRAMEWORK_SEARCH_PATHS"] << ' "${PODS_CONFIGURATION_BUILD_DIR}/Keys"'
+      config.build_settings["OTHER_LDFLAGS"] ||= "$(inherited)"
+      config.build_settings["OTHER_LDFLAGS"] << ' -framework "Keys"'
+    end
+  end
+end

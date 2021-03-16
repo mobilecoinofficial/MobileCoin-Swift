@@ -1,0 +1,69 @@
+module_version: latest
+
+source_directory: Sources
+
+github_url: https://github.com/mobilecoinofficial/MobileCoin-Swift
+github_file_prefix: https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources
+
+swift_build_tool: xcodebuild
+build_tool_arguments:
+  - -workspace
+  - ../Example/Example.xcworkspace
+  - -scheme
+  - Unit Tests
+clean: true
+
+theme: fullwidth
+hide_documentation_coverage: true
+undocumented_text: ''
+
+custom_categories:
+  - name: Classes
+    children:
+      - MobileCoinClient
+
+  - name: Structures
+    children:
+      - AccountKey
+      - PublicAddress
+      - Balance
+      - AccountActivity
+      - OwnedTxOut
+      - BlockMetadata
+      - Transaction
+      - Receipt
+      - MobUri
+      - PaymentRequest
+      - TransferPayload
+      - Attestation
+
+  - name: Utilities
+    children:
+      - Mnemonic
+      - Base58Coder
+
+  - name: Enumerations
+    children:
+      - FeeLevel
+      - TransactionStatus
+      - ReceiptStatus
+      - MobUri.Payload
+      - Base58DecodingResult
+
+  - name: Protocols
+    children:
+      - StorageAdapter
+
+  - name: Configuration
+    children:
+      - MobileCoinLogging
+
+  - name: Errors
+    children:
+      - ConnectionError
+      - InvalidInputError
+      - BalanceTransferEstimationError
+      - TransactionEstimationError
+      - TransactionPreparationError
+      - DefragTransactionPreparationError
+      - TransactionSubmissionError

@@ -1,0 +1,7 @@
+source 'https://rubygems.org' do
+  gem 'cocoapods', '~> 1.8', '< 1.10'
+  gem 'cocoapods-binary', :git => 'https://github.com/mobilecoinofficial/cocoapods-binary.git', :tag => 'v0.4.4.rev5'
+  gem 'cocoapods-repo-update'
+  gem 'cocoapods-keys'
+  gem 'fastlane'
+end

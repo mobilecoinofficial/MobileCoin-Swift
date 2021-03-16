@@ -1,0 +1,22 @@
+# Xcode
+xcuserdata/
+
+# Fastlane
+test_output/
+
+# Bundler
+.bundle/
+.vendor/
+
+# CocoaPods
+Pods/
+
+# Jazzy
+/docs/
+
+# npm
+node_modules/
+/package-lock.json
+
+# CircleCI-only
+/output/
