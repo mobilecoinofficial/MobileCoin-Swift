@@ -98,7 +98,7 @@ Pod::Spec.new do |s|
           SWIFTLINT="${PODS_ROOT}/SwiftLint/swiftlint"
           if which ${SWIFTLINT} >/dev/null; then
             cd "${PODS_TARGET_SRCROOT}"
-            ${SWIFTLINT} --config "${PODS_TARGET_SRCROOT}/.swiftlint.yml"
+            ${SWIFTLINT}
           else
             echo "warning: SwiftLint not installed, run \`pod install\`"
           fi

@@ -174,13 +174,13 @@ private final class RngTracker {
     /// If an RNG has been decommissioned, then all `TxOut`'s corresponding to the RNG are available
     /// for immediate retrieval from Fog. This means that once we encounter a search miss we can
     /// stop considering the RNG when generating search keys for a `TxOut` search.
-    var decommissioned: Bool = false
+    var decommissioned = false
 
     /// Whether we have found all `TxOut`'s for this RNG.
     ///
     /// An RNG is active until the RNG has been both decommissioned and we've encountered at least
     /// one search miss since.
-    var active: Bool = true
+    var active = true
 
     /// Number of blocks for which all `TxOut`s for this RNG are known.
     ///

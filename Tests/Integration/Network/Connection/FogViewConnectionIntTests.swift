@@ -52,7 +52,7 @@ class FogViewConnectionIntTests: XCTestCase {
                 XCTAssertEqual(response.txOutSearchResults.count, 0)
                 XCTAssertGreaterThan(response.lastKnownBlockCount, 0)
                 XCTAssertGreaterThan(response.lastKnownBlockCumulativeTxoCount, 0)
-                guard response.rngs.count > 0 else { expect.fulfill(); return }
+                guard !response.rngs.isEmpty else { expect.fulfill(); return }
 
                 success(response.rngs[0])
             }

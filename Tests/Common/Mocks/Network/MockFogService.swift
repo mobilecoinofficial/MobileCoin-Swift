@@ -80,7 +80,7 @@ extension MockFogService {
 
     func viewServiceTxOutRecords() -> [(searchKey: Data, txOutRecord: FogView_TxOutRecord)] {
         let viewTxOuts = self.viewServiceTxOuts
-        if let rngKey = viewServiceRngRecords.first?.nonce, viewTxOuts.count > 0 {
+        if let rngKey = viewServiceRngRecords.first?.nonce, !viewTxOuts.isEmpty {
             let rng: FogRng
             do {
                 rng = try FogRng.make(accountKey: accountKey, fogRngKey: rngKey).get()
