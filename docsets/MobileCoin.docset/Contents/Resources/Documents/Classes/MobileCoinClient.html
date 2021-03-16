@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MobileCoinClient Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Class/MobileCoinClient" class="dashAnchor"></a>
+
+    <a title="MobileCoinClient Class Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          MobileCoin latest Docs
+        </a>
+        
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/mobilecoinofficial/MobileCoin-Swift">
+            <img class="header-icon" src="../img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">MobileCoin Reference</a>
+      <img class="carat" src="../img/carat.png" />
+      MobileCoinClient Class Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MobileCoinClient.html">MobileCoinClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MobileCoinClient/Config.html">– Config</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structures.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccountKey.html">AccountKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/PublicAddress.html">PublicAddress</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Balance.html">Balance</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccountActivity.html">AccountActivity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/OwnedTxOut.html">OwnedTxOut</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/BlockMetadata.html">BlockMetadata</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Transaction.html">Transaction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Receipt.html">Receipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/MobUri.html">MobUri</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/MobUri/Payload.html">– Payload</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/PaymentRequest.html">PaymentRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TransferPayload.html">TransferPayload</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Attestation.html">Attestation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Attestation/MrEnclave.html">– MrEnclave</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Attestation/MrSigner.html">– MrSigner</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Utilities.html">Utilities</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Mnemonic.html">Mnemonic</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Base58Coder.html">Base58Coder</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enumerations.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/FeeLevel.html">FeeLevel</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/TransactionStatus.html">TransactionStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/ReceiptStatus.html">ReceiptStatus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Base58DecodingResult.html">Base58DecodingResult</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/StorageAdapter.html">StorageAdapter</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Configuration.html">Configuration</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/MobileCoinLogging.html">MobileCoinLogging</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Errors.html">Errors</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/ConnectionError.html">ConnectionError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/InvalidInputError.html">InvalidInputError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/BalanceTransferEstimationError.html">BalanceTransferEstimationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/TransactionEstimationError.html">TransactionEstimationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/TransactionPreparationError.html">TransactionPreparationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/DefragTransactionPreparationError.html">DefragTransactionPreparationError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/TransactionSubmissionError.html">TransactionSubmissionError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>MobileCoinClient</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">MobileCoinClient</span></code></pre>
+
+                </div>
+              </div>
+            
+              <div class="slightly-smaller">
+                <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L10-L236">Show on GitHub</a>
+              </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC4make10accountKey6configs6ResultOyAcA17InvalidInputErrorVGAA07AccountF0V_AC6ConfigVtFZ"></a>
+                    <a name="//apple_ref/swift/Method/make(accountKey:config:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC4make10accountKey6configs6ResultOyAcA17InvalidInputErrorVGAA07AccountF0V_AC6ConfigVtFZ">make(accountKey:<wbr>config:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">make</span><span class="p">(</span><span class="nv">accountKey</span><span class="p">:</span> <span class="kt"><a href="../Structs/AccountKey.html">AccountKey</a></span><span class="p">,</span> <span class="nv">config</span><span class="p">:</span> <span class="kt"><a href="../Classes/MobileCoinClient/Config.html">Config</a></span><span class="p">)</span>
+    <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">MobileCoinClient</span><span class="p">,</span> <span class="kt"><a href="../Structs/InvalidInputError.html">InvalidInputError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code><a href="../Structs/InvalidInputError.html">InvalidInputError</a></code> when <code>accountKey</code> isn&rsquo;t configured to use Fog.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L12-L21">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC7balanceAA7BalanceVvp"></a>
+                    <a name="//apple_ref/swift/Property/balance" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC7balanceAA7BalanceVvp">balance</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">balance</span><span class="p">:</span> <span class="kt"><a href="../Structs/Balance.html">Balance</a></span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L73-L75">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC15accountActivityAA07AccountE0Vvp"></a>
+                    <a name="//apple_ref/swift/Property/accountActivity" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC15accountActivityAA07AccountE0Vvp">accountActivity</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">accountActivity</span><span class="p">:</span> <span class="kt"><a href="../Structs/AccountActivity.html">AccountActivity</a></span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L77-L79">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC21setBasicAuthorization8username8passwordySS_SStF"></a>
+                    <a name="//apple_ref/swift/Method/setBasicAuthorization(username:password:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC21setBasicAuthorization8username8passwordySS_SStF">setBasicAuthorization(username:<wbr>password:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setBasicAuthorization</span><span class="p">(</span><span class="nv">username</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L81-L84">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC13updateBalance10completionyys6ResultOyAA0E0VAA15ConnectionErrorOGc_tF"></a>
+                    <a name="//apple_ref/swift/Method/updateBalance(completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC13updateBalance10completionyys6ResultOyAA0E0VAA15ConnectionErrorOGc_tF">updateBalance(completion:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">updateBalance</span><span class="p">(</span><span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Balance.html">Balance</a></span><span class="p">,</span> <span class="kt"><a href="../Enums/ConnectionError.html">ConnectionError</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L86-L101">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC18amountTransferable8feeLevels6ResultOys6UInt64VAA30BalanceTransferEstimationErrorOGAA03FeeG0O_tF"></a>
+                    <a name="//apple_ref/swift/Method/amountTransferable(feeLevel:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC18amountTransferable8feeLevels6ResultOys6UInt64VAA30BalanceTransferEstimationErrorOGAA03FeeG0O_tF">amountTransferable(feeLevel:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">amountTransferable</span><span class="p">(</span><span class="nv">feeLevel</span><span class="p">:</span> <span class="kt"><a href="../Enums/FeeLevel.html">FeeLevel</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">minimum</span><span class="p">)</span>
+    <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">UInt64</span><span class="p">,</span> <span class="kt"><a href="../Enums/BalanceTransferEstimationError.html">BalanceTransferEstimationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L103-L110">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC16estimateTotalFee12toSendAmount8feeLevels6ResultOys6UInt64VAA26TransactionEstimationErrorOGAJ_AA0fK0OtF"></a>
+                    <a name="//apple_ref/swift/Method/estimateTotalFee(toSendAmount:feeLevel:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC16estimateTotalFee12toSendAmount8feeLevels6ResultOys6UInt64VAA26TransactionEstimationErrorOGAJ_AA0fK0OtF">estimateTotalFee(toSendAmount:<wbr>feeLevel:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">estimateTotalFee</span><span class="p">(</span>
+    <span class="n">toSendAmount</span> <span class="nv">amount</span><span class="p">:</span> <span class="kt">UInt64</span><span class="p">,</span>
+    <span class="nv">feeLevel</span><span class="p">:</span> <span class="kt"><a href="../Enums/FeeLevel.html">FeeLevel</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">minimum</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">UInt64</span><span class="p">,</span> <span class="kt"><a href="../Enums/TransactionEstimationError.html">TransactionEstimationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L112-L120">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC23requiresDefragmentation12toSendAmount8feeLevels6ResultOySbAA26TransactionEstimationErrorOGs6UInt64V_AA03FeeJ0OtF"></a>
+                    <a name="//apple_ref/swift/Method/requiresDefragmentation(toSendAmount:feeLevel:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC23requiresDefragmentation12toSendAmount8feeLevels6ResultOySbAA26TransactionEstimationErrorOGs6UInt64V_AA03FeeJ0OtF">requiresDefragmentation(toSendAmount:<wbr>feeLevel:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">requiresDefragmentation</span><span class="p">(</span><span class="n">toSendAmount</span> <span class="nv">amount</span><span class="p">:</span> <span class="kt">UInt64</span><span class="p">,</span> <span class="nv">feeLevel</span><span class="p">:</span> <span class="kt"><a href="../Enums/FeeLevel.html">FeeLevel</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">minimum</span><span class="p">)</span>
+    <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="p">,</span> <span class="kt"><a href="../Enums/TransactionEstimationError.html">TransactionEstimationError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L122-L129">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC18prepareTransaction2to6amount3fee10completionyAA13PublicAddressV_s6UInt64VALys6ResultOyAA0E0V11transaction_AA7ReceiptV7receipttAA0E16PreparationErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/prepareTransaction(to:amount:fee:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC18prepareTransaction2to6amount3fee10completionyAA13PublicAddressV_s6UInt64VALys6ResultOyAA0E0V11transaction_AA7ReceiptV7receipttAA0E16PreparationErrorOGctF">prepareTransaction(to:<wbr>amount:<wbr>fee:<wbr>completion:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">prepareTransaction</span><span class="p">(</span>
+    <span class="n">to</span> <span class="nv">recipient</span><span class="p">:</span> <span class="kt"><a href="../Structs/PublicAddress.html">PublicAddress</a></span><span class="p">,</span>
+    <span class="nv">amount</span><span class="p">:</span> <span class="kt">UInt64</span><span class="p">,</span>
+    <span class="nv">fee</span><span class="p">:</span> <span class="kt">UInt64</span><span class="p">,</span>
+    <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span>
+        <span class="kt">Result</span><span class="o">&lt;</span><span class="p">(</span><span class="nv">transaction</span><span class="p">:</span> <span class="kt"><a href="../Structs/Transaction.html">Transaction</a></span><span class="p">,</span> <span class="nv">receipt</span><span class="p">:</span> <span class="kt"><a href="../Structs/Receipt.html">Receipt</a></span><span class="p">),</span> <span class="kt"><a href="../Enums/TransactionPreparationError.html">TransactionPreparationError</a></span><span class="o">&gt;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L131-L153">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC18prepareTransaction2to6amount8feeLevel10completionyAA13PublicAddressV_s6UInt64VAA03FeeI0Oys6ResultOyAA0E0V11transaction_AA7ReceiptV7receipttAA0E16PreparationErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/prepareTransaction(to:amount:feeLevel:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC18prepareTransaction2to6amount8feeLevel10completionyAA13PublicAddressV_s6UInt64VAA03FeeI0Oys6ResultOyAA0E0V11transaction_AA7ReceiptV7receipttAA0E16PreparationErrorOGctF">prepareTransaction(to:<wbr>amount:<wbr>feeLevel:<wbr>completion:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">prepareTransaction</span><span class="p">(</span>
+    <span class="n">to</span> <span class="nv">recipient</span><span class="p">:</span> <span class="kt"><a href="../Structs/PublicAddress.html">PublicAddress</a></span><span class="p">,</span>
+    <span class="nv">amount</span><span class="p">:</span> <span class="kt">UInt64</span><span class="p">,</span>
+    <span class="nv">feeLevel</span><span class="p">:</span> <span class="kt"><a href="../Enums/FeeLevel.html">FeeLevel</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">minimum</span><span class="p">,</span>
+    <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span>
+        <span class="kt">Result</span><span class="o">&lt;</span><span class="p">(</span><span class="nv">transaction</span><span class="p">:</span> <span class="kt"><a href="../Structs/Transaction.html">Transaction</a></span><span class="p">,</span> <span class="nv">receipt</span><span class="p">:</span> <span class="kt"><a href="../Structs/Receipt.html">Receipt</a></span><span class="p">),</span> <span class="kt"><a href="../Enums/TransactionPreparationError.html">TransactionPreparationError</a></span><span class="o">&gt;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L155-L177">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC38prepareDefragmentationStepTransactions12toSendAmount8feeLevel10completionys6UInt64V_AA03FeeL0Oys6ResultOySayAA11TransactionVGAA06DefragQ16PreparationErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/prepareDefragmentationStepTransactions(toSendAmount:feeLevel:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC38prepareDefragmentationStepTransactions12toSendAmount8feeLevel10completionys6UInt64V_AA03FeeL0Oys6ResultOySayAA11TransactionVGAA06DefragQ16PreparationErrorOGctF">prepareDefragmentationStepTransactions(toSendAmount:<wbr>feeLevel:<wbr>completion:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">prepareDefragmentationStepTransactions</span><span class="p">(</span>
+    <span class="n">toSendAmount</span> <span class="nv">amount</span><span class="p">:</span> <span class="kt">UInt64</span><span class="p">,</span>
+    <span class="nv">feeLevel</span><span class="p">:</span> <span class="kt"><a href="../Enums/FeeLevel.html">FeeLevel</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">minimum</span><span class="p">,</span>
+    <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="p">[</span><span class="kt"><a href="../Structs/Transaction.html">Transaction</a></span><span class="p">],</span> <span class="kt"><a href="../Enums/DefragTransactionPreparationError.html">DefragTransactionPreparationError</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L179-L199">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC17submitTransaction_10completionyAA0E0V_ys6ResultOyytAA0E15SubmissionErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/submitTransaction(_:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC17submitTransaction_10completionyAA0E0V_ys6ResultOyytAA0E15SubmissionErrorOGctF">submitTransaction(_:<wbr>completion:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">submitTransaction</span><span class="p">(</span>
+    <span class="n">_</span> <span class="nv">transaction</span><span class="p">:</span> <span class="kt"><a href="../Structs/Transaction.html">Transaction</a></span><span class="p">,</span>
+    <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="p">(),</span> <span class="kt"><a href="../Enums/TransactionSubmissionError.html">TransactionSubmissionError</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L201-L213">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC6status2of10completionyAA11TransactionV_ys6ResultOyAA0G6StatusOAA15ConnectionErrorOGctF"></a>
+                    <a name="//apple_ref/swift/Method/status(of:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC6status2of10completionyAA11TransactionV_ys6ResultOyAA0G6StatusOAA15ConnectionErrorOGctF">status(of:<wbr>completion:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">status</span><span class="p">(</span>
+    <span class="n">of</span> <span class="nv">transaction</span><span class="p">:</span> <span class="kt"><a href="../Structs/Transaction.html">Transaction</a></span><span class="p">,</span>
+    <span class="nv">completion</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Enums/TransactionStatus.html">TransactionStatus</a></span><span class="p">,</span> <span class="kt"><a href="../Enums/ConnectionError.html">ConnectionError</a></span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L215-L231">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC6status2ofs6ResultOyAA13ReceiptStatusOAA17InvalidInputErrorVGAA0G0V_tF"></a>
+                    <a name="//apple_ref/swift/Method/status(of:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC6status2ofs6ResultOyAA13ReceiptStatusOAA17InvalidInputErrorVGAA0G0V_tF">status(of:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">status</span><span class="p">(</span><span class="n">of</span> <span class="nv">receipt</span><span class="p">:</span> <span class="kt"><a href="../Structs/Receipt.html">Receipt</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt"><a href="../Enums/ReceiptStatus.html">ReceiptStatus</a></span><span class="p">,</span> <span class="kt"><a href="../Structs/InvalidInputError.html">InvalidInputError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L233-L235">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin0aB6ClientC6ConfigV"></a>
+                    <a name="//apple_ref/swift/Struct/Config" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin0aB6ClientC6ConfigV">Config</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                        <a href="../Classes/MobileCoinClient/Config.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Config</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/MobileCoinClient.swift#L273-L363">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2021 <a class="link" href="https://www.mobilecoin.com/" target="_blank" rel="external">MobileCoin</a>. All rights reserved. (Last updated: 2021-03-16)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

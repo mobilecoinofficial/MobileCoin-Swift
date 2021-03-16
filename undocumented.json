@@ -1,0 +1,1055 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountActivity.swift",
+      "line": 10,
+      "symbol": "AccountActivity.txOuts",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountActivity.swift",
+      "line": 12,
+      "symbol": "AccountActivity.blockCount",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 7,
+      "symbol": "AccountKey",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 10,
+      "symbol": "AccountKey",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 11,
+      "symbol": "AccountKey.make(rootEntropy:fogReportUrl:fogReportId:fogAuthoritySpki:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 54,
+      "symbol": "AccountKey.publicAddress",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 95,
+      "symbol": "AccountKey.serializedData",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 128,
+      "symbol": "AccountKey",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
+      "line": 129,
+      "symbol": "AccountKey",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/Balance.swift",
+      "line": 7,
+      "symbol": "Balance",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/Balance.swift",
+      "line": 8,
+      "symbol": "Balance.amountPicoMobLow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/Balance.swift",
+      "line": 9,
+      "symbol": "Balance.amountPicoMobHigh",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/Balance.swift",
+      "line": 100,
+      "symbol": "Balance",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/Balance.swift",
+      "line": 101,
+      "symbol": "Balance",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/Balance.swift",
+      "line": 103,
+      "symbol": "Balance",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/OwnedTxOut.swift",
+      "line": 7,
+      "symbol": "OwnedTxOut",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/OwnedTxOut.swift",
+      "line": 12,
+      "symbol": "OwnedTxOut.value",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/OwnedTxOut.swift",
+      "line": 18,
+      "symbol": "OwnedTxOut.receivedBlock",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/OwnedTxOut.swift",
+      "line": 20,
+      "symbol": "OwnedTxOut.spentBlock",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/OwnedTxOut.swift",
+      "line": 35,
+      "symbol": "OwnedTxOut",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/OwnedTxOut.swift",
+      "line": 36,
+      "symbol": "OwnedTxOut",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
+      "line": 8,
+      "symbol": "PublicAddress",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
+      "line": 43,
+      "symbol": "PublicAddress.serializedData",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
+      "line": 60,
+      "symbol": "PublicAddress.fogReportUrlString",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
+      "line": 67,
+      "symbol": "PublicAddress",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
+      "line": 68,
+      "symbol": "PublicAddress",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 9,
+      "symbol": "InvalidInputError",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 17,
+      "symbol": "InvalidInputError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 23,
+      "symbol": "ConnectionError",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 24,
+      "symbol": "ConnectionError.connectionFailure(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 25,
+      "symbol": "ConnectionError.authorizationFailure(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 26,
+      "symbol": "ConnectionError.invalidServerResponse(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 27,
+      "symbol": "ConnectionError.attestationVerificationFailed(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 28,
+      "symbol": "ConnectionError.outdatedClient(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 29,
+      "symbol": "ConnectionError.serverRateLimited(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 32,
+      "symbol": "ConnectionError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 53,
+      "symbol": "BalanceTransferEstimationError",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 54,
+      "symbol": "BalanceTransferEstimationError.feeExceedsBalance(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 55,
+      "symbol": "BalanceTransferEstimationError.balanceOverflow(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 58,
+      "symbol": "BalanceTransferEstimationError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 71,
+      "symbol": "TransactionEstimationError",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 72,
+      "symbol": "TransactionEstimationError.invalidInput(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 73,
+      "symbol": "TransactionEstimationError.insufficientBalance(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 76,
+      "symbol": "TransactionEstimationError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 89,
+      "symbol": "TransactionPreparationError",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 90,
+      "symbol": "TransactionPreparationError.invalidInput(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 91,
+      "symbol": "TransactionPreparationError.insufficientBalance(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 92,
+      "symbol": "TransactionPreparationError.defragmentationRequired(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 93,
+      "symbol": "TransactionPreparationError.connectionError(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 96,
+      "symbol": "TransactionPreparationError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 113,
+      "symbol": "DefragTransactionPreparationError",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 114,
+      "symbol": "DefragTransactionPreparationError.invalidInput(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 115,
+      "symbol": "DefragTransactionPreparationError.insufficientBalance(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 116,
+      "symbol": "DefragTransactionPreparationError.connectionError(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 119,
+      "symbol": "DefragTransactionPreparationError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 134,
+      "symbol": "TransactionSubmissionError",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 135,
+      "symbol": "TransactionSubmissionError.connectionError(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 136,
+      "symbol": "TransactionSubmissionError.invalidTransaction(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 137,
+      "symbol": "TransactionSubmissionError.feeError(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 138,
+      "symbol": "TransactionSubmissionError.tombstoneBlockTooFar(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 139,
+      "symbol": "TransactionSubmissionError.inputsAlreadySpent(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Errors.swift",
+      "line": 142,
+      "symbol": "TransactionSubmissionError",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Logging.swift",
+      "line": 11,
+      "symbol": "MobileCoinLogging",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Common/Logging.swift",
+      "line": 12,
+      "symbol": "MobileCoinLogging.logSensitiveData",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 8,
+      "symbol": "Base58DecodingResult",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 9,
+      "symbol": "Base58DecodingResult.publicAddress(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 10,
+      "symbol": "Base58DecodingResult.paymentRequest(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 11,
+      "symbol": "Base58DecodingResult.transferPayload(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 14,
+      "symbol": "Base58Coder",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 15,
+      "symbol": "Base58Coder.encode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 21,
+      "symbol": "Base58Coder.encode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/Base58Coder.swift",
+      "line": 27,
+      "symbol": "Base58Coder.encode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 7,
+      "symbol": "MobUri",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 8,
+      "symbol": "MobUri.Payload",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 9,
+      "symbol": "MobUri.Payload.publicAddress(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 10,
+      "symbol": "MobUri.Payload.paymentRequest(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 11,
+      "symbol": "MobUri.Payload.transferPayload(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 14,
+      "symbol": "MobUri.decode(uri:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 30,
+      "symbol": "MobUri.encode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 34,
+      "symbol": "MobUri.encode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
+      "line": 38,
+      "symbol": "MobUri.encode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/PaymentRequest.swift",
+      "line": 8,
+      "symbol": "PaymentRequest",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/PaymentRequest.swift",
+      "line": 9,
+      "symbol": "PaymentRequest.publicAddress",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/PaymentRequest.swift",
+      "line": 10,
+      "symbol": "PaymentRequest.value",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/PaymentRequest.swift",
+      "line": 11,
+      "symbol": "PaymentRequest.memo",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/PaymentRequest.swift",
+      "line": 34,
+      "symbol": "PaymentRequest",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/PaymentRequest.swift",
+      "line": 35,
+      "symbol": "PaymentRequest",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/TransferPayload.swift",
+      "line": 8,
+      "symbol": "TransferPayload",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/TransferPayload.swift",
+      "line": 11,
+      "symbol": "TransferPayload.memo",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/TransferPayload.swift",
+      "line": 19,
+      "symbol": "TransferPayload.rootEntropy",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/TransferPayload.swift",
+      "line": 24,
+      "symbol": "TransferPayload",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Encodings/TransferPayload.swift",
+      "line": 25,
+      "symbol": "TransferPayload",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Ledger/BlockMetadata.swift",
+      "line": 7,
+      "symbol": "BlockMetadata",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Ledger/BlockMetadata.swift",
+      "line": 8,
+      "symbol": "BlockMetadata.index",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Ledger/BlockMetadata.swift",
+      "line": 11,
+      "symbol": "BlockMetadata.timestamp",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Ledger/BlockMetadata.swift",
+      "line": 36,
+      "symbol": "BlockMetadata",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Ledger/BlockMetadata.swift",
+      "line": 37,
+      "symbol": "BlockMetadata",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Mnemonic/AccountKey+Mnemonic.swift",
+      "line": 8,
+      "symbol": "AccountKey.rootEntropy(fromMnemonic:accountIndex:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Mnemonic/Mnemonic.swift",
+      "line": 7,
+      "symbol": "Mnemonic",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Mnemonic/Mnemonic.swift",
+      "line": 8,
+      "symbol": "Mnemonic.allWords",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Mnemonic/Mnemonic.swift",
+      "line": 10,
+      "symbol": "Mnemonic.entropy(fromMnemonic:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Mnemonic/Mnemonic.swift",
+      "line": 19,
+      "symbol": "Mnemonic.words(matchingPrefix:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 10,
+      "symbol": "MobileCoinClient",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 73,
+      "symbol": "MobileCoinClient.balance",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 77,
+      "symbol": "MobileCoinClient.accountActivity",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 81,
+      "symbol": "MobileCoinClient.setBasicAuthorization(username:password:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 86,
+      "symbol": "MobileCoinClient.updateBalance(completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 103,
+      "symbol": "MobileCoinClient.amountTransferable(feeLevel:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 112,
+      "symbol": "MobileCoinClient.estimateTotalFee(toSendAmount:feeLevel:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 122,
+      "symbol": "MobileCoinClient.requiresDefragmentation(toSendAmount:feeLevel:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 131,
+      "symbol": "MobileCoinClient.prepareTransaction(to:amount:fee:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 155,
+      "symbol": "MobileCoinClient.prepareTransaction(to:amount:feeLevel:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 179,
+      "symbol": "MobileCoinClient.prepareDefragmentationStepTransactions(toSendAmount:feeLevel:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 201,
+      "symbol": "MobileCoinClient.submitTransaction(_:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 215,
+      "symbol": "MobileCoinClient.status(of:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 233,
+      "symbol": "MobileCoinClient.status(of:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 272,
+      "symbol": "MobileCoinClient",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 273,
+      "symbol": "MobileCoinClient.Config",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 321,
+      "symbol": "MobileCoinClient.Config.cacheStorageAdapter",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 341,
+      "symbol": "MobileCoinClient.Config.setConsensusTrustRoots(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
+      "line": 353,
+      "symbol": "MobileCoinClient.Config.setFogTrustRoots(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 9,
+      "symbol": "Attestation",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 31,
+      "symbol": "Attestation.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 35,
+      "symbol": "Attestation.init(mrEnclaves:mrSigners:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 57,
+      "symbol": "Attestation",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 76,
+      "symbol": "Attestation",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 77,
+      "symbol": "Attestation.MrEnclave",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 110,
+      "symbol": "Attestation.MrEnclave",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 123,
+      "symbol": "Attestation",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 124,
+      "symbol": "Attestation.MrSigner",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Network/Attestation/Attestation.swift",
+      "line": 168,
+      "symbol": "Attestation.MrSigner",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Storage/StorageAdapter.swift",
+      "line": 7,
+      "symbol": "StorageAdapter",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Storage/StorageAdapter.swift",
+      "line": 8,
+      "symbol": "StorageAdapter.get(key:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Storage/StorageAdapter.swift",
+      "line": 9,
+      "symbol": "StorageAdapter.set(key:value:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Storage/StorageAdapter.swift",
+      "line": 10,
+      "symbol": "StorageAdapter.clear(key:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Fee/FeeLevel.swift",
+      "line": 7,
+      "symbol": "FeeLevel",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Fee/FeeLevel.swift",
+      "line": 8,
+      "symbol": "FeeLevel.minimum",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Receipt.swift",
+      "line": 52,
+      "symbol": "Receipt.serializedData",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/ReceiptStatus.swift",
+      "line": 7,
+      "symbol": "ReceiptStatus",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/ReceiptStatus.swift",
+      "line": 8,
+      "symbol": "ReceiptStatus.unknown",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/ReceiptStatus.swift",
+      "line": 9,
+      "symbol": "ReceiptStatus.received(block:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/ReceiptStatus.swift",
+      "line": 10,
+      "symbol": "ReceiptStatus.failed",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Transaction.swift",
+      "line": 8,
+      "symbol": "Transaction",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Transaction.swift",
+      "line": 21,
+      "symbol": "Transaction.serializedData",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Transaction.swift",
+      "line": 85,
+      "symbol": "Transaction",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/Transaction.swift",
+      "line": 86,
+      "symbol": "Transaction",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/TransactionStatus.swift",
+      "line": 7,
+      "symbol": "TransactionStatus",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/TransactionStatus.swift",
+      "line": 8,
+      "symbol": "TransactionStatus.unknown",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/TransactionStatus.swift",
+      "line": 9,
+      "symbol": "TransactionStatus.accepted(block:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Transaction/TransactionStatus.swift",
+      "line": 10,
+      "symbol": "TransactionStatus.failed",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/distiller/project/Sources"
+}
