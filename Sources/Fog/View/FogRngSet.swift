@@ -27,8 +27,8 @@ final class FogRngSet {
     ) -> FogSearchAttempt {
         logger.info(
             "requestedBlockCount: \(redacting: String(describing: requestedBlockCount)), " +
-                "numOutputs: \(redacting: numOutputs.value), " +
-                "minOutputsPerSelectedRnd: \(redacting: minOutputsPerSelectedRng)")
+                "numOutputs: \(numOutputs.value), " +
+                "minOutputsPerSelectedRng: \(minOutputsPerSelectedRng)")
         // Max rngs we can select while maintaining the requested minimum outputs per selected rng.
         let maxRngs = 0 < minOutputsPerSelectedRng && minOutputsPerSelectedRng <= numOutputs.value
             ? numOutputs.value / minOutputsPerSelectedRng : numOutputs.value
