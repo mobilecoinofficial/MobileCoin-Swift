@@ -23,7 +23,7 @@ final class FogResolver {
     }
 
     private init(attestation: Attestation) {
-        logger.info("attestation: \(attestation.description)")
+        logger.info("attestation: \(attestation)")
         let verifier = AttestationVerifier(attestation: attestation)
         // Safety: mc_fog_resolver_create should never return nil.
         self.ptr = verifier.withUnsafeOpaquePointer { verifierPtr in
@@ -44,6 +44,7 @@ final class FogResolver {
     }
 
     private func addReportResponse(reportUrl: FogUrl, reportResponse: Report_ReportResponse) {
+        logger.info("")
         let serializedReportResponse: Data
         do {
             serializedReportResponse = try reportResponse.serializedData()

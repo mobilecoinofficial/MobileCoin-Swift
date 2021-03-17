@@ -26,7 +26,7 @@ final class FogViewKeyScanner {
             completion($0.map { blocksTxOuts in
                 logger.info(
                     "\(blockRanges.map { $0.count }.reduce(0, +)) missed " +
-                        "blocks containing \(redacting: blocksTxOuts.count) TxOuts")
+                        "blocks containing \(blocksTxOuts.count) TxOuts")
                 let foundTxOuts = blocksTxOuts.compactMap {
                     KnownTxOut($0, accountKey: self.accountKey)
                 }

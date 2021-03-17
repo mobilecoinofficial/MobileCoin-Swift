@@ -65,15 +65,15 @@ final class FogRng {
             }.mapError {
                 switch $0.errorCode {
                 case .invalidInput:
-                    logger.info("invalid key: \($0.description)")
+                    logger.warning("invalid key: \(redacting: $0.description)")
                     return .invalidKey($0.description)
                 case .unsupportedCryptoBoxVersion:
-                    logger.info("unsupported crypto box version: \($0.description)")
+                    logger.warning("unsupported crypto box version: \(redacting: $0.description)")
                     return .unsupportedCryptoBoxVersion($0.description)
                 default:
                     // Safety: mc_fog_rng_deserialize_proto should not throw non-documented errors.
                     logger.fatalError(
-                        "Unhandled LibMobileCoin error: \($0)")
+                        "Unhandled LibMobileCoin error: \(redacting: $0.description)")
                 }
             }
         }.map { ptr in
@@ -123,7 +123,7 @@ final class FogRng {
     }
 
     func outputs(count: Int) -> [Data] {
-        logger.info("\(sensitive: count)")
+        logger.info("\(count)")
         let rngCopy = clone()
         return (0..<count).map { _ in
             rngCopy.advance()

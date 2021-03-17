@@ -47,7 +47,7 @@ struct TransactionPreparer {
                 sumOfValues: inputs.map { $0.value },
                 isGreaterThanValue: fee)
         else {
-            logger.debug("failure - sumOfValues inputs: \(redacting: inputs) " +
+            logger.warning("failure - sumOfValues inputs: \(redacting: inputs) " +
                             "isGreaterThanValue fee: \(redacting: fee)")
             serialQueue.async {
                 completion(.failure(.insufficientBalance()))
@@ -90,7 +90,7 @@ struct TransactionPreparer {
     ) {
         logger.info("")
         guard amount > 0, let amount = PositiveUInt64(amount) else {
-            logger.info("cannot spend 0 MOB")
+            logger.warning("cannot spend 0 MOB")
             serialQueue.async {
                 completion(.failure(.invalidInput("Cannot spend 0 MOB")))
             }
@@ -100,7 +100,7 @@ struct TransactionPreparer {
                 sumOfValues: inputs.map { $0.value },
                 isGreaterThanSumOfValues: [amount.value, fee])
         else {
-            logger.info("sum of inputs is greater than amount + fee")
+            logger.warning("sum of inputs is greater than amount + fee")
             serialQueue.async {
                 completion(.failure(.insufficientBalance()))
             }
@@ -179,10 +179,15 @@ struct TransactionPreparer {
         case .failure(let error):
             switch error {
             case .connectionError(let connectionError):
-                logger.info("failure - connection error")
+                logger.warning("failure - connection error")
                 completion(.failure(connectionError))
             case let .outOfBounds(blockCount: blockCount, ledgerTxOutCount: responseTxOutCount):
                 if let ledgerTxOutCount = ledgerTxOutCount {
+                    logger.warning(
+                        "Fog GetMerkleProof returned " +
+                        "doesNotExist, even though txo indices were limited by " +
+                        "globalTxoCount returned by previous call to GetMerkleProof. " +
+                        "Previously returned globalTxoCount: \(ledgerTxOutCount)")
                     completion(.failure(.invalidServerResponse(
                         "Fog GetMerkleProof returned " +
                         "doesNotExist, even though txo indices were limited by " +

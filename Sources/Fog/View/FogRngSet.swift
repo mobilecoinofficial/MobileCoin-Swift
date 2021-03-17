@@ -60,7 +60,7 @@ final class FogRngSet {
         -> [Int64: RngTracker]
     {
         logger.info(
-            "requestedBlockCount: \(redacting: String(describing: requestedBlockCount)), " +
+            "requestedBlockCount: \(String(describing: requestedBlockCount)), " +
                 "maxRngs: \(maxRngs)")
         // Filter for rngs that are still active.
         var eligibleRngTrackers = ingestInvocationIdToRngTrackers.filter { $0.value.active }
@@ -106,7 +106,7 @@ final class FogRngSet {
         highestProcessedBlockCount: UInt64
     ) -> Result<(), ConnectionError> {
         logger.info("rngRecords: \(rngRecords), " +
-                "highestProcessedBlockCount: \(redacting: highestProcessedBlockCount)")
+                "highestProcessedBlockCount: \(highestProcessedBlockCount)")
         for rngRecord in rngRecords
             where ingestInvocationIdToRngTrackers[rngRecord.ingestInvocationID] == nil
         {
@@ -144,7 +144,7 @@ final class FogRngSet {
         highestProcessedBlockCount: UInt64
     ) -> Result<[FogView_TxOutSearchResult], ConnectionError> {
         logger.info("txOutResults: \(redacting: txOutResults), " +
-                        "highestProcessedBlockCount: \(redacting: highestProcessedBlockCount)")
+                        "highestProcessedBlockCount: \(highestProcessedBlockCount)")
         let searchKeyToTxOutResult = Dictionary(
             txOutResults.map { ($0.searchKey, $0) },
             uniquingKeysWith: { key1, _ in key1 })
@@ -156,10 +156,8 @@ final class FogRngSet {
                     // This condition is considered a programming error and mean `searchAttempt` was
                     // created using a different `FogRngSet` instance. We silently fail here, since
                     // we know we're in a good state anyway.
-                    logger.info("Error: RngTracker not found for rngKey in " +
+                    logger.assertionFailure("Error: RngTracker not found for rngKey in " +
                                  "search attempt. ingestInvocationId: \(ingestInvocationId)")
-                    assertionFailure("Error: RngTracker not found for " +
-                        "rngKey in search attempt. ingestInvocationId: \(ingestInvocationId)")
                     return .success([])
                 }
 
@@ -211,7 +209,7 @@ private final class RngTracker {
     var knownBlockCount: UInt64
 
     init(rng: FogRng, startBlockIndex: UInt64) {
-        logger.info("rng: \(rng), startBlockIndex: \(redacting: startBlockIndex)")
+        logger.info("startBlockIndex: \(startBlockIndex)")
         self.rng = rng
         self.startBlockIndex = startBlockIndex
         // We assign a blockCount with the value of a blockIndex because, if X is the block index of
@@ -233,7 +231,7 @@ private final class RngTracker {
         highestProcessedBlockCount: UInt64
     ) -> Result<[FogView_TxOutSearchResult], ConnectionError> {
         logger.info("rngSearchKeyToTxOutResult: \(redacting: rngSearchKeyToTxOutResult), " +
-                        "highestProcessedBlockCount: \(redacting: highestProcessedBlockCount)")
+                        "highestProcessedBlockCount: \(highestProcessedBlockCount)")
         var foundTxOutResults: [FogView_TxOutSearchResult] = []
 
         searchResultLoop: while true {
@@ -256,7 +254,7 @@ private final class RngTracker {
                 rng.advance()
             case .notFound:
                 // The search key failed to return a `TxOut` during this search attempt.
-                logger.info("failed to return a txOut during this search attempt")
+                logger.warning("failed to return a txOut during this search attempt")
                 if highestProcessedBlockCount > knownBlockCount {
                     // `highestProcessedBlockCount` is the number of blocks that fog guarantees it
                     // finished processing when performing the search, so we store
@@ -270,10 +268,10 @@ private final class RngTracker {
                 // Break on the first miss
                 break searchResultLoop
             case .rateLimited:
-                logger.info("return error code: RateLimited")
+                logger.warning("return error code: RateLimited")
                 return .failure(.serverRateLimited("Fog View return error code: RateLimited."))
             case .badSearchKey, .internalError, .intentionallyUnused, .UNRECOGNIZED:
-                logger.info("Fog view result error")
+                logger.warning("Fog view result error")
                 return .failure(.invalidServerResponse(
                     "Fog View result error: \(txOutResult.resultCodeEnum), response: " +
                     "\(txOutResult)"))
@@ -289,22 +287,22 @@ extension RngTracker {
     static func make(rngRecord: FogView_RngRecord, accountKey: AccountKey)
         -> Result<RngTracker, ConnectionError>
     {
-        logger.info("rngRecordPubKey: \(rngRecord.pubkey.pubkey)")
+        logger.info("rngRecordPubKey: \(redacting: rngRecord.pubkey.pubkey)")
         switch FogRng.make(accountKey: accountKey, fogRngKey: FogRngKey(rngRecord.pubkey)) {
         case .success(let rng):
             logger.info("success")
             return .success(RngTracker(rng: rng, startBlockIndex: rngRecord.startBlock))
         case .failure(.invalidKey):
-            logger.info("failure, fog view returned invalid key rng key")
+            logger.warning("failure, fog view returned invalid key rng key")
             return .failure(.invalidServerResponse("Fog view returned invalid kex rng key."))
         case .failure(.unsupportedCryptoBoxVersion):
-            logger.info("failure, fog view returned unsupported kex rng version")
+            logger.warning("failure, fog view returned unsupported kex rng version")
             return .failure(.outdatedClient("Fog view returned unsupported kex rng version."))
         }
     }
 
     convenience init(rng: FogRng, rngRecord: FogView_RngRecord) {
-        logger.info("rng: \(rng), rngRecord: \(rngRecord)")
+        logger.info("")
         self.init(rng: rng, startBlockIndex: rngRecord.startBlock)
     }
 }

@@ -51,7 +51,7 @@ final class FogView {
                 // Filter out TxOuts that don't belong to this account.
                 decryptedTxOuts.compactMap { txOut in
                     guard let knownTxOut = KnownTxOut(txOut, accountKey: accountKey) else {
-                        logger.info(
+                        logger.warning(
                             "Warning: TxOut received from Fog View is not owned by this account.")
                         return nil
                     }
@@ -72,16 +72,16 @@ final class FogView {
         ).mapError { error in
             switch error {
             case .invalidInput(let reason):
-                logger.info(
+                logger.warning(
                     "Warning: could not decrypt TxOut returned from Fog View, base64 " +
-                        "ciphertext: \(searchResult.ciphertext.base64EncodedString()), " +
-                        "error: \(redacting: error)")
+                        "ciphertext: \(redacting: searchResult.ciphertext.base64EncodedString())," +
+                        " error: \(error)")
                 return .invalidServerResponse(reason)
             case .unsupportedVersion(let reason):
-                logger.info(
+                logger.warning(
                     "Warning: could not decrypt TxOut returned from Fog View, base64 " +
-                        "ciphertext: \(searchResult.ciphertext.base64EncodedString()), " +
-                        "error: \(redacting: error)")
+                        "ciphertext: \(redacting: searchResult.ciphertext.base64EncodedString())," +
+                        " error: \(error)")
                 return .outdatedClient(reason)
             }
         }.flatMap { txOutRecord in
