@@ -150,9 +150,9 @@ extension Receipt {
             logger.info("Failed to initialize receipt with External_Receipt")
             return nil
         }
-        
+
         logger.info("")
-        
+
         self.txOutPublicKeyTyped = txOutPublicKey
         self.commitment = commitment
         self.maskedValue = proto.amount.maskedValue

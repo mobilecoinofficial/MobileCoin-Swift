@@ -16,7 +16,7 @@ class ConnectionSession {
         }
         return cookieStorage
     }
-    
+
     private let url: URL
     private let cookieStorage: HTTPCookieStorage
     var authorizationCredentials: BasicCredentials?

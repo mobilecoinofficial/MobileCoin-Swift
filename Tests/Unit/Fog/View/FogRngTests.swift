@@ -21,5 +21,5 @@ class FogRngTests: XCTestCase {
             XCTAssertEqual(rng.advance(), expectedOutput)
         }
     }
-    
+
 }

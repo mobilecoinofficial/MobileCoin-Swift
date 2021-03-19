@@ -68,7 +68,7 @@ public struct PublicAddress {
     var fogReportUrl: FogUrl? { fogInfo?.reportUrl }
     var fogReportId: String? { fogInfo?.reportId }
     var fogAuthoritySig: Data? { fogInfo?.authoritySig }
-    
+
     var debugDescription: String {
         "(viewPublicKey, spendPublicKey): " +
             "(\(redacting: viewPublicKey), \(redacting: spendPublicKey)), " +

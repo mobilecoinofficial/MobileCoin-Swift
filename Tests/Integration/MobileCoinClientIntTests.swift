@@ -86,7 +86,7 @@ class MobileCoinClientIntTests: XCTestCase {
 
         submitTransaction { (transaction: Transaction) in
             var numChecksRemaining = 5
-            
+
             func checkStatus() {
                 numChecksRemaining -= 1
                 print("Checking status...")
@@ -314,7 +314,7 @@ class MobileCoinClientIntTests: XCTestCase {
                 }
             }
         }
-        
+
         group.notify(queue: DispatchQueue.main) {
             expect.fulfill()
         }

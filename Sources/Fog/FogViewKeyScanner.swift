@@ -54,7 +54,7 @@ final class FogViewKeyScanner {
                             return .failure(.invalidServerResponse(
                                 "Fog Block service returned invalid output: \(output)"))
                         }
-                        
+
                         return .success(LedgerTxOut(
                             partialTxOut,
                             globalIndex: globalIndexStart + UInt64(outputIndex),

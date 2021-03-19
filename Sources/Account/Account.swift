@@ -16,7 +16,7 @@ final class Account {
         logger.info("")
         self.accountKey = accountKey.accountKey
     }
-    
+
     var debugDescription: String { publicAddress.debugDescription }
 
     var publicAddress: PublicAddress {
@@ -199,7 +199,7 @@ final class Account {
                 """)
             return .failure(InvalidInputError("Receipt confirmation number is invalid."))
         }
-        
+
         logger.info("success - txOut owned by this account")
         return .success(ownedTxOut)
     }
@@ -214,7 +214,7 @@ extension Account {
             return .failure(InvalidInputError(
                 "Accounts without fog URLs are not currently supported."))
         }
-        
+
         logger.info("success - accountKey uses Fog")
         return .success(Account(accountKey: accountKey))
     }
@@ -285,7 +285,7 @@ extension OwnedTxOut {
         } else {
             spentBlock = nil
         }
-        
+
         self.init(txOutTracker.knownTxOut, receivedBlock: receivedBlock, spentBlock: spentBlock)
     }
 }

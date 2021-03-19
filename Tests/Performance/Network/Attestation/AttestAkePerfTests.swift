@@ -73,5 +73,5 @@ class AttestAkePerfTests: PerformanceTestCase {
                 fixture?.encryptedData.base64EncodedString())
         }
     }
-    
+
 }

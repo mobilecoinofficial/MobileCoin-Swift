@@ -98,7 +98,7 @@ final class AttestAke {
             return .failure(.invalidInput("Error: authEnd can only be " +
                 "called when there is an auth pending."))
         }
-        
+
         return attestAke.authEnd(
             authResponseData: authResponseData,
             attestationVerifier: attestationVerifier
