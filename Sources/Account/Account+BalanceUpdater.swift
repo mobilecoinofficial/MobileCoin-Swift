@@ -49,7 +49,7 @@ extension Account {
                         logger.info("failure")
                         return
                     }
-                    
+
                     logger.info("checking for spent txOuts")
                     self.checkForSpentTxOuts {
                         completion($0.map {

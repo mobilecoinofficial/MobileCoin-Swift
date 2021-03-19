@@ -30,7 +30,7 @@ func XCTAssertNoThrowOrFulfill<T>(
         }
     }
     XCTAssertNoThrow(evaluating: expressionWrapper, message(), file: file, line: line)
-    
+
     if caughtError != nil {
         expectation.fulfill()
     }

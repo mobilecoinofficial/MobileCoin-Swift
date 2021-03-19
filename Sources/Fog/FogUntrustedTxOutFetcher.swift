@@ -60,7 +60,7 @@ struct FogUntrustedTxOutFetcher {
                         "Fog UntrustedTxOut service failed to return the requested TxOuts. " +
                         "\(response)"))
                 }
-                
+
                 return .success((results, blockCount: response.numBlocks))
             })
         }

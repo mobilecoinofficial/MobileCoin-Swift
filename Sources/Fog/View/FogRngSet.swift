@@ -277,7 +277,7 @@ private final class RngTracker {
                     "\(txOutResult)"))
             }
         }
-        
+
         logger.info("success - foundTxOutResults")
         return .success(foundTxOutResults)
     }
