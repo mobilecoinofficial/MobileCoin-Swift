@@ -223,10 +223,10 @@ struct AccountKeyWithFog {
 
     init?(accountKey: AccountKey) {
         logger.info(accountKey.publicAddress.debugDescription)
+
         guard accountKey.fogInfo != nil else {
             return nil
         }
-
         self.accountKey = accountKey
     }
 
@@ -235,7 +235,6 @@ struct AccountKeyWithFog {
             // Safety: accountKey is guaranteed to have fogInfo.
             logger.fatalError("accountKey doesn't have fogInfo.")
         }
-
         return fogInfo
     }
 }
