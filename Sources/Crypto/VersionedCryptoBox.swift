@@ -32,7 +32,8 @@ enum VersionedCryptoBox {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<Data, InvalidInputError> {
-        publicKey.asMcBuffer { viewPublicKeyPtr in
+        logger.info("")
+        return publicKey.asMcBuffer { viewPublicKeyPtr in
             plaintext.asMcBuffer { plaintextPtr in
                 withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
                     Data.make(withMcMutableBuffer: { bufferPtr, errorPtr in
@@ -50,7 +51,7 @@ enum VersionedCryptoBox {
                             // Safety: mc_versioned_crypto_box_encrypt should not throw
                             // non-documented errors.
                             logger.fatalError(
-                                "\(Self.self).\(#function): Unhandled LibMobileCoin error: \($0)")
+                                "Unhandled LibMobileCoin error: \(redacting: $0.description)")
                         }
                     }
                 }
@@ -62,7 +63,8 @@ enum VersionedCryptoBox {
         ciphertext: Data,
         privateKey: RistrettoPrivate
     ) -> Result<Data, VersionedCryptoBoxError> {
-        privateKey.asMcBuffer { privateKeyPtr in
+        logger.info("")
+        return privateKey.asMcBuffer { privateKeyPtr in
             ciphertext.asMcBuffer { ciphertextPtr in
                 Data.make(withEstimatedLengthMcMutableBuffer: ciphertext.count)
                 { bufferPtr, errorPtr in
@@ -79,12 +81,12 @@ enum VersionedCryptoBox {
                     case .unsupportedCryptoBoxVersion:
                         return .unsupportedVersion($0.description)
                     case .invalidInput:
-                        logger.fatalError("\(Self.self).\(#function) error: \($0.description)")
+                        logger.fatalError("error: \($0.description)")
                     default:
                         // Safety: mc_tx_out_get_key_image should not throw non-documented
                         // errors.
                         logger.fatalError(
-                            "\(Self.self).\(#function): Unhandled LibMobileCoin error: \($0)")
+                            "Unhandled LibMobileCoin error: \(redacting: $0.description)")
                     }
                 }
             }

@@ -12,6 +12,7 @@ public struct Transaction {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
+        logger.debug("serializedData: \(redacting: serializedData)")
         guard let proto = try? External_Tx(serializedData: serializedData) else {
             return nil
         }
@@ -24,14 +25,14 @@ public struct Transaction {
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`
             logger.fatalError(
-                "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                "Error: Protobuf serialization failed: \(error)")
         }
     }
 
     var anyInputKeyImage: KeyImage {
         guard let inputKeyImage = inputKeyImagesTyped.first else {
             // Safety: Transaction is guaranteed to have at least 1 input.
-            logger.fatalError("Error: \(Self.self).\(#function): Transaction contains 0 inputs.")
+            logger.fatalError("Error: Transaction contains 0 inputs.")
         }
         return inputKeyImage
     }
@@ -44,7 +45,7 @@ public struct Transaction {
     var anyOutput: TxOut {
         guard let output = outputs.first else {
             // Safety: Transaction is guaranteed to have at least 1 output.
-            logger.fatalError("Error: \(Self.self).\(#function): Transaction contains 0 outputs.")
+            logger.fatalError("Error: Transaction contains 0 outputs.")
         }
         return output
     }
@@ -87,13 +88,14 @@ extension Transaction: Hashable {}
 
 extension Transaction {
     init?(_ proto: External_Tx) {
+        logger.info("")
         guard proto.prefix.inputs.count > 0 && proto.prefix.outputs.count > 0 else {
             return nil
         }
         self.proto = proto
         self.inputKeyImagesTyped = Set(proto.signature.ringSignatures.map {
             guard let keyImage = KeyImage($0.keyImage) else {
-                logger.fatalError("\(Self.self).\(#function): serialization failure")
+                logger.fatalError("serialization failure")
             }
             return keyImage
         })
@@ -104,10 +106,10 @@ extension Transaction {
             } catch {
                 // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`
                 logger.fatalError(
-                    "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                    "Error: Protobuf serialization failed: \(error)")
             }
             guard let txOut = TxOut(serializedData: txOutData) else {
-                logger.fatalError("\(Self.self).\(#function): serialization failure")
+                logger.fatalError("serialization failure")
             }
             return txOut
         })

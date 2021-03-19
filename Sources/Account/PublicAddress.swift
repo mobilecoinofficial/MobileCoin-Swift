@@ -13,7 +13,11 @@ public struct PublicAddress {
         fogReportId: String,
         fogAuthoritySig: Data
     ) -> Result<PublicAddress, InvalidInputError> {
-        FogInfo.make(reportUrl: fogReportUrl, reportId: fogReportId, authoritySig: fogAuthoritySig)
+        logger.info("")
+        return FogInfo.make(
+            reportUrl: fogReportUrl,
+            reportId: fogReportId,
+            authoritySig: fogAuthoritySig)
             .map { fogInfo in
                 PublicAddress(
                     viewPublicKey: viewPublicKey,
@@ -27,6 +31,7 @@ public struct PublicAddress {
     let fogInfo: FogInfo?
 
     init(viewPublicKey: RistrettoPublic, spendPublicKey: RistrettoPublic, fogInfo: FogInfo? = nil) {
+        logger.info("")
         self.viewPublicKeyTyped = viewPublicKey
         self.spendPublicKeyTyped = spendPublicKey
         self.fogInfo = fogInfo
@@ -34,6 +39,7 @@ public struct PublicAddress {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
+        logger.info("")
         guard let proto = try? External_PublicAddress(serializedData: serializedData) else {
             return nil
         }
@@ -47,7 +53,7 @@ public struct PublicAddress {
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
             logger.fatalError(
-                "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                "Error: Protobuf serialization failed: \(error)")
         }
     }
 
@@ -62,6 +68,14 @@ public struct PublicAddress {
     var fogReportUrl: FogUrl? { fogInfo?.reportUrl }
     var fogReportId: String? { fogInfo?.reportId }
     var fogAuthoritySig: Data? { fogInfo?.authoritySig }
+    
+    var debugDescription: String {
+        "(viewPublicKey, spendPublicKey): " +
+            "(\(redacting: viewPublicKey), \(redacting: spendPublicKey)), " +
+            "fogReportUrl: \(String(describing: fogReportUrl?.url)), " +
+            "fogReportId: \(String(describing: fogReportId)), " +
+            "fogAuthoritySig: \(redacting: String(describing: fogAuthoritySig))"
+    }
 }
 
 extension PublicAddress: Equatable {}
@@ -74,6 +88,7 @@ extension PublicAddress {
         accountKeyFogInfo: AccountKey.FogInfo? = nil,
         subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
     ) {
+        logger.info("")
         let (viewPublicKey, spendPublicKey) = AccountKeyUtils.publicAddressPublicKeys(
             viewPrivateKey: viewPrivateKey,
             spendPrivateKey: spendPrivateKey,
@@ -96,6 +111,7 @@ extension PublicAddress {
 
 extension PublicAddress {
     init?(_ publicAddress: External_PublicAddress) {
+        logger.info("")
         guard let viewPublicKey = RistrettoPublic(publicAddress.viewPublicKey.data),
               let spendPublicKey = RistrettoPublic(publicAddress.spendPublicKey.data)
         else {
@@ -122,6 +138,7 @@ extension PublicAddress {
 
 extension External_PublicAddress {
     init(_ publicAddress: PublicAddress) {
+        logger.info("")
         self.init()
         self.viewPublicKey = External_CompressedRistretto(publicAddress.viewPublicKey)
         self.spendPublicKey = External_CompressedRistretto(publicAddress.spendPublicKey)
@@ -158,6 +175,7 @@ extension PublicAddress {
             reportId: String,
             authoritySig: Data
         ) {
+            logger.info("")
             self.reportUrlString = reportUrlString
             self.reportUrl = reportUrl
             self.reportId = reportId
@@ -176,6 +194,7 @@ extension PublicAddress.FogInfo {
         accountKeyFogInfo: AccountKey.FogInfo,
         subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
     ) {
+        logger.info("")
         let authoritySig = AccountKeyUtils.fogAuthoritySig(
             viewPrivateKey: viewPrivateKey,
             spendPrivateKey: spendPrivateKey,

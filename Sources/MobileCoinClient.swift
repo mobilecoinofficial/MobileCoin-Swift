@@ -79,11 +79,13 @@ public final class MobileCoinClient {
     }
 
     public func setBasicAuthorization(username: String, password: String) {
+        logger.info("username: \(redacting: username), password: \(redacting: password)")
         let credentials = BasicCredentials(username: username, password: password)
         inner.accessAsync { $0.serviceProvider.setAuthorization(credentials: credentials) }
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
+        logger.info("")
         inner.accessAsync {
             Account.BalanceUpdater(
                 account: self.accountLock,
@@ -103,7 +105,8 @@ public final class MobileCoinClient {
     public func amountTransferable(feeLevel: FeeLevel = .minimum)
         -> Result<UInt64, BalanceTransferEstimationError>
     {
-        Account.TransactionEstimator(
+        logger.info("feeLevel: \(feeLevel)")
+        return Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.config.txOutSelectionStrategy
         ).amountTransferable(feeLevel: feeLevel)
@@ -113,7 +116,8 @@ public final class MobileCoinClient {
         toSendAmount amount: UInt64,
         feeLevel: FeeLevel = .minimum
     ) -> Result<UInt64, TransactionEstimationError> {
-        Account.TransactionEstimator(
+        logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
+        return Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.config.txOutSelectionStrategy
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
@@ -122,7 +126,8 @@ public final class MobileCoinClient {
     public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
         -> Result<Bool, TransactionEstimationError>
     {
-        Account.TransactionEstimator(
+        logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
+        return Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.config.txOutSelectionStrategy
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
@@ -136,6 +141,8 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
+        logger.info(
+            "recipient: \(recipient.debugDescription), amount: \(redacting: amount), fee: \(fee)")
         inner.accessAsync {
             Account.TransactionOperations(
                 account: self.accountLock,
@@ -160,6 +167,9 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
+        logger.info(
+            "recipient: \(recipient.debugDescription), amount: \(redacting: amount), " +
+                "feeLevel: \(feeLevel)")
         inner.accessAsync {
             Account.TransactionOperations(
                 account: self.accountLock,
@@ -181,6 +191,7 @@ public final class MobileCoinClient {
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
+        logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
         inner.accessAsync {
             Account.TransactionOperations(
                 account: self.accountLock,
@@ -202,6 +213,7 @@ public final class MobileCoinClient {
         _ transaction: Transaction,
         completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
     ) {
+        logger.info("transaction: \(redacting: transaction.serializedData)")
         inner.accessAsync {
             TransactionSubmitter(consensusService: $0.serviceProvider.consensusService)
                 .submitTransaction(transaction) { result in
@@ -216,6 +228,7 @@ public final class MobileCoinClient {
         of transaction: Transaction,
         completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
     ) {
+        logger.info("transaction: \(redacting: transaction.serializedData)")
         inner.accessAsync {
             TransactionStatusChecker(
                 account: self.accountLock,
@@ -231,7 +244,8 @@ public final class MobileCoinClient {
     }
 
     public func status(of receipt: Receipt) -> Result<ReceiptStatus, InvalidInputError> {
-        ReceiptStatusChecker(account: accountLock).status(receipt)
+        logger.info("receipt: \(redacting: receipt.serializedData)")
+        return ReceiptStatusChecker(account: accountLock).status(receipt)
     }
 }
 
@@ -244,6 +258,10 @@ extension MobileCoinClient {
         let fogInfo = accountKey.fogInfo
         return """
             Consensus url: \(String(reflecting: config.consensusUrl.url))
+            AccountKey Public Address View Key: \
+            \(redacting: accountKey.accountKey.publicAddress.viewPublicKey)
+            AccountKey Public Address Spend Key: \
+            \(redacting: accountKey.accountKey.publicAddress.spendPublicKey)
             Fog url: \(String(reflecting: config.fogUrl.url))
             AccountKey Fog Report url: \(String(reflecting: fogInfo.reportUrl.url))
             AccountKey Fog Report id: \(String(reflecting: fogInfo.reportId))
@@ -263,6 +281,7 @@ extension MobileCoinClient {
         let fogResolverManager: FogResolverManager
 
         init(serviceProvider: ServiceProvider, fogResolverManager: FogResolverManager) {
+            logger.info("")
             self.serviceProvider = serviceProvider
             self.fogResolverManager = fogResolverManager
         }
@@ -333,6 +352,7 @@ extension MobileCoinClient {
             fogUrl: FogUrl,
             attestationConfig: NetworkConfig.AttestationConfig? = nil
         ) {
+            logger.info("consensusUrl: \(consensusUrl.url), fogUrl: \(fogUrl.url)")
             self.consensusUrl = consensusUrl
             self.fogUrl = fogUrl
             self.attestationConfig = attestationConfig

@@ -14,6 +14,7 @@ struct TxOut: TxOutProtocol {
 
     /// - Returns: `nil` when the input is not deserializable.
     init?(serializedData: Data) {
+        logger.info("")
         guard let proto = try? External_TxOut(serializedData: serializedData) else {
             return nil
         }
@@ -26,7 +27,7 @@ struct TxOut: TxOutProtocol {
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
             logger.fatalError(
-                "Error: \(Self.self).\(#function): Protobuf serialization failed: \(error)")
+                "Error: Protobuf serialization failed: \(error)")
         }
     }
 
@@ -39,6 +40,7 @@ extension TxOut: Hashable {}
 
 extension TxOut {
     init?(_ proto: External_TxOut) {
+        logger.info("")
         guard let commitment = Data32(proto.amount.commitment.data),
               let targetKey = RistrettoPublic(proto.targetKey.data),
               let publicKey = RistrettoPublic(proto.publicKey.data)
@@ -54,6 +56,7 @@ extension TxOut {
 
 extension External_TxOut {
     init(_ txOut: TxOut) {
+        logger.info("")
         self = txOut.proto
     }
 }
