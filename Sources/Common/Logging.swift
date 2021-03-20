@@ -250,13 +250,41 @@ extension Logger {
 }
 
 extension DefaultStringInterpolation {
-    mutating func appendInterpolation<T: CustomStringConvertible>(sensitive: T) {
+    mutating func appendInterpolation<T>(redacting value: T)
+        where T: CustomStringConvertible & TextOutputStreamable
+    {
         if logSensitiveDataInternal.get() {
-            appendInterpolation(sensitive)
+            appendInterpolation(value)
+        } else {
+            appendInterpolation("<redacted>")
+        }
+    }
+
+    mutating func appendInterpolation<T: TextOutputStreamable>(redacting value: T) {
+        if logSensitiveDataInternal.get() {
+            appendInterpolation(value)
+        } else {
+            appendInterpolation("<redacted>")
         }
     }
 
     mutating func appendInterpolation<T: CustomStringConvertible>(redacting value: T) {
+        if logSensitiveDataInternal.get() {
+            appendInterpolation(value)
+        } else {
+            appendInterpolation("<redacted>")
+        }
+    }
+
+    mutating func appendInterpolation<T>(redacting value: T) {
+        if logSensitiveDataInternal.get() {
+            appendInterpolation(value)
+        } else {
+            appendInterpolation("<redacted>")
+        }
+    }
+
+    mutating func appendInterpolation(redacting value: Any.Type) {
         if logSensitiveDataInternal.get() {
             appendInterpolation(value)
         } else {
