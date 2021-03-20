@@ -92,24 +92,24 @@ extension NetworkConfig {
                         minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogView: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_VIEW_MRSIGNER,
+                        mrSigner: McConstants.DEV_FOG_MRSIGNER,
                         productId: McConstants.FOG_VIEW_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
+                        minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogKeyImage: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_LEDGER_MRSIGNER,
+                        mrSigner: McConstants.DEV_FOG_MRSIGNER,
                         productId: McConstants.FOG_LEDGER_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
+                        minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogMerkleProof: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_LEDGER_MRSIGNER,
+                        mrSigner: McConstants.DEV_FOG_MRSIGNER,
                         productId: McConstants.FOG_LEDGER_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
+                        minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogReport: try Attestation(Attestation.MrSigner.make(
                         mrSigner: McConstants.DEV_FOG_REPORT_MRSIGNER,
                         productId: McConstants.FOG_REPORT_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
+                        minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()))
             } catch {
                 // Safety: MrSigner is guaranteed to be 32 bytes in length, so Attestation.init
@@ -129,22 +129,22 @@ extension NetworkConfig {
                         minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogView: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_VIEW_MRSIGNER,
+                        mrSigner: McConstants.TESTNET_FOG_MRSIGNER,
                         productId: McConstants.FOG_VIEW_PRODUCT_ID,
                         minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogKeyImage: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_LEDGER_MRSIGNER,
+                        mrSigner: McConstants.TESTNET_FOG_MRSIGNER,
                         productId: McConstants.FOG_LEDGER_PRODUCT_ID,
                         minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogMerkleProof: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_LEDGER_MRSIGNER,
+                        mrSigner: McConstants.TESTNET_FOG_MRSIGNER,
                         productId: McConstants.FOG_LEDGER_PRODUCT_ID,
                         minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
                     fogReport: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_REPORT_MRSIGNER,
+                        mrSigner: McConstants.TESTNET_FOG_REPORT_MRSIGNER,
                         productId: McConstants.FOG_REPORT_PRODUCT_ID,
                         minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
                         allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()))
