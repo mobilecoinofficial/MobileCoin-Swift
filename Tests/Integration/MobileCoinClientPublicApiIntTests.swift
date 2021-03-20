@@ -315,7 +315,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func testConsensusTrustRootWorks() throws {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig()
         XCTAssertSuccess(
-            config.setConsensusTrustRoots(try IntegrationTestFixtures.trustRootsBytes()))
+            config.setConsensusTrustRoots(try MobileCoinNetwork.trustRootsBytes()))
         let client = try IntegrationTestFixtures.createMobileCoinClient(config: config)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 

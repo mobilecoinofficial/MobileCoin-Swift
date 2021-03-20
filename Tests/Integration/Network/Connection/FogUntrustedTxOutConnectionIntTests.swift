@@ -24,7 +24,7 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.fogRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog GetTxOuts request")
         let connection = try createFogUntrustedTxOutConnectionWithInvalidCredentials()

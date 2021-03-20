@@ -214,7 +214,7 @@ class FogViewConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.fogRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Making Fog View enclave request")
         try createFogViewConnectionWithInvalidCredentials().query(

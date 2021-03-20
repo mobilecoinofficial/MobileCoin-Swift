@@ -29,7 +29,7 @@ class FogReportConnectionIntTests: XCTestCase {
 
 extension FogReportConnectionIntTests {
     func createFogReportConnection() throws -> FogReportConnection {
-        let url = try FogUrl.make(string: IntegrationTestFixtures.fogReportUrl).get()
+        let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
         return FogReportConnection(
             url: url,
             channelManager: GrpcChannelManager(),

@@ -123,7 +123,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.fogRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 

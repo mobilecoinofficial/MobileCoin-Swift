@@ -2,60 +2,33 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable function_default_parameter_at_end let_var_whitespace multiline_function_chains
+// swiftlint:disable function_default_parameter_at_end multiline_function_chains
 
 @testable import MobileCoin
 import NIOSSL
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let mobileCoinNetwork: MobileCoinNetwork = .mobiledev
+    static let network: MobileCoinNetwork = .alpha
 }
 
 extension IntegrationTestFixtures {
-    static let isTestNet = mobileCoinNetwork.isTestNet
-
-    static let consensusRequiresCredentials = mobileCoinNetwork.consensusRequiresCredentials
-    static let fogRequiresCredentials = mobileCoinNetwork.fogRequiresCredentials
-    static let isConsensusBehindLoadBalancer = mobileCoinNetwork.isConsensusBehindLoadBalancer
-
-    static let consensusUrl = mobileCoinNetwork.consensusUrl
-    static let fogUrl = mobileCoinNetwork.fogUrl
-
-    static let fogReportUrl = mobileCoinNetwork.fogReportUrl
-    static let fogReportId = mobileCoinNetwork.fogReportId
-    static func fogAuthoritySpki() throws -> Data { try mobileCoinNetwork.fogAuthoritySpki() }
-
-    static let attestationConfig = mobileCoinNetwork.attestationConfig
-
-    static func trustRootsBytes() throws -> [Data] { try mobileCoinNetwork.trustRootsBytes() }
-    static func consensusTrustRoots() throws -> [NIOSSLCertificate]
-    { try mobileCoinNetwork.consensusTrustRoots() }
-    static func fogTrustRoots() throws -> [NIOSSLCertificate]
-    { try mobileCoinNetwork.fogTrustRoots() }
-
-    static let consensusCredentials = mobileCoinNetwork.consensusCredentials
-    static let fogCredentials = mobileCoinNetwork.fogCredentials
-    static let invalidCredentials = mobileCoinNetwork.invalidCredentials
-
     static let fee = McConstants.MINIMUM_FEE
 
-    static let rootEntropies = mobileCoinNetwork.rootEntropies
-
     static func fogReportUrlTyped() throws -> FogUrl {
-        try FogUrl.make(string: fogReportUrl).get()
+        try FogUrl.make(string: network.fogReportUrl).get()
     }
 
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
-        try createAccountKey(rootEntropy: rootEntropies[accountIndex].data)
+        try createAccountKey(rootEntropy: network.rootEntropies[accountIndex].data)
     }
 
     static func createAccountKey(rootEntropy: Data) throws -> AccountKey {
-        let fogAuthoritySpki = try self.fogAuthoritySpki()
+        let fogAuthoritySpki = try network.fogAuthoritySpki()
         return try AccountKey.make(
             rootEntropy: rootEntropy,
-            fogReportUrl: fogReportUrl,
-            fogReportId: fogReportId,
+            fogReportUrl: network.fogReportUrl,
+            fogReportId: network.fogReportId,
             fogAuthoritySpki: fogAuthoritySpki).get()
     }
 
@@ -68,40 +41,32 @@ extension IntegrationTestFixtures {
     }
 
     static func createNetworkConfig() throws -> NetworkConfig {
-        var networkConfig = try NetworkConfig.make(
-            consensusUrl: consensusUrl,
-            fogUrl: fogUrl,
-            attestation: attestationConfig).get()
-        networkConfig.consensusTrustRoots = try self.consensusTrustRoots()
-        networkConfig.fogTrustRoots = try self.fogTrustRoots()
-        networkConfig.consensusAuthorization = consensusCredentials
-        networkConfig.fogAuthorization = fogCredentials
-        return networkConfig
+        try network.networkConfig()
     }
 
     static func createNetworkConfig(trustRoots: [NIOSSLCertificate]) throws -> NetworkConfig {
-        var networkConfig = try createNetworkConfig()
+        var networkConfig = try network.networkConfig()
         networkConfig.consensusTrustRoots = trustRoots
         networkConfig.fogTrustRoots = trustRoots
         return networkConfig
     }
 
     static func createNetworkConfigWithInvalidCredentials() throws -> NetworkConfig {
-        var networkConfig = try createNetworkConfig()
-        networkConfig.consensusAuthorization = invalidCredentials
-        networkConfig.fogAuthorization = invalidCredentials
+        var networkConfig = try network.networkConfig()
+        networkConfig.consensusAuthorization = network.invalidCredentials
+        networkConfig.fogAuthorization = network.invalidCredentials
         return networkConfig
     }
 
     static func createMobileCoinClientConfig() throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
-            consensusUrl: consensusUrl,
-            consensusAttestation: attestationConfig.consensus,
-            fogUrl: fogUrl,
-            fogViewAttestation: attestationConfig.fogView,
-            fogKeyImageAttestation: attestationConfig.fogKeyImage,
-            fogMerkleProofAttestation: attestationConfig.fogMerkleProof,
-            fogReportAttestation: attestationConfig.fogReport).get()
+            consensusUrl: network.consensusUrl,
+            consensusAttestation: network.consensusAttestation(),
+            fogUrl: network.fogUrl,
+            fogViewAttestation: network.fogViewAttestation(),
+            fogKeyImageAttestation: network.fogLedgerAttestation(),
+            fogMerkleProofAttestation: network.fogLedgerAttestation(),
+            fogReportAttestation: network.fogReportAttestation()).get()
     }
 
     static func createMobileCoinClient(accountIndex: Int = 0) throws -> MobileCoinClient {
@@ -126,12 +91,16 @@ extension IntegrationTestFixtures {
         config: MobileCoinClient.Config
     ) throws -> MobileCoinClient {
         let client = try MobileCoinClient.make(accountKey: accountKey, config: config).get()
-        client.setConsensusBasicAuthorization(
-            username: consensusCredentials.username,
-            password: consensusCredentials.password)
-        client.setFogBasicAuthorization(
-            username: fogCredentials.username,
-            password: fogCredentials.password)
+        if let consensusCredentials = network.consensusCredentials {
+            client.setConsensusBasicAuthorization(
+                username: consensusCredentials.username,
+                password: consensusCredentials.password)
+        }
+        if let fogCredentials = network.fogCredentials {
+            client.setFogBasicAuthorization(
+                username: fogCredentials.username,
+                password: fogCredentials.password)
+        }
         return client
     }
 

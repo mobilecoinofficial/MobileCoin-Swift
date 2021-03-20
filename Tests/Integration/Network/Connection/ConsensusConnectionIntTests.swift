@@ -60,7 +60,7 @@ class ConsensusConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.consensusRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.consensusRequiresCredentials)
 
         let fixture = try Transaction.Fixtures.Default()
 
