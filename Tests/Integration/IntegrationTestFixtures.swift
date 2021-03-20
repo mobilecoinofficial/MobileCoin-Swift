@@ -28,7 +28,7 @@ extension IntegrationTestFixtures {
 
     static let attestationConfig = mobileCoinNetwork.attestationConfig
 
-    static func trustRootsBytes() throws -> Data { try mobileCoinNetwork.trustRootsBytes() }
+    static func trustRootsBytes() throws -> [Data] { try mobileCoinNetwork.trustRootsBytes() }
     static func consensusTrustRoots() throws -> [NIOSSLCertificate]
     { try mobileCoinNetwork.consensusTrustRoots() }
     static func fogTrustRoots() throws -> [NIOSSLCertificate]

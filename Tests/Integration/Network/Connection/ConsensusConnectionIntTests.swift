@@ -82,8 +82,7 @@ class ConsensusConnectionIntTests: XCTestCase {
     func testTrustRootWorks() throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
-        let connection = try createConsensusConnection(
-            trustRoots: [trustRootsFixture.trustRoot])
+        let connection = try createConsensusConnection(trustRoots: trustRootsFixture.trustRoots)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -104,7 +103,7 @@ class ConsensusConnectionIntTests: XCTestCase {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection = try createConsensusConnection(
-            trustRoots: [trustRootsFixture.trustRoot, trustRootsFixture.wrongTrustRoot])
+            trustRoots: trustRootsFixture.trustRoots + [trustRootsFixture.wrongTrustRoot])
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {

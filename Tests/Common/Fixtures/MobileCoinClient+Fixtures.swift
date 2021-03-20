@@ -17,7 +17,7 @@ extension MobileCoinClient.Config.Fixtures {
         let consensusUrl = "mc://node1.fake.mobilecoin.com"
         let fogUrl = "fog://fog.fake.mobilecoin.com"
 
-        let trustRootBytes: Data
+        let trustRootsBytes: [Data]
 
         let wrongTrustRootBytes: Data
         let invalidTrustRootBytes: Data
@@ -30,7 +30,7 @@ extension MobileCoinClient.Config.Fixtures {
 
         init() throws {
             let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
-            self.trustRootBytes = trustRootsFixture.trustRootBytes
+            self.trustRootsBytes = trustRootsFixture.trustRootsBytes
             self.wrongTrustRootBytes = trustRootsFixture.wrongTrustRootBytes
             self.invalidTrustRootBytes = trustRootsFixture.invalidTrustRootBytes
         }

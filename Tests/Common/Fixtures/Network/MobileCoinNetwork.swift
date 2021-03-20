@@ -55,13 +55,9 @@ extension MobileCoinNetwork {
         isTestNet ? .testNetMrSigner : .devMrSigner
     }
 
-    func trustRootsBytes() throws -> Data { try XCTUnwrap(Data(base64Encoded: Self.trustRootsB64)) }
-    private func trustRoots() throws -> [NIOSSLCertificate] {
-        let bytes = try XCTUnwrap(Data(base64Encoded: Self.trustRootsB64))
-        return [try NIOSSLCertificate(bytes: Array(bytes), format: .der)]
-    }
-    func consensusTrustRoots() throws -> [NIOSSLCertificate] { try trustRoots() }
-    func fogTrustRoots() throws -> [NIOSSLCertificate] { try trustRoots() }
+    func trustRootsBytes() throws -> [Data] { try Self.trustRootsBytes() }
+    func consensusTrustRoots() throws -> [NIOSSLCertificate] { try Self.trustRoots() }
+    func fogTrustRoots() throws -> [NIOSSLCertificate] { try Self.trustRoots() }
 
     private var consensusUsername: String { Self.devAuthUsername }
     private var consensusPassword: String { Self.devAuthPassword }
@@ -280,22 +276,32 @@ extension MobileCoinNetwork {
         }
     }
 
-    /// MobileCoin-managed Consensus and Fog services use Let's Encrypt with an intermediate
-    /// certificate that's cross-signed by IdenTrust's "DST Root CA X3": https://crt.sh/?d=8395
-    static let trustRootsB64 = """
-        MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/MSQwIgYDVQQKExtEaWdpdGFsIFN\
-        pZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMTDkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMD\
-        E0MDExNVowPzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQDEw5EU1QgUm9vdCBDQ\
-        SBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgU\
-        i+DoM3ZJKuM/IUmTrE4Orz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEqOLl5CjH\
-        9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9bxiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5W\
-        gTe1QLyNau7Fqckh49ZLOMxt+/yUFw7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicP\
-        NaDaeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0O\
-        BBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqGSIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSB\
-        d49lZRNI+DT69ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXrAvHRAosZy5Q6Xk\
-        jEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZzR8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZIm\
-        lJnt1ir/md2cXjbDaJWFBM5JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYoOb8V\
-        ZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ
+    static func trustRootsBytes() throws -> [Data] {
+        try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
+    }
+    static func trustRoots() throws -> [NIOSSLCertificate] {
+        let trustRootsBytes = try self.trustRootsBytes()
+        return try trustRootsBytes.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
+    }
+
+    static let trustRootsB64 = [
+        /// MobileCoin-managed Consensus and Fog services use Let's Encrypt with an intermediate
+        /// certificate that's cross-signed by IdenTrust's "DST Root CA X3": https://crt.sh/?d=8395
         """
+            MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/MSQwIgYDVQQKExtEaWdpdGF\
+            sIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMTDkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDT\
+            IxMDkzMDE0MDExNVowPzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQDEw5EU\
+            1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN+v6ZdQCINXtMxiZfaQguzH0yxr\
+            MMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4Orz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoO\
+            ifooUMM0RoOEqOLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9bxiqKqy69cK\
+            3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40du\
+            tolucbY38EVAjqr2m7xPi71XAicPNaDaeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB\
+            /zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqGSIb3DQEBBQUAA4I\
+            BAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8fa\
+            XbauX+5v3gTt23ADq1cEmv8uXrAvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ip\
+            xZzR8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5JDGFoqgCWjBH4d1QB7wC\
+            CZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYoOb8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ
+            """,
+    ]
 
 }
