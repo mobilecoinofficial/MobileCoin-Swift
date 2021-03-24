@@ -13,6 +13,7 @@ public final class MobileCoinClient {
         -> Result<MobileCoinClient, InvalidInputError>
     {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
+            logger.error("Accounts without fog URLs are not currently supported.")
             return .failure(
                 InvalidInputError("Accounts without fog URLs are not currently supported."))
         }
@@ -328,6 +329,7 @@ extension MobileCoinClient {
                 networkConfig.consensusTrustRoots =
                     try trustRoots.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
             } catch {
+                logger.error("Failed parsing Consensus trust roots: \(error)")
                 return .failure(InvalidInputError("Failed parsing Consensus trust roots: \(error)"))
             }
             return .success(())
@@ -339,6 +341,7 @@ extension MobileCoinClient {
                 networkConfig.fogTrustRoots =
                     try trustRoots.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
             } catch {
+                logger.error("Failed parsing Fog trust roots: \(error)")
                 return .failure(InvalidInputError("Failed parsing Fog trust roots: \(error)"))
             }
             return .success(())
