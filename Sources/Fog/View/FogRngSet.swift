@@ -109,6 +109,9 @@ final class FogRngSet {
             }
         }
 
+        // Record that Fog has told us about all rngs that could possibly have been active up to
+        // `highestProcessedBlockCount` (while accounting for the possibility that we already have
+        // more up-to-date information already).
         if highestProcessedBlockCount > rngRecordsKnownBlockCount {
             rngRecordsKnownBlockCount = highestProcessedBlockCount
         }
