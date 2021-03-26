@@ -85,6 +85,7 @@ public final class MobileCoinClient {
                 fogQueryScalingStrategy: self.fogQueryScalingStrategy,
                 targetQueue: self.serialQueue
             ).updateBalance { result in
+                logger.info("updateBalance result: \(redacting: result)")
                 self.callbackQueue.async {
                     completion(result)
                 }
@@ -96,10 +97,12 @@ public final class MobileCoinClient {
         -> Result<UInt64, BalanceTransferEstimationError>
     {
         logger.info("feeLevel: \(feeLevel)")
-        return Account.TransactionEstimator(
+        let amountTransferable = Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.txOutSelectionStrategy
         ).amountTransferable(feeLevel: feeLevel)
+        logger.info("amountTransferable result: \(redacting: amountTransferable)")
+        return amountTransferable
     }
 
     public func estimateTotalFee(
@@ -107,20 +110,24 @@ public final class MobileCoinClient {
         feeLevel: FeeLevel = .minimum
     ) -> Result<UInt64, TransactionEstimationError> {
         logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
-        return Account.TransactionEstimator(
+        let totalFee = Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.txOutSelectionStrategy
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
+        logger.info("totalFee result: \(redacting: totalFee)")
+        return totalFee
     }
 
     public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
         -> Result<Bool, TransactionEstimationError>
     {
         logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
-        return Account.TransactionEstimator(
+        let requiresDefragmentation = Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.txOutSelectionStrategy
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
+        logger.info("requiresDefragmentation result: \(redacting: requiresDefragmentation)")
+        return requiresDefragmentation
     }
 
     public func prepareTransaction(
