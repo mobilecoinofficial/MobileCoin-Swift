@@ -289,4 +289,8 @@ extension DefaultStringInterpolation {
             appendInterpolation("<redacted>")
         }
     }
+
+    mutating func appendInterpolation<T: CustomRedactingStringConvertible>(redacting value: T) {
+        appendInterpolation(value.redactingDescription)
+    }
 }
