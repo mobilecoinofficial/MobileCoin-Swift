@@ -75,8 +75,8 @@ public final class MobileCoinClient {
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
-        logger.info("")
         inner.accessAsync {
+            logger.info("")
             Account.BalanceUpdater(
                 account: self.accountLock,
                 fogViewService: $0.serviceProvider.fogViewService,
@@ -131,9 +131,9 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
-            "fee: \(redacting: fee)")
         inner.accessAsync {
+            logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
+                "fee: \(redacting: fee)")
             Account.TransactionOperations(
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
@@ -157,10 +157,9 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        logger.info(
-            "recipient: \(redacting: recipient), amount: \(redacting: amount), " +
-                "feeLevel: \(feeLevel)")
         inner.accessAsync {
+            logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
+                "feeLevel: \(feeLevel)")
             Account.TransactionOperations(
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
