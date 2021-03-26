@@ -16,8 +16,6 @@ final class Account {
         self.accountKey = accountKey.accountKey
     }
 
-    var debugDescription: String { publicAddress.debugDescription }
-
     var publicAddress: PublicAddress {
         accountKey.publicAddress
     }
@@ -166,7 +164,7 @@ final class Account {
     private func ownedTxOut(for receipt: Receipt) -> Result<KnownTxOut?, InvalidInputError> {
         logger.info("""
             receipt.txOutPublicKey: \(redacting: receipt.txOutPublicKey), \
-            account: \(accountKey.publicAddress.debugDescription)
+            account: \(redacting: accountKey.publicAddress)
             """)
         if let lastTxOut = ownedTxOuts.last {
             logger.info("Last received TxOut: Tx pubkey: \(redacting: lastTxOut.publicKey)")
@@ -223,6 +221,12 @@ extension Account {
 
         logger.info("success - accountKey uses Fog")
         return .success(Account(accountKey: accountKey))
+    }
+}
+
+extension Account: CustomRedactingStringConvertible {
+    var redactingDescription: String {
+        publicAddress.redactingDescription
     }
 }
 

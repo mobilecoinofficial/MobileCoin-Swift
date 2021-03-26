@@ -43,7 +43,7 @@ extension Account {
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
             ) -> Void
         ) {
-            logger.info("recipient: \(recipient.debugDescription), " +
+            logger.info("recipient: \(redacting: recipient), " +
                             "amount: \(redacting: amount), fee: \(fee)")
             guard amount > 0 else {
                 logger.info("failure - Cannot spend 0 MOB")
@@ -94,7 +94,7 @@ extension Account {
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
             ) -> Void
         ) {
-            logger.info("recipient: \(recipient.debugDescription), " +
+            logger.info("recipient: \(redacting: recipient), " +
                             "amount: \(redacting: amount), feeLevel: \(feeLevel)")
             guard amount > 0 else {
                 logger.info("failure - Cannot spend 0 MOB")

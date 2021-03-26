@@ -67,8 +67,13 @@ public struct PublicAddress {
     var fogReportUrl: FogUrl? { fogInfo?.reportUrl }
     var fogReportId: String? { fogInfo?.reportId }
     var fogAuthoritySig: Data? { fogInfo?.authoritySig }
+}
 
-    var debugDescription: String {
+extension PublicAddress: Equatable {}
+extension PublicAddress: Hashable {}
+
+extension PublicAddress: CustomRedactingStringConvertible {
+    var redactingDescription: String {
         var params = [
             "viewPublicKey=\(redacting: viewPublicKey.base64EncodedString())",
             "spendPublicKey=\(redacting: spendPublicKey.base64EncodedString())",
@@ -83,9 +88,6 @@ public struct PublicAddress {
         return "PublicAddress(\(params.joined(separator: ", ")))"
     }
 }
-
-extension PublicAddress: Equatable {}
-extension PublicAddress: Hashable {}
 
 extension PublicAddress {
     init(
