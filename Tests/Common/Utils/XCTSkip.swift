@@ -8,10 +8,11 @@ func XCTSkip(
     _ message: @autoclosure () -> String? = nil,
     file: StaticString = #file,
     line: UInt = #line
-) throws {
+) throws -> Never {
     #if swift(>=5.2)
     try XCTSkipIf(true)
     #endif
+    throw TestingError("Test Skipped")
 }
 
 /// Evaluates a boolean expression and, if it is false, throws an error which

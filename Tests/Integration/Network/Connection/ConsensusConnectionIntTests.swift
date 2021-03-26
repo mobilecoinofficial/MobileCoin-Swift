@@ -122,7 +122,7 @@ class ConsensusConnectionIntTests: XCTestCase {
 
     func testWrongTrustRootFails() throws {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
-        try XCTSkip()
+        try XCTSkipIf(true)
 
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()

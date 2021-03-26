@@ -36,7 +36,7 @@ class FogBlockConnectionIntTests: XCTestCase {
     }
 
     func testGetBlockZero() throws {
-        try XCTSkip()
+        try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
 
@@ -94,7 +94,7 @@ class FogBlockConnectionIntTests: XCTestCase {
     }
 
     func testDoSGetBlocks() throws {
-        try XCTSkip()
+        try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
         let group = DispatchGroup()
