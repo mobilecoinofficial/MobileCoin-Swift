@@ -255,6 +255,41 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
+    func testConcurrentBalanceChecks() throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient()
+
+        let expect = expectation(description: "Checking account balance")
+        client.updateBalance {
+            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+
+            if let amountPicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
+                print("balance: \(amountPicoMob)")
+                XCTAssertGreaterThan(amountPicoMob, 0)
+                guard amountPicoMob > 0 else { expect.fulfill(); return }
+            }
+
+            concurrentReadCachedBalance()
+        }
+        func concurrentReadCachedBalance() {
+            let group = DispatchGroup()
+            for _ in (0..<100) {
+                group.enter()
+                DispatchQueue.global().async {
+                    if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
+                        print("balance: \(amountPicoMob)")
+                        XCTAssertGreaterThan(amountPicoMob, 0)
+                        guard amountPicoMob > 0 else { expect.fulfill(); return }
+                    }
+                    group.leave()
+                }
+            }
+            group.notify(queue: DispatchQueue.main) {
+                expect.fulfill()
+            }
+        }
+        waitForExpectations(timeout: 20)
+    }
+
     func testConcurrentBalanceChecksWhileUpdating() throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient()
 
