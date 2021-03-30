@@ -27,20 +27,7 @@ public final class MobileCoinClient {
     private let callbackQueue: DispatchQueue
 
     init(accountKey: AccountKeyWithFog, config: Config) {
-        let networkConfig: NetworkConfig = {
-            var networkConfig: NetworkConfig
-            if let attestationConfig = config.attestationConfig {
-                networkConfig = NetworkConfig(
-                    consensusUrl: config.consensusUrl,
-                    fogUrl: config.fogUrl,
-                    attestation: attestationConfig)
-            } else {
-            	networkConfig = NetworkConfig(consensusUrl: config.consensusUrl, fogUrl: config.fogUrl)
-            }
-            networkConfig.consensusTrustRoots = config.consensusTrustRoots
-            networkConfig.fogTrustRoots = config.fogTrustRoots
-            return networkConfig
-        }()
+        let networkConfig = NetworkConfig(mobileCoinClientConfig: config)
 
         logger.info("""
             Initializing \(Self.self):
@@ -386,5 +373,21 @@ extension MobileCoinClient {
             }
             return .success(())
         }
+    }
+}
+
+extension NetworkConfig {
+    fileprivate init(mobileCoinClientConfig config: MobileCoinClient.Config) {
+        if let attestationConfig = config.attestationConfig {
+            self.init(
+                consensusUrl: config.consensusUrl,
+                fogUrl: config.fogUrl,
+                attestation: attestationConfig)
+        } else {
+            self.init(consensusUrl: config.consensusUrl, fogUrl: config.fogUrl)
+        }
+
+        self.consensusTrustRoots = config.consensusTrustRoots
+        self.fogTrustRoots = config.fogTrustRoots
     }
 }
