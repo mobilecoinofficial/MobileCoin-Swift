@@ -43,7 +43,7 @@ public final class MobileCoinClient {
         }()
 
         logger.info("""
-            Initializing MobileCoinClient:
+            Initializing \(Self.self):
             \(Self.configDescription(
                 accountKey: accountKey,
                 config: config,
