@@ -16,21 +16,6 @@ final class DefaultServiceProvider: ServiceProvider {
     private let untrustedTxOut: FogUntrustedTxOutConnection
 
     private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
-    private var authorizationCredentials: BasicCredentials? {
-        didSet {
-            if let credentials = authorizationCredentials {
-                consensus.setAuthorization(credentials: credentials)
-                view.setAuthorization(credentials: credentials)
-                merkleProof.setAuthorization(credentials: credentials)
-                keyImage.setAuthorization(credentials: credentials)
-                block.setAuthorization(credentials: credentials)
-                untrustedTxOut.setAuthorization(credentials: credentials)
-                for connection in reportUrlToReportConnection.values {
-                    connection.setAuthorization(credentials: credentials)
-                }
-            }
-        }
-    }
 
     init(networkConfig: NetworkConfig, targetQueue: DispatchQueue?) {
         self.targetQueue = targetQueue
@@ -84,9 +69,6 @@ final class DefaultServiceProvider: ServiceProvider {
                 url: fogReportUrl,
                 channelManager: channelManager,
                 targetQueue: targetQueue)
-            if let credentials = authorizationCredentials {
-                reportConnection.setAuthorization(credentials: credentials)
-            }
             reportUrlToReportConnection[config] = reportConnection
             return reportConnection
         }
@@ -94,6 +76,11 @@ final class DefaultServiceProvider: ServiceProvider {
     }
 
     func setAuthorization(credentials: BasicCredentials) {
-        authorizationCredentials = credentials
+        consensus.setAuthorization(credentials: credentials)
+        view.setAuthorization(credentials: credentials)
+        merkleProof.setAuthorization(credentials: credentials)
+        keyImage.setAuthorization(credentials: credentials)
+        block.setAuthorization(credentials: credentials)
+        untrustedTxOut.setAuthorization(credentials: credentials)
     }
 }
