@@ -75,8 +75,11 @@ final class DefaultServiceProvider: ServiceProvider {
         return reportConnection
     }
 
-    func setAuthorization(credentials: BasicCredentials) {
+    func setConsensusAuthorization(credentials: BasicCredentials) {
         consensus.setAuthorization(credentials: credentials)
+    }
+
+    func setFogAuthorization(credentials: BasicCredentials) {
         view.setAuthorization(credentials: credentials)
         merkleProof.setAuthorization(credentials: credentials)
         keyImage.setAuthorization(credentials: credentials)

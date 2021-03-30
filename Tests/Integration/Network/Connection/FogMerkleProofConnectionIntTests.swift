@@ -154,7 +154,7 @@ extension FogMerkleProofConnectionIntTests {
             trustRoots: try IntegrationTestFixtures.fogTrustRoots(),
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.credentials)
+        connection.setAuthorization(credentials: IntegrationTestFixtures.fogCredentials)
         return connection
     }
 

@@ -34,10 +34,8 @@ extension IntegrationTestFixtures {
     static func fogTrustRoots() throws -> [NIOSSLCertificate]
     { try mobileCoinNetwork.fogTrustRoots() }
 
-    static let username = mobileCoinNetwork.username
-    static let password = mobileCoinNetwork.password
-    static let wrongPassword = mobileCoinNetwork.wrongPassword
-    static let credentials = mobileCoinNetwork.credentials
+    static let consensusCredentials = mobileCoinNetwork.consensusCredentials
+    static let fogCredentials = mobileCoinNetwork.fogCredentials
     static let invalidCredentials = mobileCoinNetwork.invalidCredentials
 
     static let fee = McConstants.MINIMUM_FEE
@@ -101,7 +99,12 @@ extension IntegrationTestFixtures {
         config: MobileCoinClient.Config
     ) throws -> MobileCoinClient {
         let client = try MobileCoinClient.make(accountKey: accountKey, config: config).get()
-        client.setBasicAuthorization(username: username, password: password)
+        client.setConsensusBasicAuthorization(
+            username: consensusCredentials.username,
+            password: consensusCredentials.password)
+        client.setFogBasicAuthorization(
+            username: fogCredentials.username,
+            password: fogCredentials.password)
         return client
     }
 
@@ -138,7 +141,8 @@ extension IntegrationTestFixtures {
         let networkConfig = try createNetworkConfig()
         let serviceProvider =
             DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
-        serviceProvider.setAuthorization(credentials: credentials)
+        serviceProvider.setConsensusAuthorization(credentials: consensusCredentials)
+        serviceProvider.setFogAuthorization(credentials: fogCredentials)
         return serviceProvider
     }
 

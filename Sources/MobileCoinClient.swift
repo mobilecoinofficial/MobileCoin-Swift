@@ -78,10 +78,16 @@ public final class MobileCoinClient {
         accountLock.readSync { $0.cachedAccountActivity }
     }
 
-    public func setBasicAuthorization(username: String, password: String) {
+    public func setConsensusBasicAuthorization(username: String, password: String) {
         logger.info("username: \(redacting: username), password: \(redacting: password)")
         let credentials = BasicCredentials(username: username, password: password)
-        inner.accessAsync { $0.serviceProvider.setAuthorization(credentials: credentials) }
+        inner.accessAsync { $0.serviceProvider.setConsensusAuthorization(credentials: credentials) }
+    }
+
+    public func setFogBasicAuthorization(username: String, password: String) {
+        logger.info("username: \(redacting: username), password: \(redacting: password)")
+        let credentials = BasicCredentials(username: username, password: password)
+        inner.accessAsync { $0.serviceProvider.setFogAuthorization(credentials: credentials) }
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {

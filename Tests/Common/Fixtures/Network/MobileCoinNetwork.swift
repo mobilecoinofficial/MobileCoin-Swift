@@ -63,14 +63,20 @@ extension MobileCoinNetwork {
     func consensusTrustRoots() throws -> [NIOSSLCertificate] { try trustRoots() }
     func fogTrustRoots() throws -> [NIOSSLCertificate] { try trustRoots() }
 
-    var username: String { Self.devAuthUsername }
-    var password: String { Self.devAuthPassword }
-    var credentials: BasicCredentials { BasicCredentials(username: username, password: password) }
+    private var consensusUsername: String { Self.devAuthUsername }
+    private var consensusPassword: String { Self.devAuthPassword }
+    var consensusCredentials: BasicCredentials
+        { BasicCredentials(username: consensusUsername, password: consensusPassword) }
 
-    var wrongPassword: String { "user1:1602033437:ffffffffffffffffffff" }
-    var invalidCredentials: BasicCredentials {
-        BasicCredentials(username: username, password: wrongPassword)
-    }
+    private var fogUsername: String { Self.devAuthUsername }
+    private var fogPassword: String { Self.devAuthPassword }
+    var fogCredentials: BasicCredentials
+        { BasicCredentials(username: fogUsername, password: fogPassword) }
+
+    private var invalidCredUsername: String { "user1" }
+    private var invalidCredPassword: String { "user1:1602033437:ffffffffffffffffffff" }
+    var invalidCredentials: BasicCredentials
+        { BasicCredentials(username: invalidCredUsername, password: invalidCredPassword) }
 
     var rootEntropies: [Data32] { isTestNet ? Self.testNetRootEntropies : Self.devRootEntropies }
 }
@@ -79,13 +85,9 @@ extension MobileCoinNetwork {
 
 #if canImport(Keys)
     static let devAuthUsername = MobileCoinKeys().mobilecoinDevAuthUsername
-#else
-    static let devAuthUsername = ""
-#endif
-
-#if canImport(Keys)
     static let devAuthPassword = MobileCoinKeys().mobilecoinDevAuthPassword
 #else
+    static let devAuthUsername = ""
     static let devAuthPassword = ""
 #endif
 

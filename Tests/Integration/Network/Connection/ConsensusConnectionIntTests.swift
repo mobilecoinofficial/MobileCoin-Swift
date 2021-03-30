@@ -173,7 +173,7 @@ extension ConsensusConnectionIntTests {
             trustRoots: trustRoots,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.credentials)
+        connection.setAuthorization(credentials: IntegrationTestFixtures.consensusCredentials)
         return connection
     }
 }
