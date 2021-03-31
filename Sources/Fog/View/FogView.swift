@@ -129,22 +129,26 @@ final class FogView {
                 return .outdatedClient(reason)
             }
         }.flatMap { txOutRecord in
-            guard let ledgerTxOut = LedgerTxOut(txOutRecord) else {
-                let serializedTxOutRecord: Data
-                do {
-                    serializedTxOutRecord = try txOutRecord.serializedData()
-                } catch {
-                    // Safety: Protobuf binary serialization is no fail when not using proto2 or
-                    // `Any`.
-                    logger.fatalError(
-                        "Error: Protobuf serialization failed: \(error)")
-                }
-                logger.info("Invalid TxOut returned from Fog View.")
-                return .failure(.invalidServerResponse(
-                    "Invalid TxOut returned from Fog View. Base64-encoded TxOutRecord: " +
-                    "\(serializedTxOutRecord.base64EncodedString())"))
-            }
-            return .success(ledgerTxOut)
+            ledgerTxOut(from: txOutRecord)
         }
+    }
+
+    private static func ledgerTxOut(from txOutRecord: FogView_TxOutRecord)
+        -> Result<LedgerTxOut, ConnectionError>
+    {
+        guard let ledgerTxOut = LedgerTxOut(txOutRecord) else {
+            let serializedTxOutRecord: Data
+            do {
+                serializedTxOutRecord = try txOutRecord.serializedData()
+            } catch {
+                // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
+                logger.fatalError("Protobuf serialization failed: \(error)")
+            }
+            logger.info("Invalid TxOut returned from Fog View.")
+            return .failure(.invalidServerResponse(
+                "Invalid TxOut returned from Fog View. Base64-encoded TxOutRecord: " +
+                "\(serializedTxOutRecord.base64EncodedString())"))
+        }
+        return .success(ledgerTxOut)
     }
 }
