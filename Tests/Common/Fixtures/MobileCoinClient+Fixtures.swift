@@ -8,31 +8,12 @@ import Foundation
 @testable import MobileCoin
 import NIOSSL
 
-extension MobileCoinClient {
-    enum Fixtures {}
-}
-
-extension MobileCoinClient.Fixtures {
-    struct Init {
-        let accountKey: AccountKey
-
-        let consensusUrl = "mc://node1.fake.mobilecoin.com"
-        let fogUrl = "fog://fog.fake.mobilecoin.com"
-
-        init(accountIndex: UInt8 = 0) throws {
-            self.accountKey = try AccountKey.Fixtures.Default(accountIndex: accountIndex).accountKey
-        }
-    }
-}
-
 extension MobileCoinClient.Config {
     enum Fixtures {}
 }
 
 extension MobileCoinClient.Config.Fixtures {
-    struct Default {
-        let config: MobileCoinClient.Config
-
+    struct Init {
         let consensusUrl = "mc://node1.fake.mobilecoin.com"
         let fogUrl = "fog://fog.fake.mobilecoin.com"
 
@@ -41,15 +22,51 @@ extension MobileCoinClient.Config.Fixtures {
         let wrongTrustRootBytes: Data
         let invalidTrustRootBytes: Data
 
-        init() throws {
-            self.config = try MobileCoinClient.Config.make(
-                consensusUrl: self.consensusUrl,
-                fogUrl: self.fogUrl).get()
+        let consensusAttestation = Attestation()
+        let fogViewAttestation = Attestation()
+        let fogMerkleProofAttestation = Attestation()
+        let fogKeyImageAttestation = Attestation()
+        let fogReportAttestation = Attestation()
 
+        init() throws {
             let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
             self.trustRootBytes = trustRootsFixture.trustRootBytes
             self.wrongTrustRootBytes = trustRootsFixture.wrongTrustRootBytes
             self.invalidTrustRootBytes = trustRootsFixture.invalidTrustRootBytes
+        }
+    }
+}
+
+extension MobileCoinClient.Config.Fixtures {
+    struct Default {
+        let config: MobileCoinClient.Config
+
+        init() throws {
+            let initFixture = try Init()
+            self.config = try MobileCoinClient.Config.make(
+                consensusUrl: initFixture.consensusUrl,
+                consensusAttestation: initFixture.consensusAttestation,
+                fogUrl: initFixture.fogUrl,
+                fogViewAttestation: initFixture.fogViewAttestation,
+                fogKeyImageAttestation: initFixture.fogKeyImageAttestation,
+                fogMerkleProofAttestation: initFixture.fogMerkleProofAttestation,
+                fogReportAttestation: initFixture.fogReportAttestation).get()
+        }
+    }
+}
+
+extension MobileCoinClient {
+    enum Fixtures {}
+}
+
+extension MobileCoinClient.Fixtures {
+    struct Init {
+        let accountKey: AccountKey
+        let config: MobileCoinClient.Config
+
+        init(accountIndex: UInt8 = 0) throws {
+            self.accountKey = try AccountKey.Fixtures.Default(accountIndex: accountIndex).accountKey
+            self.config = try MobileCoinClient.Config.Fixtures.Default().config
         }
     }
 }

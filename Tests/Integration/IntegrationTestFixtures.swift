@@ -67,14 +67,37 @@ extension IntegrationTestFixtures {
         var networkConfig = try NetworkConfig.make(
             consensusUrl: consensusUrl,
             fogUrl: fogUrl,
-            attestationConfig: attestationConfig).get()
-        networkConfig.consensusTrustRoots = try consensusTrustRoots()
-        networkConfig.fogTrustRoots = try fogTrustRoots()
+            attestation: attestationConfig).get()
+        networkConfig.consensusTrustRoots = try self.consensusTrustRoots()
+        networkConfig.fogTrustRoots = try self.fogTrustRoots()
+        networkConfig.consensusAuthorization = consensusCredentials
+        networkConfig.fogAuthorization = fogCredentials
+        return networkConfig
+    }
+
+    static func createNetworkConfig(trustRoots: [NIOSSLCertificate]) throws -> NetworkConfig {
+        var networkConfig = try createNetworkConfig()
+        networkConfig.consensusTrustRoots = trustRoots
+        networkConfig.fogTrustRoots = trustRoots
+        return networkConfig
+    }
+
+    static func createNetworkConfigWithInvalidCredentials() throws -> NetworkConfig {
+        var networkConfig = try createNetworkConfig()
+        networkConfig.consensusAuthorization = invalidCredentials
+        networkConfig.fogAuthorization = invalidCredentials
         return networkConfig
     }
 
     static func createMobileCoinClientConfig() throws -> MobileCoinClient.Config {
-        try MobileCoinClient.Config.make(consensusUrl: consensusUrl, fogUrl: fogUrl).get()
+        try MobileCoinClient.Config.make(
+            consensusUrl: consensusUrl,
+            consensusAttestation: attestationConfig.consensus,
+            fogUrl: fogUrl,
+            fogViewAttestation: attestationConfig.fogView,
+            fogKeyImageAttestation: attestationConfig.fogKeyImage,
+            fogMerkleProofAttestation: attestationConfig.fogMerkleProof,
+            fogReportAttestation: attestationConfig.fogReport).get()
     }
 
     static func createMobileCoinClient(accountIndex: Int = 0) throws -> MobileCoinClient {
@@ -139,11 +162,7 @@ extension IntegrationTestFixtures {
 
     static func createServiceProvider() throws -> ServiceProvider {
         let networkConfig = try createNetworkConfig()
-        let serviceProvider =
-            DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
-        serviceProvider.setConsensusAuthorization(credentials: consensusCredentials)
-        serviceProvider.setFogAuthorization(credentials: fogCredentials)
-        return serviceProvider
+        return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
     }
 
     static func createFogReportManager() throws -> FogReportManager {

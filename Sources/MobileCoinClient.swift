@@ -20,40 +20,36 @@ public final class MobileCoinClient {
         return .success(MobileCoinClient(accountKey: accountKey, config: config))
     }
 
-    private let config: Config
     private let accountLock: ReadWriteDispatchLock<Account>
     private let inner: SerialDispatchLock<Inner>
     private let serialQueue: DispatchQueue
     private let callbackQueue: DispatchQueue
 
-    init(accountKey: AccountKeyWithFog, config: Config) {
-        let networkConfig = NetworkConfig(mobileCoinClientConfig: config)
+    private let txOutSelectionStrategy: TxOutSelectionStrategy
+    private let mixinSelectionStrategy: MixinSelectionStrategy
+    private let fogQueryScalingStrategy: FogQueryScalingStrategy
 
+    init(accountKey: AccountKeyWithFog, config: Config) {
         logger.info("""
             Initializing \(Self.self):
-            \(Self.configDescription(
-                accountKey: accountKey,
-                config: config,
-                networkConfig: networkConfig))
+            \(Self.configDescription(accountKey: accountKey, config: config))
             """)
 
-        self.config = config
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)")
         self.callbackQueue = config.callbackQueue ?? DispatchQueue.main
         self.accountLock = .init(Account(accountKey: accountKey))
+        self.txOutSelectionStrategy = config.txOutSelectionStrategy
+        self.mixinSelectionStrategy = config.mixinSelectionStrategy
+        self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
-        let serviceProvider = DefaultServiceProvider(
-            networkConfig: networkConfig,
-            targetQueue: serialQueue)
-
+        let serviceProvider =
+            DefaultServiceProvider(networkConfig: config.networkConfig, targetQueue: serialQueue)
         let fogResolverManager = FogResolverManager(
-            fogReportAttestation: networkConfig.fogReportAttestation,
+            fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
             targetQueue: serialQueue)
 
-        let inner = Inner(
-            serviceProvider: serviceProvider,
-            fogResolverManager: fogResolverManager)
+        let inner = Inner(serviceProvider: serviceProvider, fogResolverManager: fogResolverManager)
         self.inner = .init(inner, targetQueue: serialQueue)
     }
 
@@ -85,7 +81,7 @@ public final class MobileCoinClient {
                 fogViewService: $0.serviceProvider.fogViewService,
                 fogKeyImageService: $0.serviceProvider.fogKeyImageService,
                 fogBlockService: $0.serviceProvider.fogBlockService,
-                fogQueryScalingStrategy: self.config.fogQueryScalingStrategy,
+                fogQueryScalingStrategy: self.fogQueryScalingStrategy,
                 targetQueue: self.serialQueue
             ).updateBalance { result in
                 self.callbackQueue.async {
@@ -101,7 +97,7 @@ public final class MobileCoinClient {
         logger.info("feeLevel: \(feeLevel)")
         return Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.config.txOutSelectionStrategy
+            txOutSelectionStrategy: self.txOutSelectionStrategy
         ).amountTransferable(feeLevel: feeLevel)
     }
 
@@ -112,7 +108,7 @@ public final class MobileCoinClient {
         logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
         return Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.config.txOutSelectionStrategy
+            txOutSelectionStrategy: self.txOutSelectionStrategy
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
     }
 
@@ -122,7 +118,7 @@ public final class MobileCoinClient {
         logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
         return Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.config.txOutSelectionStrategy
+            txOutSelectionStrategy: self.txOutSelectionStrategy
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
     }
 
@@ -141,8 +137,8 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
-                txOutSelectionStrategy: self.config.txOutSelectionStrategy,
-                mixinSelectionStrategy: self.config.mixinSelectionStrategy,
+                txOutSelectionStrategy: self.txOutSelectionStrategy,
+                mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
             ).prepareTransaction(to: recipient, amount: amount, fee: fee) { result in
                 self.callbackQueue.async {
@@ -168,8 +164,8 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
-                txOutSelectionStrategy: self.config.txOutSelectionStrategy,
-                mixinSelectionStrategy: self.config.mixinSelectionStrategy,
+                txOutSelectionStrategy: self.txOutSelectionStrategy,
+                mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
             ).prepareTransaction(to: recipient, amount: amount, feeLevel: feeLevel) { result in
                 self.callbackQueue.async {
@@ -190,8 +186,8 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
-                txOutSelectionStrategy: self.config.txOutSelectionStrategy,
-                mixinSelectionStrategy: self.config.mixinSelectionStrategy,
+                txOutSelectionStrategy: self.txOutSelectionStrategy,
+                mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
             ).prepareDefragmentationStepTransactions(toSendAmount: amount, feeLevel: feeLevel)
             { result in
@@ -243,27 +239,23 @@ public final class MobileCoinClient {
 }
 
 extension MobileCoinClient {
-    private static func configDescription(
-        accountKey: AccountKeyWithFog,
-        config: Config,
-        networkConfig: NetworkConfig
-    ) -> String {
+    private static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
         return """
-            Consensus url: \(String(reflecting: config.consensusUrl.url))
+            Consensus url: \(String(reflecting: config.networkConfig.consensusUrl.url))
             AccountKey Public Address View Key: \
             \(redacting: accountKey.accountKey.publicAddress.viewPublicKey)
             AccountKey Public Address Spend Key: \
             \(redacting: accountKey.accountKey.publicAddress.spendPublicKey)
-            Fog url: \(String(reflecting: config.fogUrl.url))
+            Fog url: \(String(reflecting: config.networkConfig.fogUrl.url))
             AccountKey Fog Report url: \(String(reflecting: fogInfo.reportUrl.url))
             AccountKey Fog Report id: \(String(reflecting: fogInfo.reportId))
             AccountKey Fog Report authority sPKI: 0x\(fogInfo.authoritySpki.hexEncodedString())
-            Consensus attestation: \(networkConfig.consensusAttestation)
-            Fog View attestation: \(networkConfig.fogViewAttestation)
-            Fog KeyImage attestation: \(networkConfig.fogKeyImageAttestation)
-            Fog MerkleProof attestation: \(networkConfig.fogMerkleProofAttestation)
-            Fog Report attestation: \(networkConfig.fogReportAttestation)
+            Consensus attestation: \(config.networkConfig.consensus.attestation)
+            Fog View attestation: \(config.networkConfig.fogView.attestation)
+            Fog KeyImage attestation: \(config.networkConfig.fogKeyImage.attestation)
+            Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProof.attestation)
+            Fog Report attestation: \(config.networkConfig.fogReportAttestation)
             """
     }
 }
@@ -285,18 +277,6 @@ extension MobileCoinClient {
     public struct Config {
         /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
         ///     with the appropriate schemes.
-        public static func make(consensusUrl: String, fogUrl: String)
-            -> Result<Config, InvalidInputError>
-        {
-            ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
-                FogUrl.make(string: fogUrl).map { fogUrl in
-                    Config(consensusUrl: consensusUrl, fogUrl: fogUrl)
-                }
-            }
-        }
-
-        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
-        ///     with the appropriate schemes.
         public static func make(
             consensusUrl: String,
             consensusAttestation: Attestation,
@@ -314,21 +294,16 @@ extension MobileCoinClient {
                         fogKeyImage: fogKeyImageAttestation,
                         fogMerkleProof: fogMerkleProofAttestation,
                         fogReport: fogReportAttestation)
-                    return Config(
+                    let networkConfig = NetworkConfig(
                         consensusUrl: consensusUrl,
                         fogUrl: fogUrl,
-                        attestationConfig: attestationConfig)
+                        attestation: attestationConfig)
+                    return Config(networkConfig: networkConfig)
                 }
             }
         }
 
-        fileprivate var consensusUrl: ConsensusUrl
-        fileprivate var fogUrl: FogUrl
-
-        fileprivate var attestationConfig: NetworkConfig.AttestationConfig?
-
-        fileprivate var consensusTrustRoots: [NIOSSLCertificate]?
-        fileprivate var fogTrustRoots: [NIOSSLCertificate]?
+        fileprivate var networkConfig: NetworkConfig
 
         public var cacheStorageAdapter: StorageAdapter?
 
@@ -340,22 +315,17 @@ extension MobileCoinClient {
         var mixinSelectionStrategy: MixinSelectionStrategy = DefaultMixinSelectionStrategy()
         var fogQueryScalingStrategy: FogQueryScalingStrategy = DefaultFogQueryScalingStrategy()
 
-        init(
-            consensusUrl: ConsensusUrl,
-            fogUrl: FogUrl,
-            attestationConfig: NetworkConfig.AttestationConfig? = nil
-        ) {
-            logger.info("consensusUrl: \(consensusUrl.url), fogUrl: \(fogUrl.url)")
-            self.consensusUrl = consensusUrl
-            self.fogUrl = fogUrl
-            self.attestationConfig = attestationConfig
+        init(networkConfig: NetworkConfig) {
+            logger.info("consensusUrl: \(networkConfig.consensusUrl.url), fogUrl: " +
+                "\(networkConfig.fogUrl.url)")
+            self.networkConfig = networkConfig
         }
 
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
             do {
-                consensusTrustRoots =
+                networkConfig.consensusTrustRoots =
                     try trustRoots.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
             } catch {
                 return .failure(InvalidInputError("Failed parsing Consensus trust roots: \(error)"))
@@ -366,28 +336,22 @@ extension MobileCoinClient {
         public mutating func setFogTrustRoots(_ trustRoots: [Data]) -> Result<(), InvalidInputError>
         {
             do {
-                fogTrustRoots =
+                networkConfig.fogTrustRoots =
                     try trustRoots.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
             } catch {
                 return .failure(InvalidInputError("Failed parsing Fog trust roots: \(error)"))
             }
             return .success(())
         }
-    }
-}
 
-extension NetworkConfig {
-    fileprivate init(mobileCoinClientConfig config: MobileCoinClient.Config) {
-        if let attestationConfig = config.attestationConfig {
-            self.init(
-                consensusUrl: config.consensusUrl,
-                fogUrl: config.fogUrl,
-                attestation: attestationConfig)
-        } else {
-            self.init(consensusUrl: config.consensusUrl, fogUrl: config.fogUrl)
+        public mutating func setConsensusBasicAuthorization(username: String, password: String) {
+            networkConfig.consensusAuthorization =
+                BasicCredentials(username: username, password: password)
         }
 
-        self.consensusTrustRoots = config.consensusTrustRoots
-        self.fogTrustRoots = config.fogTrustRoots
+        public mutating func setFogBasicAuthorization(username: String, password: String) {
+            networkConfig.fogAuthorization =
+                BasicCredentials(username: username, password: password)
+        }
     }
 }

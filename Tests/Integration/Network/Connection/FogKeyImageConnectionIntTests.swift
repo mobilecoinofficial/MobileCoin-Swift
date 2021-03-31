@@ -109,25 +109,17 @@ class FogKeyImageConnectionIntTests: XCTestCase {
 extension FogKeyImageConnectionIntTests {
     func createFogKeyImageConnection() throws -> FogKeyImageConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        let connection = FogKeyImageConnection(
-            url: networkConfig.fogUrl,
-            attestation: networkConfig.fogKeyImageAttestation,
-            trustRoots: try IntegrationTestFixtures.fogTrustRoots(),
+        return FogKeyImageConnection(
+            config: networkConfig.fogKeyImage,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.fogCredentials)
-        return connection
     }
 
     func createFogKeyImageConnectionWithInvalidCredentials() throws -> FogKeyImageConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        let connection = FogKeyImageConnection(
-            url: networkConfig.fogUrl,
-            attestation: networkConfig.fogKeyImageAttestation,
-            trustRoots: try IntegrationTestFixtures.fogTrustRoots(),
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
+        return FogKeyImageConnection(
+            config: networkConfig.fogKeyImage,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.invalidCredentials)
-        return connection
     }
 }

@@ -8,17 +8,12 @@ import Foundation
 import NIOSSL
 
 struct NetworkConfig {
-    static func make(
-        consensusUrl: String,
-        fogUrl: String,
-        attestationConfig: AttestationConfig = .devMrSigner
-    ) -> Result<NetworkConfig, InvalidInputError> {
+    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig)
+        -> Result<NetworkConfig, InvalidInputError>
+    {
         ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
             FogUrl.make(string: fogUrl).map { fogUrl in
-                NetworkConfig(
-                    consensusUrl: consensusUrl,
-                    fogUrl: fogUrl,
-                    attestation: attestationConfig)
+                NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation)
             }
         }
     }
@@ -26,27 +21,62 @@ struct NetworkConfig {
     let consensusUrl: ConsensusUrl
     let fogUrl: FogUrl
 
-    private let attestationConfig: AttestationConfig
+    private let attestation: AttestationConfig
 
     var consensusTrustRoots: [NIOSSLCertificate]?
     var fogTrustRoots: [NIOSSLCertificate]?
 
-    init(
-        consensusUrl: ConsensusUrl,
-        fogUrl: FogUrl,
-        attestation attestationConfig: AttestationConfig = .devMrSigner
-    ) {
+    var consensusAuthorization: BasicCredentials?
+    var fogAuthorization: BasicCredentials?
+
+    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig) {
         logger.info("consensusUrl: \(consensusUrl), fogUrl: \(fogUrl)")
         self.consensusUrl = consensusUrl
         self.fogUrl = fogUrl
-        self.attestationConfig = attestationConfig
+        self.attestation = attestation
     }
 
-    var consensusAttestation: Attestation { attestationConfig.consensus }
-    var fogViewAttestation: Attestation { attestationConfig.fogView }
-    var fogKeyImageAttestation: Attestation { attestationConfig.fogKeyImage }
-    var fogMerkleProofAttestation: Attestation { attestationConfig.fogMerkleProof }
-    var fogReportAttestation: Attestation { attestationConfig.fogReport }
+    var consensus: AttestedConnectionConfig<ConsensusUrl> {
+        AttestedConnectionConfig(
+            url: consensusUrl,
+            attestation: attestation.consensus,
+            trustRoots: consensusTrustRoots,
+            authorization: consensusAuthorization)
+    }
+
+    var fogView: AttestedConnectionConfig<FogUrl> {
+        AttestedConnectionConfig(
+            url: fogUrl,
+            attestation: attestation.fogView,
+            trustRoots: fogTrustRoots,
+            authorization: fogAuthorization)
+    }
+
+    var fogMerkleProof: AttestedConnectionConfig<FogUrl> {
+        AttestedConnectionConfig(
+            url: fogUrl,
+            attestation: attestation.fogMerkleProof,
+            trustRoots: fogTrustRoots,
+            authorization: fogAuthorization)
+    }
+
+    var fogKeyImage: AttestedConnectionConfig<FogUrl> {
+        AttestedConnectionConfig(
+            url: fogUrl,
+            attestation: attestation.fogKeyImage,
+            trustRoots: fogTrustRoots,
+            authorization: fogAuthorization)
+    }
+
+    var fogBlock: ConnectionConfig<FogUrl> {
+        ConnectionConfig(url: fogUrl, trustRoots: fogTrustRoots, authorization: fogAuthorization)
+    }
+
+    var fogUntrustedTxOut: ConnectionConfig<FogUrl> {
+        ConnectionConfig(url: fogUrl, trustRoots: fogTrustRoots, authorization: fogAuthorization)
+    }
+
+    var fogReportAttestation: Attestation { attestation.fogReport }
 }
 
 extension NetworkConfig {
