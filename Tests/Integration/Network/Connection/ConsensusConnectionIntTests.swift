@@ -153,27 +153,19 @@ extension ConsensusConnectionIntTests {
         return try createConsensusConnection(trustRoots: trustRoots)
     }
 
-    func createConsensusConnectionWithInvalidCredentials() throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        let connection = ConsensusConnection(
-            url: networkConfig.consensusUrl,
-            attestation: networkConfig.consensusAttestation,
-            trustRoots: try IntegrationTestFixtures.consensusTrustRoots(),
+    func createConsensusConnection(trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(trustRoots: trustRoots)
+        return ConsensusConnection(
+            config: networkConfig.consensus,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.invalidCredentials)
-        return connection
     }
 
-    func createConsensusConnection(trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        let connection = ConsensusConnection(
-            url: networkConfig.consensusUrl,
-            attestation: networkConfig.consensusAttestation,
-            trustRoots: trustRoots,
+    func createConsensusConnectionWithInvalidCredentials() throws -> ConsensusConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
+        return ConsensusConnection(
+            config: networkConfig.consensus,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.credentials)
-        return connection
     }
 }

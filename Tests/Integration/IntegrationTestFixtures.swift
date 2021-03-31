@@ -34,10 +34,8 @@ extension IntegrationTestFixtures {
     static func fogTrustRoots() throws -> [NIOSSLCertificate]
     { try mobileCoinNetwork.fogTrustRoots() }
 
-    static let username = mobileCoinNetwork.username
-    static let password = mobileCoinNetwork.password
-    static let wrongPassword = mobileCoinNetwork.wrongPassword
-    static let credentials = mobileCoinNetwork.credentials
+    static let consensusCredentials = mobileCoinNetwork.consensusCredentials
+    static let fogCredentials = mobileCoinNetwork.fogCredentials
     static let invalidCredentials = mobileCoinNetwork.invalidCredentials
 
     static let fee = McConstants.MINIMUM_FEE
@@ -69,14 +67,37 @@ extension IntegrationTestFixtures {
         var networkConfig = try NetworkConfig.make(
             consensusUrl: consensusUrl,
             fogUrl: fogUrl,
-            attestationConfig: attestationConfig).get()
-        networkConfig.consensusTrustRoots = try consensusTrustRoots()
-        networkConfig.fogTrustRoots = try fogTrustRoots()
+            attestation: attestationConfig).get()
+        networkConfig.consensusTrustRoots = try self.consensusTrustRoots()
+        networkConfig.fogTrustRoots = try self.fogTrustRoots()
+        networkConfig.consensusAuthorization = consensusCredentials
+        networkConfig.fogAuthorization = fogCredentials
+        return networkConfig
+    }
+
+    static func createNetworkConfig(trustRoots: [NIOSSLCertificate]) throws -> NetworkConfig {
+        var networkConfig = try createNetworkConfig()
+        networkConfig.consensusTrustRoots = trustRoots
+        networkConfig.fogTrustRoots = trustRoots
+        return networkConfig
+    }
+
+    static func createNetworkConfigWithInvalidCredentials() throws -> NetworkConfig {
+        var networkConfig = try createNetworkConfig()
+        networkConfig.consensusAuthorization = invalidCredentials
+        networkConfig.fogAuthorization = invalidCredentials
         return networkConfig
     }
 
     static func createMobileCoinClientConfig() throws -> MobileCoinClient.Config {
-        try MobileCoinClient.Config.make(consensusUrl: consensusUrl, fogUrl: fogUrl).get()
+        try MobileCoinClient.Config.make(
+            consensusUrl: consensusUrl,
+            consensusAttestation: attestationConfig.consensus,
+            fogUrl: fogUrl,
+            fogViewAttestation: attestationConfig.fogView,
+            fogKeyImageAttestation: attestationConfig.fogKeyImage,
+            fogMerkleProofAttestation: attestationConfig.fogMerkleProof,
+            fogReportAttestation: attestationConfig.fogReport).get()
     }
 
     static func createMobileCoinClient(accountIndex: Int = 0) throws -> MobileCoinClient {
@@ -101,7 +122,12 @@ extension IntegrationTestFixtures {
         config: MobileCoinClient.Config
     ) throws -> MobileCoinClient {
         let client = try MobileCoinClient.make(accountKey: accountKey, config: config).get()
-        client.setBasicAuthorization(username: username, password: password)
+        client.setConsensusBasicAuthorization(
+            username: consensusCredentials.username,
+            password: consensusCredentials.password)
+        client.setFogBasicAuthorization(
+            username: fogCredentials.username,
+            password: fogCredentials.password)
         return client
     }
 
@@ -136,10 +162,7 @@ extension IntegrationTestFixtures {
 
     static func createServiceProvider() throws -> ServiceProvider {
         let networkConfig = try createNetworkConfig()
-        let serviceProvider =
-            DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
-        serviceProvider.setAuthorization(credentials: credentials)
-        return serviceProvider
+        return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
     }
 
     static func createFogReportManager() throws -> FogReportManager {

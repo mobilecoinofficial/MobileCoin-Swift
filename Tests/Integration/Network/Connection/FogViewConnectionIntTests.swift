@@ -239,26 +239,18 @@ extension FogViewConnectionIntTests {
     func createFogViewConnection() throws -> FogViewConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
         let channelManager = GrpcChannelManager()
-        let connection = FogViewConnection(
-            url: networkConfig.fogUrl,
-            attestation: networkConfig.fogViewAttestation,
-            trustRoots: try IntegrationTestFixtures.fogTrustRoots(),
+        return FogViewConnection(
+            config: networkConfig.fogView,
             channelManager: channelManager,
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.credentials)
-        return connection
     }
 
     func createFogViewConnectionWithInvalidCredentials() throws -> FogViewConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
         let channelManager = GrpcChannelManager()
-        let connection = FogViewConnection(
-            url: networkConfig.fogUrl,
-            attestation: networkConfig.fogViewAttestation,
-            trustRoots: try IntegrationTestFixtures.fogTrustRoots(),
+        return FogViewConnection(
+            config: networkConfig.fogView,
             channelManager: channelManager,
             targetQueue: DispatchQueue.main)
-        connection.setAuthorization(credentials: IntegrationTestFixtures.invalidCredentials)
-        return connection
     }
 }

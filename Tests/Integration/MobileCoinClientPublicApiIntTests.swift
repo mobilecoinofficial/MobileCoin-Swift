@@ -351,7 +351,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig()
         XCTAssertSuccess(config.setConsensusTrustRoots([
             try IntegrationTestFixtures.trustRootsBytes(),
-            try MobileCoinClient.Config.Fixtures.Default().wrongTrustRootBytes,
+            try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
         ]))
         let client =
             try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, config: config)
@@ -391,9 +391,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig()
         XCTAssertSuccess(config.setConsensusTrustRoots([
-            try MobileCoinClient.Config.Fixtures.Default().wrongTrustRootBytes,
+            try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
         ]))
-        let client = try IntegrationTestFixtures.createMobileCoinClient(config: config)
+        let client =
+            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, config: config)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         let expect = expectation(description: "Submitting transaction")
