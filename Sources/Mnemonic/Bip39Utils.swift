@@ -15,11 +15,10 @@ enum Bip39Utils {
             switch $0.errorCode {
             case .invalidInput:
                 return InvalidInputError(
-                    "BIP39: error deriving entropy from mnemonic: \($0.description)")
+                    "BIP39: error deriving entropy from mnemonic: \(redacting: $0.description)")
             default:
                 // Safety: mc_bip39_entropy_from_mnemonic should not throw non-documented errors.
-                logger.fatalError(
-                    "\(Self.self).\(#function): Unhandled LibMobileCoin error: \($0)")
+                logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
             }
         }
     }
@@ -47,12 +46,11 @@ enum Bip39Utils {
         }.mapError {
             switch $0.errorCode {
             case .invalidInput:
-                return InvalidInputError(
-                    "BIP39: error getting seed from mnemonic and passphrase: \($0.description)")
+                return InvalidInputError("BIP39: error getting seed from mnemonic and " +
+                    "passphrase: \(redacting: $0.description)")
             default:
                 // Safety: mc_bip39_get_seed should not throw non-documented errors.
-                logger.fatalError(
-                    "\(Self.self).\(#function): Unhandled LibMobileCoin error: \($0)")
+                logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
             }
         }
     }

@@ -233,7 +233,7 @@ struct AccountKeyWithFog {
     var fogInfo: AccountKey.FogInfo {
         guard let fogInfo = accountKey.fogInfo else {
             // Safety: accountKey is guaranteed to have fogInfo.
-            logger.fatalError("accountKey doesn't have fogInfo.")
+            logger.fatalError("accountKey doesn't have fogInfo")
         }
         return fogInfo
     }

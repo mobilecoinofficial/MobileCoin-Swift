@@ -73,8 +73,7 @@ final class FogResolver {
                 default:
                     // Safety: mc_fog_resolver_add_report_response should not throw non-documented
                     // errors.
-                    logger.fatalError(
-                        "ERROR - Unhandled LibMobileCoin error: \(error)")
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
                 }
             }
         }
