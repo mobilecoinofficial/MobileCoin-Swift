@@ -35,18 +35,18 @@ final class FogView {
     }
 
     func processQueryResponse(
+        _ queryResponse: FogView_QueryResponse,
         searchAttempt: FogSearchAttempt,
-        response: FogView_QueryResponse,
         accountKey: AccountKey
     ) -> Result<[KnownTxOut], ConnectionError> {
         logger.info("")
         return rngSet.processQueryResponse(
+            queryResponse,
             searchAttempt: searchAttempt,
-            queryResponse: response,
             accountKey: accountKey
         ).flatMap { searchResults in
             searchResults.map { searchResult in
-                Self.decryptSearchResult(searchResult: searchResult, accountKey: accountKey)
+                Self.decryptSearchResult(searchResult, accountKey: accountKey)
             }.collectResult().map { decryptedTxOuts in
                 // Filter out TxOuts that don't belong to this account.
                 decryptedTxOuts.compactMap { txOut in
@@ -62,7 +62,7 @@ final class FogView {
     }
 
     private static func decryptSearchResult(
-        searchResult: FogView_TxOutSearchResult,
+        _ searchResult: FogView_TxOutSearchResult,
         accountKey: AccountKey
     ) -> Result<LedgerTxOut, ConnectionError> {
         logger.info("")
