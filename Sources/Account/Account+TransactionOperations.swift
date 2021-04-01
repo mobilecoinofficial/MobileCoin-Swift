@@ -79,7 +79,7 @@ extension Account {
                     tombstoneBlockIndex: tombstoneBlockIndex,
                     completion: completion)
             case .failure(let error):
-                logger.info("failure - error: \(error.localizedDescription)")
+                logger.info("failure - error: \(error)")
                 serialQueue.async {
                     completion(.failure(error))
                 }
@@ -132,7 +132,7 @@ extension Account {
                     tombstoneBlockIndex: tombstoneBlockIndex,
                     completion: completion)
             case .failure(let error):
-                logger.info("failure - error: \(error.localizedDescription)")
+                logger.info("failure - error: \(error)")
                 serialQueue.async {
                     completion(.failure(error))
                 }
