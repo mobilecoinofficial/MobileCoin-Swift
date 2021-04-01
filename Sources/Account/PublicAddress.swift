@@ -69,11 +69,18 @@ public struct PublicAddress {
     var fogAuthoritySig: Data? { fogInfo?.authoritySig }
 
     var debugDescription: String {
-        "(viewPublicKey, spendPublicKey): " +
-            "(\(redacting: viewPublicKey), \(redacting: spendPublicKey)), " +
-            "fogReportUrl: \(String(describing: fogReportUrl?.url)), " +
-            "fogReportId: \(String(describing: fogReportId)), " +
-            "fogAuthoritySig: \(redacting: String(describing: fogAuthoritySig))"
+        var params = [
+            "viewPublicKey=\(redacting: viewPublicKey.base64EncodedString())",
+            "spendPublicKey=\(redacting: spendPublicKey.base64EncodedString())",
+        ]
+        if let fogInfo = fogInfo {
+            params += [
+                "fogReportUrl: \(fogInfo.reportUrlString)",
+                "fogReportId: \(fogInfo.reportId)",
+                "fogAuthoritySig: \(redacting: fogInfo.authoritySig)",
+            ]
+        }
+        return "PublicAddress(\(params.joined(separator: ", ")))"
     }
 }
 

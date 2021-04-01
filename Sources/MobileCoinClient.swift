@@ -130,8 +130,8 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        logger.info(
-            "recipient: \(recipient.debugDescription), amount: \(redacting: amount), fee: \(fee)")
+        logger.info("recipient: \(recipient.debugDescription), amount: \(redacting: amount), " +
+            "fee: \(redacting: fee)")
         inner.accessAsync {
             Account.TransactionOperations(
                 account: self.accountLock,

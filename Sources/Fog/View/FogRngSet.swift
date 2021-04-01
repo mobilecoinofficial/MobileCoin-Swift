@@ -25,7 +25,7 @@ final class FogRngSet {
         numOutputs: PositiveInt,
         minOutputsPerSelectedRng: Int
     ) -> FogSearchAttempt {
-        logger.info("requestedBlockCount: \(redacting: String(describing: requestedBlockCount)), " +
+        logger.info("requestedBlockCount: \(String(describing: requestedBlockCount)), " +
             "numOutputs: \(numOutputs.value), minOutputsPerSelectedRng: " +
             "\(minOutputsPerSelectedRng)")
         // Max rngs we can select while maintaining the requested minimum outputs per selected rng.
@@ -287,7 +287,7 @@ extension RngTracker {
     static func make(rngRecord: FogView_RngRecord, accountKey: AccountKey)
         -> Result<RngTracker, ConnectionError>
     {
-        logger.info("rngRecordPubKey: \(redacting: rngRecord.pubkey.pubkey)")
+        logger.info("rngRecordPubKey: \(rngRecord.pubkey.pubkey)")
         switch FogRng.make(accountKey: accountKey, fogRngKey: FogRngKey(rngRecord.pubkey)) {
         case .success(let rng):
             logger.info("success")
