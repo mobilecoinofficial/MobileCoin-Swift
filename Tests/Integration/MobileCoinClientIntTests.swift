@@ -252,7 +252,7 @@ class MobileCoinClientIntTests: XCTestCase {
             }
             checkStatus()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 60)
     }
 
     func testConcurrentBalanceChecks() throws {
@@ -326,7 +326,7 @@ class MobileCoinClientIntTests: XCTestCase {
         group.notify(queue: DispatchQueue.main) {
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 120)
     }
 
     func testConcurrentBalanceUpdates() throws {

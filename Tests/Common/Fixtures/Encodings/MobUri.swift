@@ -23,9 +23,9 @@ extension MobUri.Fixtures {
 extension MobUri.Fixtures.Default {
 
     fileprivate static let uri = """
-        mob:///b58/VbGaYEHbLrTUrDcj2HKVmtTSMJSqqkotszqABe8rZpco2bivKi3ppncedAr9vJbYrkSqGYLmkthNv24a\
-        e4g8iMZ7ppQnJBeHJQ2ybiabdLavENw5q3NBuHLTPnVoGRVzHE2bQfZEN6CxSHvCve3pHfLFTu4TAe3eEHwk41pJDtF\
-        NbuocguyDHbUCTsgEQTFguMPnbG4HarSMeQNiDdqRRd6wbJzX4C5Dcg8uFzkvyZtocHtNYmtVVcBYwu
+        mob:///b58/DBRMnVBHSDx69nCKEP1VNWh7KSytVWvBwfrUKsyq3uTLaQbf5aCQBu4etpLfjaR2QmtS17gQfMGfty9n\
+        x8zkLBTTNnS83fBd9sLhG8LzscPeJuz6LadgYAhrpCxJVBTJChgYnP9ktSjqEZ8oLjwYhp4b6aYGSW6F9LWsU9vnHwP\
+        QsJmLpP3YMi5TRSfrtVQ6rw5uw4F7MAuJPc3VKQHSqjN5tWL1T9ve2s2smhrGijhP54a3uucz5TjUUg
         """
 
 }

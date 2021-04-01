@@ -56,12 +56,12 @@ extension Receipt.Fixtures.Default {
     }
 
     fileprivate static let serializedData = Data(base64Encoded: """
-        CiIKINRKK1jvVHl6Z9F2cftMHTRgHfcArTSa9/QOTm6Z1ZQtEiIKILs8QjK0OPKWykAaUKASWMiqo2Pm+Gte53DqNOR\
-        WEzfbGGQiLQoiCiAWtv30lxMC0OOlL0ll2wN9vf+ibhwbs1k0j4fTEXOrJhG3oHdsKB2a/w==
+        CiIKIARfCkd3ZdIMRhXSGvi72N2cDjtc5A0LvdPCgTMBWX5JEiIKIFf4+WnFJ5XvgQ3Si6ewxByjiZKIhwJO4AfN1cP\
+        9PDr+GGQiLQoiCiDIZT/y7TcjyGcnounBT/vfd3aEthkR9NSPRDC3iwGQFxG5uTt4u1G0bg==
         """)!
 
     fileprivate static let txOutPublicKeyBase64Encoded =
-        "1EorWO9UeXpn0XZx+0wdNGAd9wCtNJr39A5ObpnVlC0="
+        "BF8KR3dl0gxGFdIa+LvY3ZwOO1zkDQu908KBMwFZfkk="
     fileprivate static let value: UInt64 = 10
     fileprivate static let txTombstoneBlockIndex: UInt64 = 100
 

@@ -58,13 +58,13 @@ extension TxOut.Fixtures.Default {
     }
 
     fileprivate static let serializedData = Data(base64Encoded: """
-        Ci0KIgog8MbnOGEzPAhctoCv9g2KYxuod3l54dV/satGdD7srH8RvfyTK5L8kv8SIgogJAsm0CReqHeUu10uKzcY8VP\
-        xNib30VZh2T78nYuy0xQaIgog1EorWO9UeXpn0XZx+0wdNGAd9wCtNJr39A5ObpnVlC0iVgpUbgYTxUjexTpVTynv91\
+        Ci0KIgogBLssqSqN8jQARYHR96C0MgS9vSBxCY1x60FHi4el1GsRs+XfPwGwvG4SIgogmFwyP8+0UqrAoqiAsHY36oC\
+        mvj+b2eIbD+CKqydGWXAaIgogBF8KR3dl0gxGFdIa+LvY3ZwOO1zkDQu908KBMwFZfkkiVgpUbgYTxUjexTpVTynv91\
         YtSvLT8XyPuxxfV05xwRTjjrGDm1TkuHkCmnzbw3a3ETt6RrNlwLKGfLfgBBkvsI4a8UMl/r21BigZytKZNbZJ52DSs\
         gEA
         """)!
 
-    fileprivate static let keyImageBase64Encoded = "ajrktRQF/zWZapOWeb52jzpCN6BeuQCIBSI0Jo9rYVg="
+    fileprivate static let keyImageBase64Encoded = "6LmUstevIcLo0k6lcyXTBaRjdm9ktKqg/VnX2ivayA4="
     fileprivate static let value: UInt64 = 2_499_990_000_000_000
 
 }

@@ -20,13 +20,11 @@ extension IntegrationTestFixtures {
     }
 
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
-        try createAccountKey(rootEntropy: network.rootEntropies[accountIndex].data)
-    }
-
-    static func createAccountKey(rootEntropy: Data) throws -> AccountKey {
+        let (viewPrivateKey, spendPrivateKey) = network.accountPrivateKeys[accountIndex]
         let fogAuthoritySpki = try network.fogAuthoritySpki()
         return try AccountKey.make(
-            rootEntropy: rootEntropy,
+            viewPrivateKey: viewPrivateKey,
+            spendPrivateKey: spendPrivateKey,
             fogReportUrl: network.fogReportUrl,
             fogReportId: network.fogReportId,
             fogAuthoritySpki: fogAuthoritySpki).get()
