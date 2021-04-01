@@ -148,15 +148,16 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 extension FogMerkleProofConnectionIntTests {
     func createFogMerkleProofConnection() throws -> FogMerkleProofConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        return FogMerkleProofConnection(
-            config: networkConfig.fogMerkleProof,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createFogMerkleProofConnection(networkConfig: networkConfig)
     }
 
     func createFogMerkleProofConnectionWithInvalidCredentials() throws -> FogMerkleProofConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return FogMerkleProofConnection(
+        return createFogMerkleProofConnection(networkConfig: networkConfig)
+    }
+
+    func createFogMerkleProofConnection(networkConfig: NetworkConfig) -> FogMerkleProofConnection {
+        FogMerkleProofConnection(
             config: networkConfig.fogMerkleProof,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)

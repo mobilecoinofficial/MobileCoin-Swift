@@ -144,15 +144,16 @@ class FogBlockConnectionIntTests: XCTestCase {
 extension FogBlockConnectionIntTests {
     func createFogBlockConnection() throws -> FogBlockConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        return FogBlockConnection(
-            config: networkConfig.fogBlock,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createFogBlockConnection(networkConfig: networkConfig)
     }
 
     func createFogBlockConnectionWithInvalidCredentials() throws -> FogBlockConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return FogBlockConnection(
+        return createFogBlockConnection(networkConfig: networkConfig)
+    }
+
+    func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
+        FogBlockConnection(
             config: networkConfig.fogBlock,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)

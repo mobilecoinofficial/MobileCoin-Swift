@@ -46,17 +46,20 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
 extension FogUntrustedTxOutConnectionIntTests {
     func createFogUntrustedTxOutConnection() throws -> FogUntrustedTxOutConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        return FogUntrustedTxOutConnection(
-            config: networkConfig.fogUntrustedTxOut,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createFogUntrustedTxOutConnection(networkConfig: networkConfig)
     }
 
     func createFogUntrustedTxOutConnectionWithInvalidCredentials() throws
         -> FogUntrustedTxOutConnection
     {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return FogUntrustedTxOutConnection(
+        return createFogUntrustedTxOutConnection(networkConfig: networkConfig)
+    }
+
+    func createFogUntrustedTxOutConnection(networkConfig: NetworkConfig)
+        -> FogUntrustedTxOutConnection
+    {
+        FogUntrustedTxOutConnection(
             config: networkConfig.fogUntrustedTxOut,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)

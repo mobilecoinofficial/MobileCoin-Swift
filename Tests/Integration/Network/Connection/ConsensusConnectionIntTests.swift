@@ -148,21 +148,22 @@ class ConsensusConnectionIntTests: XCTestCase {
 
 extension ConsensusConnectionIntTests {
     func createConsensusConnection() throws -> ConsensusConnection {
-        let trustRoots = try IntegrationTestFixtures.consensusTrustRoots()
-        return try createConsensusConnection(trustRoots: trustRoots)
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+        return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnection(trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(trustRoots: trustRoots)
-        return ConsensusConnection(
-            config: networkConfig.consensus,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnectionWithInvalidCredentials() throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return ConsensusConnection(
+        return createConsensusConnection(networkConfig: networkConfig)
+    }
+
+    func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
+        ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
