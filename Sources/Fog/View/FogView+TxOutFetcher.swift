@@ -37,8 +37,7 @@ extension FogView {
         }
 
         func fetchTxOuts(
-            partialResultsWithWriteLock: @escaping
-                ((newTxOuts: [KnownTxOut], missedBlocks: [Range<UInt64>])) -> Void,
+            partialResultsWithWriteLock: @escaping ([KnownTxOut]) -> Void,
             completion: @escaping (Result<(), ConnectionError>) -> Void
         ) {
             let queryScaling = fogQueryScalingStrategy.create()
@@ -75,8 +74,7 @@ extension FogView {
         private func checkForNewTxOutsLoop(
             targetBlockCount: UInt64?,
             numOutputs: PositiveInt,
-            partialResultsWithWriteLock: @escaping
-                ((newTxOuts: [KnownTxOut], missedBlocks: [Range<UInt64>])) -> Void,
+            partialResultsWithWriteLock: @escaping ([KnownTxOut]) -> Void,
             completion: @escaping (Result<UInt64, ConnectionError>) -> Void
         ) {
             logger.info("targetBlockCount: \(String(describing: targetBlockCount)), " +
@@ -104,36 +102,9 @@ extension FogView {
                             accountKey: self.accountKey
                         ).map { newTxOuts in
                             logger.info("processSearchResults: Found " +
-                                    "\(redacting: newTxOuts.count) new TxOuts")
-                            var missedBlocks = response.missedBlockRanges.map { $0.range }
-                            if let earliestRngStartBlockIndex = fogView.earliestRngStartBlockIndex {
-                                missedBlocks = missedBlocks.compactMap { range in
-                                    // Check that we don't view key scan missed blocks that occur
-                                    // before the first RngRecord's startBlock. This is a workaround
-                                    // for Fog Ingest needing to mark the blocks before the first
-                                    // run of Fog Ingest as missed blocks.
-                                    //
-                                    // This can be removed when Fog provides a guarantee that it
-                                    // won't report the blocks before Fog Ingest was run for the
-                                    // first time as missed.
-                                    guard range.lowerBound >= earliestRngStartBlockIndex else {
-                                        if range.upperBound <= earliestRngStartBlockIndex {
-                                            // Entire missed block range is before the earliest
-                                            // RngRecord's startBlock.
-                                            return nil
-                                        } else {
-                                            // Part of missed block range is before the ealiest
-                                            // RngRecord's startBlock, so we modify the missed
-                                            // blocks range.
-                                            return earliestRngStartBlockIndex..<range.upperBound
-                                        }
-                                    }
-                                    return range
-                                }
-                            }
-                            let partialResults = (newTxOuts: newTxOuts, missedBlocks: missedBlocks)
+                                "\(redacting: newTxOuts.count) new TxOuts")
 
-                            partialResultsWithWriteLock(partialResults)
+                            partialResultsWithWriteLock(newTxOuts)
 
                             return response.highestProcessedBlockCount
                         }

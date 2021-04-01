@@ -9,10 +9,7 @@ import LibMobileCoin
 
 final class FogView {
     private let rngSet = FogRngSet()
-
-    var earliestRngStartBlockIndex: UInt64? {
-        rngSet.earliestRngRecordStartBlockIndex
-    }
+    private(set) var unscannedMissedBlocksRanges: [Range<UInt64>] = []
 
     var allRngTxOutsFoundBlockCount: UInt64 {
         rngSet.knownBlockCount
@@ -41,7 +38,9 @@ final class FogView {
     ) -> Result<[KnownTxOut], ConnectionError> {
         logger.info("")
         return rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
-            rngSet.processTxOutSearchResults(
+            processMissedBlockRanges(queryResponse.missedBlockRanges)
+
+            return rngSet.processTxOutSearchResults(
                 queryResponse: queryResponse,
                 searchAttempt: searchAttempt
             ).flatMap { searchResults in
@@ -59,6 +58,39 @@ final class FogView {
                     }
                 }
             }
+        }
+    }
+
+    private func processMissedBlockRanges(_ missedBlockRanges: [FogCommon_BlockRange]) {
+        var missedBlocks = missedBlockRanges.map { $0.range }
+        if let earliestRngStartBlockIndex = rngSet.earliestRngRecordStartBlockIndex {
+            missedBlocks = missedBlocks.compactMap { range in
+                // Check that we don't view key scan missed blocks that occur before the first
+                // RngRecord's startBlock. This is a workaround for Fog Ingest needing to mark the
+                // blocks before the first run of Fog Ingest as missed blocks.
+                //
+                // This can be removed when Fog provides a guarantee that it won't report the blocks
+                // before Fog Ingest was run for the first time as missed.
+                guard range.lowerBound >= earliestRngStartBlockIndex else {
+                    if range.upperBound <= earliestRngStartBlockIndex {
+                        // Entire missed block range is before the earliest RngRecord's startBlock.
+                        return nil
+                    } else {
+                        // Part of missed block range is before the ealiest RngRecord's startBlock,
+                        // so we modify the missed blocks range.
+                        return earliestRngStartBlockIndex..<range.upperBound
+                    }
+                }
+                return range
+            }
+        }
+
+        unscannedMissedBlocksRanges.append(contentsOf: missedBlocks)
+    }
+
+    func markBlocksAsScanned(blockRanges: [Range<UInt64>]) {
+        for range in blockRanges {
+            unscannedMissedBlocksRanges.removeAll(where: { $0 == range })
         }
     }
 
