@@ -83,7 +83,7 @@ class FogKeyImageConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.fogRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog CheckKeyImages request")
 
@@ -109,15 +109,16 @@ class FogKeyImageConnectionIntTests: XCTestCase {
 extension FogKeyImageConnectionIntTests {
     func createFogKeyImageConnection() throws -> FogKeyImageConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        return FogKeyImageConnection(
-            config: networkConfig.fogKeyImage,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createFogKeyImageConnection(networkConfig: networkConfig)
     }
 
     func createFogKeyImageConnectionWithInvalidCredentials() throws -> FogKeyImageConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return FogKeyImageConnection(
+        return createFogKeyImageConnection(networkConfig: networkConfig)
+    }
+
+    func createFogKeyImageConnection(networkConfig: NetworkConfig) -> FogKeyImageConnection {
+        FogKeyImageConnection(
             config: networkConfig.fogKeyImage,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)

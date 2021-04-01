@@ -36,7 +36,7 @@ class FogBlockConnectionIntTests: XCTestCase {
     }
 
     func testGetBlockZero() throws {
-        try XCTSkip()
+        try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
 
@@ -94,7 +94,7 @@ class FogBlockConnectionIntTests: XCTestCase {
     }
 
     func testDoSGetBlocks() throws {
-        try XCTSkip()
+        try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
         let group = DispatchGroup()
@@ -120,7 +120,7 @@ class FogBlockConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.fogRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog GetBlocks request")
 
@@ -144,15 +144,16 @@ class FogBlockConnectionIntTests: XCTestCase {
 extension FogBlockConnectionIntTests {
     func createFogBlockConnection() throws -> FogBlockConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        return FogBlockConnection(
-            config: networkConfig.fogBlock,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createFogBlockConnection(networkConfig: networkConfig)
     }
 
     func createFogBlockConnectionWithInvalidCredentials() throws -> FogBlockConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return FogBlockConnection(
+        return createFogBlockConnection(networkConfig: networkConfig)
+    }
+
+    func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
+        FogBlockConnection(
             config: networkConfig.fogBlock,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)

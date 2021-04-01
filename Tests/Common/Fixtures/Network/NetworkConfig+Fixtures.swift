@@ -12,8 +12,8 @@ extension NetworkConfig {
 
 extension NetworkConfig.Fixtures {
     struct TrustRoots {
-        let trustRootBytes: Data
-        let trustRoot: NIOSSLCertificate
+        let trustRootsBytes: [Data]
+        let trustRoots: [NIOSSLCertificate]
 
         let wrongTrustRootBytes: Data
         let wrongTrustRoot: NIOSSLCertificate
@@ -21,9 +21,8 @@ extension NetworkConfig.Fixtures {
         let invalidTrustRootBytes: Data
 
         init() throws {
-            self.trustRootBytes =
-                try XCTUnwrap(Data(base64Encoded: MobileCoinNetwork.trustRootsB64))
-            self.trustRoot = try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .der)
+            self.trustRootsBytes = try MobileCoinNetwork.trustRootsBytes()
+            self.trustRoots = try MobileCoinNetwork.trustRoots()
 
             self.wrongTrustRootBytes = try XCTUnwrap(Data(base64Encoded: Self.wrongTrustRootB64))
             self.wrongTrustRoot =

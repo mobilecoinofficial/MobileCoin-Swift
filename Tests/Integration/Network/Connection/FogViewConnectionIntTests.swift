@@ -214,7 +214,7 @@ class FogViewConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.fogRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Making Fog View enclave request")
         try createFogViewConnectionWithInvalidCredentials().query(
@@ -238,19 +238,18 @@ class FogViewConnectionIntTests: XCTestCase {
 extension FogViewConnectionIntTests {
     func createFogViewConnection() throws -> FogViewConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
-        let channelManager = GrpcChannelManager()
-        return FogViewConnection(
-            config: networkConfig.fogView,
-            channelManager: channelManager,
-            targetQueue: DispatchQueue.main)
+        return createFogViewConnection(networkConfig: networkConfig)
     }
 
     func createFogViewConnectionWithInvalidCredentials() throws -> FogViewConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        let channelManager = GrpcChannelManager()
-        return FogViewConnection(
+        return createFogViewConnection(networkConfig: networkConfig)
+    }
+
+    func createFogViewConnection(networkConfig: NetworkConfig) -> FogViewConnection {
+        FogViewConnection(
             config: networkConfig.fogView,
-            channelManager: channelManager,
+            channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
     }
 }

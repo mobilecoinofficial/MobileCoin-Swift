@@ -60,7 +60,7 @@ class ConsensusConnectionIntTests: XCTestCase {
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.consensusRequiresCredentials)
+        try XCTSkipUnless(IntegrationTestFixtures.network.consensusRequiresCredentials)
 
         let fixture = try Transaction.Fixtures.Default()
 
@@ -82,8 +82,7 @@ class ConsensusConnectionIntTests: XCTestCase {
     func testTrustRootWorks() throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
-        let connection = try createConsensusConnection(
-            trustRoots: [trustRootsFixture.trustRoot])
+        let connection = try createConsensusConnection(trustRoots: trustRootsFixture.trustRoots)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -104,7 +103,7 @@ class ConsensusConnectionIntTests: XCTestCase {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection = try createConsensusConnection(
-            trustRoots: [trustRootsFixture.trustRoot, trustRootsFixture.wrongTrustRoot])
+            trustRoots: trustRootsFixture.trustRoots + [trustRootsFixture.wrongTrustRoot])
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -123,7 +122,7 @@ class ConsensusConnectionIntTests: XCTestCase {
 
     func testWrongTrustRootFails() throws {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
-        try XCTSkip()
+        try XCTSkipIf(true)
 
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
@@ -149,21 +148,22 @@ class ConsensusConnectionIntTests: XCTestCase {
 
 extension ConsensusConnectionIntTests {
     func createConsensusConnection() throws -> ConsensusConnection {
-        let trustRoots = try IntegrationTestFixtures.consensusTrustRoots()
-        return try createConsensusConnection(trustRoots: trustRoots)
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+        return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnection(trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(trustRoots: trustRoots)
-        return ConsensusConnection(
-            config: networkConfig.consensus,
-            channelManager: GrpcChannelManager(),
-            targetQueue: DispatchQueue.main)
+        return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnectionWithInvalidCredentials() throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
-        return ConsensusConnection(
+        return createConsensusConnection(networkConfig: networkConfig)
+    }
+
+    func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
+        ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: GrpcChannelManager(),
             targetQueue: DispatchQueue.main)
