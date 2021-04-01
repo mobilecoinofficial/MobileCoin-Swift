@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Mnemonic Enumeration Reference</title>
+    <title>Mnemonic Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Enum/Mnemonic" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Struct/Mnemonic" class="dashAnchor"></a>
 
-    <a title="Mnemonic Enumeration Reference"></a>
+    <a title="Mnemonic Structure Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">MobileCoin Reference</a>
       <img class="carat" src="../img/carat.png" />
-      Mnemonic Enumeration Reference
+      Mnemonic Structure Reference
     </p>
 
     <div class="content-wrapper">
@@ -115,7 +115,7 @@
             <a class="nav-group-name-link" href="../Utilities.html">Utilities</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Enums/Mnemonic.html">Mnemonic</a>
+                <a class="nav-group-task-link" href="../Structs/Mnemonic.html">Mnemonic</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Enums/Base58Coder.html">Base58Coder</a>
@@ -191,13 +191,13 @@
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Mnemonic</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Mnemonic</span></code></pre>
 
                 </div>
               </div>
             
               <div class="slightly-smaller">
-                <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Mnemonic/Mnemonic.swift#L7-L22">Show on GitHub</a>
+                <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Mnemonic/Mnemonic.swift#L7-L28">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -209,9 +209,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10MobileCoin8MnemonicO8allWordsSaySSGvpZ"></a>
+                    <a name="/s:10MobileCoin8MnemonicV8allWordsSaySSGvpZ"></a>
                     <a name="//apple_ref/swift/Variable/allWords" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10MobileCoin8MnemonicO8allWordsSaySSGvpZ">allWords</a>
+                    <a class="token" href="#/s:10MobileCoin8MnemonicV8allWordsSaySSGvpZ">allWords</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -225,7 +225,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">allWords</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">allWords</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span></code></pre>
 
                         </div>
                       </div>
@@ -238,38 +238,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10MobileCoin8MnemonicO7entropy04fromC0s6ResultOy10Foundation4DataVAA17InvalidInputErrorVGSS_tFZ"></a>
-                    <a name="//apple_ref/swift/Method/entropy(fromMnemonic:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10MobileCoin8MnemonicO7entropy04fromC0s6ResultOy10Foundation4DataVAA17InvalidInputErrorVGSS_tFZ">entropy(fromMnemonic:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">fromMnemonic</span> <span class="nv">mnemonic</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">Data</span><span class="p">,</span> <span class="kt"><a href="../Structs/InvalidInputError.html">InvalidInputError</a></span><span class="o">&gt;</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Mnemonic/Mnemonic.swift#L10-L12">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:10MobileCoin8MnemonicO8mnemonic11fromEntropys6ResultOySSAA17InvalidInputErrorVG10Foundation4DataV_tFZ"></a>
+                    <a name="/s:10MobileCoin8MnemonicV8mnemonic11fromEntropys6ResultOySSAA17InvalidInputErrorVG10Foundation4DataV_tFZ"></a>
                     <a name="//apple_ref/swift/Method/mnemonic(fromEntropy:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10MobileCoin8MnemonicO8mnemonic11fromEntropys6ResultOySSAA17InvalidInputErrorVG10Foundation4DataV_tFZ">mnemonic(fromEntropy:<wbr>)</a>
+                    <a class="token" href="#/s:10MobileCoin8MnemonicV8mnemonic11fromEntropys6ResultOySSAA17InvalidInputErrorVG10Foundation4DataV_tFZ">mnemonic(fromEntropy:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -289,6 +260,35 @@
                         </div>
                       </div>
                       <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Mnemonic/Mnemonic.swift#L11-L13">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin8MnemonicV7entropy04fromC0s6ResultOy10Foundation4DataVAA17InvalidInputErrorVGSS_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/entropy(fromMnemonic:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin8MnemonicV7entropy04fromC0s6ResultOy10Foundation4DataVAA17InvalidInputErrorVGSS_tFZ">entropy(fromMnemonic:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">fromMnemonic</span> <span class="nv">mnemonic</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">Data</span><span class="p">,</span> <span class="kt"><a href="../Structs/InvalidInputError.html">InvalidInputError</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
                         <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Mnemonic/Mnemonic.swift#L15-L17">Show on GitHub</a>
                       </div>
                     </section>
@@ -297,9 +297,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10MobileCoin8MnemonicO5words14matchingPrefixSaySSGSS_tFZ"></a>
+                    <a name="/s:10MobileCoin8MnemonicV5words14matchingPrefixSaySSGSS_tFZ"></a>
                     <a name="//apple_ref/swift/Method/words(matchingPrefix:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10MobileCoin8MnemonicO5words14matchingPrefixSaySSGSS_tFZ">words(matchingPrefix:<wbr>)</a>
+                    <a class="token" href="#/s:10MobileCoin8MnemonicV5words14matchingPrefixSaySSGSS_tFZ">words(matchingPrefix:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">

@@ -30,35 +30,28 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 11,
-      "symbol": "AccountKey.make(rootEntropy:fogReportUrl:fogReportId:fogAuthoritySpki:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.static",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 57,
+      "line": 38,
       "symbol": "AccountKey.publicAddress",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 101,
+      "line": 67,
       "symbol": "AccountKey.serializedData",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 133,
+      "line": 99,
       "symbol": "AccountKey",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 134,
+      "line": 100,
       "symbol": "AccountKey",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
@@ -682,7 +675,14 @@
     {
       "file": "/Users/distiller/project/Sources/Mnemonic/AccountKey+Mnemonic.swift",
       "line": 8,
-      "symbol": "AccountKey.rootEntropy(fromMnemonic:accountIndex:)",
+      "symbol": "AccountKey.make(entropy:fogReportUrl:fogReportId:fogAuthoritySpki:accountIndex:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/distiller/project/Sources/Mnemonic/AccountKey+Mnemonic.swift",
+      "line": 26,
+      "symbol": "AccountKey.make(mnemonic:fogReportUrl:fogReportId:fogAuthoritySpki:accountIndex:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
@@ -690,7 +690,7 @@
       "file": "/Users/distiller/project/Sources/Mnemonic/Mnemonic.swift",
       "line": 7,
       "symbol": "Mnemonic",
-      "symbol_kind": "source.lang.swift.decl.enum",
+      "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
@@ -702,7 +702,7 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Mnemonic/Mnemonic.swift",
-      "line": 10,
+      "line": 15,
       "symbol": "Mnemonic.entropy(fromMnemonic:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
