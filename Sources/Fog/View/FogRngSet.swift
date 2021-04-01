@@ -79,21 +79,15 @@ final class FogRngSet {
         return Dictionary(uniqueKeysWithValues: Array(eligibleRngTrackers.prefix(maxRngs)))
     }
 
-    func processQueryResponse(
-        _ queryResponse: FogView_QueryResponse,
-        searchAttempt: FogSearchAttempt,
-        accountKey: AccountKey
-    ) -> Result<[FogView_TxOutSearchResult], ConnectionError> {
+    func processRngs(queryResponse: FogView_QueryResponse, accountKey: AccountKey)
+        -> Result<(), ConnectionError>
+    {
         processRngRecords(
             queryResponse.rngs,
             highestProcessedBlockCount: queryResponse.highestProcessedBlockCount,
             accountKey: accountKey
-        ).flatMap {
+        ).map {
             processDecommissionedRngs(queryResponse.decommissionedIngestInvocations)
-            return processTxOutSearchResults(
-                queryResponse.txOutSearchResults,
-                highestProcessedBlockCount: queryResponse.highestProcessedBlockCount,
-                searchAttempt: searchAttempt)
         }
     }
 
@@ -133,6 +127,16 @@ final class FogRngSet {
                 rngTracker.decommissioned = true
             }
         }
+    }
+
+    func processTxOutSearchResults(
+        queryResponse: FogView_QueryResponse,
+        searchAttempt: FogSearchAttempt
+    ) -> Result<[FogView_TxOutSearchResult], ConnectionError> {
+        processTxOutSearchResults(
+            queryResponse.txOutSearchResults,
+            highestProcessedBlockCount: queryResponse.highestProcessedBlockCount,
+            searchAttempt: searchAttempt)
     }
 
     private func processTxOutSearchResults(

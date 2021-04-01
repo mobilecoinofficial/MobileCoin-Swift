@@ -40,22 +40,23 @@ final class FogView {
         accountKey: AccountKey
     ) -> Result<[KnownTxOut], ConnectionError> {
         logger.info("")
-        return rngSet.processQueryResponse(
-            queryResponse,
-            searchAttempt: searchAttempt,
-            accountKey: accountKey
-        ).flatMap { searchResults in
-            searchResults.map { searchResult in
-                Self.decryptSearchResult(searchResult, accountKey: accountKey)
-            }.collectResult().map { decryptedTxOuts in
-                // Filter out TxOuts that don't belong to this account.
-                decryptedTxOuts.compactMap { txOut in
-                    guard let knownTxOut = KnownTxOut(txOut, accountKey: accountKey) else {
-                        logger.warning(
-                            "Warning: TxOut received from Fog View is not owned by this account.")
-                        return nil
+        return rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
+            rngSet.processTxOutSearchResults(
+                queryResponse: queryResponse,
+                searchAttempt: searchAttempt
+            ).flatMap { searchResults in
+                searchResults.map { searchResult in
+                    Self.decryptSearchResult(searchResult, accountKey: accountKey)
+                }.collectResult().map { decryptedTxOuts in
+                    // Filter out TxOuts that don't belong to this account.
+                    decryptedTxOuts.compactMap { txOut in
+                        guard let knownTxOut = KnownTxOut(txOut, accountKey: accountKey) else {
+                            logger.warning(
+                                "TxOut received from Fog View is not owned by this account.")
+                            return nil
+                        }
+                        return knownTxOut
                     }
-                    return knownTxOut
                 }
             }
         }
