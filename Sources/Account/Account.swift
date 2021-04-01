@@ -10,7 +10,6 @@ final class Account {
     let fogView = FogView()
 
     var allTxOutTrackers: [TxOutTracker] = []
-    var unscannedMissedBlocksRanges: [Range<UInt64>] = []
 
     init(accountKey: AccountKeyWithFog) {
         logger.info("")
@@ -22,6 +21,8 @@ final class Account {
     var publicAddress: PublicAddress {
         accountKey.publicAddress
     }
+
+    var unscannedMissedBlocksRanges: [Range<UInt64>] { fogView.unscannedMissedBlocksRanges }
 
     private var allTxOutsFoundBlockCount: UInt64 {
         var allTxOutsFoundBlockCount = fogView.allRngTxOutsFoundBlockCount
@@ -127,6 +128,11 @@ final class Account {
     func addTxOuts(_ txOuts: [KnownTxOut]) {
         logger.info("txOuts: \(redacting: txOuts)")
         allTxOutTrackers.append(contentsOf: txOuts.map { TxOutTracker($0) })
+    }
+
+    func addViewKeyScanResults(scannedBlockRanges: [Range<UInt64>], foundTxOuts: [KnownTxOut]) {
+        addTxOuts(foundTxOuts)
+        fogView.markBlocksAsScanned(blockRanges: scannedBlockRanges)
     }
 
     func cachedReceivedStatus(of receipt: Receipt)
