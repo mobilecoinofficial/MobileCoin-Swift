@@ -96,7 +96,6 @@ extension FogView {
             fogViewService.query(requestAad: requestAad, request: request) {
                 completion($0.flatMap { response in
                     Self.printFogQueryResponseDebug(response: response)
-
                     return self.fogView.writeSync { fogView in
                         fogView.processQueryResponse(
                             response,
