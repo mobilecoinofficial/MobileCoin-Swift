@@ -104,8 +104,7 @@ public struct AccountKey {
             return try proto.serializedData()
         } catch {
             // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError(
-                "Error: Protobuf serialization failed: \(redacting: error.localizedDescription)")
+            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
         }
     }
 
@@ -223,20 +222,19 @@ struct AccountKeyWithFog {
     let accountKey: AccountKey
 
     init?(accountKey: AccountKey) {
-        logger.info(accountKey.publicAddress.debugDescription)
+        logger.info("\(redacting: accountKey.publicAddress)")
+
         guard accountKey.fogInfo != nil else {
             return nil
         }
-
         self.accountKey = accountKey
     }
 
     var fogInfo: AccountKey.FogInfo {
         guard let fogInfo = accountKey.fogInfo else {
             // Safety: accountKey is guaranteed to have fogInfo.
-            logger.fatalError("accountKey doesn't have fogInfo.")
+            logger.fatalError("accountKey doesn't have fogInfo")
         }
-
         return fogInfo
     }
 }

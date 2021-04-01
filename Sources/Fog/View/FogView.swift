@@ -142,7 +142,7 @@ final class FogView {
                 serializedTxOutRecord = try txOutRecord.serializedData()
             } catch {
                 // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-                logger.fatalError("Protobuf serialization failed: \(error)")
+                logger.fatalError("Protobuf serialization failed: \(redacting: error)")
             }
             logger.info("Invalid TxOut returned from Fog View.")
             return .failure(.invalidServerResponse(

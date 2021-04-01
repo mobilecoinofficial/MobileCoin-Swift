@@ -13,6 +13,7 @@ public final class MobileCoinClient {
         -> Result<MobileCoinClient, InvalidInputError>
     {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
+            logger.error("Accounts without fog URLs are not currently supported.")
             return .failure(
                 InvalidInputError("Accounts without fog URLs are not currently supported."))
         }
@@ -74,8 +75,8 @@ public final class MobileCoinClient {
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
-        logger.info("")
         inner.accessAsync {
+            logger.info("")
             Account.BalanceUpdater(
                 account: self.accountLock,
                 fogViewService: $0.serviceProvider.fogViewService,
@@ -84,6 +85,7 @@ public final class MobileCoinClient {
                 fogQueryScalingStrategy: self.fogQueryScalingStrategy,
                 targetQueue: self.serialQueue
             ).updateBalance { result in
+                logger.info("updateBalance result: \(redacting: result)")
                 self.callbackQueue.async {
                     completion(result)
                 }
@@ -95,10 +97,12 @@ public final class MobileCoinClient {
         -> Result<UInt64, BalanceTransferEstimationError>
     {
         logger.info("feeLevel: \(feeLevel)")
-        return Account.TransactionEstimator(
+        let amountTransferable = Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.txOutSelectionStrategy
         ).amountTransferable(feeLevel: feeLevel)
+        logger.info("amountTransferable result: \(redacting: amountTransferable)")
+        return amountTransferable
     }
 
     public func estimateTotalFee(
@@ -106,20 +110,24 @@ public final class MobileCoinClient {
         feeLevel: FeeLevel = .minimum
     ) -> Result<UInt64, TransactionEstimationError> {
         logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
-        return Account.TransactionEstimator(
+        let totalFee = Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.txOutSelectionStrategy
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
+        logger.info("totalFee result: \(redacting: totalFee)")
+        return totalFee
     }
 
     public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
         -> Result<Bool, TransactionEstimationError>
     {
         logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
-        return Account.TransactionEstimator(
+        let requiresDefragmentation = Account.TransactionEstimator(
             account: accountLock,
             txOutSelectionStrategy: self.txOutSelectionStrategy
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
+        logger.info("requiresDefragmentation result: \(redacting: requiresDefragmentation)")
+        return requiresDefragmentation
     }
 
     public func prepareTransaction(
@@ -130,9 +138,9 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        logger.info(
-            "recipient: \(recipient.debugDescription), amount: \(redacting: amount), fee: \(fee)")
         inner.accessAsync {
+            logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
+                "fee: \(redacting: fee)")
             Account.TransactionOperations(
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
@@ -156,10 +164,9 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        logger.info(
-            "recipient: \(recipient.debugDescription), amount: \(redacting: amount), " +
-                "feeLevel: \(feeLevel)")
         inner.accessAsync {
+            logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
+                "feeLevel: \(feeLevel)")
             Account.TransactionOperations(
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
@@ -328,6 +335,7 @@ extension MobileCoinClient {
                 networkConfig.consensusTrustRoots =
                     try trustRoots.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
             } catch {
+                logger.error("Failed parsing Consensus trust roots: \(error)")
                 return .failure(InvalidInputError("Failed parsing Consensus trust roots: \(error)"))
             }
             return .success(())
@@ -339,6 +347,7 @@ extension MobileCoinClient {
                 networkConfig.fogTrustRoots =
                     try trustRoots.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
             } catch {
+                logger.error("Failed parsing Fog trust roots: \(error)")
                 return .failure(InvalidInputError("Failed parsing Fog trust roots: \(error)"))
             }
             return .success(())
