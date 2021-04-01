@@ -81,6 +81,8 @@ extension FogView {
                 "numOutputs: \(numOutputs)")
             var requestAad = FogView_QueryRequestAAD()
             let searchAttempt: FogSearchAttempt = fogView.readSync {
+                requestAad.startFromUserEventID = $0.nextStartFromUserEventId
+
                 // Note: converting directly from blockIndex to blockCount here is valid.
                 requestAad.startFromBlockIndex = $0.allRngRecordsKnownBlockCount
 

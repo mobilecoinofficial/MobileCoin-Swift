@@ -11,6 +11,9 @@ final class FogView {
     private let rngSet = FogRngSet()
     private(set) var unscannedMissedBlocksRanges: [Range<UInt64>] = []
 
+    /// See `FogUserEvent` in the Fog repo for a list of user events.
+    private(set) var nextStartFromUserEventId: Int64 = 0
+
     var allRngTxOutsFoundBlockCount: UInt64 {
         rngSet.knownBlockCount
     }
@@ -39,6 +42,14 @@ final class FogView {
         logger.info("")
         return rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
             processMissedBlockRanges(queryResponse.missedBlockRanges)
+
+            if queryResponse.nextStartFromUserEventID > nextStartFromUserEventId {
+                // We set this only after we've processed the info in `QueryResponse` that's
+                // considered an event, which currently includes `NewRngRecord`,
+                // `DecommissionIngestInvocation`, and `MissingBlocks`. (See `FogUserEvent` in the
+                // Fog repo for the canonical list.)
+                nextStartFromUserEventId = queryResponse.nextStartFromUserEventID
+            }
 
             return rngSet.processTxOutSearchResults(
                 queryResponse: queryResponse,
