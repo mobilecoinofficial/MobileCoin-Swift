@@ -38,23 +38,31 @@ enum MobileCoinNetwork {
 
 extension MobileCoinNetwork {
 
-    private static let devRootEntropies = [
+    private static let devNetworkTestAccountPrivateKeysHex = [
         // account key 0
-        Data32(hexEncoded: "029a2f3945a8f6bb1fb5b11a54283a40526d282359243905f1a30db82a9e597c")!,
+        ("e7a1cbbd97382b0d7532f31bf45e7d1628ba9127039d3650a371e6675ac7b40d",
+         "bb9fd7c2faf1e4f66c979777eddfd79de81a7962a8e45a4fda5e7cd94bd0b000"),
         // account key 1
-        Data32(hexEncoded: "ebf8bd9b42682cfad6b7ba01cfdf08af2c38907caf33b7daf888986d07b5549c")!,
+        ("fe7f68d45331d9f386f816e9a90dcc8b39cc9db8bba2ffd7337fd1bff9f4a601",
+         "877be1fe01e037141ae6fa2ae032c4c0e0bbae385b811eebe543f154fa33f10e"),
         // account key 2
-        Data32(hexEncoded: "5626b806e7736e568f67731e8a26d8e581c32f0aaffdc643fbbdab72a1eb5708")!,
+        ("c203ff741f6c988d9a3467fe96b0083d4d6cfedd3bdb98195c74fc8c608c6f07",
+         "e202cbe05fc8ba0a4561719997a0e89b514e98e81a266d8d7ff02fb429b49401"),
         // account key 3
-        Data32(hexEncoded: "727022e7d0b9fc7075f63be0287eb6d127825956664dcb49fd583bee55820fc8")!,
+        ("1497e50403429a496410786f5005419859b8b392492a03793f4acd75b8db7f0b",
+         "a44d34fa67db295c1bb220173d11fa7c39362f22663811349d373e3912087a0e"),
         // account key 4
-        Data32(hexEncoded: "1dbae15960625090ca4696959d963c780ec889eb98e74d5047d4205245ce5137")!,
+        ("a20cbb25550ce5d35cf714fd49f904ad0ee211686b51dfce00d0cbbca731c10f",
+         "f4bbafd7fa221bc488f7879cff65df586d49fdcfc3cd2c1a270e66585cb48008"),
         // account key 5
-        Data32(hexEncoded: "4fd57855482a09688fbafd908973252b9b2f3c4b9d6e7c379b65afa75feb3342")!,
+        ("1a2e559605b685dcd24224e29904e97d05858f19ef8c9c01c997b26ac6f1fb0f",
+         "2fed1891e7c17d1a78933596434252d1be7f461ff8b5505f08476162f579b208"),
         // account key 6
-        Data32(hexEncoded: "1c7e4be6c1609fc5dfa63e6a9957b8b47e0cbc80ee4086cfc38e25147527f63f")!,
+        ("389b07fce6b0daf0a3434c6c555ba3e2ba096e5f8b6ec1e129f9e0160d3f240c",
+         "41a0c650d0572ffdc5745dbba8f1f14f836e435bee221abd0916fe24d6951404"),
         // account key 7
-        Data32(hexEncoded: "91e7f15bf090d6c1e625987745033c0e2b755acb368519d2216887d839433ed4")!,
+        ("a2480ca6e0623206577b6567fb43d47c361f3d441b4871d8abf4e9a022ea3b08",
+         "5ce48390a4b805f321abaf4aa5960773fa9c6ad34ed2d4bfe0155c5df01aab0f"),
     ]
 
     var consensusUrl: String {
@@ -246,12 +254,20 @@ extension MobileCoinNetwork {
         }
     }
 
-    var rootEntropies: [Data32] {
+    var accountPrivateKeys: [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]
+    {
+        accountPrivateKeysHex.map {
+            (RistrettoPrivate(hexEncoded: $0.viewPrivateKeyHex)!,
+             RistrettoPrivate(hexEncoded: $0.spendPrivateKeyHex)!)
+        }
+    }
+
+    var accountPrivateKeysHex: [(viewPrivateKeyHex: String, spendPrivateKeyHex: String)] {
         switch self {
         case .mainNet, .testNet:
             return []
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
-            return Self.devRootEntropies
+            return Self.devNetworkTestAccountPrivateKeysHex
         }
     }
 
