@@ -12,7 +12,7 @@ class AccountKeyPublicApiTests: XCTestCase {
     func testMake() throws {
         let fixture = try AccountKey.Fixtures.Init()
         _ = try AccountKey.make(
-            rootEntropy: fixture.rootEntropyData,
+            mnemonic: fixture.mnemonicString,
             fogReportUrl: fixture.fogReportUrl,
             fogReportId: fixture.fogReportId,
             fogAuthoritySpki: fixture.fogAuthoritySpki).get()
@@ -21,7 +21,7 @@ class AccountKeyPublicApiTests: XCTestCase {
     func testWrongSchemeFails() throws {
         let fixture = try AccountKey.Fixtures.Init()
         XCTAssertThrowsError(try AccountKey.make(
-            rootEntropy: fixture.rootEntropyData,
+            mnemonic: fixture.mnemonicString,
             fogReportUrl: "mc://fog-report.fake.mobilecoin.com",
             fogReportId: fixture.fogReportId,
             fogAuthoritySpki: fixture.fogAuthoritySpki).get())

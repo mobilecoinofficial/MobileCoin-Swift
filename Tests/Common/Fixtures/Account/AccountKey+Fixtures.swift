@@ -13,8 +13,8 @@ extension AccountKey {
 
 extension AccountKey.Fixtures {
     struct Init {
-        let rootEntropy = Self.rootEntropy()
-        var rootEntropyData: Data { rootEntropy.data }
+        let mnemonic: Mnemonic
+        var mnemonicString: String { mnemonic.phrase }
 
         let fogReportUrl = Self.fogReportUrl
         let fogReportId = Self.fogReportId
@@ -24,6 +24,7 @@ extension AccountKey.Fixtures {
         let spendPrivateKey = DefaultZero.spendPrivateKey
 
         init() throws {
+            self.mnemonic = Self.mnemonic()
             self.fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: Self.fogAuthoritySpkiB64))
         }
     }
@@ -39,10 +40,10 @@ extension AccountKey.Fixtures {
 
         init(accountIndex: UInt8 = 0) throws {
             let initFixture = try Init()
-            let rootEntropy = Init.rootEntropy(accountIndex: accountIndex)
+            let mnemonic = Init.mnemonic(accountIndex: accountIndex)
             self.fogAuthoritySpki = initFixture.fogAuthoritySpki
             self.accountKey = try AccountKey.make(
-                rootEntropy: rootEntropy,
+                mnemonic: mnemonic.phrase,
                 fogReportUrl: initFixture.fogReportUrl,
                 fogReportId: initFixture.fogReportId,
                 fogAuthoritySpki: self.fogAuthoritySpki).get()
@@ -63,7 +64,7 @@ extension AccountKey.Fixtures {
         init() throws {
             let initFixture = try Init()
             self.accountKey = try AccountKey.make(
-                rootEntropy: initFixture.rootEntropy,
+                mnemonic: initFixture.mnemonicString,
                 fogReportUrl: initFixture.fogReportUrl,
                 fogReportId: initFixture.fogReportId,
                 fogAuthoritySpki: initFixture.fogAuthoritySpki).get()
@@ -76,8 +77,8 @@ extension AccountKey.Fixtures {
         let accountKey: AccountKey
 
         init(accountIndex: UInt8 = 0) {
-            let rootEntropy = Init.rootEntropy(accountIndex: accountIndex)
-            self.accountKey = AccountKey(rootEntropy: rootEntropy)
+            let mnemonic = Init.mnemonic(accountIndex: accountIndex)
+            self.accountKey = AccountKey(mnemonic: mnemonic)
         }
     }
 }
@@ -96,8 +97,8 @@ extension AccountKey.Fixtures {
 
 extension AccountKey.Fixtures.Init {
 
-    fileprivate static func rootEntropy(accountIndex: UInt8 = 0) -> Data32 {
-        Data32(repeating: accountIndex)
+    fileprivate static func mnemonic(accountIndex: UInt8 = 0) -> Mnemonic {
+        Bip39Utils.mnemonic(fromEntropy: Data32(repeating: accountIndex))
     }
 
     fileprivate static let fogReportUrl = "fog://fog-report.fake.mobilecoin.com"
@@ -118,31 +119,23 @@ extension AccountKey.Fixtures.Init {
 
 extension AccountKey.Fixtures.DefaultZero {
 
-    fileprivate static let viewPrivateKey = RistrettoPrivate([
-        176, 20, 109, 232, 205, 143, 91, 121, 98, 249, 231, 74, 94, 240, 243, 229, 138, 149, 80,
-        201, 82, 122, 193, 68, 243, 135, 41, 240, 253, 63, 237, 14,
-    ])!
-    fileprivate static let spendPrivateKey = RistrettoPrivate([
-        180, 191, 1, 167, 126, 212, 224, 101, 233, 8, 45, 75, 218, 103, 173, 211, 12, 136, 224, 33,
-        220, 248, 31, 200, 78, 106, 156, 162, 203, 104, 225, 7,
-    ])!
+    fileprivate static let viewPrivateKey =
+        RistrettoPrivate(base64Encoded: "glKsF3hsRQw/FrPEL6yiGUuTrC3M/e3Y0w0opYvTIQA=")!
+    fileprivate static let spendPrivateKey =
+        RistrettoPrivate(base64Encoded: "U/o+g92rI0heZ4cyYuW2mD0aJ3HfFIPvWYqhh0SAfQU=")!
 
-    fileprivate static let subaddressViewPrivateKey = RistrettoPrivate([
-        190, 159, 158, 147, 230, 83, 60, 59, 37, 3, 134, 114, 0, 240, 50, 243, 30, 60, 78, 15, 23,
-        150, 31, 246, 192, 1, 117, 76, 241, 99, 148, 8,
-    ])!
-    fileprivate static let subaddressSpendPrivateKey = RistrettoPrivate([
-        128, 29, 25, 125, 89, 6, 98, 50, 91, 210, 140, 113, 249, 47, 95, 68, 249, 192, 181, 168, 30,
-        209, 41, 9, 255, 9, 184, 51, 216, 181, 97, 6,
-    ])!
+    fileprivate static let subaddressViewPrivateKey =
+        RistrettoPrivate(base64Encoded: "Axo3oWR5s4wgkYX+cOmpSTaPLizY2WQZxyHODerPvwo=")!
+    fileprivate static let subaddressSpendPrivateKey =
+        RistrettoPrivate(base64Encoded: "7qHbcA+cQzjwccpYXDwCkLuxtPQFtWfhSDD7nuyH6go=")!
 
 }
 
 extension AccountKey.Fixtures.Serialization {
 
     fileprivate static let serializedDataB64Encoded = """
-        CiIKILAUbejNj1t5YvnnSl7w8+WKlVDJUnrBRPOHKfD9P+0OEiIKILS/Aad+1OBl6QgtS9pnrdMMiOAh3PgfyE5qnKL\
-        LaOEHGiRmb2c6Ly9mb2ctcmVwb3J0LmZha2UubW9iaWxlY29pbi5jb20qpgQwggIiMA0GCSqGSIb3DQEBAQUAA4ICDw\
+        CiIKIIJSrBd4bEUMPxazxC+sohlLk6wtzP3t2NMNKKWL0yEAEiIKIFP6PoPdqyNIXmeHMmLltpg9Gidx3xSD71mKoYd\
+        EgH0FGiRmb2c6Ly9mb2ctcmVwb3J0LmZha2UubW9iaWxlY29pbi5jb20qpgQwggIiMA0GCSqGSIb3DQEBAQUAA4ICDw\
         AwggIKAoICAQDEAFnvlBm/24f38TzbdVNOalaI6J6GiqSxkyqwMBGph0N7EBBvVj6rJPoeWnlAxQdCWSiYUoueF7/T7\
         DFnX+5OqeHLYVGGuVyWk69zNPXRKZzH1GQoAKnEJbT3kxbF4XC0yYumqRd+Xgp4ym3F0dEBIe4uUov4VfA6orDcnafD\
         mrYOkGyDU42R1bibnlkV2KZfcztP9a6vlaUH6e0GkoVT/lP6t0Pc5Sb+0TFtiTsLnxeZhbTxOcVH0k4x6QVkyZN+Xl3\

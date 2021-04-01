@@ -84,17 +84,17 @@ extension PublicAddress.Fixtures {
 
 extension PublicAddress.Fixtures.DefaultZero {
 
-    fileprivate static let viewPublicKeyB64 = "eJAcEYNOhC32vpjBJ5U1E+EWCV1BIswn2Ae0URy4HhE="
-    fileprivate static let spendPublicKeyB64 = "9i/xwzoihbGu5hLthygfLGi7K1sPFDmhPkq3KPmO+2o="
+    fileprivate static let viewPublicKeyB64 = "CK1CgouTTmWQeU94jFpVma+hLKgIC5Cvu7+SigowzW8="
+    fileprivate static let spendPublicKeyB64 = "SqHrfSO3v+TbOXMnfYWHLrfc/hdck8XIdY7P14CtahA="
 
 }
 
 extension PublicAddress.Fixtures.Serialization {
 
     fileprivate static let serializedDataB64Encoded = """
-        CiIKIHiQHBGDToQt9r6YwSeVNRPhFgldQSLMJ9gHtFEcuB4REiIKIPYv8cM6IoWxruYS7YcoHyxouytbDxQ5oT5Ktyj\
-        5jvtqGiRmb2c6Ly9mb2ctcmVwb3J0LmZha2UubW9iaWxlY29pbi5jb20qQGKcpgeIvBZMKl0DHQXmuvQjfRYAXtU1FV\
-        zg3GIq3qNJQV6WsZTytMxiQ8Jp/ji2+n1O63EU6P7Oes+yyI1T1Iw=
+        CiIKIAitQoKLk05lkHlPeIxaVZmvoSyoCAuQr7u/kooKMM1vEiIKIEqh630jt7/k2zlzJ32Fhy633P4XXJPFyHWOz9e\
+        ArWoQGiRmb2c6Ly9mb2ctcmVwb3J0LmZha2UubW9iaWxlY29pbi5jb20qQEIjVGb+GOA3SXR9U2uPAY9AX02bJQsh28\
+        MHNhMoep49uuWGzbq7a0Ya2YJyNb7xUqpSBnmjAKfpUQLqQkMMzYE=
         """
 
 }

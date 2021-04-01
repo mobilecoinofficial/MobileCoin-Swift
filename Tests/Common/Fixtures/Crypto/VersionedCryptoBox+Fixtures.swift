@@ -35,9 +35,9 @@ extension VersionedCryptoBox.Fixtures.Default {
         AAACH//////////y0CAAAA
         """)!
     fileprivate static let ciphertext = Data(base64Encoded: """
-        cIBkDi1Juv3050d/GniqC+wZXmwEWAUdau4ORuGoLREjOyTnijygdOpfdgYrA/wiFIYoYKMCYX+M/ohta2O9PbI19DH\
-        Vn4A+955T38Ah/AzkVabRA31YQkF2ZM1eTsvZHUkwwCaHrkXCXJvlrOLLnja8STH/AUzua1REshS63owhlDwxF0hoV/\
-        k6T4AMNwxQadx53XoJOX6mGMoscdpp1aSfPIoYbBJa3ZS4fYHZkp1Z2hyA2J5iVm9YvYI8IOiHp3Wbqxmiv3QZAQA=
+        qn+wYIuZ23oBhi1qDuJoFyCJmIzbo5krlvc/2uxIQJJrATP6i/ePWebVsxpyomJ+CqAGykjmmYCwE28YfKD9VlY/a1o\
+        XAsr8aHKSv+0NE/+RuVsbaxNJRI7ExEiu1tR9Sx3zlI4glYr04udYndVQLn03Vsz3qVq7RvapMEhCn2x9M02I+17Sih\
+        8BdA9+aN2C5JqZmMqxpV0rGMoscdpp1aSfPIoYbBJa3ZS4fYHZkp1Z2hyA2J5iVm87Uzt3oZq0m3Q0sn0crGtNAQA=
         """)!
 
 }

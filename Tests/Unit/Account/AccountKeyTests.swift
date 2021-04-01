@@ -9,21 +9,21 @@ class AccountKeyTests: XCTestCase {
 
     func testInit() throws {
         let fixture = try AccountKey.Fixtures.Init()
-        _ = AccountKey(rootEntropy: fixture.rootEntropy)
+        _ = AccountKey(mnemonic: fixture.mnemonic)
     }
 
     func testMakeWithFog() throws {
         let fixture = try AccountKey.Fixtures.Init()
         XCTAssertSuccess(AccountKey.make(
-            rootEntropy: fixture.rootEntropy,
+            mnemonic: fixture.mnemonicString,
             fogReportUrl: fixture.fogReportUrl,
             fogReportId: fixture.fogReportId,
             fogAuthoritySpki: fixture.fogAuthoritySpki))
     }
 
-    func testFromRootEntropy() throws {
+    func testFromMnemonic() throws {
         let fixture = try AccountKey.Fixtures.Init()
-        let accountKey = AccountKey(rootEntropy: fixture.rootEntropy)
+        let accountKey = AccountKey(mnemonic: fixture.mnemonic)
         XCTAssertEqual(accountKey.viewPrivateKey, fixture.viewPrivateKey)
         XCTAssertEqual(accountKey.spendPrivateKey, fixture.spendPrivateKey)
     }
@@ -40,20 +40,6 @@ class AccountKeyTests: XCTestCase {
         let accountKey = fixture.accountKey
         XCTAssertEqual(accountKey.subaddressViewPrivateKey, fixture.subaddressViewPrivateKey)
         XCTAssertEqual(accountKey.subaddressSpendPrivateKey, fixture.subaddressSpendPrivateKey)
-    }
-
-    struct AcctPrivKeysFromRootEntropy: TestVector, Decodable {
-        let rootEntropy: Data32
-        let viewPrivateKey: RistrettoPrivate
-        let spendPrivateKey: RistrettoPrivate
-    }
-
-    func testAcctPrivKeysFromRootEntropy() throws {
-        for testcase in try AcctPrivKeysFromRootEntropy.testcases() {
-            let accountKey = AccountKey(rootEntropy: testcase.rootEntropy)
-            XCTAssertEqual(accountKey.viewPrivateKey, testcase.viewPrivateKey)
-            XCTAssertEqual(accountKey.spendPrivateKey, testcase.spendPrivateKey)
-        }
     }
 
     struct DefaultSubaddrKeysFromAcctPrivKeys: TestVector, Decodable {

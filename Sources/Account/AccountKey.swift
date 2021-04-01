@@ -8,29 +8,9 @@ import Foundation
 import LibMobileCoin
 
 public struct AccountKey {
-    public static func make(
-        rootEntropy: Data,
-        fogReportUrl: String,
-        fogReportId: String,
-        fogAuthoritySpki: Data
-    ) -> Result<AccountKey, InvalidInputError> {
-        logger.info("")
-        guard let rootEntropy = Data32(rootEntropy) else {
-            logger.info("failure - rootEntropy must be 32 bytes in length")
-            return .failure(InvalidInputError("rootEntropy must be 32 bytes in length"))
-        }
-
-        return FogInfo.make(
-            reportUrl: fogReportUrl,
-            reportId: fogReportId,
-            authoritySpki: fogAuthoritySpki
-        ).map { fogInfo in
-            AccountKey(rootEntropy: rootEntropy, fogInfo: fogInfo)
-        }
-    }
-
     static func make(
-        rootEntropy: Data32,
+        viewPrivateKey: RistrettoPrivate,
+        spendPrivateKey: RistrettoPrivate,
         fogReportUrl: String,
         fogReportId: String,
         fogAuthoritySpki: Data,
@@ -43,7 +23,8 @@ public struct AccountKey {
             authoritySpki: fogAuthoritySpki
         ).map { fogInfo in
             AccountKey(
-                rootEntropy: rootEntropy,
+                viewPrivateKey: viewPrivateKey,
+                spendPrivateKey: spendPrivateKey,
                 fogInfo: fogInfo,
                 subaddressIndex: subaddressIndex)
         }
@@ -55,21 +36,6 @@ public struct AccountKey {
     let subaddressIndex: UInt64
 
     public let publicAddress: PublicAddress
-
-    init(
-        rootEntropy: Data32,
-        fogInfo: FogInfo? = nil,
-        subaddressIndex: UInt64 = McConstants.DEFAULT_SUBADDRESS_INDEX
-    ) {
-        logger.info("")
-        let (viewPrivateKey, spendPrivateKey) = AccountKeyUtils.privateKeys(
-            fromRootEntropy: rootEntropy)
-        self.init(
-            viewPrivateKey: viewPrivateKey,
-            spendPrivateKey: spendPrivateKey,
-            fogInfo: fogInfo,
-            subaddressIndex: subaddressIndex)
-    }
 
     init(
         viewPrivateKey: RistrettoPrivate,
