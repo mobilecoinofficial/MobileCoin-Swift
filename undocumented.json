@@ -51,14 +51,14 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 134,
+      "line": 133,
       "symbol": "AccountKey",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Account/AccountKey.swift",
-      "line": 135,
+      "line": 134,
       "symbol": "AccountKey",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
@@ -163,21 +163,21 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
-      "line": 66,
+      "line": 65,
       "symbol": "PublicAddress.fogReportUrlString",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
-      "line": 81,
+      "line": 72,
       "symbol": "PublicAddress",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Account/PublicAddress.swift",
-      "line": 82,
+      "line": 73,
       "symbol": "PublicAddress",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
@@ -435,15 +435,15 @@
       "warning": "undocumented"
     },
     {
-      "file": "/Users/distiller/project/Sources/Common/Logging.swift",
-      "line": 11,
+      "file": "/Users/distiller/project/Sources/Common/MobileCoinLogging.swift",
+      "line": 9,
       "symbol": "MobileCoinLogging",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/distiller/project/Sources/Common/Logging.swift",
-      "line": 12,
+      "file": "/Users/distiller/project/Sources/Common/MobileCoinLogging.swift",
+      "line": 10,
       "symbol": "MobileCoinLogging.logSensitiveData",
       "symbol_kind": "source.lang.swift.decl.var.static",
       "warning": "undocumented"
@@ -548,21 +548,21 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
-      "line": 35,
+      "line": 36,
       "symbol": "MobUri.encode(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
-      "line": 40,
+      "line": 41,
       "symbol": "MobUri.encode(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
-      "line": 45,
+      "line": 46,
       "symbol": "MobUri.encode(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
@@ -723,147 +723,147 @@
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 56,
+      "line": 57,
       "symbol": "MobileCoinClient.balance",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 60,
+      "line": 61,
       "symbol": "MobileCoinClient.accountActivity",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 64,
+      "line": 65,
       "symbol": "MobileCoinClient.setConsensusBasicAuthorization(username:password:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 70,
+      "line": 71,
       "symbol": "MobileCoinClient.setFogBasicAuthorization(username:password:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 76,
+      "line": 77,
       "symbol": "MobileCoinClient.updateBalance(completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 94,
+      "line": 96,
       "symbol": "MobileCoinClient.amountTransferable(feeLevel:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 104,
+      "line": 108,
       "symbol": "MobileCoinClient.estimateTotalFee(toSendAmount:feeLevel:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 115,
+      "line": 121,
       "symbol": "MobileCoinClient.requiresDefragmentation(toSendAmount:feeLevel:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 125,
+      "line": 133,
       "symbol": "MobileCoinClient.prepareTransaction(to:amount:fee:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 151,
+      "line": 159,
       "symbol": "MobileCoinClient.prepareTransaction(to:amount:feeLevel:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 178,
+      "line": 185,
       "symbol": "MobileCoinClient.prepareDefragmentationStepTransactions(toSendAmount:feeLevel:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 201,
+      "line": 208,
       "symbol": "MobileCoinClient.submitTransaction(_:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 216,
+      "line": 223,
       "symbol": "MobileCoinClient.status(of:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 235,
+      "line": 242,
       "symbol": "MobileCoinClient.status(of:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 276,
+      "line": 283,
       "symbol": "MobileCoinClient",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 277,
+      "line": 284,
       "symbol": "MobileCoinClient.Config",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 308,
+      "line": 315,
       "symbol": "MobileCoinClient.Config.cacheStorageAdapter",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 324,
+      "line": 331,
       "symbol": "MobileCoinClient.Config.setConsensusTrustRoots(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 336,
+      "line": 344,
       "symbol": "MobileCoinClient.Config.setFogTrustRoots(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 347,
+      "line": 356,
       "symbol": "MobileCoinClient.Config.setConsensusBasicAuthorization(username:password:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/MobileCoinClient.swift",
-      "line": 352,
+      "line": 361,
       "symbol": "MobileCoinClient.Config.setFogBasicAuthorization(username:password:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
@@ -1031,14 +1031,14 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Transaction/Transaction.swift",
-      "line": 86,
+      "line": 85,
       "symbol": "Transaction",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Transaction/Transaction.swift",
-      "line": 87,
+      "line": 86,
       "symbol": "Transaction",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
