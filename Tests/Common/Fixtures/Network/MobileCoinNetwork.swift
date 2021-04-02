@@ -69,7 +69,7 @@ extension MobileCoinNetwork {
         "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
 
     private static let testNetConsensusMrEnclaveHex =
-        "cad79d32f4339f650671ce74d072ae9c1c01d84edd059bd4314932a7a8b29f3f"
+        "9268c3220a5260e51e4b586f00e4677fed2b80380f1eeaf775af60f8e880fde8"
     private static let testNetFogViewMrEnclaveHex =
         "4e598799faa4bb08a3bd55c0bcda7e1d22e41151d0c591f6c2a48b3562b0881e"
     private static let testNetFogLedgerMrEnclaveHex =
