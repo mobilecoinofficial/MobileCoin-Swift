@@ -314,7 +314,6 @@ struct FogSearchAttempt {
     fileprivate let ingestInvocationIdToRngSearchAttempt: [Int64: FogRngSearchAttempt]
 
     fileprivate init(ingestInvocationIdToRngSearchAttempt: [Int64: FogRngSearchAttempt]? = nil) {
-        logger.info("")
         self.ingestInvocationIdToRngSearchAttempt = ingestInvocationIdToRngSearchAttempt ?? [:]
     }
 

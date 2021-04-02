@@ -87,7 +87,6 @@ extension Transaction: Hashable {}
 
 extension Transaction {
     init?(_ proto: External_Tx) {
-        logger.info("")
         guard proto.prefix.inputs.count > 0 && proto.prefix.outputs.count > 0 else {
             return nil
         }

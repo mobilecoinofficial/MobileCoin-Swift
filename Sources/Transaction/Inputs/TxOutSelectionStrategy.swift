@@ -9,12 +9,10 @@ struct SelectionTxOut {
     let blockIndex: UInt64
 
     init(_ txOut: KnownTxOut) {
-        logger.info("")
         self.init(value: txOut.value, blockIndex: txOut.block.index)
     }
 
     init(value: UInt64, blockIndex: UInt64) {
-        logger.info("")
         self.value = value
         self.blockIndex = blockIndex
     }

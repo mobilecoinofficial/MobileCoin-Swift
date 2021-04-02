@@ -37,7 +37,6 @@ extension PaymentRequest: Hashable {}
 
 extension PaymentRequest {
     init?(_ paymentRequest: Printable_PaymentRequest) {
-        logger.info("")
         guard let publicAddress = PublicAddress(paymentRequest.publicAddress) else {
             return nil
         }
@@ -49,7 +48,6 @@ extension PaymentRequest {
 
 extension Printable_PaymentRequest {
     init(_ paymentRequest: PaymentRequest) {
-        logger.info("")
         self.init()
         self.publicAddress = External_PublicAddress(paymentRequest.publicAddress)
         if let value = paymentRequest.value {

@@ -34,7 +34,6 @@ public struct Receipt {
         confirmationNumber: TxOutConfirmationNumber,
         tombstoneBlockIndex: UInt64
     ) {
-        logger.info("")
         self.txOutPublicKeyTyped = txOut.publicKey
         self.commitment = txOut.commitment
         self.maskedValue = txOut.maskedValue
@@ -150,8 +149,6 @@ extension Receipt {
             return nil
         }
 
-        logger.info("")
-
         self.txOutPublicKeyTyped = txOutPublicKey
         self.commitment = commitment
         self.maskedValue = proto.amount.maskedValue
@@ -162,7 +159,6 @@ extension Receipt {
 
 extension External_Receipt {
     init(_ receipt: Receipt) {
-        logger.info("")
         self.init()
         self.publicKey = External_CompressedRistretto(receipt.txOutPublicKey)
         self.amount.commitment = External_CompressedRistretto(receipt.commitment)

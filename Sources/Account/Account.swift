@@ -12,7 +12,6 @@ final class Account {
     var allTxOutTrackers: [TxOutTracker] = []
 
     init(accountKey: AccountKeyWithFog) {
-        logger.info("")
         self.accountKey = accountKey.accountKey
     }
 
@@ -212,7 +211,6 @@ final class Account {
 extension Account {
     /// - Returns: `.failure` if `accountKey` doesn't use Fog.
     static func make(accountKey: AccountKey) -> Result<Account, InvalidInputError> {
-        logger.info("")
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
             logger.info("failure - accounts without fog URLs are not currently supported")
             return .failure(InvalidInputError(

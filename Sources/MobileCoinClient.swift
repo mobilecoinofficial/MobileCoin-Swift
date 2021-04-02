@@ -323,8 +323,6 @@ extension MobileCoinClient {
         var fogQueryScalingStrategy: FogQueryScalingStrategy = DefaultFogQueryScalingStrategy()
 
         init(networkConfig: NetworkConfig) {
-            logger.info("consensusUrl: \(networkConfig.consensusUrl.url), fogUrl: " +
-                "\(networkConfig.fogUrl.url)")
             self.networkConfig = networkConfig
         }
 
