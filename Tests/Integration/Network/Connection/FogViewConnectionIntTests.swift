@@ -72,8 +72,8 @@ class FogViewConnectionIntTests: XCTestCase {
                     XCTAssertEqual(response.txOutSearchResults.count, 5)
                     for txOutResult in response.txOutSearchResults {
                         XCTAssert(request.getTxos.contains(txOutResult.searchKey))
-                        XCTAssertEqual(txOutResult.resultCodeEnum, .found)
                     }
+                    XCTAssertEqual(response.txOutSearchResults.first?.resultCodeEnum, .found)
                     XCTAssertGreaterThan(response.lastKnownBlockCount, 0)
                     XCTAssertGreaterThan(response.lastKnownBlockCumulativeTxoCount, 0)
 
