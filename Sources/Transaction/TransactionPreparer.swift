@@ -167,7 +167,6 @@ struct TransactionPreparer {
         results: Result<[[(TxOut, TxOutMembershipProof)]], FogMerkleProofFetcherError>,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        logger.info("")
         switch results {
         case .success(let inputsMixinOutputs):
             logger.info("Processing results successful")

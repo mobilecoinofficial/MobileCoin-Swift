@@ -292,7 +292,6 @@ extension AttestedConnection {
         }
 
         private func requestCallOptions() -> CallOptions {
-            logger.info("")
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
             return callOptions
@@ -301,7 +300,6 @@ extension AttestedConnection {
         private func processResponse<Response>(callResult: UnaryCallResult<Response>)
             -> Result<Response, AttestedConnectionError>
         {
-            logger.info("")
             // Basic credential authorization failure
             guard callResult.status.code != .unauthenticated else {
                 logger.info("failure - connectionError - \(String(describing: callResult.status))")

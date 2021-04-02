@@ -105,8 +105,7 @@ struct FogMerkleProofFetcher {
     private static func parseResponse(response: FogLedger_GetOutputsResponse)
         -> Result<[UInt64: (TxOut, TxOutMembershipProof)], FogMerkleProofFetcherError>
     {
-        logger.info("")
-        return response.results.map { outputResult in
+        response.results.map { outputResult in
             switch outputResult.resultCodeEnum {
             case .exists:
                 guard let txOut = TxOut(outputResult.output),

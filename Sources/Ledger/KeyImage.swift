@@ -27,7 +27,6 @@ struct KeyImage {
 
         /// - Returns: `nil` when `blockCount` exceeds our knowledge about the spent status.
         func status(atBlockCount blockCount: UInt64) -> SpentStatus? {
-            logger.info("")
             switch self {
             case .spent(block: let spentAtBlock):
                 guard spentAtBlock.index < blockCount else {

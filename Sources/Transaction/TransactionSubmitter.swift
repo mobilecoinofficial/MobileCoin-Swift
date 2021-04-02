@@ -24,7 +24,6 @@ struct TransactionSubmitter {
     func processResponse(_ response: ConsensusCommon_ProposeTxResponse)
         -> Result<(), TransactionSubmissionError>
     {
-        logger.info("")
         switch response.result {
         case .ok:
             return .success(())

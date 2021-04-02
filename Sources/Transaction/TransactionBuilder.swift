@@ -215,7 +215,6 @@ final class TransactionBuilder {
     private static func remainingAmount(inputValues: [UInt64], outputValues: [UInt64], fee: UInt64)
         -> Result<UInt64, TransactionBuilderError>
     {
-        logger.info("")
         guard UInt64.safeCompare(
                 sumOfValues: inputValues,
                 isGreaterThanOrEqualToSumOfValues: outputValues + [fee])
@@ -236,7 +235,6 @@ final class TransactionBuilder {
     private static func positiveRemainingAmount(inputValues: [UInt64], fee: UInt64)
         -> Result<PositiveUInt64, TransactionBuilderError>
     {
-        logger.info("")
         guard UInt64.safeCompare(sumOfValues: inputValues, isGreaterThanValue: fee) else {
             return .failure(.invalidInput("Total input amount <= fee"))
         }
