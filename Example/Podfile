@@ -10,6 +10,7 @@ plugin 'cocoapods-keys', {
   :keys => [
     "devNetworkAuthUsername",
     "devNetworkAuthPassword",
+    "testNetTestAccountMnemonicsCommaSeparated",
   ]}
 
 use_frameworks!

@@ -413,7 +413,24 @@ extension MobileCoinNetwork {
     private static let devAuthPassword = ""
 #endif
 
-    var testAccountsMnemonics: [String] { [] }
+    var testAccountsMnemonics: [String] {
+        switch self {
+        case .mainNet:
+            return []
+        case .testNet:
+            return Self.testNetTestAccountMnemonicsCommaSeparated
+                .split(separator: ",").map { String($0) }
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return []
+        }
+    }
+
+#if canImport(Keys)
+    private static let testNetTestAccountMnemonicsCommaSeparated =
+        MobileCoinKeys().testNetTestAccountMnemonicsCommaSeparated
+#else
+    private static let testNetTestAccountMnemonicsCommaSeparated = ""
+#endif
 
     var testAccountsPrivateKeys:
         [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]

@@ -8,6 +8,7 @@ defaults:
     FASTLANE_SKIP_UPDATE_CHECK: "1"
     devNetworkAuthUsername:
     devNetworkAuthPassword:
+    testNetTestAccountMnemonicsCommaSeparated:
 
 commands:
   init-artifacts-submodule:
