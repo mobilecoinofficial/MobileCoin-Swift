@@ -54,8 +54,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<(totalFee: UInt64, requiresDefrag: Bool), TxOutSelectionError> {
-        logger.info("")
-        return estimateTotalFee(
+        estimateTotalFee(
             toSendAmount: amount,
             selectionFeeLevel: .feeLevel(feeLevel),
             txOuts: txOuts,
@@ -68,8 +67,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputs: Int
     ) -> Result<[Int], TransactionInputSelectionError> {
-        logger.info("")
-        return selectTransactionInputs(
+        selectTransactionInputs(
             amount: amount,
             selectionFeeLevel: .fixedPerTransaction(fee),
             fromTxOuts: txOuts,
@@ -83,8 +81,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputs: Int
     ) -> Result<(inputIds: [Int], fee: UInt64), TransactionInputSelectionError> {
-        logger.info("")
-        return selectTransactionInputs(
+        selectTransactionInputs(
             amount: amount,
             selectionFeeLevel: .feeLevel(feeLevel),
             fromTxOuts: txOuts,
@@ -503,7 +500,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
     }
 
     func numDefragTransactions(numSelected: Int, maxInputsPerTransaction: Int) -> Int {
-        logger.info("")
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
         let maxInputsPerTransaction = max(1, min(maxInputsPerTransaction, McConstants.MAX_INPUTS))
         guard maxInputsPerTransaction >= 2 else {
@@ -515,7 +511,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
     }
 
     func numInputsInFinalTransaction(numSelected: Int, maxInputsPerTransaction: Int) -> Int {
-        logger.info("")
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
         let maxInputsPerTransaction = max(1, min(maxInputsPerTransaction, McConstants.MAX_INPUTS))
 
@@ -531,8 +526,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         selectionFeeLevel: SelectionFeeLevel,
         maxInputsPerTransaction: Int
     ) -> UInt64 {
-        logger.info("")
-        return defragFees(
+        defragFees(
             numTxOuts: numTxOuts,
             selectionFeeLevel: selectionFeeLevel,
             maxInputsPerTransaction: maxInputsPerTransaction)
@@ -547,7 +541,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         selectionFeeLevel: SelectionFeeLevel,
         maxInputsPerTransaction: Int
     ) -> UInt64 {
-        logger.info("")
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
         let maxInputsPerTransaction = max(1, min(maxInputsPerTransaction, McConstants.MAX_INPUTS))
         guard maxInputsPerTransaction >= 2 else {
@@ -568,7 +561,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         selectionFeeLevel: SelectionFeeLevel,
         maxInputsPerTransaction: Int
     ) -> UInt64 {
-        logger.info("")
         switch selectionFeeLevel {
         case .feeLevel(let feeLevel):
             // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
@@ -591,7 +583,6 @@ extension FeeCalculator {
     fileprivate func defragTransactionFee(maxInputs: Int, selectionFeeLevel: SelectionFeeLevel)
         -> UInt64
     {
-        logger.info("")
         switch selectionFeeLevel {
         case .feeLevel(let feeLevel):
             return fee(numInputs: maxInputs, numOutputs: 1, feeLevel: feeLevel)

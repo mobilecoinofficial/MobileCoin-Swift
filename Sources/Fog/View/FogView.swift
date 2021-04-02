@@ -27,8 +27,7 @@ final class FogView {
         numOutputs: PositiveInt,
         minOutputsPerSelectedRng: Int
     ) -> FogSearchAttempt {
-        logger.info("")
-        return rngSet.searchAttempt(
+        rngSet.searchAttempt(
             requestedBlockCount: requestedBlockCount,
             numOutputs: numOutputs,
             minOutputsPerSelectedRng: minOutputsPerSelectedRng)
@@ -39,8 +38,7 @@ final class FogView {
         searchAttempt: FogSearchAttempt,
         accountKey: AccountKey
     ) -> Result<[KnownTxOut], ConnectionError> {
-        logger.info("")
-        return rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
+        rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
             processMissedBlockRanges(queryResponse.missedBlockRanges)
 
             if queryResponse.nextStartFromUserEventID > nextStartFromUserEventId {
@@ -109,8 +107,7 @@ final class FogView {
         _ searchResult: FogView_TxOutSearchResult,
         accountKey: AccountKey
     ) -> Result<LedgerTxOut, ConnectionError> {
-        logger.info("")
-        return FogViewUtils.decryptTxOutRecord(
+        FogViewUtils.decryptTxOutRecord(
             ciphertext: searchResult.ciphertext,
             accountKey: accountKey
         ).mapError { error in
@@ -137,18 +134,22 @@ final class FogView {
         -> Result<LedgerTxOut, ConnectionError>
     {
         guard let ledgerTxOut = LedgerTxOut(txOutRecord) else {
-            let serializedTxOutRecord: Data
-            do {
-                serializedTxOutRecord = try txOutRecord.serializedData()
-            } catch {
-                // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-                logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-            }
-            logger.info("Invalid TxOut returned from Fog View.")
-            return .failure(.invalidServerResponse(
-                "Invalid TxOut returned from Fog View. Base64-encoded TxOutRecord: " +
-                "\(serializedTxOutRecord.base64EncodedString())"))
+            let errorMessage = "Invalid TxOut returned from Fog View. TxOutRecord: " +
+                "\(redacting: txOutRecord.serializedDataInfallible.base64EncodedString())"
+            logger.error(errorMessage)
+            return .failure(.invalidServerResponse(errorMessage))
         }
         return .success(ledgerTxOut)
+    }
+}
+
+extension FogView_TxOutRecord {
+    fileprivate var serializedDataInfallible: Data {
+        do {
+            return try serializedData()
+        } catch {
+            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
+            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
+        }
     }
 }

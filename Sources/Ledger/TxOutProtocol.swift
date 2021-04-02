@@ -64,7 +64,6 @@ extension TxOutProtocol {
 
 extension FogView_FogTxOut {
     init(_ txOut: TxOutProtocol) {
-        logger.info("")
         self.init()
         self.amount =
             External_Amount(commitment: txOut.commitment, maskedValue: txOut.maskedValue)

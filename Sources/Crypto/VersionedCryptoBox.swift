@@ -32,8 +32,7 @@ enum VersionedCryptoBox {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<Data, InvalidInputError> {
-        logger.info("")
-        return publicKey.asMcBuffer { viewPublicKeyPtr in
+        publicKey.asMcBuffer { viewPublicKeyPtr in
             plaintext.asMcBuffer { plaintextPtr in
                 withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
                     Data.make(withMcMutableBuffer: { bufferPtr, errorPtr in
@@ -62,8 +61,7 @@ enum VersionedCryptoBox {
         ciphertext: Data,
         privateKey: RistrettoPrivate
     ) -> Result<Data, VersionedCryptoBoxError> {
-        logger.info("")
-        return privateKey.asMcBuffer { privateKeyPtr in
+        privateKey.asMcBuffer { privateKeyPtr in
             ciphertext.asMcBuffer { ciphertextPtr in
                 Data.make(withEstimatedLengthMcMutableBuffer: ciphertext.count)
                 { bufferPtr, errorPtr in

@@ -36,7 +36,6 @@ class AttestedConnection {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) {
-        logger.info("")
         let inner = Inner(client: client, config: config, rng: rng, rngContext: rngContext)
         self.inner = .init(inner, targetQueue: targetQueue)
     }
@@ -53,7 +52,6 @@ class AttestedConnection {
         request: Call.InnerRequest,
         completion: @escaping (Result<Call.InnerResponse, ConnectionError>) -> Void
     ) where Call.InnerRequestAad == (), Call.InnerResponseAad == () {
-        logger.info("")
         performAttestedCall(call, requestAad: (), request: request, completion: completion)
     }
 
@@ -63,7 +61,6 @@ class AttestedConnection {
         request: Call.InnerRequest,
         completion: @escaping (Result<Call.InnerResponse, ConnectionError>) -> Void
     ) where Call.InnerResponseAad == () {
-        logger.info("")
         performAttestedCall(call, requestAad: requestAad, request: request) {
             completion($0.map { $0.response })
         }
@@ -77,7 +74,6 @@ class AttestedConnection {
                    ConnectionError>
         ) -> Void
     ) where Call.InnerRequestAad == () {
-        logger.info("")
         performAttestedCall(call, requestAad: (), request: request, completion: completion)
     }
 
@@ -127,7 +123,6 @@ extension AttestedConnection {
             rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
             rngContext: Any? = nil
         ) {
-            logger.info("")
             self.session = ConnectionSession(config: config)
             self.client = client
             self.attestAke = AttestAke()
@@ -297,7 +292,6 @@ extension AttestedConnection {
         }
 
         private func requestCallOptions() -> CallOptions {
-            logger.info("")
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
             return callOptions
@@ -306,7 +300,6 @@ extension AttestedConnection {
         private func processResponse<Response>(callResult: UnaryCallResult<Response>)
             -> Result<Response, AttestedConnectionError>
         {
-            logger.info("")
             // Basic credential authorization failure
             guard callResult.status.code != .unauthenticated else {
                 logger.info("failure - connectionError - \(String(describing: callResult.status))")

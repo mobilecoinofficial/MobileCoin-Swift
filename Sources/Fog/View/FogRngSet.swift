@@ -305,7 +305,6 @@ extension RngTracker {
     }
 
     convenience init(rng: FogRng, rngRecord: FogView_RngRecord) {
-        logger.info("")
         self.init(rng: rng, startBlockIndex: rngRecord.startBlock)
     }
 }
@@ -314,7 +313,6 @@ struct FogSearchAttempt {
     fileprivate let ingestInvocationIdToRngSearchAttempt: [Int64: FogRngSearchAttempt]
 
     fileprivate init(ingestInvocationIdToRngSearchAttempt: [Int64: FogRngSearchAttempt]? = nil) {
-        logger.info("")
         self.ingestInvocationIdToRngSearchAttempt = ingestInvocationIdToRngSearchAttempt ?? [:]
     }
 

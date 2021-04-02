@@ -21,7 +21,6 @@ struct TransactionPreparer {
         mixinSelectionStrategy: MixinSelectionStrategy,
         targetQueue: DispatchQueue?
     ) {
-        logger.info("")
         self.serialQueue = DispatchQueue(
             label: "com.mobilecoin.\(Account.self).\(Self.self)",
             target: targetQueue)
@@ -137,7 +136,6 @@ struct TransactionPreparer {
         merkleRootBlock: UInt64? = nil,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        logger.info("")
         let inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
             forRealTxOutIndices: inputs.map { $0.globalIndex },
             selectionRange: ledgerTxOutCount.map { ..<$0 }
@@ -168,7 +166,6 @@ struct TransactionPreparer {
         results: Result<[[(TxOut, TxOutMembershipProof)]], FogMerkleProofFetcherError>,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        logger.info("")
         switch results {
         case .success(let inputsMixinOutputs):
             logger.info("Processing results successful")

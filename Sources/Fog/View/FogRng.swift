@@ -83,7 +83,6 @@ final class FogRng {
     private let outputSize: Int
 
     private init(_ ptr: OpaquePointer) {
-        logger.info("")
         self.ptr = ptr
         self.outputSize = withMcInfallibleReturningOptional {
             let len = mc_fog_rng_get_output_len(ptr)
@@ -92,7 +91,6 @@ final class FogRng {
     }
 
     deinit {
-        logger.info("")
         mc_fog_rng_free(ptr)
     }
 
