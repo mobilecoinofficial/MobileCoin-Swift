@@ -64,7 +64,7 @@ private struct ContextPrefixLogHandler: LogHandler {
     }
 }
 
-// `logSensitiveDataInternal` gets locked in place upon first read.
+// The value of `logSensitiveDataInternal` gets locked in place upon first read.
 private let logSensitiveDataInternal = ImmutableOnceReadLock(false)
 
 extension Logger {
