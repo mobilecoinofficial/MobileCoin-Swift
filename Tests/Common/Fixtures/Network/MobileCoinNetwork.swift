@@ -423,8 +423,8 @@ extension MobileCoinNetwork {
     }
 
 #if canImport(Keys)
-    private static let devAuthUsername = MobileCoinKeys().mobilecoinDevAuthUsername
-    private static let devAuthPassword = MobileCoinKeys().mobilecoinDevAuthPassword
+    private static let devAuthUsername = MobileCoinKeys().devNetworkAuthUsername
+    private static let devAuthPassword = MobileCoinKeys().devNetworkAuthPassword
 #else
     private static let devAuthUsername = ""
     private static let devAuthPassword = ""
