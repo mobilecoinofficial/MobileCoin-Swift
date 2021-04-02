@@ -21,8 +21,8 @@ extension NetworkConfig.Fixtures {
         let invalidTrustRootBytes: Data
 
         init() throws {
-            self.trustRootsBytes = try MobileCoinNetwork.trustRootsBytes()
-            self.trustRoots = try MobileCoinNetwork.trustRoots()
+            self.trustRootsBytes = try NetworkPreset.trustRootsBytes()
+            self.trustRoots = try NetworkPreset.trustRoots()
 
             self.wrongTrustRootBytes = try XCTUnwrap(Data(base64Encoded: Self.wrongTrustRootB64))
             self.wrongTrustRoot =

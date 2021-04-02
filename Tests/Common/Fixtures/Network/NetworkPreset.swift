@@ -12,7 +12,7 @@ import XCTest
 import Keys
 #endif
 
-enum MobileCoinNetwork {
+enum NetworkPreset {
     /// MainNet (MobileCoin Consensus node1 + MobileCoin Fog)
     case mainNet
 
@@ -36,7 +36,7 @@ enum MobileCoinNetwork {
     case eran
 }
 
-extension MobileCoinNetwork {
+extension NetworkPreset {
 
     var consensusUrl: String {
         switch self {
@@ -243,7 +243,7 @@ extension MobileCoinNetwork {
 
 }
 
-extension MobileCoinNetwork {
+extension NetworkPreset {
 
     var isDevNetwork: Bool {
         switch self {
