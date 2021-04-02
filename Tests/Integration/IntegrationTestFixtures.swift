@@ -20,14 +20,20 @@ extension IntegrationTestFixtures {
     }
 
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
-        let (viewPrivateKey, spendPrivateKey) = network.accountPrivateKeys[accountIndex]
         let fogAuthoritySpki = try network.fogAuthoritySpki()
-        return try AccountKey.make(
-            viewPrivateKey: viewPrivateKey,
-            spendPrivateKey: spendPrivateKey,
-            fogReportUrl: network.fogReportUrl,
-            fogReportId: network.fogReportId,
-            fogAuthoritySpki: fogAuthoritySpki).get()
+        let testAccountsPrivateKeys = network.testAccountsPrivateKeys
+        if testAccountsPrivateKeys.count > accountIndex {
+            let (viewPrivateKey, spendPrivateKey) = network.testAccountsPrivateKeys[accountIndex]
+            return try AccountKey.make(
+                viewPrivateKey: viewPrivateKey,
+                spendPrivateKey: spendPrivateKey,
+                fogReportUrl: network.fogReportUrl,
+                fogReportId: network.fogReportId,
+                fogAuthoritySpki: fogAuthoritySpki).get()
+        }
+
+        throw TestingError(
+            "accountIndex (\(accountIndex)) exceeds bounds of test account list")
     }
 
     static func createPublicAddress(accountIndex: Int = 0) throws -> PublicAddress {
