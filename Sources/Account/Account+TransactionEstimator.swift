@@ -22,7 +22,10 @@ extension Account {
         {
             logger.info("feeLevel: \(feeLevel)")
             let txOuts = account.readSync { $0.unspentTxOuts }
-            return txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts)
+            let amountTransferable =
+                txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts)
+            logger.info("amountTransferable result: \(redacting: amountTransferable)")
+            return amountTransferable
         }
 
         func estimateTotalFee(toSendAmount amount: UInt64, feeLevel: FeeLevel)
@@ -35,10 +38,12 @@ extension Account {
             }
 
             let txOuts = account.readSync { $0.unspentTxOuts }
-            return txOutSelector
+            let totalFee = txOutSelector
                 .estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, txOuts: txOuts)
-                .mapError { _ in .insufficientBalance() }
+                .mapError { _ -> TransactionEstimationError in .insufficientBalance() }
                 .map { $0.totalFee }
+            logger.info("totalFee result: \(redacting: totalFee)")
+            return totalFee
         }
 
         func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel)
@@ -51,10 +56,12 @@ extension Account {
             }
 
             let txOuts = account.readSync { $0.unspentTxOuts }
-            return txOutSelector
+            let requiresDefragmentation = txOutSelector
                 .estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, txOuts: txOuts)
-                .mapError { _ in .insufficientBalance() }
+                .mapError { _ -> TransactionEstimationError in .insufficientBalance() }
                 .map { $0.requiresDefrag }
+            logger.info("requiresDefragmentation result: \(redacting: requiresDefragmentation)")
+            return requiresDefragmentation
         }
     }
 }

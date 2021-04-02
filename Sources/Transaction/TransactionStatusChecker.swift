@@ -27,6 +27,8 @@ struct TransactionStatusChecker {
         _ transaction: Transaction,
         completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
     ) {
+        logger.info("Checking transaction status...")
+        logger.info("transaction: \(redacting: transaction.serializedData)")
         checkAcceptedStatus(transaction) {
             completion($0.map {
                 let status = TransactionStatus($0)

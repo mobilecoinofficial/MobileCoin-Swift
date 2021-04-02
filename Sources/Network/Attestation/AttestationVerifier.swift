@@ -9,7 +9,6 @@ final class AttestationVerifier {
     private let ptr: OpaquePointer
 
     init(attestation: Attestation) {
-        logger.info("")
         // Safety: mc_verifier_create should never return nil.
         self.ptr = withMcInfallible(mc_verifier_create)
 
@@ -18,13 +17,11 @@ final class AttestationVerifier {
     }
 
     deinit {
-        logger.info("")
         mc_verifier_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
-        logger.info("")
-        return try body(ptr)
+        try body(ptr)
     }
 
     private func addMrEnclave(_ mrEnclave: Attestation.MrEnclave) {
@@ -50,7 +47,6 @@ private final class MrEnclaveVerifier {
     private let ptr: OpaquePointer
 
     init(mrEnclave: Attestation.MrEnclave) {
-        logger.info("")
         self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
             // Safety: mc_mr_enclave_verifier_create should never fail.
             withMcInfallible { mc_mr_enclave_verifier_create(mrEnclavePtr) }
@@ -61,13 +57,11 @@ private final class MrEnclaveVerifier {
     }
 
     deinit {
-        logger.info("")
         mc_mr_enclave_verifier_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
-        logger.info("")
-        return try body(ptr)
+        try body(ptr)
     }
 
     private func addConfigAdvisory(advisoryId: String) {
@@ -91,7 +85,6 @@ private final class MrSignerVerifier {
     private let ptr: OpaquePointer
 
     init(mrSigner: Attestation.MrSigner) {
-        logger.info("")
         self.ptr = mrSigner.mrSigner.asMcBuffer { mrSignerPtr in
             // Safety: mc_mr_signer_verifier_create should never fail.
             withMcInfallible {
@@ -107,13 +100,11 @@ private final class MrSignerVerifier {
     }
 
     deinit {
-        logger.info("")
         mc_mr_signer_verifier_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
-        logger.info("")
-        return try body(ptr)
+        try body(ptr)
     }
 
     private func addConfigAdvisory(advisoryId: String) {

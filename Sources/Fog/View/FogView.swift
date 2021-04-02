@@ -134,18 +134,22 @@ final class FogView {
         -> Result<LedgerTxOut, ConnectionError>
     {
         guard let ledgerTxOut = LedgerTxOut(txOutRecord) else {
-            let serializedTxOutRecord: Data
-            do {
-                serializedTxOutRecord = try txOutRecord.serializedData()
-            } catch {
-                // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-                logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-            }
-            logger.info("Invalid TxOut returned from Fog View.")
-            return .failure(.invalidServerResponse(
-                "Invalid TxOut returned from Fog View. Base64-encoded TxOutRecord: " +
-                "\(serializedTxOutRecord.base64EncodedString())"))
+            let errorMessage = "Invalid TxOut returned from Fog View. TxOutRecord: " +
+                "\(redacting: txOutRecord.serializedDataInfallible.base64EncodedString())"
+            logger.error(errorMessage)
+            return .failure(.invalidServerResponse(errorMessage))
         }
         return .success(ledgerTxOut)
+    }
+}
+
+extension FogView_TxOutRecord {
+    fileprivate var serializedDataInfallible: Data {
+        do {
+            return try serializedData()
+        } catch {
+            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
+            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
+        }
     }
 }

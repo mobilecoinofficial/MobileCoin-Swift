@@ -36,7 +36,7 @@ extension Account {
         }
 
         func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
-            logger.info("")
+            logger.info("Updating balance...")
             checkForNewTxOuts {
                 guard $0.successOr(completion: completion) != nil else {
                     logger.info("failure")
@@ -51,9 +51,11 @@ extension Account {
 
                     logger.info("checking for spent txOuts")
                     self.checkForSpentTxOuts {
-                        completion($0.map {
+                        let result = $0.map {
                             self.account.readSync { $0.cachedBalance }
-                        })
+                        }
+                        logger.info("updateBalance result: \(redacting: result)")
+                        completion(result)
                     }
                 }
             }

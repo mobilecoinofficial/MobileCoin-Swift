@@ -43,8 +43,9 @@ public struct Receipt {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        logger.info("")
         guard let proto = try? External_Receipt(serializedData: serializedData) else {
+            logger.warning("External_Receipt deserialization failed. serializedData: " +
+                "\(redacting: serializedData.base64EncodedString())")
             return nil
         }
         self.init(proto)
@@ -145,7 +146,7 @@ extension Receipt {
               let commitment = Data32(proto.amount.commitment.data),
               let confirmationNumber = TxOutConfirmationNumber(proto.confirmation)
         else {
-            logger.info("Failed to initialize receipt with External_Receipt")
+            logger.warning("Failed to initialize Receipt with External_Receipt")
             return nil
         }
 

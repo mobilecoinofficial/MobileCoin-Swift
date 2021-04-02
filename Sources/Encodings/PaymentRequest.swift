@@ -15,7 +15,6 @@ public struct PaymentRequest {
     /// * Providing an empty string for `memo` is the same as passing `nil`, meaning no memo is
     ///     specified.
     public init(publicAddress: PublicAddress, value: UInt64? = nil, memo: String? = nil) {
-        logger.info("")
         self.publicAddress = publicAddress
 
         if let value = value, value != 0 {

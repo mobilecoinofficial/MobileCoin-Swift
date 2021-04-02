@@ -55,8 +55,8 @@ public struct AccountKey {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        logger.info("")
         guard let proto = try? External_AccountKey(serializedData: serializedData) else {
+            logger.warning("External_AccountKey deserialization failed.")
             return nil
         }
         self.init(proto)

@@ -136,7 +136,6 @@ struct TransactionPreparer {
         merkleRootBlock: UInt64? = nil,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        logger.info("")
         let inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
             forRealTxOutIndices: inputs.map { $0.globalIndex },
             selectionRange: ledgerTxOutCount.map { ..<$0 }

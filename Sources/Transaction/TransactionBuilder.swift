@@ -262,7 +262,6 @@ final class TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver()
     ) {
-        logger.info("")
         self.tombstoneBlockIndex = tombstoneBlockIndex
         self.ptr = fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
             // Safety: mc_transaction_builder_create should never return nil.
@@ -273,15 +272,13 @@ final class TransactionBuilder {
     }
 
     deinit {
-        logger.info("")
         mc_transaction_builder_free(ptr)
     }
 
     private func addInput(preparedTxInput: PreparedTxInput, accountKey: AccountKey)
         -> Result<(), TransactionBuilderError>
     {
-        logger.info("")
-        return addInput(
+        addInput(
             preparedTxInput: preparedTxInput,
             viewPrivateKey: accountKey.viewPrivateKey,
             subaddressSpendPrivateKey: accountKey.subaddressSpendPrivateKey)
@@ -292,7 +289,6 @@ final class TransactionBuilder {
         viewPrivateKey: RistrettoPrivate,
         subaddressSpendPrivateKey: RistrettoPrivate
     ) -> Result<(), TransactionBuilderError> {
-        logger.info("")
         let ring = McTransactionBuilderRing(ring: preparedTxInput.ring)
         return viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
             subaddressSpendPrivateKey.asMcBuffer { subaddressSpendPrivateKeyPtr in
@@ -357,8 +353,7 @@ final class TransactionBuilder {
             guard let txOut = TxOut(serializedData: txOutData) else {
                 // Safety: mc_transaction_builder_add_output should always return valid data on
                 // success.
-                logger.fatalError("Error: " +
-                    "mc_transaction_builder_add_output return invalid data.")
+                logger.fatalError("mc_transaction_builder_add_output returned invalid data.")
             }
 
             let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
@@ -390,8 +385,7 @@ final class TransactionBuilder {
         }.map { txBytes in
             guard let transaction = Transaction(serializedData: txBytes) else {
                 // Safety: mc_transaction_builder_build should always return valid data on success.
-                logger.fatalError("Error: " +
-                    "mc_transaction_builder_build return invalid data.")
+                logger.fatalError("mc_transaction_builder_build returned invalid data.")
             }
             return transaction
         }
@@ -402,7 +396,6 @@ private final class McTransactionBuilderRing {
     private let ptr: OpaquePointer
 
     init(ring: [(TxOut, TxOutMembershipProof)]) {
-        logger.info("")
         // Safety: mc_transaction_builder_ring_create should never return nil.
         self.ptr = withMcInfallible(mc_transaction_builder_ring_create)
 
@@ -412,12 +405,10 @@ private final class McTransactionBuilderRing {
     }
 
     deinit {
-        logger.info("")
         mc_transaction_builder_ring_free(ptr)
     }
 
     func addElement(txOut: TxOut, membershipProof: TxOutMembershipProof) {
-        logger.info("")
         txOut.serializedData.asMcBuffer { txOutBytesPtr in
             membershipProof.serializedData.asMcBuffer { membershipProofDataPtr in
                 // Safety: mc_transaction_builder_ring_add_element should never return nil.
@@ -432,7 +423,6 @@ private final class McTransactionBuilderRing {
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
-        logger.info("")
-        return try body(ptr)
+        try body(ptr)
     }
 }

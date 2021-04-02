@@ -178,13 +178,11 @@ private final class FfiAttestAke {
     private let ptr: OpaquePointer
 
     init() {
-        logger.info("")
         // Safety: mc_attest_ake_create should never return nil.
         self.ptr = withMcInfallible(mc_attest_ake_create)
     }
 
     deinit {
-        logger.info("")
         mc_attest_ake_free(ptr)
     }
 

@@ -24,7 +24,6 @@ public struct Balance {
     }
 
     init(amountLow: UInt64, amountHigh: UInt8, blockCount: UInt64) {
-        logger.info("")
         self.amountPicoMobLow = amountLow
         self.amountPicoMobHigh = amountHigh
         self.blockCount = blockCount

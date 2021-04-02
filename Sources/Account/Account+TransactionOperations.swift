@@ -42,8 +42,9 @@ extension Account {
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
             ) -> Void
         ) {
-            logger.info(
-                "recipient: \(redacting: recipient), amount: \(redacting: amount), fee: \(fee)")
+            logger.info("Preparing transaction...")
+            logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
+                "fee: \(redacting: fee)")
             guard amount > 0 else {
                 logger.info("failure - Cannot spend 0 MOB")
                 serialQueue.async {
@@ -93,12 +94,14 @@ extension Account {
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
             ) -> Void
         ) {
+            logger.info("Preparing transaction...")
             logger.info("recipient: \(redacting: recipient), amount: \(redacting: amount), " +
                 "feeLevel: \(feeLevel)")
             guard amount > 0 else {
-                logger.info("failure - Cannot spend 0 MOB")
+                let errorMessage = "Cannot spend 0 MOB"
+                logger.error(errorMessage)
                 serialQueue.async {
-                    completion(.failure(.invalidInput("Cannot spend 0 MOB")))
+                    completion(.failure(.invalidInput(errorMessage)))
                 }
                 return
             }
@@ -122,7 +125,7 @@ extension Account {
                 })
             {
             case .success(let (inputs: inputs, fee: fee)):
-                logger.info("success - fee: \(fee)")
+                logger.info("success - fee: \(redacting: fee)")
                 transactionPreparer.prepareTransaction(
                     inputs: inputs,
                     recipient: recipient,
@@ -143,6 +146,7 @@ extension Account {
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
+            logger.info("Preparing defragmentation step transactions...")
             logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
             guard amount > 0 else {
                 logger.info("failure - Cannot spend 0 MOB")
