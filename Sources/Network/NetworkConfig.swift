@@ -2,8 +2,6 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable multiline_function_chains
-
 import Foundation
 import NIOSSL
 
@@ -81,80 +79,6 @@ struct NetworkConfig {
 
 extension NetworkConfig {
     struct AttestationConfig {
-        static var devMrSigner: Self {
-            // INTEL-SA-00334: LVI hardening is handled via rustc arguments set in
-            // mc-util-build-enclave
-            do {
-                return .init(
-                    consensus: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_CONSENSUS_MRSIGNER,
-                        productId: McConstants.CONSENSUS_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogView: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_MRSIGNER,
-                        productId: McConstants.FOG_VIEW_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogKeyImage: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_MRSIGNER,
-                        productId: McConstants.FOG_LEDGER_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogMerkleProof: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_MRSIGNER,
-                        productId: McConstants.FOG_LEDGER_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogReport: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.DEV_FOG_REPORT_MRSIGNER,
-                        productId: McConstants.FOG_REPORT_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()))
-            } catch {
-                // Safety: MrSigner is guaranteed to be 32 bytes in length, so Attestation.init
-                // should never fail.
-                logger.fatalError("invalid configuration: \(error)")
-            }
-        }
-
-        static var testNetMrSigner: Self {
-            do {
-                // INTEL-SA-00334: LVI hardening is handled via rustc arguments set in
-                // mc-util-build-enclave
-                return .init(
-                    consensus: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_CONSENSUS_MRSIGNER,
-                        productId: McConstants.CONSENSUS_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogView: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_MRSIGNER,
-                        productId: McConstants.FOG_VIEW_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogKeyImage: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_MRSIGNER,
-                        productId: McConstants.FOG_LEDGER_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogMerkleProof: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_MRSIGNER,
-                        productId: McConstants.FOG_LEDGER_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()),
-                    fogReport: try Attestation(Attestation.MrSigner.make(
-                        mrSigner: McConstants.TESTNET_FOG_REPORT_MRSIGNER,
-                        productId: McConstants.FOG_REPORT_PRODUCT_ID,
-                        minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]).get()))
-            } catch {
-                // Safety: MrSigner is guaranteed to be 32 bytes in length, so Attestation.init
-                // should never fail.
-                logger.fatalError("invalid configuration: \(error)")
-            }
-        }
-
         let consensus: Attestation
         let fogView: Attestation
         let fogKeyImage: Attestation

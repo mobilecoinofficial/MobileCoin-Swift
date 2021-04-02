@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable inclusive_language multiline_function_chains
+// swiftlint:disable file_length inclusive_language multiline_function_chains
 
 @testable import MobileCoin
 import NIOSSL
@@ -12,11 +12,11 @@ import XCTest
 import Keys
 #endif
 
-enum MobileCoinNetwork {
-    /// MainNet (MobileCoin node)
+enum NetworkPreset {
+    /// MainNet (MobileCoin Consensus node1 + MobileCoin Fog)
     case mainNet
 
-    /// External TestNet (MobileCoin node)
+    /// External TestNet (MobileCoin Consensus node1 + MobileCoin Fog)
     case testNet
 
     /// Internal staging network
@@ -36,34 +36,69 @@ enum MobileCoinNetwork {
     case eran
 }
 
-extension MobileCoinNetwork {
+extension NetworkPreset {
+    private enum Network {
+        case mainNet
+        case testNet
 
-    private static let devNetworkTestAccountPrivateKeysHex = [
-        // account key 0
-        ("e7a1cbbd97382b0d7532f31bf45e7d1628ba9127039d3650a371e6675ac7b40d",
-         "bb9fd7c2faf1e4f66c979777eddfd79de81a7962a8e45a4fda5e7cd94bd0b000"),
-        // account key 1
-        ("fe7f68d45331d9f386f816e9a90dcc8b39cc9db8bba2ffd7337fd1bff9f4a601",
-         "877be1fe01e037141ae6fa2ae032c4c0e0bbae385b811eebe543f154fa33f10e"),
-        // account key 2
-        ("c203ff741f6c988d9a3467fe96b0083d4d6cfedd3bdb98195c74fc8c608c6f07",
-         "e202cbe05fc8ba0a4561719997a0e89b514e98e81a266d8d7ff02fb429b49401"),
-        // account key 3
-        ("1497e50403429a496410786f5005419859b8b392492a03793f4acd75b8db7f0b",
-         "a44d34fa67db295c1bb220173d11fa7c39362f22663811349d373e3912087a0e"),
-        // account key 4
-        ("a20cbb25550ce5d35cf714fd49f904ad0ee211686b51dfce00d0cbbca731c10f",
-         "f4bbafd7fa221bc488f7879cff65df586d49fdcfc3cd2c1a270e66585cb48008"),
-        // account key 5
-        ("1a2e559605b685dcd24224e29904e97d05858f19ef8c9c01c997b26ac6f1fb0f",
-         "2fed1891e7c17d1a78933596434252d1be7f461ff8b5505f08476162f579b208"),
-        // account key 6
-        ("389b07fce6b0daf0a3434c6c555ba3e2ba096e5f8b6ec1e129f9e0160d3f240c",
-         "41a0c650d0572ffdc5745dbba8f1f14f836e435bee221abd0916fe24d6951404"),
-        // account key 7
-        ("a2480ca6e0623206577b6567fb43d47c361f3d441b4871d8abf4e9a022ea3b08",
-         "5ce48390a4b805f321abaf4aa5960773fa9c6ad34ed2d4bfe0155c5df01aab0f"),
-    ]
+        case alpha
+        case mobiledev
+        case master
+        case build
+        case demo
+        case diogenes
+        case drakeley
+        case eran
+    }
+
+    private var network: Network {
+        switch self {
+        case .mainNet:
+            return .mainNet
+        case .testNet:
+            return .testNet
+
+        case .alpha:
+            return .alpha
+        case .mobiledev:
+            return .mobiledev
+        case .master:
+            return .master
+        case .build:
+            return .build
+        case .demo:
+            return .demo
+        case .diogenes:
+            return .diogenes
+        case .drakeley:
+            return .drakeley
+        case .eran:
+            return .eran
+        }
+    }
+}
+
+extension NetworkPreset {
+    private enum NetworkGroup {
+        case mainNet
+        case testNet
+        case devNetwork
+    }
+
+    private var networkGroup: NetworkGroup {
+        switch network {
+        case .mainNet:
+            return .mainNet
+        case .testNet:
+            return .testNet
+
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return .devNetwork
+        }
+    }
+}
+
+extension NetworkPreset {
 
     var consensusUrl: String {
         switch self {
@@ -71,6 +106,7 @@ extension MobileCoinNetwork {
             return "mc://node1.prod.mobilecoinww.com"
         case .testNet:
             return "mc://node1.test.mobilecoin.com"
+
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return "mc://consensus.\(self).mobilecoin.com"
         }
@@ -81,6 +117,7 @@ extension MobileCoinNetwork {
             return "fog://fog.prod.mobilecoinww.com"
         case .testNet:
             return "fog://fog.test.mobilecoin.com"
+
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return "fog://fog.\(self).mobilecoin.com"
         }
@@ -96,7 +133,7 @@ extension MobileCoinNetwork {
         "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
 
     private static let testNetConsensusMrEnclaveHex =
-        "cad79d32f4339f650671ce74d072ae9c1c01d84edd059bd4314932a7a8b29f3f"
+        "9268c3220a5260e51e4b586f00e4677fed2b80380f1eeaf775af60f8e880fde8"
     private static let testNetFogViewMrEnclaveHex =
         "4e598799faa4bb08a3bd55c0bcda7e1d22e41151d0c591f6c2a48b3562b0881e"
     private static let testNetFogLedgerMrEnclaveHex =
@@ -129,6 +166,7 @@ extension MobileCoinNetwork {
         EOhYh572+3ckgl2SaV4uo9Gvkz8MMGRBcMIMlRirSwhCfozV2RyT5Wn1NgPpyc8zJL7QdOhL7Qxb+5WjnCVrQYHI2cC\
         AwEAAQ==
         """
+
     private static let alphaFogAuthoritySpkiB64Encoded = """
         MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyFOockvCEc9TcO1NvsiUfFVzvtDsR64UIRRUl3tBM2Bh8KB\
         A932/Up86RtgJVnbslxuUCrTJZCV4dgd5hAo/mzuJOy9lAGxUTpwWWG0zZJdpt8HJRVLX76CBpWrWEt7JMoEmduvsCR\
@@ -241,35 +279,36 @@ extension MobileCoinNetwork {
     private static let invalidCredUsername = "user1"
     private static let invalidCredPassword = "user1:1602033437:ffffffffffffffffffff"
 
+    private static let devNetworkTestAccountPrivateKeysHex = [
+        // account key 0
+        ("e7a1cbbd97382b0d7532f31bf45e7d1628ba9127039d3650a371e6675ac7b40d",
+         "bb9fd7c2faf1e4f66c979777eddfd79de81a7962a8e45a4fda5e7cd94bd0b000"),
+        // account key 1
+        ("fe7f68d45331d9f386f816e9a90dcc8b39cc9db8bba2ffd7337fd1bff9f4a601",
+         "877be1fe01e037141ae6fa2ae032c4c0e0bbae385b811eebe543f154fa33f10e"),
+        // account key 2
+        ("c203ff741f6c988d9a3467fe96b0083d4d6cfedd3bdb98195c74fc8c608c6f07",
+         "e202cbe05fc8ba0a4561719997a0e89b514e98e81a266d8d7ff02fb429b49401"),
+        // account key 3
+        ("1497e50403429a496410786f5005419859b8b392492a03793f4acd75b8db7f0b",
+         "a44d34fa67db295c1bb220173d11fa7c39362f22663811349d373e3912087a0e"),
+        // account key 4
+        ("a20cbb25550ce5d35cf714fd49f904ad0ee211686b51dfce00d0cbbca731c10f",
+         "f4bbafd7fa221bc488f7879cff65df586d49fdcfc3cd2c1a270e66585cb48008"),
+        // account key 5
+        ("1a2e559605b685dcd24224e29904e97d05858f19ef8c9c01c997b26ac6f1fb0f",
+         "2fed1891e7c17d1a78933596434252d1be7f461ff8b5505f08476162f579b208"),
+        // account key 6
+        ("389b07fce6b0daf0a3434c6c555ba3e2ba096e5f8b6ec1e129f9e0160d3f240c",
+         "41a0c650d0572ffdc5745dbba8f1f14f836e435bee221abd0916fe24d6951404"),
+        // account key 7
+        ("a2480ca6e0623206577b6567fb43d47c361f3d441b4871d8abf4e9a022ea3b08",
+         "5ce48390a4b805f321abaf4aa5960773fa9c6ad34ed2d4bfe0155c5df01aab0f"),
+    ]
+
 }
 
-extension MobileCoinNetwork {
-
-    var isDevNetwork: Bool {
-        switch self {
-        case .mainNet, .testNet:
-            return false
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
-            return true
-        }
-    }
-
-    var accountPrivateKeys: [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]
-    {
-        accountPrivateKeysHex.map {
-            (RistrettoPrivate(hexEncoded: $0.viewPrivateKeyHex)!,
-             RistrettoPrivate(hexEncoded: $0.spendPrivateKeyHex)!)
-        }
-    }
-
-    var accountPrivateKeysHex: [(viewPrivateKeyHex: String, spendPrivateKeyHex: String)] {
-        switch self {
-        case .mainNet, .testNet:
-            return []
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
-            return Self.devNetworkTestAccountPrivateKeysHex
-        }
-    }
+extension NetworkPreset {
 
     func networkConfig() throws -> NetworkConfig {
         let attestationConfig = try self.attestationConfig()
@@ -294,6 +333,7 @@ extension MobileCoinNetwork {
             fogAuthoritySpkiB64Encoded = Self.mainNetFogAuthoritySpkiB64Encoded
         case .testNet:
             fogAuthoritySpkiB64Encoded = Self.testNetFogAuthoritySpkiB64Encoded
+
         case .alpha:
             fogAuthoritySpkiB64Encoded = Self.alphaFogAuthoritySpkiB64Encoded
         case .mobiledev:
@@ -324,11 +364,12 @@ extension MobileCoinNetwork {
     }
 
     func consensusAttestation() throws -> Attestation {
-        switch self {
-        case .mainNet, .testNet:
-            return try defaultAttestation(mrEnclaveHex: self == .mainNet ?
-                Self.mainNetConsensusMrEnclaveHex : Self.testNetConsensusMrEnclaveHex)
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        switch networkGroup {
+        case .mainNet:
+            return try defaultAttestation(mrEnclaveHex: Self.mainNetConsensusMrEnclaveHex)
+        case .testNet:
+            return try defaultAttestation(mrEnclaveHex: Self.testNetConsensusMrEnclaveHex)
+        case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.CONSENSUS_PRODUCT_ID,
@@ -337,11 +378,12 @@ extension MobileCoinNetwork {
         }
     }
     func fogViewAttestation() throws -> Attestation {
-        switch self {
-        case .mainNet, .testNet:
-            return try defaultAttestation(mrEnclaveHex: self == .mainNet ?
-                Self.mainNetFogViewMrEnclaveHex : Self.testNetFogViewMrEnclaveHex)
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        switch networkGroup {
+        case .mainNet:
+            return try defaultAttestation(mrEnclaveHex: Self.mainNetFogViewMrEnclaveHex)
+        case .testNet:
+            return try defaultAttestation(mrEnclaveHex: Self.testNetFogViewMrEnclaveHex)
+        case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_VIEW_PRODUCT_ID,
@@ -350,11 +392,12 @@ extension MobileCoinNetwork {
         }
     }
     func fogLedgerAttestation() throws -> Attestation {
-        switch self {
-        case .mainNet, .testNet:
-            return try defaultAttestation(mrEnclaveHex: self == .mainNet ?
-                Self.mainNetFogLedgerMrEnclaveHex : Self.testNetFogLedgerMrEnclaveHex)
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        switch networkGroup {
+        case .mainNet:
+            return try defaultAttestation(mrEnclaveHex: Self.mainNetFogLedgerMrEnclaveHex)
+        case .testNet:
+            return try defaultAttestation(mrEnclaveHex: Self.testNetFogLedgerMrEnclaveHex)
+        case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_LEDGER_PRODUCT_ID,
@@ -363,11 +406,12 @@ extension MobileCoinNetwork {
         }
     }
     func fogReportAttestation() throws -> Attestation {
-        switch self {
-        case .mainNet, .testNet:
-            return try defaultAttestation(mrEnclaveHex: self == .mainNet ?
-                Self.mainNetFogReportMrEnclaveHex : Self.testNetFogReportMrEnclaveHex)
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        switch networkGroup {
+        case .mainNet:
+            return try defaultAttestation(mrEnclaveHex: Self.mainNetFogReportMrEnclaveHex)
+        case .testNet:
+            return try defaultAttestation(mrEnclaveHex: Self.testNetFogReportMrEnclaveHex)
+        case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_REPORT_PRODUCT_ID,
@@ -394,40 +438,97 @@ extension MobileCoinNetwork {
         try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
     }
 
-    var consensusRequiresCredentials: Bool { isDevNetwork }
-    var fogRequiresCredentials: Bool { isDevNetwork }
-
+    var consensusRequiresCredentials: Bool {
+        switch self {
+        case .mainNet, .testNet:
+            return false
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return true
+        }
+    }
     var consensusCredentials: BasicCredentials? {
-        if isDevNetwork {
-            return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
-        } else {
+        switch self {
+        case .mainNet, .testNet:
+            // No credentials necessary.
             return nil
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
+        }
+    }
+
+    var fogRequiresCredentials: Bool {
+        switch self {
+        case .mainNet, .testNet:
+            return false
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return true
         }
     }
     var fogCredentials: BasicCredentials? {
-        if isDevNetwork {
-            return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
-        } else {
+        switch self {
+        case .mainNet, .testNet:
+            // No credentials necessary.
             return nil
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
         }
     }
 
-    var invalidCredentials: BasicCredentials? {
-        if isDevNetwork {
-            return BasicCredentials(
-                username: Self.invalidCredUsername,
-                password: Self.invalidCredPassword)
-        } else {
-            return nil
-        }
+    var invalidCredentials: BasicCredentials {
+        BasicCredentials(username: Self.invalidCredUsername, password: Self.invalidCredPassword)
     }
 
 #if canImport(Keys)
-    private static let devAuthUsername = MobileCoinKeys().mobilecoinDevAuthUsername
-    private static let devAuthPassword = MobileCoinKeys().mobilecoinDevAuthPassword
+    private static let devAuthUsername = MobileCoinKeys().devNetworkAuthUsername
+    private static let devAuthPassword = MobileCoinKeys().devNetworkAuthPassword
 #else
     private static let devAuthUsername = ""
     private static let devAuthPassword = ""
 #endif
+
+    var testAccountsMnemonics: [String] {
+        switch self {
+        case .mainNet:
+            return []
+
+        case .testNet:
+            return Self.testNetTestAccountMnemonicsCommaSeparated
+                .split(separator: ",").map { String($0) }
+
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return []
+        }
+    }
+
+#if canImport(Keys)
+    private static let testNetTestAccountMnemonicsCommaSeparated =
+        MobileCoinKeys().testNetTestAccountMnemonicsCommaSeparated
+#else
+    private static let testNetTestAccountMnemonicsCommaSeparated = ""
+#endif
+
+    var testAccountsPrivateKeys:
+        [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]
+    {
+        testAccountsPrivateKeysHex.map {
+            (RistrettoPrivate(hexEncoded: $0.viewPrivateKeyHex)!,
+             RistrettoPrivate(hexEncoded: $0.spendPrivateKeyHex)!)
+        }
+    }
+
+    private var testAccountsPrivateKeysHex:
+        [(viewPrivateKeyHex: String, spendPrivateKeyHex: String)]
+    {
+        switch self {
+        case .mainNet:
+            return []
+
+        case .testNet:
+            return []
+
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return Self.devNetworkTestAccountPrivateKeysHex
+        }
+    }
 
 }

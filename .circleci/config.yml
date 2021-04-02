@@ -6,8 +6,9 @@ defaults:
 
   default-environment: &default-environment
     FASTLANE_SKIP_UPDATE_CHECK: "1"
-    mobilecoinDevAuthUsername:
-    mobilecoinDevAuthPassword:
+    devNetworkAuthUsername:
+    devNetworkAuthPassword:
+    testNetTestAccountMnemonicsCommaSeparated:
 
 commands:
   init-artifacts-submodule:

@@ -6,3 +6,5 @@ disabled_rules:
   - weak_delegate
   - overridden_super_call
   - force_try
+cyclomatic_complexity:
+  ignores_case_statements: true
