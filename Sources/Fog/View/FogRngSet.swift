@@ -305,7 +305,6 @@ extension RngTracker {
     }
 
     convenience init(rng: FogRng, rngRecord: FogView_RngRecord) {
-        logger.info("")
         self.init(rng: rng, startBlockIndex: rngRecord.startBlock)
     }
 }

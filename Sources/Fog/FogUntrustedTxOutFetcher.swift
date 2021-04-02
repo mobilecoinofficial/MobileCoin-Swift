@@ -18,7 +18,6 @@ struct FogUntrustedTxOutFetcher {
             Result<(result: FogLedger_TxOutResult, blockCount: UInt64), ConnectionError>
         ) -> Void
     ) {
-        logger.info("outputPublicKey: \(redacting: outputPublicKey)")
         getTxOuts(outputPublicKeys: [outputPublicKey]) {
             completion($0.flatMap { results, blockCount in
                 guard let result =

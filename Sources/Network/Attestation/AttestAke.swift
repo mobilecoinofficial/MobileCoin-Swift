@@ -51,7 +51,6 @@ final class AttestAke {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = nil,
         rngContext: Any? = nil
     ) -> Attest_AuthMessage {
-        logger.info("responderId: \(responderId)")
         var request = Attest_AuthMessage()
         request.data = authBeginRequestData(
             responderId: responderId,
@@ -65,7 +64,6 @@ final class AttestAke {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = nil,
         rngContext: Any? = nil
     ) -> Data {
-        logger.info("responderId: \(responderId)")
         let ffi = FfiAttestAke()
         let requestData = ffi.authBeginRequestData(
             responderId: responderId,
@@ -79,10 +77,7 @@ final class AttestAke {
     func authEnd(authResponse: Attest_AuthMessage, attestationVerifier: AttestationVerifier)
         -> Result<Cipher, AttestAkeError>
     {
-        logger.info("")
-        return authEnd(
-            authResponseData: authResponse.data,
-            attestationVerifier: attestationVerifier)
+        authEnd(authResponseData: authResponse.data, attestationVerifier: attestationVerifier)
     }
 
     @discardableResult
@@ -146,7 +141,6 @@ extension AttestAke {
         func encryptMessage(aad: Data, plaintext: Data)
             -> Result<Attest_Message, AeadError>
         {
-            logger.info("aad: \(redacting: aad), plaintext: \(redacting: plaintext)")
             var message = Attest_Message()
             message.aad = aad
             message.channelID = binding
@@ -162,8 +156,7 @@ extension AttestAke {
         }
 
         func decryptMessage(_ message: Attest_Message) -> Result<Data, AeadError> {
-            logger.info("")
-            return decrypt(aad: message.aad, ciphertext: message.data)
+            decrypt(aad: message.aad, ciphertext: message.data)
         }
 
         func decrypt(aad: Data, ciphertext: Data) -> Result<Data, AeadError> {

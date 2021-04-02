@@ -27,8 +27,7 @@ final class FogView {
         numOutputs: PositiveInt,
         minOutputsPerSelectedRng: Int
     ) -> FogSearchAttempt {
-        logger.info("")
-        return rngSet.searchAttempt(
+        rngSet.searchAttempt(
             requestedBlockCount: requestedBlockCount,
             numOutputs: numOutputs,
             minOutputsPerSelectedRng: minOutputsPerSelectedRng)
@@ -39,8 +38,7 @@ final class FogView {
         searchAttempt: FogSearchAttempt,
         accountKey: AccountKey
     ) -> Result<[KnownTxOut], ConnectionError> {
-        logger.info("")
-        return rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
+        rngSet.processRngs(queryResponse: queryResponse, accountKey: accountKey).flatMap {
             processMissedBlockRanges(queryResponse.missedBlockRanges)
 
             if queryResponse.nextStartFromUserEventID > nextStartFromUserEventId {
@@ -109,8 +107,7 @@ final class FogView {
         _ searchResult: FogView_TxOutSearchResult,
         accountKey: AccountKey
     ) -> Result<LedgerTxOut, ConnectionError> {
-        logger.info("")
-        return FogViewUtils.decryptTxOutRecord(
+        FogViewUtils.decryptTxOutRecord(
             ciphertext: searchResult.ciphertext,
             accountKey: accountKey
         ).mapError { error in

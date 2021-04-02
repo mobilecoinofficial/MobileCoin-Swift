@@ -39,8 +39,7 @@ final class TransactionBuilder {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) -> Result<(transaction: Transaction, receipt: Receipt), TransactionBuilderError> {
-        logger.info("")
-        return build(
+        build(
             inputs: inputs,
             accountKey: accountKey,
             outputs: [(recipient, amount)],
@@ -94,8 +93,7 @@ final class TransactionBuilder {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) -> Result<(transaction: Transaction, receipts: [Receipt]), TransactionBuilderError> {
-        logger.info("")
-        return outputsAddingChangeOutputIfNeeded(
+        outputsAddingChangeOutputIfNeeded(
             inputs: inputs,
             outputs: outputs,
             changeAddress: changeAddress,
@@ -165,8 +163,7 @@ final class TransactionBuilder {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<TxOut, TransactionBuilderError> {
-        logger.info("")
-        return outputWithReceipt(
+        outputWithReceipt(
             publicAddress: publicAddress,
             amount: amount,
             tombstoneBlockIndex: 0,
@@ -202,8 +199,7 @@ final class TransactionBuilder {
         changeAddress: PublicAddress,
         fee: UInt64
     ) -> Result<[(recipient: PublicAddress, amount: PositiveUInt64)], TransactionBuilderError> {
-        logger.info("")
-        return remainingAmount(
+        remainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
             outputValues: outputs.map { $0.amount.value },
             fee: fee

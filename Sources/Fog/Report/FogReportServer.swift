@@ -21,7 +21,6 @@ final class FogReportServer {
         reportService: FogReportService,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void
     ) {
-        logger.info("")
         fetchReports(reportService: reportService, completion: completion)
     }
 

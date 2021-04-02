@@ -43,7 +43,6 @@ struct FogMerkleProofFetcher {
             Result<[[(TxOut, TxOutMembershipProof)]], FogMerkleProofFetcherError>
         ) -> Void
     ) {
-        logger.info("")
         getOutputs(
             globalIndices: globalIndicesArray.flatMap { $0 },
             merkleRootBlock: merkleRootBlock,

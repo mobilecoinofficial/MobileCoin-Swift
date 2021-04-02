@@ -29,7 +29,6 @@ public struct Attestation {
     let mrSigners: [MrSigner]
 
     public init(_ mrSigner: MrSigner) {
-        logger.info("")
         self.init(mrEnclaves: [], mrSigners: [mrSigner])
     }
 

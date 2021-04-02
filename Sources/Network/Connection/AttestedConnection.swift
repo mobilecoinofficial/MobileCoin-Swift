@@ -52,7 +52,6 @@ class AttestedConnection {
         request: Call.InnerRequest,
         completion: @escaping (Result<Call.InnerResponse, ConnectionError>) -> Void
     ) where Call.InnerRequestAad == (), Call.InnerResponseAad == () {
-        logger.info("")
         performAttestedCall(call, requestAad: (), request: request, completion: completion)
     }
 
@@ -62,7 +61,6 @@ class AttestedConnection {
         request: Call.InnerRequest,
         completion: @escaping (Result<Call.InnerResponse, ConnectionError>) -> Void
     ) where Call.InnerResponseAad == () {
-        logger.info("")
         performAttestedCall(call, requestAad: requestAad, request: request) {
             completion($0.map { $0.response })
         }
@@ -76,7 +74,6 @@ class AttestedConnection {
                    ConnectionError>
         ) -> Void
     ) where Call.InnerRequestAad == () {
-        logger.info("")
         performAttestedCall(call, requestAad: (), request: request, completion: completion)
     }
 

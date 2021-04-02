@@ -54,8 +54,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<(totalFee: UInt64, requiresDefrag: Bool), TxOutSelectionError> {
-        logger.info("")
-        return estimateTotalFee(
+        estimateTotalFee(
             toSendAmount: amount,
             selectionFeeLevel: .feeLevel(feeLevel),
             txOuts: txOuts,
@@ -68,8 +67,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputs: Int
     ) -> Result<[Int], TransactionInputSelectionError> {
-        logger.info("")
-        return selectTransactionInputs(
+        selectTransactionInputs(
             amount: amount,
             selectionFeeLevel: .fixedPerTransaction(fee),
             fromTxOuts: txOuts,
@@ -83,8 +81,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputs: Int
     ) -> Result<(inputIds: [Int], fee: UInt64), TransactionInputSelectionError> {
-        logger.info("")
-        return selectTransactionInputs(
+        selectTransactionInputs(
             amount: amount,
             selectionFeeLevel: .feeLevel(feeLevel),
             fromTxOuts: txOuts,
