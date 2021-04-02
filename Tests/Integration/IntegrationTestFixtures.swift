@@ -21,6 +21,17 @@ extension IntegrationTestFixtures {
 
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
         let fogAuthoritySpki = try network.fogAuthoritySpki()
+
+        let mnemonics = network.testAccountsMnemonics
+        if mnemonics.count > accountIndex {
+            let mnemonic = mnemonics[accountIndex]
+            return try AccountKey.make(
+                mnemonic: mnemonic,
+                fogReportUrl: network.fogReportUrl,
+                fogReportId: network.fogReportId,
+                fogAuthoritySpki: fogAuthoritySpki).get()
+        }
+
         let testAccountsPrivateKeys = network.testAccountsPrivateKeys
         if testAccountsPrivateKeys.count > accountIndex {
             let (viewPrivateKey, spendPrivateKey) = network.testAccountsPrivateKeys[accountIndex]

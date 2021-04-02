@@ -413,6 +413,8 @@ extension MobileCoinNetwork {
     private static let devAuthPassword = ""
 #endif
 
+    var testAccountsMnemonics: [String] { [] }
+
     var testAccountsPrivateKeys:
         [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]
     {
