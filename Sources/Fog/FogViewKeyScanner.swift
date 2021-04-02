@@ -23,13 +23,12 @@ final class FogViewKeyScanner {
         logger.info("")
         fetchBlocksTxOuts(ranges: blockRanges) {
             completion($0.map { blocksTxOuts in
-                logger.info(
-                    "\(blockRanges.map { $0.count }.reduce(0, +)) missed " +
-                        "blocks containing \(blocksTxOuts.count) TxOuts")
+                logger.info("\(blockRanges.map { $0.count }.reduce(0, +)) missed blocks " +
+                    "containing \(blocksTxOuts.count) TxOuts")
                 let foundTxOuts = blocksTxOuts.compactMap {
                     KnownTxOut($0, accountKey: self.accountKey)
                 }
-                logger.info(": Found \(redacting: foundTxOuts.count) missed TxOuts")
+                logger.info("Found \(redacting: foundTxOuts.count) missed TxOuts")
                 return foundTxOuts
             })
         }
@@ -48,8 +47,8 @@ final class FogViewKeyScanner {
                         responseBlock.globalTxoCount - UInt64(responseBlock.outputs.count)
                     return responseBlock.outputs.enumerated().map { outputIndex, output in
                         guard let partialTxOut = PartialTxOut(output) else {
-                            logger.info("failure - Fog Block service returned " +
-                                            "invalid output: \(output)")
+                            logger.info(
+                                "failure - Fog Block service returned invalid output: \(output)")
                             return .failure(.invalidServerResponse(
                                 "Fog Block service returned invalid output: \(output)"))
                         }
