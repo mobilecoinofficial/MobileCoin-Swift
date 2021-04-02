@@ -21,7 +21,6 @@ struct TransactionPreparer {
         mixinSelectionStrategy: MixinSelectionStrategy,
         targetQueue: DispatchQueue?
     ) {
-        logger.info("")
         self.serialQueue = DispatchQueue(
             label: "com.mobilecoin.\(Account.self).\(Self.self)",
             target: targetQueue)

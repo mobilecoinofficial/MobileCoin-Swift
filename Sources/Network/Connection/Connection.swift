@@ -41,7 +41,6 @@ extension Connection {
         private let session: ConnectionSession
 
         init(config: ConnectionConfigProtocol) {
-            logger.info("")
             self.session = ConnectionSession(config: config)
         }
 

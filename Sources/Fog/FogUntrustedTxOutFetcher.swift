@@ -9,7 +9,6 @@ struct FogUntrustedTxOutFetcher {
     private let fogUntrustedTxOutService: FogUntrustedTxOutService
 
     init(fogUntrustedTxOutService: FogUntrustedTxOutService) {
-        logger.info("")
         self.fogUntrustedTxOutService = fogUntrustedTxOutService
     }
 

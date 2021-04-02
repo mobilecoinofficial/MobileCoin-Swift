@@ -13,7 +13,6 @@ final class FogReportServer {
     private let serialConnectionQueue: SerialCallbackQueue
 
     init(serialExclusionQueue: DispatchQueue) {
-        logger.info("")
         self.inner = .init(Inner(), serialExclusionQueue: serialExclusionQueue)
         self.serialConnectionQueue = .init(targetQueue: serialExclusionQueue)
     }

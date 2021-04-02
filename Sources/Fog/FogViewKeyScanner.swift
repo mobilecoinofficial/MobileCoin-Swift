@@ -12,7 +12,6 @@ final class FogViewKeyScanner {
     private let fogBlockService: FogBlockService
 
     init(accountKey: AccountKey, fogBlockService: FogBlockService) {
-        logger.info("")
         self.accountKey = accountKey
         self.fogBlockService = fogBlockService
     }

@@ -31,7 +31,6 @@ struct FogMerkleProofFetcher {
     private let fogMerkleProofService: FogMerkleProofService
 
     init(fogMerkleProofService: FogMerkleProofService, targetQueue: DispatchQueue?) {
-        logger.info("")
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)", target: targetQueue)
         self.fogMerkleProofService = fogMerkleProofService
     }

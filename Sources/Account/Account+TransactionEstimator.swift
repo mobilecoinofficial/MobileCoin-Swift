@@ -13,7 +13,6 @@ extension Account {
             account: ReadWriteDispatchLock<Account>,
             txOutSelectionStrategy: TxOutSelectionStrategy
         ) {
-            logger.info("")
             self.account = account
             self.txOutSelector = TxOutSelector(txOutSelectionStrategy: txOutSelectionStrategy)
         }

@@ -20,7 +20,6 @@ extension Account {
             fogQueryScalingStrategy: FogQueryScalingStrategy,
             targetQueue: DispatchQueue?
         ) {
-            logger.info("")
             self.account = account
             self.txOutFetcher = FogView.TxOutFetcher(
                 fogView: account.mapLockWithoutLocking { $0.fogView },

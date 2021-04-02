@@ -22,7 +22,6 @@ extension FogView {
             fogQueryScalingStrategy: FogQueryScalingStrategy,
             targetQueue: DispatchQueue?
         ) {
-            logger.info("")
             self.serialQueue = DispatchQueue(
                 label: "com.mobilecoin.\(FogView.self).\(Self.self)",
                 target: targetQueue)

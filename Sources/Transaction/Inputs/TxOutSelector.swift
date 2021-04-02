@@ -43,7 +43,6 @@ final class TxOutSelector {
     private let txOutSelectionStrategy: TxOutSelectionStrategy
 
     init(txOutSelectionStrategy: TxOutSelectionStrategy) {
-        logger.info("")
         self.txOutSelectionStrategy = txOutSelectionStrategy
     }
 

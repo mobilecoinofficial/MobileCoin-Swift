@@ -9,7 +9,6 @@ struct TransactionSubmitter {
     private let consensusService: ConsensusService
 
     init(consensusService: ConsensusService) {
-        logger.info("")
         self.consensusService = consensusService
     }
 

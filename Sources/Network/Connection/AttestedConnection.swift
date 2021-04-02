@@ -36,7 +36,6 @@ class AttestedConnection {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) {
-        logger.info("")
         let inner = Inner(client: client, config: config, rng: rng, rngContext: rngContext)
         self.inner = .init(inner, targetQueue: targetQueue)
     }
@@ -127,7 +126,6 @@ extension AttestedConnection {
             rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
             rngContext: Any? = nil
         ) {
-            logger.info("")
             self.session = ConnectionSession(config: config)
             self.client = client
             self.attestAke = AttestAke()

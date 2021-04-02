@@ -16,7 +16,6 @@ struct TransactionStatusChecker {
         fogKeyImageService: FogKeyImageService,
         targetQueue: DispatchQueue?
     ) {
-        logger.info("")
         self.account = account
         self.fogUntrustedTxOutFetcher =
             FogUntrustedTxOutFetcher(fogUntrustedTxOutService: fogUntrustedTxOutService)

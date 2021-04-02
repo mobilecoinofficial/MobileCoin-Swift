@@ -12,7 +12,6 @@ struct FogKeyImageChecker {
     private let fogKeyImageService: FogKeyImageService
 
     init(fogKeyImageService: FogKeyImageService, targetQueue: DispatchQueue?) {
-        logger.info("")
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)", target: targetQueue)
         self.fogKeyImageService = fogKeyImageService
     }
