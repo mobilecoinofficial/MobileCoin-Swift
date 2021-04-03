@@ -81,15 +81,12 @@ extension FogView {
             var requestAad = FogView_QueryRequestAAD()
             let searchAttempt: FogSearchAttempt = fogView.readSync {
                 requestAad.startFromUserEventID = $0.nextStartFromUserEventId
-
-                // Note: converting directly from blockIndex to blockCount here is valid.
-                requestAad.startFromBlockIndex = $0.allRngRecordsKnownBlockCount
-
                 return $0.searchAttempt(
                     requestedBlockCount: targetBlockCount,
                     numOutputs: numOutputs,
                     minOutputsPerSelectedRng: min(2, numOutputs.value))
             }
+            requestAad.startFromBlockIndex = searchAttempt.lowestStartFromBlockIndex
             var request = FogView_QueryRequest()
             request.getTxos = searchAttempt.searchKeys.map { $0.bytes }
             fogViewService.query(requestAad: requestAad, request: request) {

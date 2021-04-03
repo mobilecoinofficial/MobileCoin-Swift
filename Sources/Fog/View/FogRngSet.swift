@@ -227,7 +227,9 @@ private final class RngTracker {
         logger.info("numOutputs: \(numOutputs)")
         let outputs = rng.outputs(count: numOutputs)
         let searchKeys = outputs.map { FogSearchKey($0) }
-        return FogRngSearchAttempt(searchKeys: searchKeys)
+
+        // Note: converting directly from blockCount to blockIndex is valid here.
+        return FogRngSearchAttempt(searchKeys: searchKeys, startFromBlockIndex: knownBlockCount)
     }
 
     func processSearchKeyResults(
@@ -319,8 +321,13 @@ struct FogSearchAttempt {
     var searchKeys: [FogSearchKey] {
         ingestInvocationIdToRngSearchAttempt.values.flatMap { $0.searchKeys }
     }
+
+    var lowestStartFromBlockIndex: UInt64 {
+        ingestInvocationIdToRngSearchAttempt.values.map { $0.startFromBlockIndex }.min() ?? 0
+    }
 }
 
 private struct FogRngSearchAttempt {
     let searchKeys: [FogSearchKey]
+    let startFromBlockIndex: UInt64
 }
