@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "1.0.0-rc1"
+  s.version      = "1.0.0"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
     subspec.dependency "LibMobileCoin", "~> 1.0"
 
-    subspec.dependency "gRPC-Swift", "~> 1.0.0"
+    subspec.dependency "gRPC-Swift", "~> 1.0"
     subspec.dependency "Logging", "~> 1.4"
     subspec.dependency "SwiftNIO", "~> 2.22"
     subspec.dependency "SwiftNIOHPACK", "~> 1.16"
