@@ -47,7 +47,7 @@ struct TransactionPreparer {
                 isGreaterThanValue: fee)
         else {
             logger.warning("failure - sumOfValues inputs: \(redacting: inputs) " +
-                            "isGreaterThanValue fee: \(redacting: fee)")
+                            "is less than or equal to fee: \(redacting: fee)")
             serialQueue.async {
                 completion(.failure(.insufficientBalance()))
             }
@@ -97,9 +97,9 @@ struct TransactionPreparer {
         }
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanSumOfValues: [amount.value, fee])
+                isGreaterThanOrEqualToSumOfValues: [amount.value, fee])
         else {
-            logger.warning("sum of inputs is greater than amount + fee")
+            logger.warning("sum of inputs is less than amount + fee")
             serialQueue.async {
                 completion(.failure(.insufficientBalance()))
             }
