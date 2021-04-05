@@ -56,7 +56,7 @@ private struct ContextPrefixLogHandler: LogHandler {
     ) {
         var (message, metadata) = (message, metadata)
 
-        // Remove log function metadata entry and add file/line/function name if it was enable.
+        // Remove log function metadata entry and add file/line/function name if it was enabled.
         if metadata?
             .removeValue(forKey: ContextPrefixLogHandler.ENABLE_LOG_FUNCTION_METADATA_KEY) != nil
         {
