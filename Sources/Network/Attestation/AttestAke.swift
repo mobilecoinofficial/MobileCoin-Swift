@@ -84,7 +84,6 @@ final class AttestAke {
     func authEnd(authResponseData: Data, attestationVerifier: AttestationVerifier)
         -> Result<Cipher, AttestAkeError>
     {
-        logger.info("authResponseData: \(redacting: authResponseData)")
         guard case .authPending(let attestAke) = state else {
             logger.info("""
                 failure - Error: authEnd can only be called \
@@ -151,8 +150,7 @@ extension AttestAke {
         }
 
         func encrypt(aad: Data, plaintext: Data) -> Result<Data, AeadError> {
-            logger.info("aad: \(redacting: aad), plaintext: \(redacting: plaintext)")
-            return ffi.encrypt(aad: aad, plaintext: plaintext)
+            ffi.encrypt(aad: aad, plaintext: plaintext)
         }
 
         func decryptMessage(_ message: Attest_Message) -> Result<Data, AeadError> {
@@ -160,8 +158,7 @@ extension AttestAke {
         }
 
         func decrypt(aad: Data, ciphertext: Data) -> Result<Data, AeadError> {
-            logger.info("")
-            return ffi.decrypt(aad: aad, ciphertext: ciphertext)
+            ffi.decrypt(aad: aad, ciphertext: ciphertext)
         }
     }
 }
@@ -205,8 +202,7 @@ private final class FfiAttestAke {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = nil,
         rngContext: Any? = nil
     ) -> Data {
-        logger.info("responderId: \(responderId)")
-        return withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+        withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
             Data(withMcMutableBufferInfallible: { bufferPtr in
                 mc_attest_ake_get_auth_request(ptr, responderId, rngCallbackPtr, bufferPtr)
             })
@@ -216,8 +212,7 @@ private final class FfiAttestAke {
     func authEnd(authResponseData: Data, attestationVerifier: AttestationVerifier)
         -> Result<(), AttestAkeError>
     {
-        logger.info("authResponseData: \(redacting: authResponseData)")
-        return authResponseData.asMcBuffer { bytesPtr in
+        authResponseData.asMcBuffer { bytesPtr in
             attestationVerifier.withUnsafeOpaquePointer { attestationVerifierPtr in
                 withMcError { errorPtr in
                     mc_attest_ake_process_auth_response(
@@ -242,8 +237,7 @@ private final class FfiAttestAke {
     }
 
     func encrypt(aad: Data, plaintext: Data) -> Result<Data, AeadError> {
-        logger.info("")
-        return aad.asMcBuffer { aadPtr in
+        aad.asMcBuffer { aadPtr in
             plaintext.asMcBuffer { plaintextPtr in
                 Data.make(withMcMutableBuffer: { ciphertextOutPtr, errorPtr in
                     mc_attest_ake_encrypt(ptr, aadPtr, plaintextPtr, ciphertextOutPtr, &errorPtr)
@@ -263,8 +257,7 @@ private final class FfiAttestAke {
     }
 
     func decrypt(aad: Data, ciphertext: Data) -> Result<Data, AeadError> {
-        logger.info("")
-        return aad.asMcBuffer { aadPtr in
+        aad.asMcBuffer { aadPtr in
             ciphertext.asMcBuffer { ciphertextPtr in
                 Data.make(withEstimatedLengthMcMutableBuffer: ciphertext.count)
                 { plaintextOutPtr, errorPtr in

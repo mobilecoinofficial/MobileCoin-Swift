@@ -22,8 +22,7 @@ struct LedgerTxOut: TxOutProtocol {
     var publicKey: RistrettoPublic { txOut.publicKey }
 
     func decrypt(accountKey: AccountKey) -> KnownTxOut? {
-        logger.info("")
-        return KnownTxOut(self, accountKey: accountKey)
+        KnownTxOut(self, accountKey: accountKey)
     }
 }
 

@@ -25,7 +25,6 @@ final class AttestationVerifier {
     }
 
     private func addMrEnclave(_ mrEnclave: Attestation.MrEnclave) {
-        logger.info("")
         let ffiMrEnclaveVerifier = MrEnclaveVerifier(mrEnclave: mrEnclave)
         ffiMrEnclaveVerifier.withUnsafeOpaquePointer { ffiMrEnclaveVerifierPtr in
             // Safety: mc_verifier_add_mr_enclave should never fail.
@@ -34,7 +33,6 @@ final class AttestationVerifier {
     }
 
     private func addMrSigner(_ mrSigner: Attestation.MrSigner) {
-        logger.info("")
         let ffiMrSignerVerifier = MrSignerVerifier(mrSigner: mrSigner)
         ffiMrSignerVerifier.withUnsafeOpaquePointer { ffiMrSignerVerifierPtr in
             // Safety: mc_verifier_add_mr_signer should never fail.
@@ -65,7 +63,6 @@ private final class MrEnclaveVerifier {
     }
 
     private func addConfigAdvisory(advisoryId: String) {
-        logger.info("")
         advisoryId.withCString { advisoryIdPtr in
             // Safety: mc_mr_enclave_verifier_allow_config_advisory should never fail.
             withMcInfallible { mc_mr_enclave_verifier_allow_config_advisory(ptr, advisoryIdPtr) }
@@ -73,7 +70,6 @@ private final class MrEnclaveVerifier {
     }
 
     private func addHardeningAdvisory(advisoryId: String) {
-        logger.info("")
         advisoryId.withCString { advisoryIdPtr in
             // Safety: mc_mr_enclave_verifier_allow_hardening_advisory should never fail.
             withMcInfallible { mc_mr_enclave_verifier_allow_hardening_advisory(ptr, advisoryIdPtr) }
@@ -108,7 +104,6 @@ private final class MrSignerVerifier {
     }
 
     private func addConfigAdvisory(advisoryId: String) {
-        logger.info("")
         advisoryId.withCString { advisoryIdPtr in
             // Safety: mc_mr_signer_verifier_allow_config_advisory should never fail.
             withMcInfallible { mc_mr_signer_verifier_allow_config_advisory(ptr, advisoryIdPtr) }
@@ -116,7 +111,6 @@ private final class MrSignerVerifier {
     }
 
     private func addHardeningAdvisory(advisoryId: String) {
-        logger.info("")
         advisoryId.withCString { advisoryIdPtr in
             // Safety: mc_mr_signer_verifier_allow_hardening_advisory should never fail.
             withMcInfallible { mc_mr_signer_verifier_allow_hardening_advisory(ptr, advisoryIdPtr) }

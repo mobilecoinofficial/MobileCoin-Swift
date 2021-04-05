@@ -33,7 +33,6 @@ public struct Attestation {
     }
 
     public init(mrEnclaves: [MrEnclave] = [], mrSigners: [MrSigner] = []) {
-        logger.info("")
         self.mrEnclaves = mrEnclaves
         self.mrSigners = mrSigners
     }
@@ -86,7 +85,6 @@ extension Attestation {
             allowedConfigAdvisories: [String] = [],
             allowedHardeningAdvisories: [String] = []
         ) -> Result<MrEnclave, InvalidInputError> {
-            logger.info("")
             guard let mrEnclave32 = Data32(mrEnclave) else {
                 logger.info("""
                     failure - mrEnclave must be 32 bytes in length. \
@@ -142,7 +140,6 @@ extension Attestation {
             allowedConfigAdvisories: [String] = [],
             allowedHardeningAdvisories: [String] = []
         ) -> Result<MrSigner, InvalidInputError> {
-            logger.info("")
             guard let mrSigner32 = Data32(mrSigner) else {
                 logger.info("""
                     failure - mrSigner must be 32 bytes in length. \

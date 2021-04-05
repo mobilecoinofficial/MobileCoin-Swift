@@ -73,18 +73,7 @@ extension PublicAddress: Hashable {}
 
 extension PublicAddress: CustomRedactingStringConvertible {
     var redactingDescription: String {
-        var params = [
-            "viewPublicKey=\(redacting: viewPublicKey.base64EncodedString())",
-            "spendPublicKey=\(redacting: spendPublicKey.base64EncodedString())",
-        ]
-        if let fogInfo = fogInfo {
-            params += [
-                "fogReportUrl: \(fogInfo.reportUrlString)",
-                "fogReportId: \(fogInfo.reportId)",
-                "fogAuthoritySig: \(redacting: fogInfo.authoritySig)",
-            ]
-        }
-        return "PublicAddress(\(params.joined(separator: ", ")))"
+        "PublicAddress(\(Base58Coder.encode(self)))"
     }
 }
 
@@ -117,8 +106,8 @@ extension PublicAddress {
 
 extension PublicAddress {
     init?(_ publicAddress: External_PublicAddress) {
-        guard let viewPublicKey = RistrettoPublic(publicAddress.viewPublicKey.data),
-              let spendPublicKey = RistrettoPublic(publicAddress.spendPublicKey.data)
+        guard let viewPublicKey = RistrettoPublic(publicAddress.viewPublicKey),
+              let spendPublicKey = RistrettoPublic(publicAddress.spendPublicKey)
         else {
             return nil
         }

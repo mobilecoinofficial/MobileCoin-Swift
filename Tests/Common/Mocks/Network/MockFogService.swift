@@ -83,7 +83,7 @@ extension MockFogService {
         if let rngKey = viewServiceRngRecords.first?.nonce, !viewTxOuts.isEmpty {
             let rng: FogRng
             do {
-                rng = try FogRng.make(accountKey: accountKey, fogRngKey: rngKey).get()
+                rng = try FogRng.make(fogRngKey: rngKey, accountKey: accountKey).get()
             } catch {
                 fatalError("Error: \(Self.self).\(#function): \(error)")
             }

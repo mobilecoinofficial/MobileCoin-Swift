@@ -61,7 +61,7 @@ class FogViewConnectionIntTests: XCTestCase {
         fetchRngRecords { rngRecord in
             XCTAssertNoThrowOrFulfill(expectation: expect, evaluating: {
                 let fogRngKey = FogRngKey(rngRecord.pubkey)
-                let rng = try FogRng.make(accountKey: accountKey, fogRngKey: fogRngKey).get()
+                let rng = try FogRng.make(fogRngKey: fogRngKey, accountKey: accountKey).get()
 
                 var request = FogView_QueryRequest()
                 request.getTxos = rng.outputs(count: 5)

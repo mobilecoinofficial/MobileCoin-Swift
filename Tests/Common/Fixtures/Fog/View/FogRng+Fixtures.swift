@@ -37,8 +37,8 @@ extension FogRng.Fixtures {
         init() throws {
             let initFixture = try Init()
             self.fogRng = try FogRng.make(
-                subaddressViewPrivateKey: initFixture.subaddressViewPrivateKey,
-                fogRngKey: initFixture.fogRngKey).get()
+                fogRngKey: initFixture.fogRngKey,
+                subaddressViewPrivateKey: initFixture.subaddressViewPrivateKey).get()
         }
     }
 }

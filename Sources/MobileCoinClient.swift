@@ -13,9 +13,9 @@ public final class MobileCoinClient {
         -> Result<MobileCoinClient, InvalidInputError>
     {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
-            logger.error("Accounts without fog URLs are not currently supported.")
-            return .failure(
-                InvalidInputError("Accounts without fog URLs are not currently supported."))
+            let errorMessage = "Accounts without fog URLs are not currently supported."
+            logger.error(errorMessage)
+            return .failure(InvalidInputError(errorMessage))
         }
 
         return .success(MobileCoinClient(accountKey: accountKey, config: config))
@@ -34,7 +34,7 @@ public final class MobileCoinClient {
         logger.info("""
             Initializing \(Self.self):
             \(Self.configDescription(accountKey: accountKey, config: config))
-            """)
+            """, logFunction: false)
 
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)")
         self.callbackQueue = config.callbackQueue ?? DispatchQueue.main
@@ -63,13 +63,11 @@ public final class MobileCoinClient {
     }
 
     public func setConsensusBasicAuthorization(username: String, password: String) {
-        logger.info("username: \(redacting: username), password: \(redacting: password)")
         let credentials = BasicCredentials(username: username, password: password)
         inner.accessAsync { $0.serviceProvider.setConsensusAuthorization(credentials: credentials) }
     }
 
     public func setFogBasicAuthorization(username: String, password: String) {
-        logger.info("username: \(redacting: username), password: \(redacting: password)")
         let credentials = BasicCredentials(username: username, password: password)
         inner.accessAsync { $0.serviceProvider.setFogAuthorization(credentials: credentials) }
     }
@@ -230,13 +228,11 @@ extension MobileCoinClient {
     private static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
         return """
-            Consensus url: \(String(reflecting: config.networkConfig.consensusUrl.url))
-            AccountKey Public Address View Key: \
-            \(redacting: accountKey.accountKey.publicAddress.viewPublicKey)
-            AccountKey Public Address Spend Key: \
-            \(redacting: accountKey.accountKey.publicAddress.spendPublicKey)
-            Fog url: \(String(reflecting: config.networkConfig.fogUrl.url))
-            AccountKey Fog Report url: \(String(reflecting: fogInfo.reportUrl.url))
+            Consensus url: \(config.networkConfig.consensusUrl.url)
+            Fog url: \(config.networkConfig.fogUrl.url)
+            AccountKey PublicAddress: \
+            \(redacting: Base58Coder.encode(accountKey.accountKey.publicAddress))
+            AccountKey Fog Report url: \(fogInfo.reportUrl.url)
             AccountKey Fog Report id: \(String(reflecting: fogInfo.reportId))
             AccountKey Fog Report authority sPKI: 0x\(fogInfo.authoritySpki.hexEncodedString())
             Consensus attestation: \(config.networkConfig.consensus.attestation)

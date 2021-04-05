@@ -10,8 +10,8 @@ class FogRngTests: XCTestCase {
     func testMake() throws {
         let fixture = try FogRng.Fixtures.Init()
         XCTAssertSuccess(FogRng.make(
-            subaddressViewPrivateKey: fixture.subaddressViewPrivateKey,
-            fogRngKey: fixture.fogRngKey))
+            fogRngKey: fixture.fogRngKey,
+            subaddressViewPrivateKey: fixture.subaddressViewPrivateKey))
     }
 
     func testOutputs() throws {

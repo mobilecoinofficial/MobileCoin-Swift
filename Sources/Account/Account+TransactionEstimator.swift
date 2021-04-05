@@ -20,12 +20,15 @@ extension Account {
         func amountTransferable(feeLevel: FeeLevel)
             -> Result<UInt64, BalanceTransferEstimationError>
         {
-            logger.info("feeLevel: \(feeLevel)")
             let txOuts = account.readSync { $0.unspentTxOuts }
-            let amountTransferable =
-                txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts)
-            logger.info("amountTransferable result: \(redacting: amountTransferable)")
-            return amountTransferable
+            logger.info(
+                "Calculating amountTransferable. unspentTxOutValues: " +
+                    "\(redacting: txOuts.map { $0.value })",
+                logFunction: false)
+            return txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts).map {
+                logger.info("amountTransferable: \(redacting: $0)", logFunction: false)
+                return $0
+            }
         }
 
         func estimateTotalFee(toSendAmount amount: UInt64, feeLevel: FeeLevel)
@@ -33,8 +36,9 @@ extension Account {
         {
             logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
             guard amount > 0 else {
-                logger.info("failure - Cannot spend 0 MOB")
-                return .failure(.invalidInput("Cannot spend 0 MOB"))
+                let errorMessage = "Cannot spend 0 MOB"
+                logger.error(errorMessage)
+                return .failure(.invalidInput(errorMessage))
             }
 
             let txOuts = account.readSync { $0.unspentTxOuts }
@@ -51,8 +55,9 @@ extension Account {
         {
             logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
             guard amount > 0 else {
-                logger.info("failure - Cannot spend 0 MOB")
-                return .failure(.invalidInput("Cannot spend 0 MOB"))
+                let errorMessage = "Cannot spend 0 MOB"
+                logger.error(errorMessage)
+                return .failure(.invalidInput(errorMessage))
             }
 
             let txOuts = account.readSync { $0.unspentTxOuts }
