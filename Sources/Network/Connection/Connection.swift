@@ -45,7 +45,6 @@ extension Connection {
         }
 
         func setAuthorization(credentials: BasicCredentials) {
-            logger.info("")
             session.authorizationCredentials = credentials
         }
 

@@ -20,10 +20,11 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<UInt64, BalanceTransferEstimationError> {
-        logger.info("")
         let txOutValues = txOuts.map { $0.value }
         if txOutValues.allSatisfy({ $0 == 0 }) {
-            logger.info("success - allTxOutValues have 0 value")
+            logger.warning(
+                "Tried to calculate amountTransferable with 0 balance",
+                logFunction: false)
             return .success(0)
         }
 
@@ -33,18 +34,23 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             maxInputsPerTransaction: maxInputsPerTransaction)
 
         guard UInt64.safeCompare(sumOfValues: txOutValues, isGreaterThanValue: totalFee) else {
-            logger.info("failure - fee exceeds balance")
+            logger.error(
+                "Fee is equal to or greater than balance. txOut values: " +
+                    "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
+                logFunction: false)
             return .failure(.feeExceedsBalance())
         }
 
         guard let transferAmount =
                 UInt64.safeSubtract(sumOfValues: txOutValues, minusValue: totalFee)
         else {
-            logger.info("failure - balanceOverflow")
+            logger.error(
+                "Balance minus fee exceeds UInt64.max. txOut values: \(redacting: txOutValues), " +
+                    "totalFee: \(redacting: totalFee)",
+                logFunction: false)
             return .failure(.balanceOverflow())
         }
 
-        logger.info("success - transferAmount: \(redacting: transferAmount)")
         return .success(transferAmount)
     }
 
@@ -94,8 +100,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputs: Int
     ) -> Result<(inputIds: [Int], fee: UInt64), TransactionInputSelectionError> {
-        logger.info("")
-        return estimateTotalFee(
+        estimateTotalFee(
             toSendAmount: amount,
             selectionFeeLevel: selectionFeeLevel,
             txOuts: txOuts,
@@ -107,6 +112,10 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             }
         }.flatMap {
             guard !$0.requiresDefrag else {
+                logger.warning(
+                    "Select Transaction Inputs failed: defragmentation required. amount: " +
+                        "\(redacting: amount), txOut values: \(redacting: txOuts.map { $0.value })",
+                    logFunction: false)
                 return .failure(.defragmentationRequired())
             }
 
@@ -132,8 +141,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<(txOutIds: [Int], totalFee: UInt64), TxOutSelectionError> {
-        logger.info("")
-        return estimateTotalFee(
+        estimateTotalFee(
             toSendAmount: amount,
             selectionFeeLevel: .feeLevel(feeLevel),
             txOuts: txOuts,
@@ -157,7 +165,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<(totalFee: UInt64, requiresDefrag: Bool), TxOutSelectionError> {
-        logger.info("")
         // Ensure that amount + fee is non-zero so that we select at least 1 input.
         let amount = amount != 0 || !selectionFeeLevel.isZeroFee ? amount : 1
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
@@ -195,15 +202,21 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 sumOfValues: selectedTxOuts.map { $0.1.value },
                 isGreaterThanOrEqualToSumOfValues: [amount, totalFee])
             {
-                logger.info("success - feeAmount: \(redacting: totalFee)")
                 // Success! Sum value of selectedTxOuts is enough to cover sendAmount + totalFee.
-                return .success((totalFee, selectedTxOuts.count > maxInputsPerTransaction))
+                let requiresDefrag = selectedTxOuts.count > maxInputsPerTransaction
+                logger.info(
+                    "Estimated total fee successful. totalFee: \(redacting: totalFee), " +
+                        "requiresDefrag: \(requiresDefrag)",
+                    logFunction: false)
+                return .success((totalFee, requiresDefrag))
             }
         }
 
-        // Insufficient balance to cover sendAmount + the cost of any required
-        // defragmentation.
-        logger.info("failure - insufficientTxOuts")
+        // Insufficient balance to cover sendAmount + the cost of any required defragmentation.
+        logger.warning(
+            "Estimate total fee failed: insufficient TxOuts. amountToSend: \(redacting: amount), " +
+                "txOut values: \(redacting: txOuts.map { $0.value })",
+            logFunction: false)
         return .failure(.insufficientTxOuts())
     }
 
@@ -219,7 +232,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         maxTotalFee: UInt64,
         allowDefrag: Bool
     ) -> Result<(txOutIds: [Int], totalFee: UInt64), TxOutSelectionError> {
-        logger.info("")
         // Ensure that amount + fee is non-zero so that we select at least 1 input.
         let amount = amount != 0 || !selectionFeeLevel.isZeroFee ? amount : 1
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
@@ -245,6 +257,10 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         while true {
             guard !availableTxOuts.isEmpty else {
                 // Insufficient balance to cover amount + fee.
+                logger.warning(
+                    "Select TxOuts failed: insufficient TxOuts. amountToSend: " +
+                        "\(redacting: amount), txOut values: \(redacting: txOuts.map { $0.value })",
+                    logFunction: false)
                 return .failure(.insufficientTxOuts())
             }
 
@@ -267,7 +283,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 guard let highestAvailableValue = availableTxOuts.map({ $0.1.value }).max(by: <)
                 else {
                     // Safety: availableTxOuts is guaranteed to not be empty at this point.
-                    logger.fatalError("ERROR: availableTxOuts is empty")
+                    logger.fatalError("Select TxOuts failure: availableTxOuts is empty")
                 }
 
                 // Deselect 1 of the currently selected TxOuts. We want to favor selecting the
@@ -283,7 +299,11 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 else {
                     // We've selected the highest value TxOuts already which means the TxOuts don't
                     // have enough total value to cover amount + fees.
-                    logger.debug("failure - insufficient txOuts")
+                    logger.warning(
+                        "Select TxOuts failed: insufficient TxOuts. amountToSend: " +
+                            "\(redacting: amount), txOut values: " +
+                            "\(redacting: txOuts.map { $0.value })",
+                        logFunction: false)
                     return .failure(.insufficientTxOuts())
                 }
 
@@ -296,7 +316,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 else {
                     // Safety: availableTxOuts is guaranteed to not be empty at this point and
                     // guaranteed to have a TxOut with a value greater the value of deselectedTxOut.
-                    logger.fatalError("ERROR: availableTxOuts is empty")
+                    logger.fatalError("Select TxOuts failure: availableTxOuts is empty")
                 }
 
                 selectedTxOuts.append(selectedTxOut)
@@ -347,7 +367,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<[(inputIds: [Int], fee: UInt64)], TxOutSelectionError> {
-        logger.info("")
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
         let maxInputsPerTransaction = max(1, min(maxInputsPerTransaction, McConstants.MAX_INPUTS))
         guard maxInputsPerTransaction >= 2 else {
@@ -452,7 +471,6 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         maxInputsPerTransaction: Int,
         maxTotalFee: UInt64
     ) {
-        logger.debug("")
         // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
         let maxInputsPerTransaction = max(1, min(maxInputsPerTransaction, McConstants.MAX_INPUTS))
 

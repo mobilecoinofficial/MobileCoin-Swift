@@ -183,8 +183,6 @@ struct AccountKeyWithFog {
     let accountKey: AccountKey
 
     init?(accountKey: AccountKey) {
-        logger.info("\(redacting: accountKey.publicAddress)")
-
         guard accountKey.fogInfo != nil else {
             return nil
         }

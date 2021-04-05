@@ -72,15 +72,12 @@ enum VersionedCryptoBox {
                         &errorPtr)
                 }.mapError {
                     switch $0.errorCode {
-                    case .aead:
-                        return .invalidInput(
-                            "VersionedCryptoBox decryption error: \(redacting: $0.description)")
+                    case .aead, .invalidInput:
+                        return .invalidInput("\(redacting: $0.description)")
                     case .unsupportedCryptoBoxVersion:
                         return .unsupportedVersion("\(redacting: $0.description)")
-                    case .invalidInput:
-                        logger.fatalError("error: \(redacting: $0.description)")
                     default:
-                        // Safety: mc_tx_out_get_key_image should not throw non-documented
+                        // Safety: mc_versioned_crypto_box_decrypt should not throw non-documented
                         // errors.
                         logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
                     }

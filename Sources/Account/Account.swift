@@ -123,7 +123,6 @@ final class Account {
     }
 
     func addTxOuts(_ txOuts: [KnownTxOut]) {
-        logger.info("txOuts: \(redacting: txOuts)")
         allTxOutTrackers.append(contentsOf: txOuts.map { TxOutTracker($0) })
     }
 
@@ -234,7 +233,6 @@ final class TxOutTracker {
     var keyImageTracker: KeyImageSpentTracker
 
     init(_ knownTxOut: KnownTxOut) {
-        logger.info("knownTxOut.publicKey: \(redacting: knownTxOut.publicKey)")
         self.knownTxOut = knownTxOut
         self.keyImageTracker = KeyImageSpentTracker(knownTxOut.keyImage)
     }
@@ -248,30 +246,18 @@ final class TxOutTracker {
     }
 
     func receivedAndUnspent(asOfBlockCount blockCount: UInt64) -> Bool {
-        logger.info("asOfBlockCount: \(blockCount)")
-        return received(asOfBlockCount: blockCount) && !spent(asOfBlockCount: blockCount)
+        received(asOfBlockCount: blockCount) && !spent(asOfBlockCount: blockCount)
     }
 
     func received(asOfBlockCount blockCount: UInt64) -> Bool {
-        logger.info("asOfBlockCount: \(blockCount)")
-        return knownTxOut.block.index < blockCount
+        knownTxOut.block.index < blockCount
     }
 
     func spent(asOfBlockCount blockCount: UInt64) -> Bool {
-        logger.info("asOfBlockCount: \(blockCount)")
         if case .spent = keyImageTracker.spentStatus.status(atBlockCount: blockCount) {
             return true
         }
         return false
-    }
-
-    func netValue(atBlockCount blockCount: UInt64) -> UInt64 {
-        logger.info("asOfBlockCount: \(blockCount)")
-        if receivedAndUnspent(asOfBlockCount: blockCount) {
-            return knownTxOut.value
-        } else {
-            return 0
-        }
     }
 }
 
