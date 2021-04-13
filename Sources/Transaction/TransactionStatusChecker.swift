@@ -51,7 +51,6 @@ struct TransactionStatusChecker {
         _ transaction: Transaction,
         completion: @escaping (Result<Transaction.AcceptedStatus, ConnectionError>) -> Void
     ) {
-        logger.info("")
         performAsync(body1: { callback in
             fogUntrustedTxOutFetcher.getTxOut(
                 outputPublicKey: transaction.anyOutput.publicKey,

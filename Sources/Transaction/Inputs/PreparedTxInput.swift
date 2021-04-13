@@ -18,7 +18,6 @@ struct PreparedTxInput {
             return .failure(InvalidInputError("TxOut not found in ring"))
         }
 
-        logger.info("success")
         return .success(
             PreparedTxInput(knownTxOut: knownTxOut, ring: ring, realInputIndex: realInputIndex))
     }

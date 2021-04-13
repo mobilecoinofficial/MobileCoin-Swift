@@ -62,22 +62,19 @@ public struct Receipt {
     }
 
     func matchesTxOut(_ txOut: TxOutProtocol) -> Bool {
-        logger.info("")
-        return txOutPublicKeyTyped == txOut.publicKey
+        txOutPublicKeyTyped == txOut.publicKey
             && commitment == txOut.commitment
             && maskedValue == txOut.maskedValue
     }
 
     func validateConfirmationNumber(accountKey: AccountKey) -> Bool {
-        logger.info("")
-        return TxOutUtils.validateConfirmationNumber(
+        TxOutUtils.validateConfirmationNumber(
             publicKey: txOutPublicKeyTyped,
             confirmationNumber: confirmationNumber,
             viewPrivateKey: accountKey.viewPrivateKey)
     }
 
     func unmaskValue(accountKey: AccountKey) -> Result<UInt64, InvalidInputError> {
-        logger.info("")
         guard let value = TxOutUtils.value(
             commitment: commitment,
             maskedValue: maskedValue,
@@ -99,7 +96,6 @@ public struct Receipt {
     /// subaddress of the `accountKey`, but not which one.
     @discardableResult
     public func validateAndUnmaskValue(accountKey: AccountKey) -> UInt64? {
-        logger.info("")
         guard validateConfirmationNumber(accountKey: accountKey) else {
             return nil
         }

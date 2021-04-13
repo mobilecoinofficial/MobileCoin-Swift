@@ -369,8 +369,7 @@ final class TransactionBuilder {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<Transaction, TransactionBuilderError> {
-        logger.info("")
-        return withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+        withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
             Data.make(withMcDataBytes: { errorPtr in
                 mc_transaction_builder_build(ptr, rngCallbackPtr, &errorPtr)
             }).mapError {

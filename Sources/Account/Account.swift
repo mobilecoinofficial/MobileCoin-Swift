@@ -92,25 +92,14 @@ final class Account {
     func cachedReceivedStatus(of receipt: Receipt)
         -> Result<Receipt.ReceivedStatus, InvalidInputError>
     {
-        logger.info("receipt.txOutPublicKey: \(redacting: receipt.txOutPublicKey)")
-        return ownedTxOut(for: receipt).map {
+        ownedTxOut(for: receipt).map {
             if let ownedTxOut = $0 {
-                logger.info("received - txOut.publicKey: \(redacting: ownedTxOut.publicKey)")
                 return .received(block: ownedTxOut.block)
             } else {
                 let knownToBeNotReceivedBlockCount = allTxOutsFoundBlockCount
                 guard receipt.txTombstoneBlockIndex > knownToBeNotReceivedBlockCount else {
-                    logger.info("""
-                        tombstone exceeded - receipt.txTombstoneBlockIndex: \
-                        \(receipt.txTombstoneBlockIndex) > \
-                        knownToBeNotReceivedBlockCount: \(knownToBeNotReceivedBlockCount)
-                        """)
                     return .tombstoneExceeded
                 }
-                logger.info("""
-                    not received - \
-                    knownToBeNotReceivedBlockCount: \(knownToBeNotReceivedBlockCount)
-                    """)
                 return .notReceived(knownToBeNotReceivedBlockCount: knownToBeNotReceivedBlockCount)
             }
         }
@@ -129,8 +118,6 @@ final class Account {
         // First check if we've received the TxOut (either from Fog View or from view key scanning).
         // This has the benefit of providing a guarantee that the TxOut is owned by this account.
         guard let ownedTxOut = ownedTxOut(for: receipt.txOutPublicKeyTyped) else {
-            logger.info(
-                "Receipt status check failed. Account has not received Receipt TxOut.")
             return .success(nil)
         }
 
@@ -157,8 +144,6 @@ final class Account {
             return .failure(InvalidInputError(errorMessage))
         }
 
-        logger.info("Receipt status check succeeded. TxOut was received in block index " +
-            "\(ownedTxOut.block.index)")
         return .success(ownedTxOut)
     }
 
@@ -221,12 +206,7 @@ final class TxOutTracker {
 
 extension OwnedTxOut {
     fileprivate init?(_ txOutTracker: TxOutTracker, atBlockCount blockCount: UInt64) {
-        logger.info("""
-            txOut.publicKey: \(redacting: txOutTracker.knownTxOut.publicKey), \
-            atBlockCount: \(blockCount)
-            """)
         guard txOutTracker.knownTxOut.block.index < blockCount else {
-            logger.info("knownTxout block index < blockCount")
             return nil
         }
         let receivedBlock = txOutTracker.knownTxOut.block
