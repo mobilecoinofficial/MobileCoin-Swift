@@ -14,7 +14,7 @@ public final class MobileCoinClient {
     {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
             let errorMessage = "Accounts without fog URLs are not currently supported."
-            logger.error(errorMessage)
+            logger.error(errorMessage, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
 
@@ -387,7 +387,7 @@ extension MobileCoinClient {
                 } catch {
                     let errorMessage = "Error parsing trust root certificate: " +
                         "\(trustRootBytes.base64EncodedString()) - Error: \(error)"
-                    logger.error(errorMessage)
+                    logger.error(errorMessage, logFunction: false)
                     return .failure(InvalidInputError(errorMessage))
                 }
             }
