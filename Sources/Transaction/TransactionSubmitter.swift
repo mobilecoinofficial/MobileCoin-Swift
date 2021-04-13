@@ -16,8 +16,9 @@ struct TransactionSubmitter {
         _ transaction: Transaction,
         completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
     ) {
-        logger.info("Submitting transaction...")
-        logger.info("transaction: \(redacting: transaction.serializedData)")
+        logger.info(
+            "Submitting transaction... transaction: \(redacting: transaction.serializedData)",
+            logFunction: false)
         consensusService.proposeTx(External_Tx(transaction)) {
             completion($0.mapError { .connectionError($0) }.flatMap { self.processResponse($0) })
         }

@@ -353,7 +353,8 @@ final class TransactionBuilder {
             guard let txOut = TxOut(serializedData: txOutData) else {
                 // Safety: mc_transaction_builder_add_output should always return valid data on
                 // success.
-                logger.fatalError("mc_transaction_builder_add_output returned invalid data.")
+                logger.fatalError("mc_transaction_builder_add_output returned invalid data: " +
+                    "\(redacting: txOutData.base64EncodedString())")
             }
 
             let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
@@ -384,7 +385,8 @@ final class TransactionBuilder {
         }.map { txBytes in
             guard let transaction = Transaction(serializedData: txBytes) else {
                 // Safety: mc_transaction_builder_build should always return valid data on success.
-                logger.fatalError("mc_transaction_builder_build returned invalid data.")
+                logger.fatalError("mc_transaction_builder_build returned invalid data: " +
+                    "\(redacting: txBytes.base64EncodedString())")
             }
             return transaction
         }

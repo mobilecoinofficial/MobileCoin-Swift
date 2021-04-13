@@ -15,8 +15,10 @@ struct TxOut: TxOutProtocol {
     /// - Returns: `nil` when the input is not deserializable.
     init?(serializedData: Data) {
         guard let proto = try? External_TxOut(serializedData: serializedData) else {
-            logger.warning("External_TxOut deserialization failed. serializedData: " +
-                "\(redacting: serializedData.base64EncodedString())")
+            logger.warning(
+                "External_TxOut deserialization failed. serializedData: " +
+                    "\(redacting: serializedData.base64EncodedString())",
+                logFunction: false)
             return nil
         }
         self.init(proto)

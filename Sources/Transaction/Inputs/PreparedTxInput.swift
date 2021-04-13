@@ -14,8 +14,9 @@ struct PreparedTxInput {
         guard let realInputIndex =
                 ring.firstIndex(where: { $0.0.publicKey == knownTxOut.publicKey })
         else {
-            logger.info("failure - txOut not found in ring")
-            return .failure(InvalidInputError("TxOut not found in ring"))
+            let errorMessage = "PreparedTxInput.make: TxOut not found in ring"
+            logger.error(errorMessage, logFunction: false)
+            return .failure(InvalidInputError(errorMessage))
         }
 
         return .success(
