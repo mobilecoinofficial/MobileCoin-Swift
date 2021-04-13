@@ -12,10 +12,6 @@ struct ReceiptStatusChecker {
     }
 
     func status(_ receipt: Receipt) -> Result<ReceiptStatus, InvalidInputError> {
-        receivedStatus(receipt).map { ReceiptStatus($0) }
-    }
-
-    func receivedStatus(_ receipt: Receipt) -> Result<Receipt.ReceivedStatus, InvalidInputError> {
-        account.readSync { $0.cachedReceivedStatus(of: receipt) }
+        account.readSync { $0.cachedReceivedStatus(of: receipt) }.map { ReceiptStatus($0) }
     }
 }

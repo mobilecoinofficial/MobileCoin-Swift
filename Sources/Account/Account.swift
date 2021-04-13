@@ -50,36 +50,8 @@ final class Account {
         return Balance(values: txOutValues, blockCount: blockCount)
     }
 
-    func cachedBalance(atBlockCount blockCount: UInt64) -> Balance? {
-        logger.info("atBlockCount: \(blockCount)")
-        guard blockCount <= knowableBlockCount else {
-            logger.info("""
-                error - blockCount: \(blockCount) > \
-                knowableBlockCount: \(knowableBlockCount)
-                """)
-            return nil
-        }
-        let txOutValues = allTxOutTrackers
-            .filter { $0.receivedAndUnspent(asOfBlockCount: blockCount) }
-            .map { $0.knownTxOut.value }
-        return Balance(values: txOutValues, blockCount: blockCount)
-    }
-
     var cachedAccountActivity: AccountActivity {
         let blockCount = knowableBlockCount
-        let txOuts = allTxOutTrackers.compactMap { OwnedTxOut($0, atBlockCount: blockCount) }
-        return AccountActivity(txOuts: txOuts, blockCount: blockCount)
-    }
-
-    func cachedAccountActivity(asOfBlockCount blockCount: UInt64) -> AccountActivity? {
-        logger.info("asOfBlockCount: \(blockCount)")
-        guard blockCount <= knowableBlockCount else {
-            logger.info("""
-                error - blockCount: \(blockCount) > \
-                knowableBlockCount: \(knowableBlockCount)
-                """)
-            return nil
-        }
         let txOuts = allTxOutTrackers.compactMap { OwnedTxOut($0, atBlockCount: blockCount) }
         return AccountActivity(txOuts: txOuts, blockCount: blockCount)
     }
@@ -106,20 +78,6 @@ final class Account {
             .filter { $0.receivedAndUnspent(asOfBlockCount: knowableBlockCount) }
             .map { $0.knownTxOut }
         return (txOuts: txOuts, blockCount: knowableBlockCount)
-    }
-
-    func receivedAndUnspentTxOuts(atBlockCount blockCount: UInt64) -> [KnownTxOut]? {
-        logger.info("atBlockCount: \(blockCount)")
-        guard blockCount <= knowableBlockCount else {
-            logger.info("""
-                error - blockCount: \(blockCount) > \
-                knowableBlockCount: \(knowableBlockCount)
-                """)
-            return nil
-        }
-        return allTxOutTrackers
-            .filter { $0.receivedAndUnspent(asOfBlockCount: blockCount) }
-            .map { $0.knownTxOut }
     }
 
     func addTxOuts(_ txOuts: [KnownTxOut]) {
