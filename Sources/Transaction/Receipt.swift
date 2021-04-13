@@ -53,12 +53,7 @@ public struct Receipt {
 
     public var serializedData: Data {
         let proto = External_Receipt(self)
-        do {
-            return try proto.serializedData()
-        } catch {
-            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-        }
+        return proto.serializedDataInfallible
     }
 
     /// Public key of the `TxOut` that this `Receipt` represents, in bytes.

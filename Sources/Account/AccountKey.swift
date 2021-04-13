@@ -64,12 +64,7 @@ public struct AccountKey {
 
     public var serializedData: Data {
         let proto = External_AccountKey(self)
-        do {
-            return try proto.serializedData()
-        } catch {
-            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-        }
+        return proto.serializedDataInfallible
     }
 
     var fogReportUrlString: String? { fogInfo?.reportUrlString }

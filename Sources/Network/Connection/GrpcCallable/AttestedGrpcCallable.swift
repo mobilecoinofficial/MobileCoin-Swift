@@ -63,7 +63,7 @@ extension AttestedGrpcCallable where InnerResponseAad == (), InnerResponse == Re
 extension AttestedGrpcCallable
     where InnerRequestAad == (),
         Request == Attest_Message,
-        InnerRequest: Message
+        InnerRequest: InfallibleDataSerializable
 {
     func processRequest(
         requestAad: InnerRequestAad,
@@ -71,13 +71,7 @@ extension AttestedGrpcCallable
         attestAkeCipher: AttestAke.Cipher
     ) -> Result<Attest_Message, AeadError> {
         let aad = Data()
-        let plaintext: Data
-        do {
-            plaintext = try request.serializedData()
-        } catch {
-            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-        }
+        let plaintext = request.serializedDataInfallible
 
         return attestAkeCipher.encryptMessage(aad: aad, plaintext: plaintext)
     }
@@ -115,24 +109,17 @@ extension AttestedGrpcCallable
 }
 
 extension AttestedGrpcCallable
-    where InnerRequestAad: Message,
+    where InnerRequestAad: InfallibleDataSerializable,
         Request == Attest_Message,
-        InnerRequest: Message
+        InnerRequest: InfallibleDataSerializable
 {
     func processRequest(
         requestAad: InnerRequestAad,
         request: InnerRequest,
         attestAkeCipher: AttestAke.Cipher
     ) -> Result<Attest_Message, AeadError> {
-        let aad: Data
-        let plaintext: Data
-        do {
-            aad = try requestAad.serializedData()
-            plaintext = try request.serializedData()
-        } catch {
-            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-        }
+        let aad = requestAad.serializedDataInfallible
+        let plaintext = request.serializedDataInfallible
 
         return attestAkeCipher.encryptMessage(aad: aad, plaintext: plaintext)
     }

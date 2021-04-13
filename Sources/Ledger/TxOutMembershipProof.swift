@@ -19,13 +19,7 @@ extension TxOutMembershipProof: Hashable {}
 
 extension TxOutMembershipProof {
     init?(_ txOutMembershipProof: External_TxOutMembershipProof) {
-        let serializedData: Data
-        do {
-            serializedData = try txOutMembershipProof.serializedData()
-        } catch {
-            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-        }
+        let serializedData = txOutMembershipProof.serializedDataInfallible
         self.init(serializedData: serializedData)
     }
 }

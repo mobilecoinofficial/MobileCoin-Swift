@@ -26,12 +26,7 @@ public struct Transaction {
     }
 
     public var serializedData: Data {
-        do {
-            return try proto.serializedData()
-        } catch {
-            // Safety: Protobuf binary serialization is no fail when not using proto2 or `Any`.
-            logger.fatalError("Protobuf serialization failed: \(redacting: error)")
-        }
+        proto.serializedDataInfallible
     }
 
     var anyInputKeyImage: KeyImage {
