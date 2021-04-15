@@ -48,7 +48,6 @@ final class FogReportServer {
         reportService: FogReportService,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void
     ) {
-        logger.info("")
         serialConnectionQueue.append({ callback in
             self.doFetchReports(reportService: reportService, completion: callback)
         }, completion: completion)
@@ -80,7 +79,6 @@ final class FogReportServer {
         reportService: FogReportService,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void
     ) {
-        logger.info("")
         reportService.getReports(request: Report_ReportRequest()) {
             guard let reportResponse = $0.successOr(completion: completion) else { return }
 
@@ -97,7 +95,6 @@ final class FogReportServer {
         _ reportResponse: Report_ReportResponse,
         completion: @escaping () -> Void
     ) {
-        logger.info("")
         inner.accessAsync {
             $0.cacheReportResponse(reportResponse)
 

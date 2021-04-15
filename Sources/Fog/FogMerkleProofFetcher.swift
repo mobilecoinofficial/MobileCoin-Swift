@@ -70,7 +70,6 @@ struct FogMerkleProofFetcher {
             Result<[UInt64: (TxOut, TxOutMembershipProof)], FogMerkleProofFetcherError>
         ) -> Void
     ) {
-        logger.info("")
         let globalIndicesArrays =
             globalIndices.chunked(maxLength: maxNumIndicesPerQuery).map { Array($0) }
         globalIndicesArrays.mapAsync({ chunk, callback in
@@ -91,7 +90,6 @@ struct FogMerkleProofFetcher {
             Result<[UInt64: (TxOut, TxOutMembershipProof)], FogMerkleProofFetcherError>
         ) -> Void
     ) {
-        logger.info("")
         var request = FogLedger_GetOutputsRequest()
         request.indices = globalIndices
         request.merkleRootBlock = merkleRootBlock
