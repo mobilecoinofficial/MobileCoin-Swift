@@ -87,22 +87,22 @@ extension AttestedGrpcCallable
         attestAkeCipher: AttestAke.Cipher
     ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError> {
         guard response.aad == Data() else {
-            let errorMessage = "\(Self.self) received unexpected aad: " +
-                "\(redacting: response.aad.base64EncodedString()), message: \(redacting: response)"
-            logger.error(errorMessage)
-            return .failure(.connectionError(.invalidServerResponse(errorMessage)))
+            return .failure(.connectionError(.invalidServerResponse(
+                "\(Self.self) received unexpected aad: " +
+                    "\(redacting: response.aad.base64EncodedString()), message: " +
+                    "\(redacting: response.serializedDataInfallible.base64EncodedString())")))
         }
 
         return attestAkeCipher.decryptMessage(response)
             .mapError { _ in .attestationFailure() }
             .flatMap { plaintext in
                 guard let response = try? InnerResponse(serializedData: plaintext) else {
-                    let errorMessage = "Failed to deserialized attested message plaintext into " +
-                        "\(InnerResponse.self). serializedData: " +
-                        "\(redacting: plaintext.base64EncodedString())"
-                    logger.error(errorMessage)
-                    return .failure(.connectionError(.invalidServerResponse(errorMessage)))
+                    return .failure(.connectionError(.invalidServerResponse(
+                        "Failed to deserialized attested message plaintext into " +
+                            "\(InnerResponse.self). plaintext: " +
+                            "\(redacting: plaintext.base64EncodedString())")))
                 }
+
                 return .success((responseAad: (), response: response))
             }
     }
@@ -134,18 +134,22 @@ extension AttestedGrpcCallable
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
     ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError> {
-        attestAkeCipher.decryptMessage(response)
+        guard let responseAad = try? InnerResponseAad(serializedData: response.aad) else {
+            return .failure(.connectionError(.invalidServerResponse(
+                "Failed to deserialized attested message aad into \(InnerResponseAad.self). aad: " +
+                    "\(redacting: response.aad.base64EncodedString())")))
+        }
+
+        return attestAkeCipher.decryptMessage(response)
             .mapError { _ in .attestationFailure() }
             .flatMap { plaintext in
-                guard let plaintextResponse = try? InnerResponse(serializedData: plaintext),
-                      let responseAad = try? InnerResponseAad(serializedData: response.aad)
-                else {
-                    let errorMessage = "Failed to deserialized attested message plaintext using " +
-                        "\(InnerResponse.self) and \(InnerResponseAad.self). serializedData: " +
-                        "\(redacting: plaintext.base64EncodedString())"
-                    logger.error(errorMessage)
-                    return .failure(.connectionError(.invalidServerResponse(errorMessage)))
+                guard let plaintextResponse = try? InnerResponse(serializedData: plaintext) else {
+                    return .failure(.connectionError(.invalidServerResponse(
+                        "Failed to deserialized attested message plaintext into " +
+                            "\(InnerResponse.self). plaintext: " +
+                            "\(redacting: plaintext.base64EncodedString())")))
                 }
+
                 return .success((responseAad: responseAad, response: plaintextResponse))
             }
     }

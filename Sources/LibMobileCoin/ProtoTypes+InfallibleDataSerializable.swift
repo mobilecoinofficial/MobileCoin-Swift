@@ -25,6 +25,10 @@ extension External_Receipt: InfallibleDataSerializable {}
 
 extension Printable_PrintableWrapper: InfallibleDataSerializable {}
 
+// MARK: - Attest
+
+extension Attest_Message: InfallibleDataSerializable {}
+
 // MARK: - Fog Report
 
 extension Report_ReportResponse: InfallibleDataSerializable {}

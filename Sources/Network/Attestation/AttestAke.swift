@@ -85,9 +85,7 @@ final class AttestAke {
         -> Result<Cipher, AttestAkeError>
     {
         guard case .authPending(let attestAke) = state else {
-            let errorMessage = "AttestAke.authEnd called without a pending auth."
-            logger.error(errorMessage, logFunction: false)
-            return .failure(.invalidInput(errorMessage))
+            return .failure(.invalidInput("AttestAke.authEnd called without a pending auth."))
         }
 
         return attestAke.authEnd(
