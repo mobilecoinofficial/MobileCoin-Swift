@@ -211,7 +211,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         }
 
         // Insufficient balance to cover sendAmount + the cost of any required defragmentation.
-        logger.warning(
+        logger.error(
             "Estimate total fee failed: insufficient TxOuts. amountToSend: \(redacting: amount), " +
                 "txOut values: \(redacting: txOuts.map { $0.value })",
             logFunction: false)
@@ -255,7 +255,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         while true {
             guard !availableTxOuts.isEmpty else {
                 // Insufficient balance to cover amount + fee.
-                logger.warning(
+                logger.error(
                     "Select TxOuts failed: insufficient TxOuts. amountToSend: " +
                         "\(redacting: amount), txOut values: \(redacting: txOuts.map { $0.value })",
                     logFunction: false)
@@ -297,7 +297,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 else {
                     // We've selected the highest value TxOuts already which means the TxOuts don't
                     // have enough total value to cover amount + fees.
-                    logger.warning(
+                    logger.error(
                         "Select TxOuts failed: insufficient TxOuts. amountToSend: " +
                             "\(redacting: amount), txOut values: " +
                             "\(redacting: txOuts.map { $0.value })",
