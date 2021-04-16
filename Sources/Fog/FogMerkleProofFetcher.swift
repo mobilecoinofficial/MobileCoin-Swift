@@ -52,9 +52,9 @@ struct FogMerkleProofFetcher {
                 globalIndicesArray.map { globalIndices in
                     guard let results = allResults[globalIndices] else {
                         return .failure(.connectionError(.invalidServerResponse(
-                            "global txout indices not found in " +
-                            "GetOutputs reponse. globalTxOutIndices: \(globalIndices), returned " +
-                            "outputs: \(allResults)")))
+                            "Global txout indices not found in GetOutputs reponse. " +
+                            "globalTxOutIndices: \(globalIndices), returned outputs: " +
+                            "\(allResults)")))
                     }
                     return .success(results)
                 }.collectResult()
