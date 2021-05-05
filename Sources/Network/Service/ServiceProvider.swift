@@ -6,6 +6,7 @@ import Foundation
 
 protocol ServiceProvider {
     var consensusService: ConsensusService { get }
+    var blockchainService: BlockchainService { get }
 
     var fogViewService: FogViewService { get }
     var fogMerkleProofService: FogMerkleProofService { get }

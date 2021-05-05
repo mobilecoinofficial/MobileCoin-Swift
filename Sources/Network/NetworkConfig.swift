@@ -41,6 +41,13 @@ struct NetworkConfig {
             authorization: consensusAuthorization)
     }
 
+    var blockchain: ConnectionConfig<ConsensusUrl> {
+        ConnectionConfig(
+            url: consensusUrl,
+            trustRoots: consensusTrustRoots,
+            authorization: consensusAuthorization)
+    }
+
     var fogView: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrl,
