@@ -69,7 +69,7 @@ final class DefaultServiceProvider: ServiceProvider {
         consensus.setAuthorization(credentials: credentials)
     }
 
-    func setFogAuthorization(credentials: BasicCredentials) {
+    func setFogUserAuthorization(credentials: BasicCredentials) {
         view.setAuthorization(credentials: credentials)
         merkleProof.setAuthorization(credentials: credentials)
         keyImage.setAuthorization(credentials: credentials)

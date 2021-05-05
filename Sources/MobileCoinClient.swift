@@ -69,7 +69,7 @@ public final class MobileCoinClient {
 
     public func setFogBasicAuthorization(username: String, password: String) {
         let credentials = BasicCredentials(username: username, password: password)
-        inner.accessAsync { $0.serviceProvider.setFogAuthorization(credentials: credentials) }
+        inner.accessAsync { $0.serviceProvider.setFogUserAuthorization(credentials: credentials) }
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
@@ -341,7 +341,7 @@ extension MobileCoinClient {
         }
 
         public mutating func setFogBasicAuthorization(username: String, password: String) {
-            networkConfig.fogAuthorization =
+            networkConfig.fogUserAuthorization =
                 BasicCredentials(username: username, password: password)
         }
     }
