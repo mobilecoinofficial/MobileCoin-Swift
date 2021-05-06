@@ -139,7 +139,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "MobileCoin Inc.";
 				TargetAttributes = {
 					270686882474C4D800B82C57 = {
