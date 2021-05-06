@@ -181,19 +181,14 @@ extension AccountKey.FogInfo: Hashable {}
 
 struct AccountKeyWithFog {
     let accountKey: AccountKey
+    let fogInfo: AccountKey.FogInfo
 
     init?(accountKey: AccountKey) {
-        guard accountKey.fogInfo != nil else {
+        guard let fogInfo = accountKey.fogInfo else {
             return nil
         }
-        self.accountKey = accountKey
-    }
 
-    var fogInfo: AccountKey.FogInfo {
-        guard let fogInfo = accountKey.fogInfo else {
-            // Safety: accountKey is guaranteed to have fogInfo.
-            logger.fatalError("accountKey doesn't have fogInfo")
-        }
-        return fogInfo
+        self.accountKey = accountKey
+        self.fogInfo = fogInfo
     }
 }

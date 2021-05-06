@@ -21,7 +21,6 @@ public enum MobUri {
         guard let scheme = uri.scheme else {
             logger.info("MobUri scheme cannot be empty.")
             return .failure(InvalidInputError("MobUri scheme cannot be empty."))
-
         }
         guard scheme == McConstants.MOB_URI_SCHEME else {
             logger.info(
