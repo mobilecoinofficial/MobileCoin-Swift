@@ -71,7 +71,7 @@ extension ConnectionSession.Fixtures {
 extension ConnectionSession.Fixtures.Default {
 
     fileprivate static func url() throws -> MobileCoinUrlProtocol {
-        try AnyMobileCoinUrl.make(string: "mc://node1.fake.mobilecoin.com").get()
+        try ConsensusUrl.make(string: "mc://node1.fake.mobilecoin.com").get()
     }
 
     fileprivate static let credentials = BasicCredentials(username: "user1", password: "password1")
@@ -107,8 +107,7 @@ extension ConnectionSession.Fixtures.Default {
 extension ConnectionSession.Fixtures.Insecure {
 
     fileprivate static func url() throws -> MobileCoinUrlProtocol {
-        try AnyMobileCoinUrl.make(string: "insecure-mc://node1.fake.mobilecoin.com", useTls: false)
-            .get()
+        try ConsensusUrl.make(string: "insecure-mc://node1.fake.mobilecoin.com").get()
     }
 
 }
