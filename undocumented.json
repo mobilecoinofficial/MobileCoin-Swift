@@ -541,21 +541,21 @@
     },
     {
       "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
-      "line": 36,
+      "line": 35,
       "symbol": "MobUri.encode(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
-      "line": 41,
+      "line": 40,
       "symbol": "MobUri.encode(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
     {
       "file": "/Users/distiller/project/Sources/Encodings/MobUri.swift",
-      "line": 46,
+      "line": 45,
       "symbol": "MobUri.encode(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
