@@ -51,42 +51,6 @@ extension ConnectionError: CustomStringConvertible {
     }
 }
 
-public enum BalanceTransferEstimationError: Error {
-    case feeExceedsBalance(String = String())
-    case balanceOverflow(String = String())
-}
-
-extension BalanceTransferEstimationError: CustomStringConvertible {
-    public var description: String {
-        "Balance transfer estimation error: " + {
-            switch self {
-            case .feeExceedsBalance(let reason):
-                return "Fee exceeds balance\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .balanceOverflow(let reason):
-                return "Balance overflow\(!reason.isEmpty ? ": \(reason)" : "")"
-            }
-        }()
-    }
-}
-
-public enum TransactionEstimationError: Error {
-    case invalidInput(String)
-    case insufficientBalance(String = String())
-}
-
-extension TransactionEstimationError: CustomStringConvertible {
-    public var description: String {
-        "Transaction estimation error: " + {
-            switch self {
-            case .invalidInput(let reason):
-                return "Invalid input: \(reason)"
-            case .insufficientBalance(let reason):
-                return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
-            }
-        }()
-    }
-}
-
 public enum TransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -154,6 +118,46 @@ extension TransactionSubmissionError: CustomStringConvertible {
                 return "Tombstone block too far\(!reason.isEmpty ? ": \(reason)" : "")"
             case .inputsAlreadySpent(let reason):
                 return "Inputs already spent\(!reason.isEmpty ? ": \(reason)" : "")"
+            }
+        }()
+    }
+}
+
+@available(*, deprecated)
+public enum BalanceTransferEstimationError: Error {
+    case feeExceedsBalance(String = String())
+    case balanceOverflow(String = String())
+}
+
+@available(*, deprecated)
+extension BalanceTransferEstimationError: CustomStringConvertible {
+    public var description: String {
+        "Balance transfer estimation error: " + {
+            switch self {
+            case .feeExceedsBalance(let reason):
+                return "Fee exceeds balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .balanceOverflow(let reason):
+                return "Balance overflow\(!reason.isEmpty ? ": \(reason)" : "")"
+            }
+        }()
+    }
+}
+
+@available(*, deprecated)
+public enum TransactionEstimationError: Error {
+    case invalidInput(String)
+    case insufficientBalance(String = String())
+}
+
+@available(*, deprecated)
+extension TransactionEstimationError: CustomStringConvertible {
+    public var description: String {
+        "Transaction estimation error: " + {
+            switch self {
+            case .invalidInput(let reason):
+                return "Invalid input: \(reason)"
+            case .insufficientBalance(let reason):
+                return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()
     }

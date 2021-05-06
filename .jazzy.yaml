@@ -62,8 +62,13 @@ custom_categories:
     children:
       - ConnectionError
       - InvalidInputError
-      - BalanceTransferEstimationError
-      - TransactionEstimationError
+      - BalanceTransferEstimationFetcherError
+      - TransactionEstimationFetcherError
       - TransactionPreparationError
       - DefragTransactionPreparationError
       - TransactionSubmissionError
+
+  - name: Deprecated
+    children:
+      - BalanceTransferEstimationError
+      - TransactionEstimationError
