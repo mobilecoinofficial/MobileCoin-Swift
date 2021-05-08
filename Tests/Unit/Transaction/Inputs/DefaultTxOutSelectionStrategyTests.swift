@@ -290,7 +290,9 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         {
             _ = try? {
                 let amountTransferable = try XCTUnwrapSuccess(
-                    sut.amountTransferable(feeLevel: feeLevel, txOuts: txOuts,
+                    sut.amountTransferable(
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        txOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 if let expectedAmountTransferable = expectedAmountTransferable {
@@ -317,7 +319,9 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         for (feeLevel, txOuts, maxInputsPerTransaction, _, file, line) in testCases {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.amountTransferable(feeLevel: feeLevel, txOuts: txOuts,
+                    sut.amountTransferable(
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        txOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 if case .feeExceedsBalance = error {
@@ -330,8 +334,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testEstimateTotalFee() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase3] = [
-        ]
+        var testCases: [TestCase3] = []
         testCases.append(contentsOf: nonDefragTestCases)
         testCases.append(contentsOf: defragTestCases)
 
@@ -340,7 +343,10 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         {
             _ = try? {
                 let (totalFee, _) = try XCTUnwrapSuccess(
-                    sut.estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, txOuts: txOuts,
+                    sut.estimateTotalFee(
+                        toSendAmount: amount,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        txOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 if let expectedTotalFee = expectedTotalFee {
@@ -353,8 +359,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testEstimateTotalFeeThrowsInsufficientTxOuts() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase3] = [
-        ]
+        var testCases: [TestCase3] = []
         testCases.append(contentsOf: insufficientFundsTestCases)
 
         for (amount, feeLevel, txOuts, maxInputsPerTransaction, _, _, _, file, line) in
@@ -362,8 +367,11 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, txOuts: txOuts,
-                         maxInputsPerTransaction: maxInputsPerTransaction),
+                    sut.estimateTotalFee(
+                        toSendAmount: amount,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        txOuts: txOuts,
+                        maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 if case .insufficientTxOuts = error {
                 } else {
@@ -375,8 +383,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testSelectTransactionInputsWithFeeLevel() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase3] = [
-        ]
+        var testCases: [TestCase3] = []
         testCases.append(contentsOf: nonDefragTestCases)
 
         for (amount, feeLevel, txOuts, maxInputsPerTransaction, _, expectedTotalFee, _,
@@ -386,7 +393,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
                 let (selectedIds, fee) = try XCTUnwrapSuccess(
                     sut.selectTransactionInputs(
                         amount: amount,
-                        feeLevel: feeLevel,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
                         fromTxOuts: txOuts,
                         maxInputs: maxInputsPerTransaction),
                     file: file, line: line)
@@ -402,8 +409,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testSelectTransactionInputsWithFeeLevelThrowsDefragRequired() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase3] = [
-        ]
+        var testCases: [TestCase3] = []
         testCases.append(contentsOf: defragTestCases)
 
         for (amount, feeLevel, txOuts, maxInputsPerTransaction, _, _, _, file, line) in
@@ -411,8 +417,11 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.selectTransactionInputs(amount: amount, feeLevel: feeLevel,
-                        fromTxOuts: txOuts, maxInputs: maxInputsPerTransaction),
+                    sut.selectTransactionInputs(
+                        amount: amount,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        fromTxOuts: txOuts,
+                        maxInputs: maxInputsPerTransaction),
                     file: file, line: line)
                 if case .defragmentationRequired = error {
                 } else {
@@ -424,8 +433,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testSelectTransactionInputsWithFeeLevelThrowsInsufficientTxOuts() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase3] = [
-        ]
+        var testCases: [TestCase3] = []
         testCases.append(contentsOf: insufficientFundsTestCases)
 
         for (amount, feeLevel, txOuts, maxInputsPerTransaction, _, _, _, file, line) in
@@ -433,8 +441,11 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.selectTransactionInputs(amount: amount, feeLevel: feeLevel,
-                        fromTxOuts: txOuts, maxInputs: maxInputsPerTransaction),
+                    sut.selectTransactionInputs(
+                        amount: amount,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        fromTxOuts: txOuts,
+                        maxInputs: maxInputsPerTransaction),
                     file: file, line: line)
                 if case .insufficientTxOuts = error {
                 } else {
@@ -446,16 +457,18 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testSelectInputsForDefragTransactions() {
         let sut = DefaultTxOutSelectionStrategy()
-        let testCases: [TestCase4] = [
-        ]
+        let testCases: [TestCase4] = []
 
         for (amount, feeLevel, txOuts, maxInputsPerTransaction, expectedResults, file, line) in
             testCases
         {
             _ = try? {
                 let defragTxsInputs = try XCTUnwrapSuccess(
-                    sut.selectInputsForDefragTransactions(toSendAmount: amount, feeLevel: feeLevel,
-                        fromTxOuts: txOuts, maxInputsPerTransaction: maxInputsPerTransaction),
+                    sut.selectInputsForDefragTransactions(
+                        toSendAmount: amount,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        fromTxOuts: txOuts,
+                        maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 for (selectedIds, totalFee) in defragTxsInputs {
                     checkSelectionIds(selectedIds: selectedIds, minTotalOutput: [totalFee],
@@ -477,8 +490,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     func testSelectInputsForDefragTransactionsThrowsInsufficientTxOuts() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase3] = [
-        ]
+        var testCases: [TestCase3] = []
         testCases.append(contentsOf: insufficientFundsTestCases)
 
         for (amount, feeLevel, txOuts, maxInputsPerTransaction, _, _, _, file, line) in
@@ -486,8 +498,11 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.selectInputsForDefragTransactions(toSendAmount: amount, feeLevel: feeLevel,
-                        fromTxOuts: txOuts, maxInputsPerTransaction: maxInputsPerTransaction),
+                    sut.selectInputsForDefragTransactions(
+                        toSendAmount: amount,
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        fromTxOuts: txOuts,
+                        maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 if case .insufficientTxOuts = error {
                 } else {

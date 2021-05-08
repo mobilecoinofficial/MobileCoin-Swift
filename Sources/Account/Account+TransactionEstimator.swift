@@ -29,7 +29,8 @@ extension Account.TransactionEstimator {
             "Calculating amountTransferable. unspentTxOutValues: " +
                 "\(redacting: txOuts.map { $0.value })",
             logFunction: false)
-        return txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts)
+        let feeStrategy = feeLevel.defaultFeeStrategy
+        return txOutSelector.amountTransferable(feeStrategy: feeStrategy, txOuts: txOuts)
             .mapError {
                 switch $0 {
                 case .feeExceedsBalance(let reason):
@@ -57,8 +58,9 @@ extension Account.TransactionEstimator {
         }
 
         let txOuts = account.readSync { $0.unspentTxOuts }
+        let feeStrategy = feeLevel.defaultFeeStrategy
         let totalFee = txOutSelector
-            .estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, txOuts: txOuts)
+            .estimateTotalFee(toSendAmount: amount, feeStrategy: feeStrategy, txOuts: txOuts)
             .mapError { _ -> TransactionEstimationError in .insufficientBalance() }
             .map { $0.totalFee }
         logger.info("totalFee result: \(redacting: totalFee)")
@@ -78,8 +80,9 @@ extension Account.TransactionEstimator {
         }
 
         let txOuts = account.readSync { $0.unspentTxOuts }
+        let feeStrategy = feeLevel.defaultFeeStrategy
         let requiresDefragmentation = txOutSelector
-            .estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, txOuts: txOuts)
+            .estimateTotalFee(toSendAmount: amount, feeStrategy: feeStrategy, txOuts: txOuts)
             .mapError { _ -> TransactionEstimationError in .insufficientBalance() }
             .map { $0.requiresDefrag }
         logger.info("requiresDefragmentation result: \(redacting: requiresDefragmentation)")
