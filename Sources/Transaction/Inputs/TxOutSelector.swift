@@ -6,6 +6,21 @@
 
 import Foundation
 
+enum TxOutSelectionError: Error {
+    case insufficientTxOuts(String = String())
+}
+
+extension TxOutSelectionError: CustomStringConvertible {
+    var description: String {
+        "TxOut selection error: " + {
+            switch self {
+            case .insufficientTxOuts(let reason):
+                return "Insufficient TxOuts\(!reason.isEmpty ? ": \(reason)" : "")"
+            }
+        }()
+    }
+}
+
 enum TransactionInputSelectionError: Error {
     case insufficientTxOuts(String = String())
     case defragmentationRequired(String = String())
@@ -19,21 +34,6 @@ extension TransactionInputSelectionError: CustomStringConvertible {
                 return "Insufficient TxOuts\(!reason.isEmpty ? ": \(reason)" : "")"
             case .defragmentationRequired(let reason):
                 return "Defragmentation required\(!reason.isEmpty ? ": \(reason)" : "")"
-            }
-        }()
-    }
-}
-
-enum TxOutSelectionError: Error {
-    case insufficientTxOuts(String = String())
-}
-
-extension TxOutSelectionError: CustomStringConvertible {
-    var description: String {
-        "TxOut selection error: " + {
-            switch self {
-            case .insufficientTxOuts(let reason):
-                return "Insufficient TxOuts\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()
     }
