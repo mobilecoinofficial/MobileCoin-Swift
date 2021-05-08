@@ -6,6 +6,24 @@
 
 import Foundation
 
+enum AmountTransferableError: Error {
+    case feeExceedsBalance(String = String())
+    case balanceOverflow(String = String())
+}
+
+extension AmountTransferableError: CustomStringConvertible {
+    var description: String {
+        "Amount transferable error: " + {
+            switch self {
+            case .feeExceedsBalance(let reason):
+                return "Fee exceeds balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .balanceOverflow(let reason):
+                return "Balance overflow\(!reason.isEmpty ? ": \(reason)" : "")"
+            }
+        }()
+    }
+}
+
 enum TxOutSelectionError: Error {
     case insufficientTxOuts(String = String())
 }
@@ -47,7 +65,7 @@ final class TxOutSelector {
     }
 
     func amountTransferable(feeLevel: FeeLevel, txOuts: [KnownTxOut])
-        -> Result<UInt64, BalanceTransferEstimationError>
+        -> Result<UInt64, AmountTransferableError>
     {
         txOutSelectionStrategy.amountTransferable(
             feeLevel: feeLevel,

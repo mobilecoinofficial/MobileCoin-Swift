@@ -19,7 +19,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         feeLevel: FeeLevel,
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
-    ) -> Result<UInt64, BalanceTransferEstimationError> {
+    ) -> Result<UInt64, AmountTransferableError> {
         let txOutValues = txOuts.map { $0.value }
         if txOutValues.allSatisfy({ $0 == 0 }) {
             logger.warning(

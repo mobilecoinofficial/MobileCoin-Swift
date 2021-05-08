@@ -29,10 +29,19 @@ extension Account.TransactionEstimator {
             "Calculating amountTransferable. unspentTxOutValues: " +
                 "\(redacting: txOuts.map { $0.value })",
             logFunction: false)
-        return txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts).map {
-            logger.info("amountTransferable: \(redacting: $0)", logFunction: false)
-            return $0
-        }
+        return txOutSelector.amountTransferable(feeLevel: feeLevel, txOuts: txOuts)
+            .mapError {
+                switch $0 {
+                case .feeExceedsBalance(let reason):
+                    return .feeExceedsBalance(reason)
+                case .balanceOverflow(let reason):
+                    return .balanceOverflow(reason)
+                }
+            }
+            .map {
+                logger.info("amountTransferable: \(redacting: $0)", logFunction: false)
+                return $0
+            }
     }
 
     @available(*, deprecated, message:

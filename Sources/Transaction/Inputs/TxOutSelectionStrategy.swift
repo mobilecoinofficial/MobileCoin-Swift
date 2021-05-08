@@ -23,7 +23,7 @@ protocol TxOutSelectionStrategy {
         feeLevel: FeeLevel,
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
-    ) -> Result<UInt64, BalanceTransferEstimationError>
+    ) -> Result<UInt64, AmountTransferableError>
 
     func estimateTotalFee(
         toSendAmount amount: UInt64,
@@ -56,7 +56,7 @@ protocol TxOutSelectionStrategy {
 
 extension TxOutSelectionStrategy {
     func amountTransferable(feeLevel: FeeLevel, txOuts: [SelectionTxOut])
-        -> Result<UInt64, BalanceTransferEstimationError>
+        -> Result<UInt64, AmountTransferableError>
     {
         amountTransferable(
             feeLevel: feeLevel,
