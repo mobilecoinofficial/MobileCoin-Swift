@@ -51,6 +51,48 @@ extension ConnectionError: CustomStringConvertible {
     }
 }
 
+public enum BalanceTransferEstimationFetcherError: Error {
+    case feeExceedsBalance(String = String())
+    case balanceOverflow(String = String())
+    case connectionError(ConnectionError)
+}
+
+extension BalanceTransferEstimationFetcherError: CustomStringConvertible {
+    public var description: String {
+        "Balance transfer estimation error: " + {
+            switch self {
+            case .feeExceedsBalance(let reason):
+                return "Fee exceeds balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .balanceOverflow(let reason):
+                return "Balance overflow\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .connectionError(let innerError):
+                return "\(innerError)"
+            }
+        }()
+    }
+}
+
+public enum TransactionEstimationFetcherError: Error {
+    case invalidInput(String)
+    case insufficientBalance(String = String())
+    case connectionError(ConnectionError)
+}
+
+extension TransactionEstimationFetcherError: CustomStringConvertible {
+    public var description: String {
+        "Transaction estimation error: " + {
+            switch self {
+            case .invalidInput(let reason):
+                return "Invalid input: \(reason)"
+            case .insufficientBalance(let reason):
+                return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .connectionError(let innerError):
+                return "\(innerError)"
+            }
+        }()
+    }
+}
+
 public enum TransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())

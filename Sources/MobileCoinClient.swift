@@ -94,6 +94,44 @@ public final class MobileCoinClient {
         }
     }
 
+    public func amountTransferable(
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
+    ) {
+        Account.TransactionEstimator(
+            account: accountLock,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).amountTransferable(feeLevel: feeLevel, completion: completion)
+    }
+
+    public func estimateTotalFee(
+        toSendAmount amount: UInt64,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
+    ) {
+        Account.TransactionEstimator(
+            account: accountLock,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
+    }
+
+    public func requiresDefragmentation(
+        toSendAmount amount: UInt64,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
+    ) {
+        Account.TransactionEstimator(
+            account: accountLock,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
+    }
+
     public func prepareTransaction(
         to recipient: PublicAddress,
         amount: UInt64,
