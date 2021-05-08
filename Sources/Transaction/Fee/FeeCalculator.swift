@@ -8,7 +8,7 @@ struct FeeCalculator {
     func fee(numInputs: Int, numOutputs: Int, feeLevel: FeeLevel) -> UInt64 {
         switch feeLevel {
         case .minimum:
-            return McConstants.MINIMUM_FEE
+            return McConstants.DEFAULT_MINIMUM_FEE
         }
     }
 }

@@ -13,7 +13,7 @@ enum IntegrationTestFixtures {
 }
 
 extension IntegrationTestFixtures {
-    static let fee = McConstants.MINIMUM_FEE
+    static let fee = McConstants.DEFAULT_MINIMUM_FEE
 
     static func fogReportUrlTyped() throws -> FogUrl {
         try FogUrl.make(string: network.fogReportUrl).get()
