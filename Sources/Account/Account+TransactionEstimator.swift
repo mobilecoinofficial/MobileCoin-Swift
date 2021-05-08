@@ -6,14 +6,22 @@ import Foundation
 
 extension Account {
     struct TransactionEstimator {
+        private let serialQueue: DispatchQueue
         private let account: ReadWriteDispatchLock<Account>
+        private let feeFetcher: BlockchainFeeFetcher
         private let txOutSelector: TxOutSelector
 
         init(
             account: ReadWriteDispatchLock<Account>,
-            txOutSelectionStrategy: TxOutSelectionStrategy
+            feeFetcher: BlockchainFeeFetcher,
+            txOutSelectionStrategy: TxOutSelectionStrategy,
+            targetQueue: DispatchQueue?
         ) {
+            self.serialQueue = DispatchQueue(
+                label: "com.mobilecoin.\(Account.self).\(Self.self))",
+                target: targetQueue)
             self.account = account
+            self.feeFetcher = feeFetcher
             self.txOutSelector = TxOutSelector(txOutSelectionStrategy: txOutSelectionStrategy)
         }
     }

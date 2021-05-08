@@ -30,6 +30,8 @@ public final class MobileCoinClient {
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogQueryScalingStrategy: FogQueryScalingStrategy
 
+    private let feeFetcher: BlockchainFeeFetcher
+
     init(accountKey: AccountKeyWithFog, config: Config) {
         logger.info("""
             Initializing \(Self.self):
@@ -52,6 +54,9 @@ public final class MobileCoinClient {
 
         let inner = Inner(serviceProvider: serviceProvider, fogResolverManager: fogResolverManager)
         self.inner = .init(inner, targetQueue: serialQueue)
+
+        self.feeFetcher =
+            BlockchainFeeFetcher(blockchainService: serviceProvider.blockchainService)
     }
 
     public var balance: Balance {
@@ -102,6 +107,7 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
+                feeFetcher: self.feeFetcher,
                 txOutSelectionStrategy: self.txOutSelectionStrategy,
                 mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
@@ -126,6 +132,7 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
+                feeFetcher: self.feeFetcher,
                 txOutSelectionStrategy: self.txOutSelectionStrategy,
                 mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
@@ -147,6 +154,7 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
+                feeFetcher: self.feeFetcher,
                 txOutSelectionStrategy: self.txOutSelectionStrategy,
                 mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
@@ -223,7 +231,9 @@ extension MobileCoinClient {
     {
         Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.txOutSelectionStrategy
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
         ).amountTransferable(feeLevel: feeLevel)
     }
 
@@ -235,7 +245,9 @@ extension MobileCoinClient {
     ) -> Result<UInt64, TransactionEstimationError> {
         Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.txOutSelectionStrategy
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
     }
 
@@ -246,7 +258,9 @@ extension MobileCoinClient {
     {
         Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.txOutSelectionStrategy
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
     }
 }
