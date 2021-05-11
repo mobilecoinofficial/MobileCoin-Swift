@@ -166,7 +166,7 @@ extension AttestedConnection {
         ) {
             if let (attestAkeCipher, freshCipher) = attestAkeCipher {
                 logger.info(
-                    "Performing attested call... responderId: \(responderId)",
+                    "Performing attested call... url: \(self.url)",
                     logFunction: false)
 
                 doPerformAttestedCall(
