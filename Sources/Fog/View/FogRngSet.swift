@@ -124,7 +124,7 @@ final class FogRngSet {
         // more up-to-date information already).
         if highestProcessedBlockCount > rngRecordsKnownBlockCount {
             logger.info(
-                "FogRngSet updated rngRecordsKnownBlockCount from \(rngRecordsKnownBlockCount) " +
+                "FogRngSet updating rngRecordsKnownBlockCount from \(rngRecordsKnownBlockCount) " +
                     "to \(highestProcessedBlockCount)",
                 logFunction: false)
             rngRecordsKnownBlockCount = highestProcessedBlockCount
