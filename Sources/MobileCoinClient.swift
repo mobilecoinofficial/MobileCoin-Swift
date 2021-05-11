@@ -30,6 +30,8 @@ public final class MobileCoinClient {
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogQueryScalingStrategy: FogQueryScalingStrategy
 
+    private let feeFetcher: BlockchainFeeFetcher
+
     init(accountKey: AccountKeyWithFog, config: Config) {
         logger.info("""
             Initializing \(Self.self):
@@ -52,6 +54,9 @@ public final class MobileCoinClient {
 
         let inner = Inner(serviceProvider: serviceProvider, fogResolverManager: fogResolverManager)
         self.inner = .init(inner, targetQueue: serialQueue)
+
+        self.feeFetcher =
+            BlockchainFeeFetcher(blockchainService: serviceProvider.blockchainService)
     }
 
     public var balance: Balance {
@@ -69,7 +74,7 @@ public final class MobileCoinClient {
 
     public func setFogBasicAuthorization(username: String, password: String) {
         let credentials = BasicCredentials(username: username, password: password)
-        inner.accessAsync { $0.serviceProvider.setFogAuthorization(credentials: credentials) }
+        inner.accessAsync { $0.serviceProvider.setFogUserAuthorization(credentials: credentials) }
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
@@ -89,32 +94,42 @@ public final class MobileCoinClient {
         }
     }
 
-    public func amountTransferable(feeLevel: FeeLevel = .minimum)
-        -> Result<UInt64, BalanceTransferEstimationError>
-    {
+    public func amountTransferable(
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
+    ) {
         Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.txOutSelectionStrategy
-        ).amountTransferable(feeLevel: feeLevel)
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).amountTransferable(feeLevel: feeLevel, completion: completion)
     }
 
     public func estimateTotalFee(
         toSendAmount amount: UInt64,
-        feeLevel: FeeLevel = .minimum
-    ) -> Result<UInt64, TransactionEstimationError> {
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
+    ) {
         Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.txOutSelectionStrategy
-        ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
     }
 
-    public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
-        -> Result<Bool, TransactionEstimationError>
-    {
+    public func requiresDefragmentation(
+        toSendAmount amount: UInt64,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
+    ) {
         Account.TransactionEstimator(
             account: accountLock,
-            txOutSelectionStrategy: self.txOutSelectionStrategy
-        ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
     }
 
     public func prepareTransaction(
@@ -130,6 +145,7 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
+                feeFetcher: self.feeFetcher,
                 txOutSelectionStrategy: self.txOutSelectionStrategy,
                 mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
@@ -154,6 +170,7 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
+                feeFetcher: self.feeFetcher,
                 txOutSelectionStrategy: self.txOutSelectionStrategy,
                 mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
@@ -175,6 +192,7 @@ public final class MobileCoinClient {
                 account: self.accountLock,
                 fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
                 fogResolverManager: $0.fogResolverManager,
+                feeFetcher: self.feeFetcher,
                 txOutSelectionStrategy: self.txOutSelectionStrategy,
                 mixinSelectionStrategy: self.mixinSelectionStrategy,
                 targetQueue: self.serialQueue
@@ -241,6 +259,47 @@ extension MobileCoinClient {
             Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProof.attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
             """
+    }
+}
+
+extension MobileCoinClient {
+    @available(*, deprecated, message: "Use amountTransferable(feeLevel:completion:) instead")
+    public func amountTransferable(feeLevel: FeeLevel = .minimum)
+        -> Result<UInt64, BalanceTransferEstimationError>
+    {
+        Account.TransactionEstimator(
+            account: accountLock,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).amountTransferable(feeLevel: feeLevel)
+    }
+
+    @available(*, deprecated, message:
+        "Use estimateTotalFee(toSendAmount:feeLevel:completion:) instead")
+    public func estimateTotalFee(
+        toSendAmount amount: UInt64,
+        feeLevel: FeeLevel = .minimum
+    ) -> Result<UInt64, TransactionEstimationError> {
+        Account.TransactionEstimator(
+            account: accountLock,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
+    }
+
+    @available(*, deprecated, message:
+        "Use requiresDefragmentation(toSendAmount:feeLevel:completion:) instead")
+    public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
+        -> Result<Bool, TransactionEstimationError>
+    {
+        Account.TransactionEstimator(
+            account: accountLock,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
     }
 }
 
@@ -341,7 +400,7 @@ extension MobileCoinClient {
         }
 
         public mutating func setFogBasicAuthorization(username: String, password: String) {
-            networkConfig.fogAuthorization =
+            networkConfig.fogUserAuthorization =
                 BasicCredentials(username: username, password: password)
         }
     }

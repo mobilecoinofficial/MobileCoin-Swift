@@ -8,18 +8,16 @@
 import Foundation
 
 private enum SelectionFeeLevel {
-    case feeLevel(FeeLevel)
+    case feeStrategy(FeeStrategy)
     case fixedPerTransaction(UInt64)
 }
 
 struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
-    private let feeCalculator = FeeCalculator()
-
     func amountTransferable(
-        feeLevel: FeeLevel,
+        feeStrategy: FeeStrategy,
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
-    ) -> Result<UInt64, BalanceTransferEstimationError> {
+    ) -> Result<UInt64, AmountTransferableError> {
         let txOutValues = txOuts.map { $0.value }
         if txOutValues.allSatisfy({ $0 == 0 }) {
             logger.warning(
@@ -30,7 +28,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
 
         let totalFee = self.totalFee(
             numTxOuts: txOuts.count,
-            selectionFeeLevel: .feeLevel(feeLevel),
+            selectionFeeLevel: .feeStrategy(feeStrategy),
             maxInputsPerTransaction: maxInputsPerTransaction)
 
         guard UInt64.safeCompare(sumOfValues: txOutValues, isGreaterThanValue: totalFee) else {
@@ -56,13 +54,13 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
 
     func estimateTotalFee(
         toSendAmount amount: UInt64,
-        feeLevel: FeeLevel,
+        feeStrategy: FeeStrategy,
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<(totalFee: UInt64, requiresDefrag: Bool), TxOutSelectionError> {
         estimateTotalFee(
             toSendAmount: amount,
-            selectionFeeLevel: .feeLevel(feeLevel),
+            selectionFeeLevel: .feeStrategy(feeStrategy),
             txOuts: txOuts,
             maxInputsPerTransaction: maxInputsPerTransaction)
     }
@@ -83,13 +81,13 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
 
     func selectTransactionInputs(
         amount: UInt64,
-        feeLevel: FeeLevel,
+        feeStrategy: FeeStrategy,
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputs: Int
     ) -> Result<(inputIds: [Int], fee: UInt64), TransactionInputSelectionError> {
         selectTransactionInputs(
             amount: amount,
-            selectionFeeLevel: .feeLevel(feeLevel),
+            selectionFeeLevel: .feeStrategy(feeStrategy),
             fromTxOuts: txOuts,
             maxInputs: maxInputs)
     }
@@ -137,19 +135,19 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
 
     fileprivate func selectTxOuts(
         toSendAmount amount: UInt64,
-        feeLevel: FeeLevel,
+        feeStrategy: FeeStrategy,
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<(txOutIds: [Int], totalFee: UInt64), TxOutSelectionError> {
         estimateTotalFee(
             toSendAmount: amount,
-            selectionFeeLevel: .feeLevel(feeLevel),
+            selectionFeeLevel: .feeStrategy(feeStrategy),
             txOuts: txOuts,
             maxInputsPerTransaction: maxInputsPerTransaction
         ).flatMap {
             selectTxOuts(
                 toSendAmount: amount,
-                selectionFeeLevel: .feeLevel(feeLevel),
+                selectionFeeLevel: .feeStrategy(feeStrategy),
                 fromTxOuts: txOuts,
                 maxInputsPerTransaction: maxInputsPerTransaction,
                 maxTotalFee: $0.totalFee,
@@ -363,7 +361,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
     /// is returns.
     func selectInputsForDefragTransactions(
         toSendAmount amount: UInt64,
-        feeLevel: FeeLevel,
+        feeStrategy: FeeStrategy,
         fromTxOuts txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
     ) -> Result<[(inputIds: [Int], fee: UInt64)], TxOutSelectionError> {
@@ -382,7 +380,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         let allSelectedTxOuts: [SelectionTxOut]
         switch selectTxOuts(
             toSendAmount: amount,
-            feeLevel: feeLevel,
+            feeStrategy: feeStrategy,
             fromTxOuts: txOuts,
             maxInputsPerTransaction: maxInputsPerTransaction)
         {
@@ -393,9 +391,8 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         }
 
         // Fee to send a single defrag transaction.
-        let defragTransactionFee = feeCalculator.defragTransactionFee(
-            maxInputs: maxInputsPerTransaction,
-            selectionFeeLevel: .feeLevel(feeLevel))
+        let defragTransactionFee =
+            feeStrategy.defragTransactionFee(maxInputs: maxInputsPerTransaction)
 
         var defragTransactions: [[(Int, SelectionTxOut)]] = []
 
@@ -569,9 +566,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             numDefragTransactions(
                 numSelected: numTxOuts,
                 maxInputsPerTransaction: maxInputsPerTransaction))
-            * feeCalculator.defragTransactionFee(
-                maxInputs: maxInputsPerTransaction,
-                selectionFeeLevel: selectionFeeLevel)
+            * selectionFeeLevel.defragTransactionFee(maxInputs: maxInputsPerTransaction)
     }
 
     fileprivate func feeForFinalTransaction(
@@ -580,7 +575,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         maxInputsPerTransaction: Int
     ) -> UInt64 {
         switch selectionFeeLevel {
-        case .feeLevel(let feeLevel):
+        case .feeStrategy(let feeStrategy):
             // Clamp maxInputs between 1 and McConstants.MAX_INPUTS, inclusive.
             let maxInputsPerTransaction =
                 max(1, min(maxInputsPerTransaction, McConstants.MAX_INPUTS))
@@ -588,22 +583,26 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             let numInputsInFinalTransaction = self.numInputsInFinalTransaction(
                 numSelected: numTxOuts,
                 maxInputsPerTransaction: maxInputsPerTransaction)
-            return feeCalculator
-                .fee(numInputs: numInputsInFinalTransaction, numOutputs: 2, feeLevel: feeLevel)
+            return feeStrategy.fee(numInputs: numInputsInFinalTransaction, numOutputs: 2)
         case .fixedPerTransaction(let fee):
             return fee
         }
     }
 }
 
-extension FeeCalculator {
+extension FeeStrategy {
     /// Fee to send a single defrag transaction.
-    fileprivate func defragTransactionFee(maxInputs: Int, selectionFeeLevel: SelectionFeeLevel)
-        -> UInt64
-    {
-        switch selectionFeeLevel {
-        case .feeLevel(let feeLevel):
-            return fee(numInputs: maxInputs, numOutputs: 1, feeLevel: feeLevel)
+    func defragTransactionFee(maxInputs: Int) -> UInt64 {
+        fee(numInputs: maxInputs, numOutputs: 1)
+    }
+}
+
+extension SelectionFeeLevel {
+    /// Fee to send a single defrag transaction.
+    func defragTransactionFee(maxInputs: Int) -> UInt64 {
+        switch self {
+        case .feeStrategy(let feeStrategy):
+            return feeStrategy.defragTransactionFee(maxInputs: maxInputs)
         case .fixedPerTransaction(let fee):
             return fee
         }

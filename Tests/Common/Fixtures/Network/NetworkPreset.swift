@@ -319,7 +319,7 @@ extension NetworkPreset {
         networkConfig.consensusTrustRoots = try consensusTrustRoots()
         networkConfig.fogTrustRoots = try fogTrustRoots()
         networkConfig.consensusAuthorization = consensusCredentials
-        networkConfig.fogAuthorization = fogCredentials
+        networkConfig.fogUserAuthorization = fogUserCredentials
         return networkConfig
     }
 
@@ -464,7 +464,7 @@ extension NetworkPreset {
             return true
         }
     }
-    var fogCredentials: BasicCredentials? {
+    var fogUserCredentials: BasicCredentials? {
         switch self {
         case .mainNet, .testNet:
             // No credentials necessary.

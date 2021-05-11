@@ -13,7 +13,7 @@ enum IntegrationTestFixtures {
 }
 
 extension IntegrationTestFixtures {
-    static let fee = McConstants.MINIMUM_FEE
+    static let fee = McConstants.DEFAULT_MINIMUM_FEE
 
     static func fogReportUrlTyped() throws -> FogUrl {
         try FogUrl.make(string: network.fogReportUrl).get()
@@ -69,7 +69,7 @@ extension IntegrationTestFixtures {
     static func createNetworkConfigWithInvalidCredentials() throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.consensusAuthorization = network.invalidCredentials
-        networkConfig.fogAuthorization = network.invalidCredentials
+        networkConfig.fogUserAuthorization = network.invalidCredentials
         return networkConfig
     }
 
@@ -111,10 +111,10 @@ extension IntegrationTestFixtures {
                 username: consensusCredentials.username,
                 password: consensusCredentials.password)
         }
-        if let fogCredentials = network.fogCredentials {
+        if let fogUserCredentials = network.fogUserCredentials {
             client.setFogBasicAuthorization(
-                username: fogCredentials.username,
-                password: fogCredentials.password)
+                username: fogUserCredentials.username,
+                password: fogUserCredentials.password)
         }
         return client
     }

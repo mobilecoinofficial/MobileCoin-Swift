@@ -34,6 +34,13 @@ class Connection {
             }
         }
     }
+
+    func performCall<Call: GrpcCallable>(
+        _ call: Call,
+        completion: @escaping (Result<Call.Response, ConnectionError>) -> Void
+    ) where Call.Request == () {
+        performCall(call, request: (), completion: completion)
+    }
 }
 
 extension Connection {

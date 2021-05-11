@@ -7,6 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2021-04-05
 
-## 1.0.0-pre1 - 2021-03-15
+## 1.0.0-rc1 - 2021-03-15
 
-[1.0.0]: https://github.com/mobilecoinofficial/MobileCoin-Swift/compare/1.0.0-pre1...1.0.0
+[1.0.0]: https://github.com/mobilecoinofficial/MobileCoin-Swift/compare/1.0.0-rc1...1.0.0

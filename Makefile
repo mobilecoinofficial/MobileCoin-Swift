@@ -1,6 +1,8 @@
 .PHONY: default
 default: setup bootstrap build test
 
+# Commands
+
 .PHONY: setup
 setup:
 	bundle install
@@ -94,7 +96,7 @@ autocorrect:
 swiftlint:
 	@PATH="./Example/Pods/SwiftLint:$$PATH" swiftlint
 
-# Maintenance commands
+# Maintenance
 
 .PHONY: upgrade-deps
 upgrade-deps:
