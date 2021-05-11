@@ -111,9 +111,10 @@ extension FogReportServer {
             satisfyingReportParams reportParams: [(reportId: String, minPubkeyExpiry: UInt64)]
         ) -> Report_ReportResponse? {
             logger.info("reportParams: \(reportParams)")
-            guard let reportResponse = cachedReportResponse,
-               reportResponse.isValid(reportParams: reportParams)
-            else {
+            guard let reportResponse = cachedReportResponse else {
+                return nil
+            }
+            guard reportResponse.isValid(reportParams: reportParams) else {
                 logger.info("report response invalid - reportParams: \(reportParams)")
                 return nil
             }
