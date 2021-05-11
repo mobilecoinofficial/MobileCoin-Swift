@@ -107,13 +107,10 @@ final class Account {
 
     /// Retrieves the `KnownTxOut`'s corresponding to `receipt` and verifies `receipt` is valid.
     private func ownedTxOut(for receipt: Receipt) -> Result<KnownTxOut?, InvalidInputError> {
-        logger.info("""
-            receipt.txOutPublicKey: \(redacting: receipt.txOutPublicKey), \
-            account: \(redacting: accountKey.publicAddress)
-            """)
-        if let lastTxOut = ownedTxOuts.last {
-            logger.info("Last received TxOut: Tx pubkey: \(redacting: lastTxOut.publicKey)")
-        }
+        logger.debug(
+            "Last received TxOut: TxOut pubkey: " +
+                "\(redacting: ownedTxOuts.last?.publicKey.hexEncodedString() ?? "None")",
+            logFunction: false)
 
         // First check if we've received the TxOut (either from Fog View or from view key scanning).
         // This has the benefit of providing a guarantee that the TxOut is owned by this account.
@@ -131,7 +128,7 @@ final class Account {
                 "Receipt data doesn't match the corresponding TxOut found in the ledger. " +
                 "Receipt: \(redacting: receipt.serializedData.base64EncodedString()) - " +
                 "Account TxOut: \(redacting: ownedTxOut)"
-            logger.error(errorMessage)
+            logger.error(errorMessage, sensitive: true, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
 
@@ -140,7 +137,7 @@ final class Account {
         guard receipt.validateConfirmationNumber(accountKey: accountKey) else {
             let errorMessage = "Receipt confirmation number is invalid for this account. " +
                 "Receipt: \(redacting: receipt.serializedData.base64EncodedString())"
-            logger.error(errorMessage)
+            logger.error(errorMessage, sensitive: true, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
 
@@ -157,7 +154,7 @@ extension Account {
     static func make(accountKey: AccountKey) -> Result<Account, InvalidInputError> {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
             let errorMessage = "Accounts without fog URLs are not currently supported."
-            logger.error(errorMessage)
+            logger.error(errorMessage, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
         return .success(Account(accountKey: accountKey))
