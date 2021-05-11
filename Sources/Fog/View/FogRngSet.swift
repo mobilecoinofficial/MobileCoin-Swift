@@ -273,7 +273,7 @@ private final class RngTracker {
                 // else we can do with this rng.
                 logger.debug(
                     "Next rng output not found in searched keys. rng output: " +
-                        "\(redacting: output.hexEncodedString())",
+                        "0x\(redacting: output.hexEncodedString())",
                     logFunction: false)
                 break
             }

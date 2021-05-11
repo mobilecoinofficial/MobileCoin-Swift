@@ -75,7 +75,7 @@ extension Account {
             case .success(let txOutsToSpend):
                 logger.info(
                     "Transaction prepared with fee. txOutsToSpend: " +
-                        "\(redacting: txOutsToSpend.map { $0.publicKey })",
+                        "0x\(redacting: txOutsToSpend.map { $0.publicKey.hexEncodedString() })",
                     logFunction: false)
                 let tombstoneBlockIndex = ledgerBlockCount + 50
                 transactionPreparer.prepareTransaction(
