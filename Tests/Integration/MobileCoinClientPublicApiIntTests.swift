@@ -2,6 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
+// swiftlint:disable type_body_length
+
 import MobileCoin
 import XCTest
 
@@ -117,6 +119,70 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     to: accountKey.publicAddress,
                     amount: 100,
                     fee: IntegrationTestFixtures.fee
+                ) {
+                    guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
+                    else { return }
+
+                    client.submitTransaction(transaction) {
+                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                        print("Transaction submission successful")
+                        callback(balance)
+                    }
+                }
+            }
+        }
+
+        submitTransaction { initialBalance in
+            var numChecksRemaining = 5
+            func checkBalance() {
+                numChecksRemaining -= 1
+                print("Updating balance...")
+                client.updateBalance {
+                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                    print("Balance: \(balance)")
+
+                    do {
+                        let balancePicoMob = try XCTUnwrap(balance.amountPicoMob())
+                        let initialBalancePicoMob = try XCTUnwrap(initialBalance.amountPicoMob())
+                        let expectedBalancePicoMob =
+                            initialBalancePicoMob - IntegrationTestFixtures.fee
+                        guard balancePicoMob == expectedBalancePicoMob else {
+                            guard numChecksRemaining > 0 else {
+                                XCTFail("Failed to receive a changed balance. balance: " +
+                                    "\(balancePicoMob), expected balance: " +
+                                    "\(expectedBalancePicoMob) picoMOB")
+                                expect.fulfill()
+                                return
+                            }
+
+                            Thread.sleep(forTimeInterval: 2)
+                            checkBalance()
+                            return
+                        }
+                    } catch {}
+                    expect.fulfill()
+                }
+            }
+            checkBalance()
+        }
+        waitForExpectations(timeout: 20)
+    }
+
+    func testSelfPaymentBalanceChangeFeeLevel() throws {
+        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey)
+
+        let expect = expectation(description: "Self payment")
+        func submitTransaction(callback: @escaping (Balance) -> Void) {
+            client.updateBalance {
+                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                print("Initial balance: \(balance)")
+
+                client.prepareTransaction(
+                    to: accountKey.publicAddress,
+                    amount: 100,
+                    feeLevel: .minimum
                 ) {
                     guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
                     else { return }
