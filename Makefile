@@ -38,8 +38,8 @@ publish: tag-release publish-podspec
 .PHONY: tag-release
 tag-release:
 	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
-		git tag "$$VERSION" && \
-		git push git@github.com:mobilecoinofficial/MobileCoin-Swift.git "refs/tags/$$VERSION"
+		git tag "v$$VERSION" && \
+		git push git@github.com:mobilecoinofficial/MobileCoin-Swift.git "refs/tags/v$$VERSION"
 
 # MobileCoin pod
 
