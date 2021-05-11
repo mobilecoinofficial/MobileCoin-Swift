@@ -209,13 +209,11 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     do {
                         let balancePicoMob = try XCTUnwrap(balance.amountPicoMob())
                         let initialBalancePicoMob = try XCTUnwrap(initialBalance.amountPicoMob())
-                        let expectedBalancePicoMob =
-                            initialBalancePicoMob - IntegrationTestFixtures.fee
-                        guard balancePicoMob == expectedBalancePicoMob else {
+                        guard balancePicoMob != initialBalancePicoMob else {
                             guard numChecksRemaining > 0 else {
-                                XCTFail("Failed to receive a changed balance. balance: " +
-                                    "\(balancePicoMob), expected balance: " +
-                                    "\(expectedBalancePicoMob) picoMOB")
+                                XCTFail("Failed to receive a changed balance. initial balance: " +
+                                    "\(initialBalancePicoMob), current balance: " +
+                                    "\(balancePicoMob) picoMOB")
                                 expect.fulfill()
                                 return
                             }
