@@ -12,7 +12,7 @@ protocol Scheme {
     static var defaultInsecurePort: Int { get }
 }
 
-protocol MobileCoinUrlProtocol {
+protocol MobileCoinUrlProtocol: CustomStringConvertible {
     var url: URL { get }
     var host: String { get }
     var port: Int { get }
@@ -96,3 +96,9 @@ struct MobileCoinUrl<Scheme: MobileCoin.Scheme>: MobileCoinUrlProtocol {
 
 extension MobileCoinUrl: Equatable {}
 extension MobileCoinUrl: Hashable {}
+
+extension MobileCoinUrl: CustomStringConvertible {
+    var description: String {
+        url.description
+    }
+}

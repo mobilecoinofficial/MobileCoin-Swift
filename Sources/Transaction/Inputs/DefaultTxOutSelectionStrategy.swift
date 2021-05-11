@@ -20,9 +20,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
     ) -> Result<UInt64, AmountTransferableError> {
         let txOutValues = txOuts.map { $0.value }
         if txOutValues.allSatisfy({ $0 == 0 }) {
-            logger.warning(
-                "Tried to calculate amountTransferable with 0 balance",
-                logFunction: false)
+            logger.info("Calculating amountTransferable with 0 balance", logFunction: false)
             return .success(0)
         }
 
@@ -32,8 +30,8 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             maxInputsPerTransaction: maxInputsPerTransaction)
 
         guard UInt64.safeCompare(sumOfValues: txOutValues, isGreaterThanValue: totalFee) else {
-            logger.error(
-                "Fee is equal to or greater than balance. txOut values: " +
+            logger.warning(
+                "amountTransferable: Fee is equal to or greater than balance. txOut values: " +
                     "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
                 logFunction: false)
             return .failure(.feeExceedsBalance())
@@ -43,8 +41,8 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 UInt64.safeSubtract(sumOfValues: txOutValues, minusValue: totalFee)
         else {
             logger.error(
-                "Balance minus fee exceeds UInt64.max. txOut values: \(redacting: txOutValues), " +
-                    "totalFee: \(redacting: totalFee)",
+                "amountTransferable failure: Balance minus fee exceeds UInt64.max. txOut values: " +
+                    "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
                 logFunction: false)
             return .failure(.balanceOverflow())
         }
@@ -110,8 +108,8 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             }
         }.flatMap {
             guard !$0.requiresDefrag else {
-                logger.warning(
-                    "Select Transaction Inputs failed: defragmentation required. amount: " +
+                logger.error(
+                    "Transaction input selection failed: defragmentation required. amount: " +
                         "\(redacting: amount), txOut values: \(redacting: txOuts.map { $0.value })",
                     logFunction: false)
                 return .failure(.defragmentationRequired())
@@ -202,16 +200,12 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             {
                 // Success! Sum value of selectedTxOuts is enough to cover sendAmount + totalFee.
                 let requiresDefrag = selectedTxOuts.count > maxInputsPerTransaction
-                logger.info(
-                    "Estimated total fee successful. totalFee: \(redacting: totalFee), " +
-                        "requiresDefrag: \(requiresDefrag)",
-                    logFunction: false)
                 return .success((totalFee, requiresDefrag))
             }
         }
 
         // Insufficient balance to cover sendAmount + the cost of any required defragmentation.
-        logger.warning(
+        logger.error(
             "Estimate total fee failed: insufficient TxOuts. amountToSend: \(redacting: amount), " +
                 "txOut values: \(redacting: txOuts.map { $0.value })",
             logFunction: false)
@@ -255,7 +249,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         while true {
             guard !availableTxOuts.isEmpty else {
                 // Insufficient balance to cover amount + fee.
-                logger.warning(
+                logger.error(
                     "Select TxOuts failed: insufficient TxOuts. amountToSend: " +
                         "\(redacting: amount), txOut values: \(redacting: txOuts.map { $0.value })",
                     logFunction: false)
@@ -297,7 +291,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 else {
                     // We've selected the highest value TxOuts already which means the TxOuts don't
                     // have enough total value to cover amount + fees.
-                    logger.warning(
+                    logger.error(
                         "Select TxOuts failed: insufficient TxOuts. amountToSend: " +
                             "\(redacting: amount), txOut values: " +
                             "\(redacting: txOuts.map { $0.value })",
@@ -510,6 +504,14 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
 
             numInputsToAdd -= 1
         }
+
+        guard !txOutsToAdd.isEmpty else {
+            return
+        }
+
+        logger.info(
+            "Dust cleanup: adding \(txOutsToAdd.count) inputs to transaction",
+            logFunction: false)
         selectedTxOuts.append(contentsOf: txOutsToAdd)
         availableTxOuts.removeLast(txOutsToAdd.count)
     }

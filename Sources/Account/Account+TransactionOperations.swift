@@ -45,13 +45,8 @@ extension Account {
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
             ) -> Void
         ) {
-            logger.info("Preparing transaction with provided fee...", logFunction: false)
-            logger.info(
-                "recipient: \(redacting: recipient), amount: \(redacting: amount), fee: " +
-                    "\(redacting: fee)",
-                logFunction: false)
             guard amount > 0 else {
-                let errorMessage = "Cannot spend 0 MOB"
+                let errorMessage = "prepareTransactionWithFee failure: Cannot spend 0 MOB"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -60,9 +55,12 @@ extension Account {
             }
 
             let (unspentTxOuts, ledgerBlockCount) =
-                 account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
-            let tombstoneBlockIndex = ledgerBlockCount + 50
-
+                account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
+            logger.info(
+                "Preparing transaction with provided fee... recipient: \(redacting: recipient), " +
+                    "amount: \(redacting: amount), fee: \(redacting: fee), unspentTxOutValues: " +
+                    "\(redacting: unspentTxOuts.map { $0.value })",
+                logFunction: false)
             switch txOutSelector
                 .selectTransactionInputs(amount: amount, fee: fee, fromTxOuts: unspentTxOuts)
                 .mapError({ error -> TransactionPreparationError in
@@ -76,7 +74,10 @@ extension Account {
             {
             case .success(let txOutsToSpend):
                 logger.info(
-                    "success - txOutsToSpend: \(redacting: txOutsToSpend.map { $0.publicKey })")
+                    "Transaction prepared with fee. txOutsToSpend: " +
+                        "0x\(redacting: txOutsToSpend.map { $0.publicKey.hexEncodedString() })",
+                    logFunction: false)
+                let tombstoneBlockIndex = ledgerBlockCount + 50
                 transactionPreparer.prepareTransaction(
                     inputs: txOutsToSpend,
                     recipient: recipient,
@@ -85,7 +86,7 @@ extension Account {
                     tombstoneBlockIndex: tombstoneBlockIndex,
                     completion: completion)
             case .failure(let error):
-                logger.info("failure - error: \(error)")
+                logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
                     completion(.failure(error))
                 }
@@ -100,13 +101,8 @@ extension Account {
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
             ) -> Void
         ) {
-            logger.info("Preparing transaction with fee level...", logFunction: false)
-            logger.info(
-                "recipient: \(redacting: recipient), amount: \(redacting: amount), feeLevel: " +
-                    "\(feeLevel)",
-                logFunction: false)
             guard amount > 0 else {
-                let errorMessage = "Cannot spend 0 MOB"
+                let errorMessage = "prepareTransactionWithFeeLevel failure: Cannot spend 0 MOB"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -114,13 +110,17 @@ extension Account {
                 return
             }
 
-            let (unspentTxOuts, ledgerBlockCount) =
-                 account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
-            let tombstoneBlockIndex = ledgerBlockCount + 50
-
             feeFetcher.feeStrategy(for: feeLevel) {
                 switch $0 {
                 case .success(let feeStrategy):
+                    let (unspentTxOuts, ledgerBlockCount) =
+                        self.account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
+                    logger.info(
+                        "Preparing transaction with fee level... recipient: " +
+                            "\(redacting: recipient), amount: \(redacting: amount), feeLevel: " +
+                            "\(feeLevel), unspentTxOutValues: " +
+                            "\(redacting: unspentTxOuts.map { $0.value })",
+                        logFunction: false)
                     switch self.txOutSelector
                         .selectTransactionInputs(
                             amount: amount,
@@ -136,7 +136,10 @@ extension Account {
                         })
                     {
                     case .success(let (inputs: inputs, fee: fee)):
-                        logger.info("success - fee: \(redacting: fee)")
+                        logger.info(
+                            "Transaction prepared with fee level. fee: \(redacting: fee)",
+                            logFunction: false)
+                        let tombstoneBlockIndex = ledgerBlockCount + 50
                         self.transactionPreparer.prepareTransaction(
                             inputs: inputs,
                             recipient: recipient,
@@ -145,7 +148,9 @@ extension Account {
                             tombstoneBlockIndex: tombstoneBlockIndex,
                             completion: completion)
                     case .failure(let error):
-                        logger.info("failure - error: \(error)")
+                        logger.info(
+                            "prepareTransactionWithFeeLevel failure: \(error)",
+                            logFunction: false)
                         completion(.failure(error))
                     }
                 case .failure(let connectionError):
@@ -156,14 +161,13 @@ extension Account {
         }
 
         func prepareDefragmentationStepTransactions(
-            toSendAmount amount: UInt64,
+            toSendAmount amountToSend: UInt64,
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
-            logger.info("Preparing defragmentation step transactions...", logFunction: false)
-            logger.info("toSendAmount: \(redacting: amount), feeLevel: \(feeLevel)")
-            guard amount > 0 else {
-                let errorMessage = "Cannot spend 0 MOB"
+            guard amountToSend > 0 else {
+                let errorMessage =
+                    "prepareDefragmentationStepTransactions failure: Cannot spend 0 MOB"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -171,15 +175,18 @@ extension Account {
                 return
             }
 
-            let (unspentTxOuts, ledgerBlockCount) =
-                 account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
-            let tombstoneBlockIndex = ledgerBlockCount + 50
-
             feeFetcher.feeStrategy(for: feeLevel) {
                 switch $0 {
                 case .success(let feeStrategy):
+                    let (unspentTxOuts, ledgerBlockCount) =
+                        self.account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
+                    logger.info(
+                        "Preparing defragmentation step transactions... amountToSend: " +
+                            "\(redacting: amountToSend), feeLevel: \(feeLevel), " +
+                            "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
+                        logFunction: false)
                     switch self.txOutSelector.selectInputsForDefragTransactions(
-                        toSendAmount: amount,
+                        toSendAmount: amountToSend,
                         feeStrategy: feeStrategy,
                         fromTxOuts: unspentTxOuts)
                     {
@@ -189,6 +196,7 @@ extension Account {
                                 "Preparing \(defragTxInputs.count) defrag transactions",
                                 logFunction: false)
                         }
+                        let tombstoneBlockIndex = ledgerBlockCount + 50
                         defragTxInputs.mapAsync({ defragInputs, callback in
                             self.transactionPreparer.prepareSelfAddressedTransaction(
                                 inputs: defragInputs.inputs,
@@ -196,8 +204,10 @@ extension Account {
                                 tombstoneBlockIndex: tombstoneBlockIndex,
                                 completion: callback)
                         }, serialQueue: self.serialQueue, completion: completion)
-                    case .failure:
-                        logger.warning("failure")
+                    case .failure(let error):
+                        logger.info(
+                            "prepareDefragmentationStepTransactions failure: \(error)",
+                            logFunction: false)
                         self.serialQueue.async {
                             completion(.failure(.insufficientBalance()))
                         }
