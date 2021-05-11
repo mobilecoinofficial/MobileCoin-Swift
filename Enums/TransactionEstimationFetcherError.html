@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>TransactionEstimationError Enumeration Reference</title>
+    <title>TransactionEstimationFetcherError Enumeration Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Enum/TransactionEstimationError" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Enum/TransactionEstimationFetcherError" class="dashAnchor"></a>
 
-    <a title="TransactionEstimationError Enumeration Reference"></a>
+    <a title="TransactionEstimationFetcherError Enumeration Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">MobileCoin Reference</a>
       <img class="carat" src="../img/carat.png" />
-      TransactionEstimationError Enumeration Reference
+      TransactionEstimationFetcherError Enumeration Reference
     </p>
 
     <div class="content-wrapper">
@@ -198,18 +198,18 @@
 
         <section class="section">
           <div class="section-content top-matter">
-            <h1>TransactionEstimationError</h1>
+            <h1>TransactionEstimationFetcherError</h1>
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">TransactionEstimationError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
-<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">TransactionEstimationError</span><span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">TransactionEstimationFetcherError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">TransactionEstimationFetcherError</span><span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
 
                 </div>
               </div>
             
               <div class="slightly-smaller">
-                <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Common/Errors.swift#L189-L192">Show on GitHub</a>
+                <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Common/Errors.swift#L75-L79">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -221,9 +221,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10MobileCoin26TransactionEstimationErrorO12invalidInputyACSScACmF"></a>
+                    <a name="/s:10MobileCoin33TransactionEstimationFetcherErrorO12invalidInputyACSScACmF"></a>
                     <a name="//apple_ref/swift/Element/invalidInput(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10MobileCoin26TransactionEstimationErrorO12invalidInputyACSScACmF">invalidInput(_:<wbr>)</a>
+                    <a class="token" href="#/s:10MobileCoin33TransactionEstimationFetcherErrorO12invalidInputyACSScACmF">invalidInput(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -250,9 +250,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:10MobileCoin26TransactionEstimationErrorO19insufficientBalanceyACSScACmF"></a>
+                    <a name="/s:10MobileCoin33TransactionEstimationFetcherErrorO19insufficientBalanceyACSScACmF"></a>
                     <a name="//apple_ref/swift/Element/insufficientBalance(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:10MobileCoin26TransactionEstimationErrorO19insufficientBalanceyACSScACmF">insufficientBalance(_:<wbr>)</a>
+                    <a class="token" href="#/s:10MobileCoin33TransactionEstimationFetcherErrorO19insufficientBalanceyACSScACmF">insufficientBalance(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -267,6 +267,35 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">insufficientBalance</span><span class="p">(</span><span class="nv">_</span><span class="p">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="kt">String</span><span class="p">())</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Common/Errors.swift#L">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10MobileCoin33TransactionEstimationFetcherErrorO010connectionF0yAcA010ConnectionF0OcACmF"></a>
+                    <a name="//apple_ref/swift/Element/connectionError(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10MobileCoin33TransactionEstimationFetcherErrorO010connectionF0yAcA010ConnectionF0OcACmF">connectionError(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">connectionError</span><span class="p">(</span><span class="kt"><a href="../Enums/ConnectionError.html">ConnectionError</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -300,7 +329,7 @@
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Common/Errors.swift#L196-L205">Show on GitHub</a>
+                        <a href="https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources/Common/Errors.swift#L82-L93">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
