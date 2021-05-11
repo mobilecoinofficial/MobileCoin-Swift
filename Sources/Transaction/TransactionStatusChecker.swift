@@ -28,7 +28,8 @@ struct TransactionStatusChecker {
         completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
     ) {
         logger.info(
-            "Checking transaction status... transaction: \(redacting: transaction.serializedData)",
+            "Checking transaction status... transaction: " +
+            "\(redacting: transaction.serializedData.base64EncodedString())",
             logFunction: false)
         checkAcceptedStatus(transaction) {
             completion($0.map {
