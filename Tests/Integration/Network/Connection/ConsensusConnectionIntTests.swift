@@ -17,9 +17,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             let expect = expectation(description: "Consensus connection")
             try createConsensusConnection().proposeTx(fixture.tx, completion: {
                 guard let response = $0.successOrFulfill(expectation: expect) else { return }
-
-                print("result: \(response.result)")
-                print("blockCount: \(response.blockCount)")
+                print("response: \(response)")
 
                 XCTAssertNotEqual(response.result, .ok)
                 XCTAssertGreaterThan(response.blockCount, 0)
