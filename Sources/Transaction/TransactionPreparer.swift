@@ -187,7 +187,9 @@ struct TransactionPreparer {
                 if let ledgerTxOutCount = ledgerTxOutCount {
                     let errorMessage = "Fog GetMerkleProof returned doesNotExist, even though " +
                         "txo indices were limited by globalTxoCount returned by previous call to " +
-                        "GetMerkleProof. Previously returned globalTxoCount: \(ledgerTxOutCount)"
+                        "GetMerkleProof. Previously returned globalTxoCount: " +
+                        "\(ledgerTxOutCount), response globalTxoCount: " +
+                        "\(responseTxOutCount), response blockCount: \(blockCount)"
                     logger.error(errorMessage, logFunction: false)
                     completion(.failure(.invalidServerResponse(errorMessage)))
                 } else {

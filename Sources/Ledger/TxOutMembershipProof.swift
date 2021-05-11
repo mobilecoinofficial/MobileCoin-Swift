@@ -8,8 +8,11 @@ import LibMobileCoin
 struct TxOutMembershipProof {
     let serializedData: Data
 
-    /// - Returns: `nil` when the input is not deserializable.
-    init?(serializedData: Data) {
+    static func make(serializedData: Data) -> Result<TxOutMembershipProof, InvalidInputError> {
+        .success(TxOutMembershipProof(serializedData: serializedData))
+    }
+
+    private init(serializedData: Data) {
         self.serializedData = serializedData
     }
 }
@@ -18,8 +21,10 @@ extension TxOutMembershipProof: Equatable {}
 extension TxOutMembershipProof: Hashable {}
 
 extension TxOutMembershipProof {
-    init?(_ txOutMembershipProof: External_TxOutMembershipProof) {
+    static func make(_ txOutMembershipProof: External_TxOutMembershipProof)
+        -> Result<TxOutMembershipProof, InvalidInputError>
+    {
         let serializedData = txOutMembershipProof.serializedDataInfallible
-        self.init(serializedData: serializedData)
+        return TxOutMembershipProof.make(serializedData: serializedData)
     }
 }
