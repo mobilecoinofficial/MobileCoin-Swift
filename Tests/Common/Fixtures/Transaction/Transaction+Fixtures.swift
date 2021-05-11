@@ -84,15 +84,15 @@ extension Transaction.Fixtures.BuildTx {
                 lCjsDfrBV4Tu3HRm4=
                 """)!))))
 
-        let ring: [(TxOut, TxOutMembershipProof)] = [
+        let ring: [(TxOut, TxOutMembershipProof)] = try [
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgoguImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UARV6YtFOobDygSIgogVECBlIdhtmT\
                     FaXtlWphlqELpDL04EKMbbPWu3CoJ2UEaIgogOHyDzGA0vvts1Rkgsb2sAYfgCTBQqnOQ4cz5iI7JSh\
                     4iVgpUFDnmnE50RaxomaHM2Pr6R2NTrMdK4wEILd6fCqLjf8p2PgDbnphk2sEBUpKqf4broDg2qx9MN\
                     31M5GBQVcVK+BUdpY4T4wkT4SU/LFNJqZVWfwEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CKuNBhCumQkaLgoICKuNBhCrjQYSIgogGKFP8jdRPcBssJ3qH60iJ8gXnqwn3uziW/KyknkifGsaLgo\
                     ICKqNBhCqjQYSIgogjK36vJ1F+3wX1tq9ps8k9Z/cb5IS0PT20J489/mVOHsaLgoICKiNBhCpjQYSIg\
                     ogRiPZVtRxM4VBd2WFb8WY3E62qxn4IN6W1kKKE/PBBM4aLgoICKyNBhCvjQYSIgogze9YatBYcx5/G\
@@ -109,16 +109,16 @@ extension Transaction.Fixtures.BuildTx {
                     ZSNRbWRcaLgoICICABBD//wUSIgogHHj77MOGpM4oFjdG2Mke1MkKp4t/YVkTvYLzyvpEaJ0aKgoEEP\
                     //AxIiCiDHA1UmtYroaXdipx+2xfiOad6aEFbtzhfEu2uTUXPM6xouCggIgIAIEP//DxIiCiChCfLXM\
                     66iL1JTrn5mPeS2lNGO9oJ5dBzqDCvBKIi+dg==
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogZLMpTUm3codYcrMIiokeWe7kNYy5lWDA5ykOwYV9AgURY2zBa0WXvVISIgogunrz4fo0z/k\
                     04C/7q6z6ffHTcLMHgXku3Lx7IK6xnEIaIgogOqF+vLrpwQFhJv657RJmG258vv7lhxhvfZ99f98TCH\
                     0iVgpUZSSUOAosJNxrMGlwOkwFbclxoPMjz/Mg7vjzmNjA+RcEhWxMRXxryIJt8bnYrWlbbRxhskeP4\
                     uCn6zzsslAxWXY5FnE87nfJ628u7Ti3AozxdgEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAkQrpkJGioKBAgJEAkSIgognKcDx/hu4iAlKyWkdCwgIYagjCWGZzVfCM/naGPvAZ4aKgoECAgQCBI\
                     iCiBAr62n9cfbTlmKxQkNEfWZNmLxi+hblOFG6/G/P/d18hoqCgQIChALEiIKIIn5OYPIj2hUREaxG8\
                     AvwpPWjBeUwZ2gV4wInAB88BnRGioKBAgMEA8SIgogTxjaTwHcjvTJsYuG6v4/ccOxJ5pP/R6s8uXOd\
@@ -134,16 +134,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogRJwm18iyHr2hCjCq/QvGlbFST27ImGBUct9rcgn1XUgR1nrVJg0ckf4SIgogatL2qq9Cb3l\
                     fO5c4/V9suoxwijtYAyWiMoCZdA7RhQYaIgogOsOx3pQ5RaFVZNCatfQtygmFZxJjefWX9mB1DlrCrz\
                     oiVgpUKGCpebKIWBiTC4O1ykKPTyscIG+ZuQpHkJ7FXCh7//gF9mqsw7NnaFvhAKUSo9r6FGmyXis7x\
                     b2NisTiU8eEDnp3u+9Ytg8Fh4UqUQTQdWJPAAEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAMQrpkJGioKBAgDEAMSIgogGAK3qiA9ptHNKzPRElCq9+8mPrwUjQSpSvamEgtlcOkaKgoECAIQAhI\
                     iCiBWq8jIqCOu7SgBZv5DeOqnDAmEtlcbgIpkul7BgOnXIRooCgIQARIiCiDQPZiR2FSBtq2dlZmagn\
                     b6LbeW4BSCgg62mFTbgYjakBoqCgQIBBAHEiIKIJ0prgNhwF3q1oSSwUUsrzg9J1uVxmWHHlMW4Y77S\
@@ -159,16 +159,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgog/ktfF7xz1dXNmdmgLtBSUQUlRaSc+7CpXsDLmxQC81YRIO/xU2mLJFkSIgog3NZ7my81+bq\
                     ZzH9mXKNzyrPhnIpo5kGcuHPLkpJcHAYaIgogTA5KRyuFu+RZuYZKP9i1l533CiZILz0NbNFGgMnc4V\
                     MiVgpULeJwjU4b5KANeMCR/aHm897cb5VuRVwLgYAQ/T+CbqkV3uoF8dE4q2TYgD5BpK2yLbaALjjze\
                     mMGgKDWWOyOBnBdYdD7WVDrCoWBC4XsClX8MwEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAUQrpkJGioKBAgFEAUSIgog5OBhinRIZNLnVkVoINdeEMttYbdsan9yQFrJ9C5upboaKgoECAQQBBI\
                     iCiDL5KsDoVcmtHNkKp1Ul6+5Ki3v/hFZ6bDvu4bW193pGBoqCgQIBhAHEiIKIBzdtDBABzwQ79Cvwo\
                     2CkimC3N9lhLMIQbSojyNxMf/bGigKAhADEiIKIHzANt8/nHW7NYTk1eWF6LTv1bHBHIgXWDvGOYwFD\
@@ -184,16 +184,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogDNohyGL2/DCezioQv/Ue1x2LpcZ9s2y13CgNFxcaVVgR1U5EWVS1yysSIgogOttVHolhls9\
                     EpQxuHCBg3zT2u7swbIKKbVr01w/VxXcaIgogWGzYZTA45PoK1UeBPL7egAn3v9ZvT8VIm/8Zgy0HR1\
                     AiVgpUv9dqZZmbYvab6w++sl64TDN62Vpd7lqf+UMTUTYyl/e/9QYazT/nFbvA5M6i86EqcJWtwkbUM\
                     7wqfqOYQ+iJwFFYULx3vRDVUri5nMHIFFmeZQEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAcQrpkJGioKBAgHEAcSIgogd7+1GO045m8/MwW8BzJjdAS37OF/f7EHno4rQF1znDsaKgoECAYQBhI\
                     iCiAI6gBZk5XeJfSfJgMIe6natxaQzBXkDybhkupEVasD4RoqCgQIBBAFEiIKIK0BPLZ1ashlqRI0fI\
                     ofhQShArbArY01cy4/kmSsbnhVGigKAhADEiIKIHzANt8/nHW7NYTk1eWF6LTv1bHBHIgXWDvGOYwFD\
@@ -209,16 +209,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogMhh2S6d1d1GgBwBTiZH5FWpKzOEBRRkoQ7cei0wRcCgRMwLJvTnC0coSIgogGgdI8wsR4No\
                     BdekqxRwdKvkQbr12Oo+KlEn3crEIrzIaIgoghNKt6Nt6AVseYpqNFNVt3v/EEuaZDH5ceI+IyK4Wqk\
                     8iVgpUxPI7yAPeAwmoD2wEQzQbB/o6CA0gMjN/PLk/kKrbKj/VhKRinppI/ze3jfPggE0fpIySqI0Zx\
                     F+yyjAtUMt8dAV262JISu+yiqIUnZhWaWZlswEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAIQrpkJGioKBAgCEAISIgogVqvIyKgjru0oAWb+Q3jqpwwJhLZXG4CKZLpewYDp1yEaKgoECAMQAxI\
                     iCiAYAreqID2m0c0rM9ESUKr37yY+vBSNBKlK9qYSC2Vw6RooCgIQARIiCiDQPZiR2FSBtq2dlZmagn\
                     b6LbeW4BSCgg62mFTbgYjakBoqCgQIBBAHEiIKIJ0prgNhwF3q1oSSwUUsrzg9J1uVxmWHHlMW4Y77S\
@@ -234,16 +234,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogILXm9RU1TrCsCipooMnzY4R9vKFe6MDDkB0QuhtM2mkRsuQP0bOMA0ASIgogxpwvORW4PeS\
                     roRWZaaiOMv/g2AC+zp4T3mlxLOTMh0AaIgogmP9LhFw3IVtMASLLVRmvuFCTDVCQfuPKI7ObX7oo8S\
                     IiVgpUNzrW1dfY4HfZxQYOMakL3ewLjVlxJQzLcSvX0iRqfMpsxzCdxSYNIWDvzsew2R9lgaq1iX17K\
                     r0IdpROjXUPNUY9gUiTXm2zwECshrR6LVzY4gEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAEQrpkJGioKBAgBEAESIgogen5UJWgJCWh9t42T4vsiG80oY0EdPOOvuV/bdD/ECiUaJgoAEiIKIBc\
                     yF1mQ38h+9QTe0j61UMpoDBh+ibhrEeUcfxZR1gX6GioKBAgCEAMSIgogx5HG9np4mN6FRS9spOpee/\
                     DPmUNkucr1UFlDear3EVEaKgoECAQQBxIiCiCdKa4DYcBd6taEksFFLK84PSdblcZlhx5TFuGO+0jrY\
@@ -259,16 +259,16 @@ extension Transaction.Fixtures.BuildTx {
                     Q50j654EdgtGheCddBouCggIgIACEP//AxIiCiBO5eNNpQtK7n3wdVZCECnvtn+kof4ROYFA5mOWcSi\
                     CuxouCggIgIAEEP//BxIiCiDk6udopsqhYmY4pdox1zbQcdgSmcUpsPeOMe4uvJY4BRouCggIgIAIEP\
                     //DxIiCiChCfLXM66iL1JTrn5mPeS2lNGO9oJ5dBzqDCvBKIi+dg==
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogrr60Ucb4VG31yEnwQ5QPDp2aeHFLwAjEKpTxxY/cQWcRWh6K91+S5KsSIgogapTxe7NUEQj\
                     IlQiMdU7zQAElEpr/rIUTWY7qkzcciBQaIgogpIvHBLQ0G5qJggSUisbPe1zhKjYaaRIjkTdcmUofLz\
                     ciVgpUsOcFxWqHLQJvRtSEvtBZdW7NFFCL1eaDGT15nZNUmixoMJphUkxnIowkOo9WyEaU0a/1BegSZ\
                     bfhfQ/ouZgzOmtLFXyKng0gFiIV6y6umhm8VQEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAYQrpkJGioKBAgGEAYSIgogCOoAWZOV3iX0nyYDCHup2rcWkMwV5A8m4ZLqRFWrA+EaKgoECAcQBxI\
                     iCiB3v7UY7Tjmbz8zBbwHMmN0BLfs4X9/sQeejitAXXOcOxoqCgQIBBAFEiIKIK0BPLZ1ashlqRI0fI\
                     ofhQShArbArY01cy4/kmSsbnhVGigKAhADEiIKIHzANt8/nHW7NYTk1eWF6LTv1bHBHIgXWDvGOYwFD\
@@ -284,16 +284,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogqvIgtiuxQAqHxzv/VcLiLQlf+BK2GoP3nI+LUY4fh3wRyGwR1Q1+hGcSIgogbuh/V1ScuAV\
                     2mUulOdUsvUMEFRucCSQrV5J2PncHo2oaIgoguA6uOB6g8Mf/9ZqmC9Phk3+ShSfuTT1QaK1eDVBu1A\
                     4iVgpUEpXKMP+ltj+dGbetGv3IzVlVyzwZ+hCL4BgocsWxf0FE0E4+DLwxufdcy0WbqC8ZTumKAGFK0\
                     O2Ey8yOMBELartXClbRSescdXAIT80DrH0mCwEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     EK6ZCRomCgASIgogFzIXWZDfyH71BN7SPrVQymgMGH6JuGsR5Rx/FlHWBfoaKgoECAEQARIiCiB6flQ\
                     laAkJaH23jZPi+yIbzShjQR0846+5X9t0P8QKJRoqCgQIAhADEiIKIMeRxvZ6eJjehUUvbKTqXnvwz5\
                     lDZLnK9VBZQ3mq9xFRGioKBAgEEAcSIgognSmuA2HAXerWhJLBRSyvOD0nW5XGZYceUxbhjvtI62EaK\
@@ -309,16 +309,16 @@ extension Transaction.Fixtures.BuildTx {
                     I+ueBHYLRoXgnXQaLgoICICAAhD//wMSIgogTuXjTaULSu598HVWQhAp77Z/pKH+ETmBQOZjlnEogrs\
                     aLgoICICABBD//wcSIgog5OrnaKbKoWJmOKXaMdc20HHYEpnFKbD3jjHuLryWOAUaLgoICICACBD//w\
                     8SIgogoQny1zOuoi9SU65+Zj3ktpTRjvaCeXQc6gwrwSiIvnY=
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgog4AjVI2JEDOua3ZWQppBFMifhOiUIVwaRGbcihmTcDzcRu5AHLxzto3ISIgogitebMb1dXe6\
                     erA6jj1G0wuYSE9ZvqvB4KHBk34I6DzoaIgog3s29+r7yHHrDYY671ORDKq7SCwewHM/ceqgjgP8GrE\
                     giVgpUKd+nw3qBKRkTnh3RsxSgS2AvAFgdb+sFtUYRWwnm24gVUO65MAC2DlBDIhCtluEITRR+M/o25\
                     ELeCJ4RZ0HnTaBIEQ9i08LVYTdgwuMr7ByLkAEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAQQrpkJGioKBAgEEAQSIgogy+SrA6FXJrRzZCqdVJevuSot7/4RWemw77uG1tfd6RgaKgoECAUQBRI\
                     iCiDk4GGKdEhk0udWRWgg114Qy21ht2xqf3JAWsn0Lm6luhoqCgQIBhAHEiIKIBzdtDBABzwQ79Cvwo\
                     2CkimC3N9lhLMIQbSojyNxMf/bGigKAhADEiIKIHzANt8/nHW7NYTk1eWF6LTv1bHBHIgXWDvGOYwFD\
@@ -334,16 +334,16 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
             (
-                try XCTUnwrap(TxOut(serializedData: Data(base64Encoded: """
+                """
                     Ci0KIgogvA4PvbpHrTensVBf0897C/ochZ0572kVLUXSKBeZJFMRwjpOuYk6KWkSIgog6nEnUo3DVNo\
                     5oMuWQbuCC+3mjSLiqSs54Z5i+QpFIkMaIgog+neKXgDk+w0aA02sNras9kjtfR8PfmIWaTe0+uMilX\
                     UiVgpUEYiDkL8tAB+Qow6z49Ve0rkLNj98fP6t9MUycACJn5paF37y6W5QuAGtGEJoF6rexHAaRnSqm\
                     2J7QYXjK7lwmSkXGde1ztKuJShDN/DJ1CMfhQEA
-                    """)!)),
-                try XCTUnwrap(TxOutMembershipProof(serializedData: Data(base64Encoded: """
+                    """,
+                """
                     CAgQrpkJGioKBAgIEAgSIgogQK+tp/XH205ZisUJDRH1mTZi8YvoW5ThRuvxvz/3dfIaKgoECAkQCRI\
                     iCiCcpwPH+G7iICUrJaR0LCAhhqCMJYZnNV8Iz+doY+8BnhoqCgQIChALEiIKIIn5OYPIj2hUREaxG8\
                     AvwpPWjBeUwZ2gV4wInAB88BnRGioKBAgMEA8SIgogTxjaTwHcjvTJsYuG6v4/ccOxJ5pP/R6s8uXOd\
@@ -359,9 +359,15 @@ extension Transaction.Fixtures.BuildTx {
                     PrtDnSPrngR2C0aF4J10Gi4KCAiAgAIQ//8DEiIKIE7l402lC0ruffB1VkIQKe+2f6Sh/hE5gUDmY5Z\
                     xKIK7Gi4KCAiAgAQQ//8HEiIKIOTq52imyqFiZjil2jHXNtBx2BKZxSmw944x7i68ljgFGi4KCAiAgA\
                     gQ//8PEiIKIKEJ8tczrqIvUlOufmY95LaU0Y72gnl0HOoMK8EoiL52
-                    """)!))
+                    """
             ),
-        ]
+        ].map {
+            (
+                try XCTUnwrap(TxOut(serializedData: XCTUnwrap(Data(base64Encoded: $0.0)))),
+                try XCTUnwrapSuccess(
+                    TxOutMembershipProof.make(serializedData: XCTUnwrap(Data(base64Encoded: $0.1))))
+            )
+        }
 
         return [try PreparedTxInput.make(knownTxOut: knownTxOut, ring: ring).get()]
     }
