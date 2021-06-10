@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0-pre2] - 2021-05-10
 
+### Added
+
+- Dynamic minimum transaction fee. (#29)
+
+### Changed
+
+- Upgraded LibMobileCoin to v1.1.0-pre2. (#27)
+
 ## [1.0.0] - 2021-04-05
 
 ## 1.0.0-rc1 - 2021-03-15
