@@ -10,7 +10,10 @@ class BlockchainFeeFetcherTests: XCTestCase {
 
     func testFetchMinimumFeeReturnsDefaultWithLegacyService() throws {
         let blockchainService = TestBlockchainService.makeWithSuccess()
-        let fetcher = BlockchainFeeFetcher(blockchainService: blockchainService)
+        let fetcher = BlockchainFeeFetcher(
+            blockchainService: blockchainService,
+            minimumFeeCacheTTL: 60,
+            targetQueue: DispatchQueue.main)
 
         let expect = expectation(description: "fetching minimum fee")
         fetcher.fetchMinimumFee {
@@ -22,7 +25,10 @@ class BlockchainFeeFetcherTests: XCTestCase {
 
     func testFetchMinimumFeeWorksWithNewService() throws {
         let blockchainService = TestBlockchainService(successWithMinimumFee: 3_000_000_000)
-        let fetcher = BlockchainFeeFetcher(blockchainService: blockchainService)
+        let fetcher = BlockchainFeeFetcher(
+            blockchainService: blockchainService,
+            minimumFeeCacheTTL: 60,
+            targetQueue: DispatchQueue.main)
 
         let expect = expectation(description: "fetching minimum fee")
         fetcher.fetchMinimumFee {

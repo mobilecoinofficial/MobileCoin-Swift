@@ -55,8 +55,10 @@ public final class MobileCoinClient {
         let inner = Inner(serviceProvider: serviceProvider, fogResolverManager: fogResolverManager)
         self.inner = .init(inner, targetQueue: serialQueue)
 
-        self.feeFetcher =
-            BlockchainFeeFetcher(blockchainService: serviceProvider.blockchainService)
+        self.feeFetcher = BlockchainFeeFetcher(
+            blockchainService: serviceProvider.blockchainService,
+            minimumFeeCacheTTL: config.minimumFeeCacheTTL,
+            targetQueue: serialQueue)
     }
 
     public var balance: Balance {
@@ -346,6 +348,9 @@ extension MobileCoinClient {
         }
 
         fileprivate var networkConfig: NetworkConfig
+
+        // default minimum fee cache TTL is 30 minutes
+        public var minimumFeeCacheTTL: TimeInterval = 30 * 60
 
         public var cacheStorageAdapter: StorageAdapter?
 
