@@ -8,7 +8,6 @@ import LibMobileCoin
 import SwiftProtobuf
 
 final class BlockchainConnection: Connection, BlockchainService {
-
     private let client: ConsensusCommon_BlockchainAPIClient
 
     init(

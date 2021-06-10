@@ -7,9 +7,11 @@ import LibMobileCoin
 
 struct TransactionSubmitter {
     private let consensusService: ConsensusService
+    private let feeFetcher: BlockchainFeeFetcher
 
-    init(consensusService: ConsensusService) {
+    init(consensusService: ConsensusService, feeFetcher: BlockchainFeeFetcher) {
         self.consensusService = consensusService
+        self.feeFetcher = feeFetcher
     }
 
     func submitTransaction(
@@ -21,7 +23,19 @@ struct TransactionSubmitter {
             "\(redacting: transaction.serializedData.base64EncodedString())",
             logFunction: false)
         consensusService.proposeTx(External_Tx(transaction)) {
-            completion($0.mapError { .connectionError($0) }.flatMap { self.processResponse($0) })
+            switch $0 {
+            case .success(let response):
+                let responseResult = self.processResponse(response)
+                if case .txFeeError = response.result {
+                    self.feeFetcher.resetCache {
+                        completion(responseResult)
+                    }
+                } else {
+                    completion(responseResult)
+                }
+            case .failure(let error):
+                completion(.failure(.connectionError(error)))
+            }
         }
     }
 
