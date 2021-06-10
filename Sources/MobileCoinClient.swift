@@ -212,12 +212,14 @@ public final class MobileCoinClient {
         completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
     ) {
         inner.accessAsync {
-            TransactionSubmitter(consensusService: $0.serviceProvider.consensusService)
-                .submitTransaction(transaction) { result in
-                    self.callbackQueue.async {
-                        completion(result)
-                    }
+            TransactionSubmitter(
+                consensusService: $0.serviceProvider.consensusService,
+                feeFetcher: self.feeFetcher
+            ).submitTransaction(transaction) { result in
+                self.callbackQueue.async {
+                    completion(result)
                 }
+            }
         }
     }
 
