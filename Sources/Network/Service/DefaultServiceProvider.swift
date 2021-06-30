@@ -5,8 +5,7 @@
 import Foundation
 
 final class DefaultServiceProvider: ServiceProvider {
-    private let targetQueue: DispatchQueue?
-    private let channelManager = GrpcChannelManager()
+    private let inner: SerialDispatchLock<Inner>
 
     private let consensus: ConsensusConnection
     private let blockchain: BlockchainConnection
@@ -16,10 +15,12 @@ final class DefaultServiceProvider: ServiceProvider {
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
 
-    private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
-
     init(networkConfig: NetworkConfig, targetQueue: DispatchQueue?) {
-        self.targetQueue = targetQueue
+        let channelManager = GrpcChannelManager()
+
+        let inner = Inner(channelManager: channelManager, targetQueue: targetQueue)
+        self.inner = .init(inner, targetQueue: targetQueue)
+
         self.consensus = ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: channelManager,
@@ -58,17 +59,11 @@ final class DefaultServiceProvider: ServiceProvider {
     var fogBlockService: FogBlockService { block }
     var fogUntrustedTxOutService: FogUntrustedTxOutService { untrustedTxOut }
 
-    func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
-        let config = GrpcChannelConfig(url: fogReportUrl)
-        guard let reportConnection = reportUrlToReportConnection[config] else {
-            let reportConnection = FogReportConnection(
-                url: fogReportUrl,
-                channelManager: channelManager,
-                targetQueue: targetQueue)
-            reportUrlToReportConnection[config] = reportConnection
-            return reportConnection
-        }
-        return reportConnection
+    func fogReportService(
+        for fogReportUrl: FogUrl,
+        completion: @escaping (FogReportService) -> Void
+    ) {
+        inner.accessAsync { completion($0.fogReportService(for: fogReportUrl)) }
     }
 
     func setConsensusAuthorization(credentials: BasicCredentials) {
@@ -82,5 +77,32 @@ final class DefaultServiceProvider: ServiceProvider {
         keyImage.setAuthorization(credentials: credentials)
         block.setAuthorization(credentials: credentials)
         untrustedTxOut.setAuthorization(credentials: credentials)
+    }
+}
+
+extension DefaultServiceProvider {
+    private struct Inner {
+        private let targetQueue: DispatchQueue?
+        private let channelManager: GrpcChannelManager
+
+        private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
+
+        init(channelManager: GrpcChannelManager, targetQueue: DispatchQueue?) {
+            self.targetQueue = targetQueue
+            self.channelManager = channelManager
+        }
+
+        mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
+            let config = GrpcChannelConfig(url: fogReportUrl)
+            guard let reportConnection = reportUrlToReportConnection[config] else {
+                let reportConnection = FogReportConnection(
+                    url: fogReportUrl,
+                    channelManager: channelManager,
+                    targetQueue: targetQueue)
+                reportUrlToReportConnection[config] = reportConnection
+                return reportConnection
+            }
+            return reportConnection
+        }
     }
 }

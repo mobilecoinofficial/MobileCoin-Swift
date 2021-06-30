@@ -14,7 +14,9 @@ protocol ServiceProvider {
     var fogBlockService: FogBlockService { get }
     var fogUntrustedTxOutService: FogUntrustedTxOutService { get }
 
-    func fogReportService(for fogReportUrl: FogUrl) -> FogReportService
+    func fogReportService(
+        for fogReportUrl: FogUrl,
+        completion: @escaping (FogReportService) -> Void)
 
     func setConsensusAuthorization(credentials: BasicCredentials)
     func setFogUserAuthorization(credentials: BasicCredentials)
