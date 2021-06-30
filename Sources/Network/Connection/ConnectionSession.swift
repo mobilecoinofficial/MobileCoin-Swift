@@ -39,6 +39,10 @@ final class ConnectionSession {
     func processResponse(headers: HPACKHeaders) {
         processCookieHeader(headers: headers)
     }
+    
+    func removeCookies(for input: URL) {
+        cookieStorage.cookies(for: input)?.forEach({cookieStorage.deleteCookie($0)})
+    }
 }
 
 extension ConnectionSession {

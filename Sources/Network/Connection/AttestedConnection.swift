@@ -183,17 +183,32 @@ extension AttestedConnection {
 
                         completion(.success(response))
                     case .failure(.connectionError(let connectionError)):
-                        let errorMessage = "Connection failure while performing attested call. " +
-                            "url: \(self.url), error: \(connectionError)"
-                        switch connectionError {
-                        case .connectionFailure, .serverRateLimited:
-                            logger.warning(errorMessage, logFunction: false)
-                        case .authorizationFailure, .invalidServerResponse,
-                             .attestationVerificationFailed, .outdatedClient:
-                            logger.error(errorMessage, logFunction: false)
-                        }
+                        if freshCipher {
+                            let errorMessage = "Connection failure while performing attested call. " +
+                                "url: \(self.url), error: \(connectionError)"
+                            switch connectionError {
+                            case .connectionFailure, .serverRateLimited:
+                                logger.warning(errorMessage, logFunction: false)
+                            case .authorizationFailure, .invalidServerResponse,
+                                 .attestationVerificationFailed, .outdatedClient:
+                                logger.error(errorMessage, logFunction: false)
+                            }
 
-                        completion(.failure(connectionError))
+                            completion(.failure(connectionError))
+                        } else {
+                            logger.info(
+                                "Connection failure while performing attested call., reattesting url:" +
+                                    "\(self.url)",
+                                logFunction: false)
+
+                            self.session.removeCookies(for: self.url.url)
+                            self.doPerformAttestedCallWithAuth(
+                                call,
+                                requestAad: requestAad,
+                                request: request,
+                                attestAkeCipher: nil,
+                                completion: completion)
+                        }
                     case .failure(.attestationFailure):
                         self.attestAke.deattest()
 
@@ -209,6 +224,7 @@ extension AttestedConnection {
                                     "\(self.url)",
                                 logFunction: false)
 
+                            self.session.removeCookies(for: self.url.url)
                             self.doPerformAttestedCallWithAuth(
                                 call,
                                 requestAad: requestAad,
