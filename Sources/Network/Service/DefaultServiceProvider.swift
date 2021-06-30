@@ -56,7 +56,7 @@ final class DefaultServiceProvider: ServiceProvider {
     var fogMerkleProofService: FogMerkleProofService { merkleProof }
     var fogKeyImageService: FogKeyImageService { keyImage }
     var fogBlockService: FogBlockService { block }
-    var fogUntrustedTxOutService: FogUntrustedTxOutConnection { untrustedTxOut }
+    var fogUntrustedTxOutService: FogUntrustedTxOutService { untrustedTxOut }
 
     func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
         let config = GrpcChannelConfig(url: fogReportUrl)

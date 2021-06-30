@@ -6,10 +6,7 @@ import Foundation
 import NIOSSL
 
 protocol AttestedConnectionConfigProtocol: ConnectionConfigProtocol {
-    var url: MobileCoinUrlProtocol { get }
     var attestation: Attestation { get }
-    var trustRoots: [NIOSSLCertificate]? { get }
-    var authorization: BasicCredentials? { get }
 }
 
 struct AttestedConnectionConfig<Url: MobileCoinUrlProtocol>: AttestedConnectionConfigProtocol {

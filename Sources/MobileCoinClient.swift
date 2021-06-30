@@ -371,16 +371,26 @@ extension MobileCoinClient {
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map { trustRoots in
-                networkConfig.consensusTrustRoots = trustRoots
+            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
+                networkConfig.consensusTrustRoots = $0
             }
         }
 
         public mutating func setFogTrustRoots(_ trustRoots: [Data]) -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map { trustRoots in
-                networkConfig.fogTrustRoots = trustRoots
+            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
+                networkConfig.fogTrustRoots = $0
             }
+        }
+
+        public mutating func setConsensusBasicAuthorization(username: String, password: String) {
+            networkConfig.consensusAuthorization =
+                BasicCredentials(username: username, password: password)
+        }
+
+        public mutating func setFogBasicAuthorization(username: String, password: String) {
+            networkConfig.fogUserAuthorization =
+                BasicCredentials(username: username, password: password)
         }
 
         private static func parseTrustRoots(trustRootsBytes: [Data])
@@ -399,16 +409,6 @@ extension MobileCoinClient {
                 }
             }
             return .success(trustRoots)
-        }
-
-        public mutating func setConsensusBasicAuthorization(username: String, password: String) {
-            networkConfig.consensusAuthorization =
-                BasicCredentials(username: username, password: password)
-        }
-
-        public mutating func setFogBasicAuthorization(username: String, password: String) {
-            networkConfig.fogUserAuthorization =
-                BasicCredentials(username: username, password: password)
         }
     }
 }
