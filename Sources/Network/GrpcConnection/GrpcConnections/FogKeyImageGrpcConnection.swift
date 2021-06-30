@@ -6,8 +6,8 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogViewConnection: AttestedConnection, FogViewService {
-    private let client: FogView_FogViewAPIClient
+final class FogKeyImageGrpcConnection: AttestedGrpcConnection, FogKeyImageService {
+    private let client: FogLedger_FogKeyImageAPIClient
 
     init(
         config: AttestedConnectionConfig<FogUrl>,
@@ -17,7 +17,7 @@ final class FogViewConnection: AttestedConnection, FogViewService {
         rngContext: Any? = nil
     ) {
         let channel = channelManager.channel(for: config)
-        self.client = FogView_FogViewAPIClient(channel: channel)
+        self.client = FogLedger_FogKeyImageAPIClient(channel: channel)
         super.init(
             client: self.client,
             config: config,
@@ -26,36 +26,33 @@ final class FogViewConnection: AttestedConnection, FogViewService {
             rngContext: rngContext)
     }
 
-    func query(
-        requestAad: FogView_QueryRequestAAD,
-        request: FogView_QueryRequest,
-        completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
+    func checkKeyImages(
+        request: FogLedger_CheckKeyImagesRequest,
+        completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
     ) {
         performAttestedCall(
-            EnclaveRequestCall(client: client),
-            requestAad: requestAad,
+            CheckKeyImagesCall(client: client),
             request: request,
             completion: completion)
     }
 }
 
-extension FogViewConnection {
-    private struct EnclaveRequestCall: AttestedGrpcCallable {
-        typealias InnerRequestAad = FogView_QueryRequestAAD
-        typealias InnerRequest = FogView_QueryRequest
-        typealias InnerResponse = FogView_QueryResponse
+extension FogKeyImageGrpcConnection {
+    private struct CheckKeyImagesCall: AttestedGrpcCallable {
+        typealias InnerRequest = FogLedger_CheckKeyImagesRequest
+        typealias InnerResponse = FogLedger_CheckKeyImagesResponse
 
-        let client: FogView_FogViewAPIClient
+        let client: FogLedger_FogKeyImageAPIClient
 
         func call(
             request: Attest_Message,
             callOptions: CallOptions?,
             completion: @escaping (UnaryCallResult<Attest_Message>) -> Void
         ) {
-            let unaryCall = client.query(request, callOptions: callOptions)
+            let unaryCall = client.checkKeyImages(request, callOptions: callOptions)
             unaryCall.callResult.whenSuccess(completion)
         }
     }
 }
 
-extension FogView_FogViewAPIClient: AuthGrpcCallableClient {}
+extension FogLedger_FogKeyImageAPIClient: AuthGrpcCallableClient {}

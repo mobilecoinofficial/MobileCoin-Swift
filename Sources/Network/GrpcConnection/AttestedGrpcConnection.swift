@@ -9,12 +9,12 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-enum AttestedConnectionError: Error {
+enum AttestedGrpcConnectionError: Error {
     case connectionError(ConnectionError)
     case attestationFailure(String = String())
 }
 
-extension AttestedConnectionError: CustomStringConvertible {
+extension AttestedGrpcConnectionError: CustomStringConvertible {
     var description: String {
         "Attested connection error: " + {
             switch self {
@@ -27,7 +27,7 @@ extension AttestedConnectionError: CustomStringConvertible {
     }
 }
 
-class AttestedConnection {
+class AttestedGrpcConnection {
     private let inner: SerialCallbackLock<Inner>
 
     init(
@@ -96,7 +96,7 @@ class AttestedConnection {
     }
 }
 
-extension AttestedConnection {
+extension AttestedGrpcConnection {
     // Note: Because `SerialCallbackLock` is being used to wrap `AttestedConnection.Inner`, calls
     // to `AttestedConnection.Inner` have exclusive access (other calls will be queued up) until the
     // executing call invokes the completion handler that returns control back to
@@ -299,7 +299,7 @@ extension AttestedConnection {
             attestAkeCipher: AttestAke.Cipher,
             completion: @escaping (
                 Result<(responseAad: Call.InnerResponseAad, response: Call.InnerResponse),
-                       AttestedConnectionError>
+                       AttestedGrpcConnectionError>
             ) -> Void
         ) {
             guard let processedRequest =
@@ -321,7 +321,7 @@ extension AttestedConnection {
         private func doPerformCall<Call: GrpcCallable>(
             _ call: Call,
             request: Call.Request,
-            completion: @escaping (Result<Call.Response, AttestedConnectionError>) -> Void
+            completion: @escaping (Result<Call.Response, AttestedGrpcConnectionError>) -> Void
         ) {
             let callOptions = requestCallOptions()
 
@@ -337,7 +337,7 @@ extension AttestedConnection {
         }
 
         private func processResponse<Response>(callResult: UnaryCallResult<Response>)
-            -> Result<Response, AttestedConnectionError>
+            -> Result<Response, AttestedGrpcConnectionError>
         {
             // Basic credential authorization failure
             guard callResult.status.code != .unauthenticated else {

@@ -6,7 +6,7 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogUntrustedTxOutConnection: Connection, FogUntrustedTxOutService {
+final class FogUntrustedTxOutGrpcConnection: GrpcConnection, FogUntrustedTxOutService {
     private let client: FogLedger_FogUntrustedTxOutApiClient
 
     init(
@@ -27,7 +27,7 @@ final class FogUntrustedTxOutConnection: Connection, FogUntrustedTxOutService {
     }
 }
 
-extension FogUntrustedTxOutConnection {
+extension FogUntrustedTxOutGrpcConnection {
     private struct GetTxOutsCall: GrpcCallable {
         let client: FogLedger_FogUntrustedTxOutApiClient
 

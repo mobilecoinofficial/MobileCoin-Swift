@@ -6,7 +6,7 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class ConsensusConnection: AttestedConnection, ConsensusService {
+final class ConsensusGrpcConnection: AttestedGrpcConnection, ConsensusService {
     private let client: ConsensusClient_ConsensusClientAPIClient
 
     init(
@@ -37,7 +37,7 @@ final class ConsensusConnection: AttestedConnection, ConsensusService {
     }
 }
 
-extension ConsensusConnection {
+extension ConsensusGrpcConnection {
     private struct ProposeTxCall: AttestedGrpcCallable {
         typealias InnerRequest = External_Tx
         typealias InnerResponse = ConsensusCommon_ProposeTxResponse

@@ -6,8 +6,8 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogKeyImageConnection: AttestedConnection, FogKeyImageService {
-    private let client: FogLedger_FogKeyImageAPIClient
+final class FogMerkleProofGrpcConnection: AttestedGrpcConnection, FogMerkleProofService {
+    private let client: FogLedger_FogMerkleProofAPIClient
 
     init(
         config: AttestedConnectionConfig<FogUrl>,
@@ -17,7 +17,7 @@ final class FogKeyImageConnection: AttestedConnection, FogKeyImageService {
         rngContext: Any? = nil
     ) {
         let channel = channelManager.channel(for: config)
-        self.client = FogLedger_FogKeyImageAPIClient(channel: channel)
+        self.client = FogLedger_FogMerkleProofAPIClient(channel: channel)
         super.init(
             client: self.client,
             config: config,
@@ -26,33 +26,33 @@ final class FogKeyImageConnection: AttestedConnection, FogKeyImageService {
             rngContext: rngContext)
     }
 
-    func checkKeyImages(
-        request: FogLedger_CheckKeyImagesRequest,
-        completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
+    func getOutputs(
+        request: FogLedger_GetOutputsRequest,
+        completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
     ) {
         performAttestedCall(
-            CheckKeyImagesCall(client: client),
+            GetOutputsCall(client: client),
             request: request,
             completion: completion)
     }
 }
 
-extension FogKeyImageConnection {
-    private struct CheckKeyImagesCall: AttestedGrpcCallable {
-        typealias InnerRequest = FogLedger_CheckKeyImagesRequest
-        typealias InnerResponse = FogLedger_CheckKeyImagesResponse
+extension FogMerkleProofGrpcConnection {
+    private struct GetOutputsCall: AttestedGrpcCallable {
+        typealias InnerRequest = FogLedger_GetOutputsRequest
+        typealias InnerResponse = FogLedger_GetOutputsResponse
 
-        let client: FogLedger_FogKeyImageAPIClient
+        let client: FogLedger_FogMerkleProofAPIClient
 
         func call(
             request: Attest_Message,
             callOptions: CallOptions?,
             completion: @escaping (UnaryCallResult<Attest_Message>) -> Void
         ) {
-            let unaryCall = client.checkKeyImages(request, callOptions: callOptions)
+            let unaryCall = client.getOutputs(request, callOptions: callOptions)
             unaryCall.callResult.whenSuccess(completion)
         }
     }
 }
 
-extension FogLedger_FogKeyImageAPIClient: AuthGrpcCallableClient {}
+extension FogLedger_FogMerkleProofAPIClient: AuthGrpcCallableClient {}

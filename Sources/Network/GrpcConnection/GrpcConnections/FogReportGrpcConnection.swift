@@ -6,7 +6,7 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogReportConnection: ArbitraryConnection, FogReportService {
+final class FogReportGrpcConnection: ArbitraryGrpcConnection, FogReportService {
     private let client: Report_ReportAPIClient
 
     init(url: FogUrl, channelManager: GrpcChannelManager, targetQueue: DispatchQueue?) {
@@ -23,7 +23,7 @@ final class FogReportConnection: ArbitraryConnection, FogReportService {
     }
 }
 
-extension FogReportConnection {
+extension FogReportGrpcConnection {
     private struct GetReportsCall: GrpcCallable {
         let client: Report_ReportAPIClient
 

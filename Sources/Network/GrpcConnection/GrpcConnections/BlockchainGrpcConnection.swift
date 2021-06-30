@@ -7,7 +7,7 @@ import GRPC
 import LibMobileCoin
 import SwiftProtobuf
 
-final class BlockchainConnection: Connection, BlockchainService {
+final class BlockchainGrpcConnection: GrpcConnection, BlockchainService {
     private let client: ConsensusCommon_BlockchainAPIClient
 
     init(
@@ -28,7 +28,7 @@ final class BlockchainConnection: Connection, BlockchainService {
     }
 }
 
-extension BlockchainConnection {
+extension BlockchainGrpcConnection {
     private struct GetLastBlockInfoCall: GrpcCallable {
         let client: ConsensusCommon_BlockchainAPIClient
 

@@ -6,8 +6,8 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogMerkleProofConnection: AttestedConnection, FogMerkleProofService {
-    private let client: FogLedger_FogMerkleProofAPIClient
+final class FogViewGrpcConnection: AttestedGrpcConnection, FogViewService {
+    private let client: FogView_FogViewAPIClient
 
     init(
         config: AttestedConnectionConfig<FogUrl>,
@@ -17,7 +17,7 @@ final class FogMerkleProofConnection: AttestedConnection, FogMerkleProofService 
         rngContext: Any? = nil
     ) {
         let channel = channelManager.channel(for: config)
-        self.client = FogLedger_FogMerkleProofAPIClient(channel: channel)
+        self.client = FogView_FogViewAPIClient(channel: channel)
         super.init(
             client: self.client,
             config: config,
@@ -26,33 +26,36 @@ final class FogMerkleProofConnection: AttestedConnection, FogMerkleProofService 
             rngContext: rngContext)
     }
 
-    func getOutputs(
-        request: FogLedger_GetOutputsRequest,
-        completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
+    func query(
+        requestAad: FogView_QueryRequestAAD,
+        request: FogView_QueryRequest,
+        completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
     ) {
         performAttestedCall(
-            GetOutputsCall(client: client),
+            EnclaveRequestCall(client: client),
+            requestAad: requestAad,
             request: request,
             completion: completion)
     }
 }
 
-extension FogMerkleProofConnection {
-    private struct GetOutputsCall: AttestedGrpcCallable {
-        typealias InnerRequest = FogLedger_GetOutputsRequest
-        typealias InnerResponse = FogLedger_GetOutputsResponse
+extension FogViewGrpcConnection {
+    private struct EnclaveRequestCall: AttestedGrpcCallable {
+        typealias InnerRequestAad = FogView_QueryRequestAAD
+        typealias InnerRequest = FogView_QueryRequest
+        typealias InnerResponse = FogView_QueryResponse
 
-        let client: FogLedger_FogMerkleProofAPIClient
+        let client: FogView_FogViewAPIClient
 
         func call(
             request: Attest_Message,
             callOptions: CallOptions?,
             completion: @escaping (UnaryCallResult<Attest_Message>) -> Void
         ) {
-            let unaryCall = client.getOutputs(request, callOptions: callOptions)
+            let unaryCall = client.query(request, callOptions: callOptions)
             unaryCall.callResult.whenSuccess(completion)
         }
     }
 }
 
-extension FogLedger_FogMerkleProofAPIClient: AuthGrpcCallableClient {}
+extension FogView_FogViewAPIClient: AuthGrpcCallableClient {}

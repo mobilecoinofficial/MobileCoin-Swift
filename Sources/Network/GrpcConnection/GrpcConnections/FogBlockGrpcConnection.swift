@@ -6,7 +6,7 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogBlockConnection: Connection, FogBlockService {
+final class FogBlockGrpcConnection: GrpcConnection, FogBlockService {
     private let client: FogLedger_FogBlockAPIClient
 
     init(
@@ -27,7 +27,7 @@ final class FogBlockConnection: Connection, FogBlockService {
     }
 }
 
-extension FogBlockConnection {
+extension FogBlockGrpcConnection {
     private struct GetBlocksCall: GrpcCallable {
         let client: FogLedger_FogBlockAPIClient
 
