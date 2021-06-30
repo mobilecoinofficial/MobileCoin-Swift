@@ -27,7 +27,7 @@ extension AttestedGrpcConnectionError: CustomStringConvertible {
     }
 }
 
-class AttestedGrpcConnection {
+class AttestedGrpcConnection: ConnectionProtocol {
     private let inner: SerialCallbackLock<Inner>
 
     init(

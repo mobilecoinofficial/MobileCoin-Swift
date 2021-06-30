@@ -18,6 +18,8 @@ protocol ServiceProvider {
         for fogReportUrl: FogUrl,
         completion: @escaping (FogReportService) -> Void)
 
+    func setTransportProtocolOption(_ transportProtocolOption: TransportProtocol.Option)
+
     func setConsensusAuthorization(credentials: BasicCredentials)
     func setFogUserAuthorization(credentials: BasicCredentials)
 }

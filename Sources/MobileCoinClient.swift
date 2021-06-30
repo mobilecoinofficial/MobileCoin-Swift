@@ -66,6 +66,10 @@ public final class MobileCoinClient {
         accountLock.readSync { $0.cachedAccountActivity }
     }
 
+    public func setTransportProtocol(_ transportProtocol: TransportProtocol) {
+        serviceProvider.setTransportProtocolOption(transportProtocol.option)
+    }
+
     public func setConsensusBasicAuthorization(username: String, password: String) {
         let credentials = BasicCredentials(username: username, password: password)
         serviceProvider.setConsensusAuthorization(credentials: credentials)
@@ -341,6 +345,11 @@ extension MobileCoinClient {
             self.networkConfig = networkConfig
         }
 
+        public var transportProtocol: TransportProtocol {
+            get { networkConfig.transportProtocol }
+            set { networkConfig.transportProtocol = newValue }
+        }
+
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
@@ -364,6 +373,11 @@ extension MobileCoinClient {
         public mutating func setFogBasicAuthorization(username: String, password: String) {
             networkConfig.fogUserAuthorization =
                 BasicCredentials(username: username, password: password)
+        }
+
+        public var httpRequester: HttpRequester? {
+            get { networkConfig.httpRequester }
+            set { networkConfig.httpRequester = newValue }
         }
 
         private static func parseTrustRoots(trustRootsBytes: [Data])

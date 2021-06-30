@@ -66,6 +66,19 @@ final class DefaultServiceProvider: ServiceProvider {
         inner.accessAsync { completion($0.fogReportService(for: fogReportUrl)) }
     }
 
+    func setTransportProtocolOption(_ transportProtocolOption: TransportProtocol.Option) {
+        inner.accessAsync {
+            $0.setTransportProtocolOption(transportProtocolOption)
+            self.consensus.setTransportProtocolOption(transportProtocolOption)
+            self.blockchain.setTransportProtocolOption(transportProtocolOption)
+            self.view.setTransportProtocolOption(transportProtocolOption)
+            self.merkleProof.setTransportProtocolOption(transportProtocolOption)
+            self.keyImage.setTransportProtocolOption(transportProtocolOption)
+            self.block.setTransportProtocolOption(transportProtocolOption)
+            self.untrustedTxOut.setTransportProtocolOption(transportProtocolOption)
+        }
+    }
+
     func setConsensusAuthorization(credentials: BasicCredentials) {
         consensus.setAuthorization(credentials: credentials)
         blockchain.setAuthorization(credentials: credentials)
@@ -86,6 +99,7 @@ extension DefaultServiceProvider {
         private let channelManager: GrpcChannelManager
 
         private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
+        private(set) var transportProtocolOption: TransportProtocol.Option
 
         init(channelManager: GrpcChannelManager, targetQueue: DispatchQueue?) {
             self.targetQueue = targetQueue
@@ -97,12 +111,22 @@ extension DefaultServiceProvider {
             guard let reportConnection = reportUrlToReportConnection[config] else {
                 let reportConnection = FogReportConnection(
                     url: fogReportUrl,
+                    transportProtocolOption: transportProtocolOption,
                     channelManager: channelManager,
                     targetQueue: targetQueue)
                 reportUrlToReportConnection[config] = reportConnection
                 return reportConnection
             }
             return reportConnection
+        }
+
+        mutating func setTransportProtocolOption(
+            _ transportProtocolOption: TransportProtocol.Option
+        ) {
+            self.transportProtocolOption = transportProtocolOption
+            for reportConnection in reportUrlToReportConnection.values {
+                reportConnection.setTransportProtocolOption(transportProtocolOption)
+            }
         }
     }
 }

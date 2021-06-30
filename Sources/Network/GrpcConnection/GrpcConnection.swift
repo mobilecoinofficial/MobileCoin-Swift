@@ -5,7 +5,7 @@
 import Foundation
 import GRPC
 
-class GrpcConnection {
+class GrpcConnection: ConnectionProtocol {
     private let inner: SerialDispatchLock<Inner>
 
     init(config: ConnectionConfigProtocol, targetQueue: DispatchQueue?) {
