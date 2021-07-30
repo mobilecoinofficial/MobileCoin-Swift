@@ -11,4 +11,8 @@ final class FogBlockHttpConnection: ConnectionProtocol, FogBlockService {
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
     }
+    
+    func setAuthorization(credentials: BasicCredentials) {
+        
+    }
 }

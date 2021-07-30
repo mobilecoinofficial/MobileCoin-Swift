@@ -11,4 +11,8 @@ final class BlockchainHttpConnection: ConnectionProtocol, BlockchainService {
             @escaping (Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>) -> Void
     ) {
     }
+    
+    func setAuthorization(credentials: BasicCredentials) {
+        
+    }
 }

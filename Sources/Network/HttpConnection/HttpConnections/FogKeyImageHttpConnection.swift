@@ -11,4 +11,8 @@ final class FogKeyImageHttpConnection: ConnectionProtocol, FogKeyImageService {
         completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
     ) {
     }
+    
+    func setAuthorization(credentials: BasicCredentials) {
+    
+    }
 }

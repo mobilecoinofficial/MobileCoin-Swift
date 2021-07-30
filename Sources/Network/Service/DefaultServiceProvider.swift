@@ -32,6 +32,7 @@ final class DefaultServiceProvider: ServiceProvider {
         self.view = FogViewConnection(
             config: networkConfig.fogView,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.merkleProof = FogMerkleProofConnection(
             config: networkConfig.fogMerkleProof,
@@ -104,6 +105,7 @@ extension DefaultServiceProvider {
         init(channelManager: GrpcChannelManager, targetQueue: DispatchQueue?) {
             self.targetQueue = targetQueue
             self.channelManager = channelManager
+            self.transportProtocolOption = TransportProtocol.grpc.option
         }
 
         mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {

@@ -40,6 +40,7 @@ struct NetworkConfig {
     var consensus: AttestedConnectionConfig<ConsensusUrl> {
         AttestedConnectionConfig(
             url: consensusUrl,
+            transportProtocolOption: transportProtocol.option,
             attestation: attestation.consensus,
             trustRoots: consensusTrustRoots,
             authorization: consensusAuthorization)
@@ -48,6 +49,7 @@ struct NetworkConfig {
     var blockchain: ConnectionConfig<ConsensusUrl> {
         ConnectionConfig(
             url: consensusUrl,
+            transportProtocolOption: transportProtocol.option,
             trustRoots: consensusTrustRoots,
             authorization: consensusAuthorization)
     }
@@ -55,6 +57,7 @@ struct NetworkConfig {
     var fogView: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrl,
+            transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogView,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
@@ -63,6 +66,7 @@ struct NetworkConfig {
     var fogMerkleProof: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrl,
+            transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogMerkleProof,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
@@ -71,6 +75,7 @@ struct NetworkConfig {
     var fogKeyImage: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrl,
+            transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogKeyImage,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
@@ -79,6 +84,7 @@ struct NetworkConfig {
     var fogBlock: ConnectionConfig<FogUrl> {
         ConnectionConfig(
             url: fogUrl,
+            transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }
@@ -86,6 +92,7 @@ struct NetworkConfig {
     var fogUntrustedTxOut: ConnectionConfig<FogUrl> {
         ConnectionConfig(
             url: fogUrl,
+            transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }

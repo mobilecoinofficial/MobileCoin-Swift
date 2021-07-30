@@ -44,5 +44,11 @@ final class BlockchainConnection:
         completion:
             @escaping (Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getLastBlockInfo(completion: completion)
+        case .http(let httpConnection):
+            httpConnection.getLastBlockInfo(completion: completion)
+        }
     }
 }

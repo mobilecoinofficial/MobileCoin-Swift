@@ -44,5 +44,11 @@ final class FogReportConnection:
         request: Report_ReportRequest,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getReports(request: request, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.getReports(request: request, completion: completion)
+        }
     }
 }

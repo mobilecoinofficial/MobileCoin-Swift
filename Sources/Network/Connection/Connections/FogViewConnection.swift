@@ -10,7 +10,7 @@ final class FogViewConnection:
     Connection<FogViewGrpcConnection, FogViewHttpConnection>, FogViewService
 {
     private let config: AttestedConnectionConfig<FogUrl>
-    private let channelManager: GrpcChannelManager
+    //    private let channelManager: GrpcChannelManager
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
     private let rngContext: Any?
@@ -18,16 +18,16 @@ final class FogViewConnection:
     init(
         config: AttestedConnectionConfig<FogUrl>,
         channelManager: GrpcChannelManager,
+        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) {
         self.config = config
-        self.channelManager = channelManager
+        //        self.channelManager = channelManager
         self.targetQueue = targetQueue
         self.rng = rng
         self.rngContext = rngContext
-
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
                 switch transportProtocolOption {
@@ -40,7 +40,16 @@ final class FogViewConnection:
                             rng: rng,
                             rngContext: rngContext))
                 case .http:
-                    return .http(httpService: FogViewHttpConnection())
+                    let httpClientWrapper = HttpClientWrapper(
+                        config: config,
+                        httpRequester: httpRequester)
+                    return .http(
+                        httpService: FogViewHttpConnection(
+                            config: config,
+                            client: httpClientWrapper,
+                            targetQueue: targetQueue,
+                            rng: rng,
+                            rngContext: rngContext))
                 }
             },
             transportProtocolOption: config.transportProtocolOption,
@@ -52,7 +61,7 @@ final class FogViewConnection:
         request: FogView_QueryRequest,
         completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
     ) {
-        switch connectionOption {
+        switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.query(requestAad: requestAad, request: request, completion: completion)
         case .http(let httpConnection):

@@ -26,6 +26,10 @@ class ArbitraryConnection<GrpcService, HttpService> {
         let connectionOptionWrapper = connectionOptionWrapperFactory(transportProtocolOption)
         inner.accessAsync { $0.connectionOptionWrapper = connectionOptionWrapper }
     }
+
+    var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService> {
+        inner.accessWithoutLocking.connectionOptionWrapper
+    }
 }
 
 extension ArbitraryConnection {

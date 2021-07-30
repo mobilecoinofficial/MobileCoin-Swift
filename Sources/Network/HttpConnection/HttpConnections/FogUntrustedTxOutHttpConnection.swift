@@ -11,4 +11,8 @@ final class FogUntrustedTxOutHttpConnection: ConnectionProtocol, FogUntrustedTxO
         completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
     ) {
     }
+    
+    func setAuthorization(credentials: BasicCredentials) {
+        
+    }
 }

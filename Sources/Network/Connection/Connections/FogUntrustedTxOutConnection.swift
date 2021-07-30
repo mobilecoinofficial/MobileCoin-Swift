@@ -44,5 +44,11 @@ final class FogUntrustedTxOutConnection:
         request: FogLedger_TxOutRequest,
         completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getTxOuts(request: request, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.getTxOuts(request: request, completion: completion)
+        }
     }
 }

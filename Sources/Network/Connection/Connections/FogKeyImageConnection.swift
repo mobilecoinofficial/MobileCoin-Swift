@@ -51,5 +51,11 @@ final class FogKeyImageConnection:
         request: FogLedger_CheckKeyImagesRequest,
         completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.checkKeyImages(request: request, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.checkKeyImages(request: request, completion: completion)
+        }
     }
 }

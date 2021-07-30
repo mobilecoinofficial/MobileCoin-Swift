@@ -51,5 +51,11 @@ final class ConsensusConnection:
         _ tx: External_Tx,
         completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.proposeTx(tx, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.proposeTx(tx, completion: completion)
+        }
     }
 }

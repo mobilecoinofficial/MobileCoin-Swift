@@ -11,4 +11,8 @@ final class FogMerkleProofHttpConnection: ConnectionProtocol, FogMerkleProofServ
         completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
     ) {
     }
+    
+    func setAuthorization(credentials: BasicCredentials) {
+        
+    }
 }

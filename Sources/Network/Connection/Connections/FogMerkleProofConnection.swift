@@ -51,5 +51,11 @@ final class FogMerkleProofConnection:
         request: FogLedger_GetOutputsRequest,
         completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getOutputs(request: request, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.getOutputs(request: request, completion: completion)
+        }
     }
 }

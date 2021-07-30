@@ -250,6 +250,7 @@ extension FogViewConnectionIntTests {
         FogViewConnection(
             config: networkConfig.fogView,
             channelManager: GrpcChannelManager(),
+            httpRequester: nil,
             targetQueue: DispatchQueue.main)
     }
 }

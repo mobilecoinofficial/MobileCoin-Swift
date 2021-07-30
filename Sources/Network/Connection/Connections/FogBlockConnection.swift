@@ -43,5 +43,11 @@ final class FogBlockConnection:
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getBlocks(request: request, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.getBlocks(request: request, completion: completion)
+        }
     }
 }
