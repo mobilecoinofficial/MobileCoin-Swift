@@ -39,7 +39,8 @@ protocol AttestedGrpcCallable: GrpcCallable {
     func processResponse(
         response: Response,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError>
+    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                AttestedGrpcConnectionError>
 }
 
 extension AttestedGrpcCallable where InnerRequestAad == (), InnerRequest == Request {
@@ -54,7 +55,8 @@ extension AttestedGrpcCallable where InnerRequestAad == (), InnerRequest == Requ
 
 extension AttestedGrpcCallable where InnerResponseAad == (), InnerResponse == Response {
     func processResponse(response: Response, attestAkeCipher: AttestAke.Cipher)
-        -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError>
+        -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                  AttestedGrpcConnectionError>
     {
         .success((responseAad: (), response: response))
     }
@@ -85,7 +87,9 @@ extension AttestedGrpcCallable
     func processResponse(
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError> {
+    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                AttestedGrpcConnectionError>
+    {
         guard response.aad == Data() else {
             return .failure(.connectionError(.invalidServerResponse(
                 "\(Self.self) received unexpected aad: " +
@@ -133,7 +137,9 @@ extension AttestedGrpcCallable
     func processResponse(
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError> {
+    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                AttestedGrpcConnectionError>
+    {
         guard let responseAad = try? InnerResponseAad(serializedData: response.aad) else {
             return .failure(.connectionError(.invalidServerResponse(
                 "Failed to deserialized attested message aad into \(InnerResponseAad.self). aad: " +

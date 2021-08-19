@@ -21,11 +21,15 @@ struct NetworkConfig {
 
     private let attestation: AttestationConfig
 
+    var transportProtocol: TransportProtocol = .grpc
+
     var consensusTrustRoots: [NIOSSLCertificate]?
     var fogTrustRoots: [NIOSSLCertificate]?
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?
+
+    var httpRequester: HttpRequester?
 
     init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig) {
         self.consensusUrl = consensusUrl
