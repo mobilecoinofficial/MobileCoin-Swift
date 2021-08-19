@@ -9,7 +9,6 @@ MobileCoin is a privacy-preserving payments network designed for use on mobile d
 # Sending your First Payment
 
 * You must read and accept the [Terms of Use for MobileCoins and MobileCoin Wallets](./TERMS-OF-USE.md) to use MobileCoin Software.
-* Please note that currently, MobileCoin Wallets are not available for download or use by U.S. persons or entities, persons or entities located in the U.S., or persons or entities in other prohibited jurisdictions.
 
 ### Note to Developers
 
