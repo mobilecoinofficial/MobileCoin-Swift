@@ -21,6 +21,22 @@ final class ConnectionSession {
     private let cookieStorage: HTTPCookieStorage
     var authorizationCredentials: BasicCredentials?
 
+    private var cookieHeaders : [String:String] {
+        guard let cookies = cookieStorage.cookies(for: url) else { return [:] }
+        return HTTPCookie.requestHeaderFields(with: cookies)
+    }
+
+    private var authorizationHeades : [String: String] {
+        guard let credentials = authorizationCredentials else { return [:] }
+        return ["Authorization" : credentials.authorizationHeaderValue]
+    }
+    var requestHeaders: [String : String] {
+        var headers : [String: String] = [:]
+        headers.merge(cookieHeaders) {  (_, new) in new }
+        headers.merge(authorizationHeades) {  (_, new) in new }
+        return headers
+    }
+    
     convenience init(config: ConnectionConfigProtocol) {
         self.init(url: config.url, authorization: config.authorization)
     }
@@ -39,6 +55,10 @@ final class ConnectionSession {
     func processResponse(headers: HPACKHeaders) {
         processCookieHeader(headers: headers)
     }
+    
+    func processResponse(headers: [AnyHashable : Any]) {
+        processCookieHeader(headers: headers)
+    }
 }
 
 extension ConnectionSession {
@@ -47,15 +67,11 @@ extension ConnectionSession {
             hpackHeaders.add(httpHeaders: ["Authorization": credentials.authorizationHeaderValue])
         }
     }
+    
 }
 
+// GRPC
 extension ConnectionSession {
-    private func addCookieHeader(to hpackHeaders: inout HPACKHeaders) {
-        if let cookies = cookieStorage.cookies(for: url) {
-            hpackHeaders.add(httpHeaders: HTTPCookie.requestHeaderFields(with: cookies))
-        }
-    }
-
     private func processCookieHeader(headers: HPACKHeaders) {
         let http1Headers = Dictionary(
             headers.map { ($0.name.capitalized, $0.value) },
@@ -66,6 +82,28 @@ extension ConnectionSession {
             for: url)
         receivedCookies.forEach(cookieStorage.setCookie)
     }
+    
+    private func addCookieHeader(to hpackHeaders: inout HPACKHeaders) {
+        if let cookies = cookieStorage.cookies(for: url) {
+            hpackHeaders.add(httpHeaders: HTTPCookie.requestHeaderFields(with: cookies))
+        }
+    }
+
+    private func processCookieHeader(headers: [AnyHashable: Any]) {
+        let http1Headers = Dictionary(
+            headers.compactMap({ (key: AnyHashable, value: Any) -> (name: String, value: String)? in
+                guard let name = key as? String else { return nil }
+                guard let value = value as? String else { return nil }
+                return (name:name, value:value)
+            }).map { ($0.name.capitalized, $0.value) },
+            uniquingKeysWith: { k, _ in k })
+
+        let receivedCookies = HTTPCookie.cookies(
+            withResponseHeaderFields: http1Headers,
+            for: url)
+        receivedCookies.forEach(cookieStorage.setCookie)
+    }
+    
 }
 
 extension HPACKHeaders {

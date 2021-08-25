@@ -6,25 +6,25 @@ import Foundation
 import LibMobileCoin
 import SwiftProtobuf
 
-enum AttestedCallError: Error {
-    case aeadError(AeadError)
-    case invalidInput(String)
-}
+//enum AttestedCallError: Error {
+//    case aeadError(AeadError)
+//    case invalidInput(String)
+//}
+//
+//extension AttestedCallError: CustomStringConvertible {
+//    var description: String {
+//        "Attested call error: " + {
+//            switch self {
+//            case .aeadError(let innerError):
+//                return "\(innerError)"
+//            case .invalidInput(let reason):
+//                return "Invalid input: \(reason)"
+//            }
+//        }()
+//    }
+//}
 
-extension AttestedCallError: CustomStringConvertible {
-    var description: String {
-        "Attested call error: " + {
-            switch self {
-            case .aeadError(let innerError):
-                return "\(innerError)"
-            case .invalidInput(let reason):
-                return "Invalid input: \(reason)"
-            }
-        }()
-    }
-}
-
-protocol AttestedGrpcCallable: GrpcCallable {
+protocol AttestedHttpCallable: HttpCallable {
     associatedtype InnerRequestAad = ()
     associatedtype InnerRequest
     associatedtype InnerResponseAad = ()
@@ -39,10 +39,11 @@ protocol AttestedGrpcCallable: GrpcCallable {
     func processResponse(
         response: Response,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError>
+    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                AttestedHttpConnectionError>
 }
 
-extension AttestedGrpcCallable where InnerRequestAad == (), InnerRequest == Request {
+extension AttestedHttpCallable where InnerRequestAad == (), InnerRequest == Request {
     func processRequest(
         requestAad: InnerRequestAad,
         request: InnerRequest,
@@ -52,15 +53,16 @@ extension AttestedGrpcCallable where InnerRequestAad == (), InnerRequest == Requ
     }
 }
 
-extension AttestedGrpcCallable where InnerResponseAad == (), InnerResponse == Response {
+extension AttestedHttpCallable where InnerResponseAad == (), InnerResponse == Response {
     func processResponse(response: Response, attestAkeCipher: AttestAke.Cipher)
-        -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError>
+        -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                  AttestedHttpConnectionError>
     {
         .success((responseAad: (), response: response))
     }
 }
 
-extension AttestedGrpcCallable
+extension AttestedHttpCallable
     where InnerRequestAad == (),
         Request == Attest_Message,
         InnerRequest: InfallibleDataSerializable
@@ -77,7 +79,7 @@ extension AttestedGrpcCallable
     }
 }
 
-extension AttestedGrpcCallable
+extension AttestedHttpCallable
     where InnerResponseAad == (),
         Response == Attest_Message,
         InnerResponse: Message
@@ -85,7 +87,9 @@ extension AttestedGrpcCallable
     func processResponse(
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError> {
+    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                AttestedHttpConnectionError>
+    {
         guard response.aad == Data() else {
             return .failure(.connectionError(.invalidServerResponse(
                 "\(Self.self) received unexpected aad: " +
@@ -108,7 +112,7 @@ extension AttestedGrpcCallable
     }
 }
 
-extension AttestedGrpcCallable
+extension AttestedHttpCallable
     where InnerRequestAad: InfallibleDataSerializable,
         Request == Attest_Message,
         InnerRequest: InfallibleDataSerializable
@@ -125,7 +129,7 @@ extension AttestedGrpcCallable
     }
 }
 
-extension AttestedGrpcCallable
+extension AttestedHttpCallable
     where InnerResponseAad: Message,
         Response == Attest_Message,
         InnerResponse: Message
@@ -133,7 +137,9 @@ extension AttestedGrpcCallable
     func processResponse(
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse), AttestedConnectionError> {
+    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+                AttestedHttpConnectionError>
+    {
         guard let responseAad = try? InnerResponseAad(serializedData: response.aad) else {
             return .failure(.connectionError(.invalidServerResponse(
                 "Failed to deserialized attested message aad into \(InnerResponseAad.self). aad: " +

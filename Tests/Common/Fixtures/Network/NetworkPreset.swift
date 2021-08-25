@@ -308,6 +308,32 @@ extension NetworkPreset {
 
 }
 
+final class TestHttpRequester: HttpRequester {
+    func request(
+        url: URL,
+        method: HTTPMethod,
+        headers: [String: String]?,
+        body: Data?,
+        completion: @escaping (HTTPResult) -> Void
+    ) {
+        let task = URLSession.shared.dataTask(with: url) {data, response, error in
+            if let error = error {
+                completion(.failure(error: error))
+                return
+            }
+            guard let response = response as? HTTPURLResponse,
+            (200...299).contains(response.statusCode) else {
+                completion(.failure(error: ConnectionError.invalidServerResponse("")))
+                return
+            }
+            let httpResponse = HTTPResponse(httpUrlResponse: response, responseData: data)
+            completion(.success(response: httpResponse))
+
+        }
+        task.resume()
+    }
+}
+
 extension NetworkPreset {
 
     func networkConfig() throws -> NetworkConfig {
@@ -316,6 +342,7 @@ extension NetworkPreset {
             consensusUrl: consensusUrl,
             fogUrl: fogUrl,
             attestation: attestationConfig).get()
+        networkConfig.httpRequester = TestHttpRequester()
         networkConfig.consensusTrustRoots = try consensusTrustRoots()
         networkConfig.fogTrustRoots = try fogTrustRoots()
         networkConfig.consensusAuthorization = consensusCredentials

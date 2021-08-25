@@ -5,8 +5,7 @@
 import Foundation
 
 final class DefaultServiceProvider: ServiceProvider {
-    private let targetQueue: DispatchQueue?
-    private let channelManager = GrpcChannelManager()
+    private let inner: SerialDispatchLock<Inner>
 
     private let consensus: ConsensusConnection
     private let blockchain: BlockchainConnection
@@ -16,10 +15,12 @@ final class DefaultServiceProvider: ServiceProvider {
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
 
-    private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
-
     init(networkConfig: NetworkConfig, targetQueue: DispatchQueue?) {
-        self.targetQueue = targetQueue
+        let channelManager = GrpcChannelManager()
+
+        let inner = Inner(channelManager: channelManager, targetQueue: targetQueue)
+        self.inner = .init(inner, targetQueue: targetQueue)
+
         self.consensus = ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: channelManager,
@@ -31,6 +32,7 @@ final class DefaultServiceProvider: ServiceProvider {
         self.view = FogViewConnection(
             config: networkConfig.fogView,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.merkleProof = FogMerkleProofConnection(
             config: networkConfig.fogMerkleProof,
@@ -56,19 +58,26 @@ final class DefaultServiceProvider: ServiceProvider {
     var fogMerkleProofService: FogMerkleProofService { merkleProof }
     var fogKeyImageService: FogKeyImageService { keyImage }
     var fogBlockService: FogBlockService { block }
-    var fogUntrustedTxOutService: FogUntrustedTxOutConnection { untrustedTxOut }
+    var fogUntrustedTxOutService: FogUntrustedTxOutService { untrustedTxOut }
 
-    func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
-        let config = GrpcChannelConfig(url: fogReportUrl)
-        guard let reportConnection = reportUrlToReportConnection[config] else {
-            let reportConnection = FogReportConnection(
-                url: fogReportUrl,
-                channelManager: channelManager,
-                targetQueue: targetQueue)
-            reportUrlToReportConnection[config] = reportConnection
-            return reportConnection
+    func fogReportService(
+        for fogReportUrl: FogUrl,
+        completion: @escaping (FogReportService) -> Void
+    ) {
+        inner.accessAsync { completion($0.fogReportService(for: fogReportUrl)) }
+    }
+
+    func setTransportProtocolOption(_ transportProtocolOption: TransportProtocol.Option) {
+        inner.accessAsync {
+            $0.setTransportProtocolOption(transportProtocolOption)
+            self.consensus.setTransportProtocolOption(transportProtocolOption)
+            self.blockchain.setTransportProtocolOption(transportProtocolOption)
+            self.view.setTransportProtocolOption(transportProtocolOption)
+            self.merkleProof.setTransportProtocolOption(transportProtocolOption)
+            self.keyImage.setTransportProtocolOption(transportProtocolOption)
+            self.block.setTransportProtocolOption(transportProtocolOption)
+            self.untrustedTxOut.setTransportProtocolOption(transportProtocolOption)
         }
-        return reportConnection
     }
 
     func setConsensusAuthorization(credentials: BasicCredentials) {
@@ -82,5 +91,44 @@ final class DefaultServiceProvider: ServiceProvider {
         keyImage.setAuthorization(credentials: credentials)
         block.setAuthorization(credentials: credentials)
         untrustedTxOut.setAuthorization(credentials: credentials)
+    }
+}
+
+extension DefaultServiceProvider {
+    private struct Inner {
+        private let targetQueue: DispatchQueue?
+        private let channelManager: GrpcChannelManager
+
+        private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
+        private(set) var transportProtocolOption: TransportProtocol.Option
+
+        init(channelManager: GrpcChannelManager, targetQueue: DispatchQueue?) {
+            self.targetQueue = targetQueue
+            self.channelManager = channelManager
+            self.transportProtocolOption = TransportProtocol.grpc.option
+        }
+
+        mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
+            let config = GrpcChannelConfig(url: fogReportUrl)
+            guard let reportConnection = reportUrlToReportConnection[config] else {
+                let reportConnection = FogReportConnection(
+                    url: fogReportUrl,
+                    transportProtocolOption: transportProtocolOption,
+                    channelManager: channelManager,
+                    targetQueue: targetQueue)
+                reportUrlToReportConnection[config] = reportConnection
+                return reportConnection
+            }
+            return reportConnection
+        }
+
+        mutating func setTransportProtocolOption(
+            _ transportProtocolOption: TransportProtocol.Option
+        ) {
+            self.transportProtocolOption = transportProtocolOption
+            for reportConnection in reportUrlToReportConnection.values {
+                reportConnection.setTransportProtocolOption(transportProtocolOption)
+            }
+        }
     }
 }

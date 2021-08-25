@@ -22,7 +22,6 @@ public final class MobileCoinClient {
     }
 
     private let accountLock: ReadWriteDispatchLock<Account>
-    private let inner: SerialDispatchLock<Inner>
     private let serialQueue: DispatchQueue
     private let callbackQueue: DispatchQueue
 
@@ -30,6 +29,8 @@ public final class MobileCoinClient {
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogQueryScalingStrategy: FogQueryScalingStrategy
 
+    private let serviceProvider: ServiceProvider
+    private let fogResolverManager: FogResolverManager
     private let feeFetcher: BlockchainFeeFetcher
 
     init(accountKey: AccountKeyWithFog, config: Config) {
@@ -45,16 +46,12 @@ public final class MobileCoinClient {
         self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
-        let serviceProvider =
+        self.serviceProvider =
             DefaultServiceProvider(networkConfig: config.networkConfig, targetQueue: serialQueue)
-        let fogResolverManager = FogResolverManager(
+        self.fogResolverManager = FogResolverManager(
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
             targetQueue: serialQueue)
-
-        let inner = Inner(serviceProvider: serviceProvider, fogResolverManager: fogResolverManager)
-        self.inner = .init(inner, targetQueue: serialQueue)
-
         self.feeFetcher = BlockchainFeeFetcher(
             blockchainService: serviceProvider.blockchainService,
             minimumFeeCacheTTL: config.minimumFeeCacheTTL,
@@ -69,29 +66,31 @@ public final class MobileCoinClient {
         accountLock.readSync { $0.cachedAccountActivity }
     }
 
+    public func setTransportProtocol(_ transportProtocol: TransportProtocol) {
+        serviceProvider.setTransportProtocolOption(transportProtocol.option)
+    }
+
     public func setConsensusBasicAuthorization(username: String, password: String) {
         let credentials = BasicCredentials(username: username, password: password)
-        inner.accessAsync { $0.serviceProvider.setConsensusAuthorization(credentials: credentials) }
+        serviceProvider.setConsensusAuthorization(credentials: credentials)
     }
 
     public func setFogBasicAuthorization(username: String, password: String) {
         let credentials = BasicCredentials(username: username, password: password)
-        inner.accessAsync { $0.serviceProvider.setFogUserAuthorization(credentials: credentials) }
+        serviceProvider.setFogUserAuthorization(credentials: credentials)
     }
 
     public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
-        inner.accessAsync {
-            Account.BalanceUpdater(
-                account: self.accountLock,
-                fogViewService: $0.serviceProvider.fogViewService,
-                fogKeyImageService: $0.serviceProvider.fogKeyImageService,
-                fogBlockService: $0.serviceProvider.fogBlockService,
-                fogQueryScalingStrategy: self.fogQueryScalingStrategy,
-                targetQueue: self.serialQueue
-            ).updateBalance { result in
-                self.callbackQueue.async {
-                    completion(result)
-                }
+        Account.BalanceUpdater(
+            account: accountLock,
+            fogViewService: serviceProvider.fogViewService,
+            fogKeyImageService: serviceProvider.fogKeyImageService,
+            fogBlockService: serviceProvider.fogBlockService,
+            fogQueryScalingStrategy: fogQueryScalingStrategy,
+            targetQueue: serialQueue
+        ).updateBalance { result in
+            self.callbackQueue.async {
+                completion(result)
             }
         }
     }
@@ -142,19 +141,17 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        inner.accessAsync {
-            Account.TransactionOperations(
-                account: self.accountLock,
-                fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
-                fogResolverManager: $0.fogResolverManager,
-                feeFetcher: self.feeFetcher,
-                txOutSelectionStrategy: self.txOutSelectionStrategy,
-                mixinSelectionStrategy: self.mixinSelectionStrategy,
-                targetQueue: self.serialQueue
-            ).prepareTransaction(to: recipient, amount: amount, fee: fee) { result in
-                self.callbackQueue.async {
-                    completion(result)
-                }
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            targetQueue: serialQueue
+        ).prepareTransaction(to: recipient, amount: amount, fee: fee) { result in
+            self.callbackQueue.async {
+                completion(result)
             }
         }
     }
@@ -167,19 +164,17 @@ public final class MobileCoinClient {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        inner.accessAsync {
-            Account.TransactionOperations(
-                account: self.accountLock,
-                fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
-                fogResolverManager: $0.fogResolverManager,
-                feeFetcher: self.feeFetcher,
-                txOutSelectionStrategy: self.txOutSelectionStrategy,
-                mixinSelectionStrategy: self.mixinSelectionStrategy,
-                targetQueue: self.serialQueue
-            ).prepareTransaction(to: recipient, amount: amount, feeLevel: feeLevel) { result in
-                self.callbackQueue.async {
-                    completion(result)
-                }
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            targetQueue: serialQueue
+        ).prepareTransaction(to: recipient, amount: amount, feeLevel: feeLevel) { result in
+            self.callbackQueue.async {
+                completion(result)
             }
         }
     }
@@ -189,20 +184,18 @@ public final class MobileCoinClient {
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
-        inner.accessAsync {
-            Account.TransactionOperations(
-                account: self.accountLock,
-                fogMerkleProofService: $0.serviceProvider.fogMerkleProofService,
-                fogResolverManager: $0.fogResolverManager,
-                feeFetcher: self.feeFetcher,
-                txOutSelectionStrategy: self.txOutSelectionStrategy,
-                mixinSelectionStrategy: self.mixinSelectionStrategy,
-                targetQueue: self.serialQueue
-            ).prepareDefragmentationStepTransactions(toSendAmount: amount, feeLevel: feeLevel)
-            { result in
-                self.callbackQueue.async {
-                    completion(result)
-                }
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            feeFetcher: feeFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            targetQueue: serialQueue
+        ).prepareDefragmentationStepTransactions(toSendAmount: amount, feeLevel: feeLevel)
+        { result in
+            self.callbackQueue.async {
+                completion(result)
             }
         }
     }
@@ -211,14 +204,12 @@ public final class MobileCoinClient {
         _ transaction: Transaction,
         completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
     ) {
-        inner.accessAsync {
-            TransactionSubmitter(
-                consensusService: $0.serviceProvider.consensusService,
-                feeFetcher: self.feeFetcher
-            ).submitTransaction(transaction) { result in
-                self.callbackQueue.async {
-                    completion(result)
-                }
+        TransactionSubmitter(
+            consensusService: serviceProvider.consensusService,
+            feeFetcher: feeFetcher
+        ).submitTransaction(transaction) { result in
+            self.callbackQueue.async {
+                completion(result)
             }
         }
     }
@@ -227,16 +218,14 @@ public final class MobileCoinClient {
         of transaction: Transaction,
         completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
     ) {
-        inner.accessAsync {
-            TransactionStatusChecker(
-                account: self.accountLock,
-                fogUntrustedTxOutService: $0.serviceProvider.fogUntrustedTxOutService,
-                fogKeyImageService: $0.serviceProvider.fogKeyImageService,
-                targetQueue: self.serialQueue
-            ).checkStatus(transaction) { result in
-                self.callbackQueue.async {
-                    completion(result)
-                }
+        TransactionStatusChecker(
+            account: accountLock,
+            fogUntrustedTxOutService: serviceProvider.fogUntrustedTxOutService,
+            fogKeyImageService: serviceProvider.fogKeyImageService,
+            targetQueue: serialQueue
+        ).checkStatus(transaction) { result in
+            self.callbackQueue.async {
+                completion(result)
             }
         }
     }
@@ -308,18 +297,6 @@ extension MobileCoinClient {
 }
 
 extension MobileCoinClient {
-    private struct Inner {
-        let serviceProvider: ServiceProvider
-        let fogResolverManager: FogResolverManager
-
-        init(serviceProvider: ServiceProvider, fogResolverManager: FogResolverManager) {
-            self.serviceProvider = serviceProvider
-            self.fogResolverManager = fogResolverManager
-        }
-    }
-}
-
-extension MobileCoinClient {
     public struct Config {
         /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
         ///     with the appropriate schemes.
@@ -368,19 +345,39 @@ extension MobileCoinClient {
             self.networkConfig = networkConfig
         }
 
+        public var transportProtocol: TransportProtocol {
+            get { networkConfig.transportProtocol }
+            set { networkConfig.transportProtocol = newValue }
+        }
+
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map { trustRoots in
-                networkConfig.consensusTrustRoots = trustRoots
+            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
+                networkConfig.consensusTrustRoots = $0
             }
         }
 
         public mutating func setFogTrustRoots(_ trustRoots: [Data]) -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map { trustRoots in
-                networkConfig.fogTrustRoots = trustRoots
+            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
+                networkConfig.fogTrustRoots = $0
             }
+        }
+
+        public mutating func setConsensusBasicAuthorization(username: String, password: String) {
+            networkConfig.consensusAuthorization =
+                BasicCredentials(username: username, password: password)
+        }
+
+        public mutating func setFogBasicAuthorization(username: String, password: String) {
+            networkConfig.fogUserAuthorization =
+                BasicCredentials(username: username, password: password)
+        }
+
+        public var httpRequester: HttpRequester? {
+            get { networkConfig.httpRequester }
+            set { networkConfig.httpRequester = newValue }
         }
 
         private static func parseTrustRoots(trustRootsBytes: [Data])
@@ -399,16 +396,6 @@ extension MobileCoinClient {
                 }
             }
             return .success(trustRoots)
-        }
-
-        public mutating func setConsensusBasicAuthorization(username: String, password: String) {
-            networkConfig.consensusAuthorization =
-                BasicCredentials(username: username, password: password)
-        }
-
-        public mutating func setFogBasicAuthorization(username: String, password: String) {
-            networkConfig.fogUserAuthorization =
-                BasicCredentials(username: username, password: password)
         }
     }
 }
