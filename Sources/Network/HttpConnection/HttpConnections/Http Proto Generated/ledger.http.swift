@@ -32,13 +32,13 @@ public protocol FogLedger_FogMerkleProofAPIRestProtocol: HTTPClient {
 
   func auth(
     _ request: Attest_AuthMessage,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Attest_AuthMessage, Attest_AuthMessage>
+    callOptions: HTTPCallOptions?
+  ) -> HTTPUnaryCall<Attest_AuthMessage, Attest_AuthMessage>
 
   func getOutputs(
     _ request: Attest_Message,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Attest_Message, Attest_Message>
+    callOptions: HTTPCallOptions?
+  ) -> HTTPUnaryCall<Attest_Message, Attest_Message>
 }
 
 extension FogLedger_FogMerkleProofAPIRestProtocol {
@@ -55,12 +55,13 @@ extension FogLedger_FogMerkleProofAPIRestProtocol {
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
   public func auth(
     _ request: Attest_AuthMessage,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Attest_AuthMessage, Attest_AuthMessage> {
+    callOptions: HTTPCallOptions? = nil
+  ) -> HTTPUnaryCall<Attest_AuthMessage, Attest_AuthMessage> {
     return self.makeUnaryCall(
       path: "/fog_ledger.FogMerkleProofAPI/Auth",
       request: request,
-      callOptions: callOptions ?? self.defaultCallOptions
+      callOptions: callOptions ?? self.defaultHTTPCallOptions
+    )
   }
 
   //// Get TxOut's and merkle proofs of membership for these outputs
@@ -73,12 +74,12 @@ extension FogLedger_FogMerkleProofAPIRestProtocol {
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
   public func getOutputs(
     _ request: Attest_Message,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Attest_Message, Attest_Message> {
+    callOptions: HTTPCallOptions? = nil
+  ) -> HTTPUnaryCall<Attest_Message, Attest_Message> {
     return self.makeUnaryCall(
       path: "/fog_ledger.FogMerkleProofAPI/GetOutputs",
       request: request,
-      callOptions: callOptions ?? self.defaultCallOptions
+      callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
   }
 }
@@ -94,19 +95,19 @@ public protocol FogLedger_FogMerkleProofAPIInterceptorFactoryProtocol {
 
 public final class FogLedger_FogMerkleProofAPI: FogLedger_FogMerkleProofAPIRestProtocol {
   public let channel: GRPCChannel
-  public var defaultCallOptions: CallOptions
+  public var defaultHTTPCallOptions: HTTPCallOptions
 
   /// Creates a client for the fog_ledger.FogMerkleProofAPI service.
   ///
   /// - Parameters:
   ///   - channel: `GRPCChannel` to the service host.
-  ///   - defaultCallOptions: Options to use for each service call if the user doesn't provide them.
+  ///   - defaultHTTPCallOptions: Options to use for each service call if the user doesn't provide them.
   public init(
     channel: GRPCChannel,
-    defaultCallOptions: CallOptions = CallOptions()
+    defaultHTTPCallOptions: HTTPCallOptions = HTTPCallOptions()
   ) {
     self.channel = channel
-    self.defaultCallOptions = defaultCallOptions
+    self.defaultHTTPCallOptions = defaultHTTPCallOptions
   }
 }
 
@@ -116,13 +117,13 @@ public protocol FogLedger_FogKeyImageAPIRestProtocol: HTTPClient {
 
   func auth(
     _ request: Attest_AuthMessage,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Attest_AuthMessage, Attest_AuthMessage>
+    callOptions: HTTPCallOptions?
+  ) -> HTTPUnaryCall<Attest_AuthMessage, Attest_AuthMessage>
 
   func checkKeyImages(
     _ request: Attest_Message,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Attest_Message, Attest_Message>
+    callOptions: HTTPCallOptions?
+  ) -> HTTPUnaryCall<Attest_Message, Attest_Message>
 }
 
 extension FogLedger_FogKeyImageAPIRestProtocol {
@@ -138,12 +139,12 @@ extension FogLedger_FogKeyImageAPIRestProtocol {
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
   public func auth(
     _ request: Attest_AuthMessage,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Attest_AuthMessage, Attest_AuthMessage> {
+    callOptions: HTTPCallOptions? = nil
+  ) -> HTTPUnaryCall<Attest_AuthMessage, Attest_AuthMessage> {
     return self.makeUnaryCall(
       path: "/fog_ledger.FogKeyImageAPI/Auth",
       request: request,
-      callOptions: callOptions ?? self.defaultCallOptions
+      callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
   }
 
@@ -155,12 +156,12 @@ extension FogLedger_FogKeyImageAPIRestProtocol {
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
   public func checkKeyImages(
     _ request: Attest_Message,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Attest_Message, Attest_Message> {
+    callOptions: HTTPCallOptions? = nil
+  ) -> HTTPUnaryCall<Attest_Message, Attest_Message> {
     return self.makeUnaryCall(
       path: "/fog_ledger.FogKeyImageAPI/CheckKeyImages",
       request: request,
-      callOptions: callOptions ?? self.defaultCallOptions
+      callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
   }
 }
@@ -176,19 +177,19 @@ public protocol FogLedger_FogKeyImageAPIInterceptorFactoryProtocol {
 
 public final class FogLedger_FogKeyImageAPI: FogLedger_FogKeyImageAPIRestProtocol {
   public let channel: GRPCChannel
-  public var defaultCallOptions: CallOptions
+  public var defaultHTTPCallOptions: HTTPCallOptions
 
   /// Creates a client for the fog_ledger.FogKeyImageAPI service.
   ///
   /// - Parameters:
   ///   - channel: `GRPCChannel` to the service host.
-  ///   - defaultCallOptions: Options to use for each service call if the user doesn't provide them.
+  ///   - defaultHTTPCallOptions: Options to use for each service call if the user doesn't provide them.
   public init(
     channel: GRPCChannel,
-    defaultCallOptions: CallOptions = CallOptions()
+    defaultHTTPCallOptions: HTTPCallOptions = HTTPCallOptions()
   ) {
     self.channel = channel
-    self.defaultCallOptions = defaultCallOptions
+    self.defaultHTTPCallOptions = defaultHTTPCallOptions
   }
 }
 
@@ -198,8 +199,8 @@ public protocol FogLedger_FogBlockAPIRestProtocol: HTTPClient {
 
   func getBlocks(
     _ request: FogLedger_BlockRequest,
-    callOptions: CallOptions?
-  ) -> UnaryCall<FogLedger_BlockRequest, FogLedger_BlockResponse>
+    callOptions: HTTPCallOptions?
+  ) -> HTTPUnaryCall<FogLedger_BlockRequest, FogLedger_BlockResponse>
 }
 
 extension FogLedger_FogBlockAPIRestProtocol {
@@ -217,12 +218,12 @@ extension FogLedger_FogBlockAPIRestProtocol {
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
   public func getBlocks(
     _ request: FogLedger_BlockRequest,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<FogLedger_BlockRequest, FogLedger_BlockResponse> {
+    callOptions: HTTPCallOptions? = nil
+  ) -> HTTPUnaryCall<FogLedger_BlockRequest, FogLedger_BlockResponse> {
     return self.makeUnaryCall(
       path: "/fog_ledger.FogBlockAPI/GetBlocks",
       request: request,
-      callOptions: callOptions ?? self.defaultCallOptions
+      callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
   }
 }
@@ -235,19 +236,19 @@ public protocol FogLedger_FogBlockAPIInterceptorFactoryProtocol {
 
 public final class FogLedger_FogBlockAPI: FogLedger_FogBlockAPIRestProtocol {
   public let channel: GRPCChannel
-  public var defaultCallOptions: CallOptions
+  public var defaultHTTPCallOptions: HTTPCallOptions
 
   /// Creates a client for the fog_ledger.FogBlockAPI service.
   ///
   /// - Parameters:
   ///   - channel: `GRPCChannel` to the service host.
-  ///   - defaultCallOptions: Options to use for each service call if the user doesn't provide them.
+  ///   - defaultHTTPCallOptions: Options to use for each service call if the user doesn't provide them.
   public init(
     channel: GRPCChannel,
-    defaultCallOptions: CallOptions = CallOptions()
+    defaultHTTPCallOptions: HTTPCallOptions = HTTPCallOptions()
   ) {
     self.channel = channel
-    self.defaultCallOptions = defaultCallOptions
+    self.defaultHTTPCallOptions = defaultHTTPCallOptions
   }
 }
 
@@ -257,8 +258,8 @@ public protocol FogLedger_FogUntrustedTxOutApiClientProtocol: HTTPClient {
 
   func getTxOuts(
     _ request: FogLedger_TxOutRequest,
-    callOptions: CallOptions?
-  ) -> UnaryCall<FogLedger_TxOutRequest, FogLedger_TxOutResponse>
+    callOptions: HTTPCallOptions?
+  ) -> HTTPUnaryCall<FogLedger_TxOutRequest, FogLedger_TxOutResponse>
 }
 
 extension FogLedger_FogUntrustedTxOutApiClientProtocol {
@@ -287,12 +288,12 @@ extension FogLedger_FogUntrustedTxOutApiClientProtocol {
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
   public func getTxOuts(
     _ request: FogLedger_TxOutRequest,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<FogLedger_TxOutRequest, FogLedger_TxOutResponse> {
+    callOptions: HTTPCallOptions? = nil
+  ) -> HTTPUnaryCall<FogLedger_TxOutRequest, FogLedger_TxOutResponse> {
     return self.makeUnaryCall(
       path: "/fog_ledger.FogUntrustedTxOutApi/GetTxOuts",
       request: request,
-      callOptions: callOptions ?? self.defaultCallOptions
+      callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
   }
 }
@@ -305,19 +306,19 @@ public protocol FogLedger_FogUntrustedTxOutApiClientInterceptorFactoryProtocol {
 
 public final class FogLedger_FogUntrustedTxOutApiClient: FogLedger_FogUntrustedTxOutApiClientProtocol {
   public let channel: GRPCChannel
-  public var defaultCallOptions: CallOptions
+  public var defaultHTTPCallOptions: HTTPCallOptions
 
   /// Creates a client for the fog_ledger.FogUntrustedTxOutApi service.
   ///
   /// - Parameters:
   ///   - channel: `GRPCChannel` to the service host.
-  ///   - defaultCallOptions: Options to use for each service call if the user doesn't provide them.
+  ///   - defaultHTTPCallOptions: Options to use for each service call if the user doesn't provide them.
   public init(
     channel: GRPCChannel,
-    defaultCallOptions: CallOptions = CallOptions()
+    defaultHTTPCallOptions: HTTPCallOptions = HTTPCallOptions()
   ) {
     self.channel = channel
-    self.defaultCallOptions = defaultCallOptions
+    self.defaultHTTPCallOptions = defaultHTTPCallOptions
   }
 }
 

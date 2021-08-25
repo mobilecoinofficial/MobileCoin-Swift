@@ -32,18 +32,12 @@ extension ConsensusClient_ConsensusClientAPIRestClientProtocol {
     _ request: Attest_Message,
     callOptions: HTTPCallOptions? = nil
   ) -> HTTPUnaryCall<Attest_Message, ConsensusCommon_ProposeTxResponse> {
-    return self.makeHTTPUnaryCall(
+    return self.makeUnaryCall(
       path: "/consensus_client.ConsensusClientAPIRest/ClientTxPropose",
       request: request,
       callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
   }
-}
-
-public protocol ConsensusClient_ConsensusClientAPIRestClientInterceptorFactoryProtocol {
-
-  /// - Returns: Interceptors to use when invoking 'clientTxPropose'.
-  func makeClientTxProposeInterceptors() -> [ClientInterceptor<Attest_Message, ConsensusCommon_ProposeTxResponse>]
 }
 
 public final class ConsensusClient_ConsensusClientAPIRestClient: ConsensusClient_ConsensusClientAPIRestClientProtocol {
@@ -56,8 +50,7 @@ public final class ConsensusClient_ConsensusClientAPIRestClient: ConsensusClient
   ///   - defaultHTTPCallOptions: Options to use for each service call if the user doesn't provide them.
   ///   - interceptors: A factory providing interceptors for each RPC.
   public init(
-    defaultHTTPCallOptions: HTTPCallOptions = HTTPCallOptions(),
-    interceptors: ConsensusClient_ConsensusClientAPIRestClientInterceptorFactoryProtocol? = nil
+    defaultHTTPCallOptions: HTTPCallOptions = HTTPCallOptions()
   ) {
     self.defaultHTTPCallOptions = defaultHTTPCallOptions
   }
