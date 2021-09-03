@@ -1,33 +1,23 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+//  swiftlint:disable all
 
 import Foundation
 import LibMobileCoin
 
 
-//final class FogBlockHttpConnection: ConnectionProtocol, FogBlockService {
-//    func getBlocks(
-//        request: FogLedger_BlockRequest,
-//        completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
-//    ) {
-//    }
-//
-//    func setAuthorization(credentials: BasicCredentials) {
-//
-//    }
-//}
-
 final class FogBlockHttpConnection: HttpConnection, FogBlockService {
     private let client: FogLedger_FogBlockAPIRestClient
-    private let requester: HTTPRequester
+    private let requester: RestApiRequester
 
     init(
         config: ConnectionConfig<FogUrl>,
+        requester: RestApiRequester,
         targetQueue: DispatchQueue?
     ) {
         self.client = FogLedger_FogBlockAPIRestClient()
-        self.requester = HTTPRequester(baseUrl: config.url.httpBasedUrl, trustRoots: config.trustRoots)
+        self.requester = requester
         super.init(config: config, targetQueue: targetQueue)
     }
 
@@ -42,15 +32,15 @@ final class FogBlockHttpConnection: HttpConnection, FogBlockService {
 extension FogBlockHttpConnection {
     private struct GetBlocksCall: HttpCallable {
         let client: FogLedger_FogBlockAPIRestClient
-        let requester: HTTPRequester
+        let requester: RestApiRequester
 
         func call(
             request: FogLedger_BlockRequest,
             callOptions: HTTPCallOptions?,
             completion: @escaping (HttpCallResult<FogLedger_BlockResponse>) -> Void
         ) {
-            let unaryCall = client.getBlocks(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            let clientCall = client.getBlocks(request, callOptions: callOptions)
+            requester.makeRequest(call: clientCall, completion: completion)
         }
     }
 }

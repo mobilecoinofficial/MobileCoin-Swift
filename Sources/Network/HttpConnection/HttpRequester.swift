@@ -14,7 +14,7 @@ public protocol HttpRequester {
         method: HTTPMethod,
         headers: [String: String]?,
         body: Data?,
-        completion: @escaping (HTTPResult) -> Void)
+        completion: @escaping (Result<HTTPResponse, Error>) -> Void)
 }
 
 public enum HTTPMethod : String {
@@ -39,97 +39,84 @@ public struct HTTPResponse {
     }
 }
 
-public enum HTTPResult {
-    case success(response: HTTPResponse)
-    case failure(error: Error)
-}
-
 // - Add relative path component toe NetworkedMessage and then combine at runtime.
 
-public class HTTPRequester {
-    public static let defaultConfiguration : URLSessionConfiguration = {
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 30
-        config.timeoutIntervalForResource = 30
-        return config
-    }()
-
-    let configuration : URLSessionConfiguration
+public class RestApiRequester {
+    let requester: HttpRequester
     let baseUrl: URL
     let trustRoots: [NIOSSLCertificate]?
     let prefix: String = "gw"
+    var challengeDelegate: URLSessionDelegate?
 
-    public init(baseUrl: URL, trustRoots: [NIOSSLCertificate]?, configuration: URLSessionConfiguration = HTTPRequester.defaultConfiguration) {
-        self.configuration = configuration
+    public init(requester: HttpRequester, baseUrl: URL, trustRoots: [NIOSSLCertificate]? = []) {
+        self.requester = requester
         self.baseUrl = baseUrl
         self.trustRoots = trustRoots
+        self.challengeDelegate = ConnectionSessionTrust(url: baseUrl, trustRoots: trustRoots ?? [])
     }
 }
 
 public protocol Requester {
-//    func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (Result<T.ResponsePayload, Error>) -> Void)
-    func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (Result<HttpCallResult<T.ResponsePayload>, Error>) -> Void)
+    func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void)
 }
 
-extension HTTPRequester : Requester {
-    private func completeURLFromPath(_ path: String) -> URL? {
-        URL(string: path, relativeTo: URL(string: prefix, relativeTo: baseUrl))
+extension RestApiRequester : Requester {
+    private func completeURL(path: String) -> URL? {
+        .prefix(baseUrl, pathComponents:[prefix, path])
     }
     
-//    public func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (Result<HttpCallResult<T.ResponsePayload>, Error>) -> Void) {
-    public func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (Result<HttpCallResult<T.ResponsePayload>, Error>) -> Void) {
-        let session = URLSession(configuration: configuration)
-        
-        guard let url = completeURLFromPath(call.path) else {
-            completion(.failure(InvalidInputError("Invalid URL")))
+    public func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void) {
+        guard let url = completeURL(path: call.path) else {
+            completion(HttpCallResult(status: HTTPStatus(code: 1, message: "could not construct URL")))
             return
         }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = call.method.rawValue
+
+        var request = URLRequest(url: url.absoluteURL)
         request.addProtoHeaders()
+        request.addHeaders(call.options?.headers ?? [:])
 
         do {
-            request.httpBody = try call.requestPayload?.serializedData() ?? Google_Protobuf_Empty().serializedData()
-            logger.debug("MC HTTP Request: \(call.requestPayload?.prettyPrintJSON() ?? "")")
+            request.httpBody = try call.requestPayload?.serializedData()
         } catch let error {
-            logger.debug(error.localizedDescription)
+            completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
         }
 
-        session.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let response = response as? HTTPURLResponse else {
-                completion(.failure(NetworkingError.noResponse))
-                return
-            }
-            
-            guard (200...299).contains(response.statusCode) else {
-                completion(.failure(HTTPResponseStatusCodeError(response.statusCode)))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(NetworkingError.noData))
-                return
-            }
-            
-            do {
-                let responsePayload = try T.ResponsePayload.init(serializedData: data)
-                logger.debug("Resposne Proto as JSON: \((try? responsePayload.jsonString()) ?? "Unable to print JSON")")
+        requester.request(url: url, method: call.method, headers: request.allHTTPHeaderFields, body: request.httpBody) { result in
+            switch result {
+            case .failure(let error):
+                completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
+            case .success(let httpResponse):
+                let response = httpResponse.httpUrlResponse
+
+                logger.info("Http Request url: \(url)")
+                logger.info("Status code: \(response.statusCode)")
                 
-                // let result = HttpCallResult<T.ResponsePayload>(status: HTTPStatus(code: response.statusCode, message: ""), initialMetadata: response, response: responsePayload)
-                let result = HttpCallResult<T.ResponsePayload>(status: HTTPStatus(code: response.statusCode, message: ""), initialMetadata: response, response: responsePayload)
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
+                let responsePayload : T.ResponsePayload? = {
+                    guard let data = httpResponse.responseData,
+                          let responsePayload = try? T.ResponsePayload.init(serializedData: data)
+                    else {
+                        return nil
+                    }
+                    return responsePayload
+                }()
+
+                let result = HttpCallResult(status: HTTPStatus(code: response.statusCode, message: ""), metadata: response, response: responsePayload)
+                completion(result)
             }
-        }.resume()
+        }
     }
     
+}
+
+fileprivate extension URL {
+    static func prefix(_ url: URL, pathComponents: [String]) -> URL? {
+        let prunedComponents = pathComponents.map({ $0.hasPrefix("/") ? String($0.dropFirst()) : $0})
+        var components = URLComponents()
+        components.scheme = url.scheme
+        components.host = url.host
+        components.path = "/" + (url.pathComponents + prunedComponents).joined(separator: "/")
+        return components.url
+    }
 }
 
 fileprivate extension URLRequest {
@@ -139,6 +126,12 @@ fileprivate extension URLRequest {
         
         let accept = HTTPHeadersConstants.ACCEPT_PROTOBUF
         self.addValue(accept.value, forHTTPHeaderField: accept.fieldName)
+    }
+    
+    mutating func addHeaders(_ headers: [String:String]) {
+        headers.forEach { headerFieldName, value in
+            self.setValue(value, forHTTPHeaderField: headerFieldName)
+        }
     }
 }
 
@@ -163,6 +156,7 @@ public enum HTTPResponseStatusCodeError : Error {
     case unauthorized
     case badRequest
     case forbidden
+    case notFound
     case unprocessableEntity
     case internalServerError
     case invalidResponseFromExternal
@@ -174,6 +168,7 @@ public enum HTTPResponseStatusCodeError : Error {
         case 400: self = .badRequest
         case 401: self = .unauthorized
         case 403: self = .forbidden
+        case 404: self = .notFound
         case 422: self = .unprocessableEntity
         case 500: self = .internalServerError
         case 502: self = .invalidResponseFromExternal
@@ -186,6 +181,7 @@ public enum HTTPResponseStatusCodeError : Error {
         case .badRequest: return 400
         case .unauthorized: return 401
         case .forbidden: return 403
+        case .notFound: return 404
         case .unprocessableEntity: return 422
         case .internalServerError: return 500
         case .invalidResponseFromExternal: return 502
@@ -195,11 +191,16 @@ public enum HTTPResponseStatusCodeError : Error {
 }
 
 extension HTTPResponseStatusCodeError : CustomStringConvertible {
+    public var localizedDescription: String {
+        return description
+    }
+    
     public var description: String {
         switch self {
         case .badRequest: return "The request is malformed (ex. missing or incorrect parameters)"
         case .unauthorized: return "Failed to provide proper authentication with the request."
         case .forbidden: return "The action in the request is not allowed."
+        case .notFound: return "Not Found"
         case .unprocessableEntity: return "The server understands the content type of the request entity, and the syntax of the request entity is correct, but it was unable to process the contained instructions."
         case .internalServerError: return "Unhandled exception from one of the other services: the Database, FTX, or the Full Service Wallet."
         case .invalidResponseFromExternal: return "The server was acting as a gateway or proxy and received an invalid response from the upstream server (ie. one of the other services: the Database, FTX, or the Full Service Wallet.)"
@@ -238,3 +239,41 @@ extension NetworkingError: CustomStringConvertible {
         }
     }
 }
+
+//public class MyURLSessionDelegate: NSObject, URLSessionDelegate {
+//    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+//        // `NSURLAuthenticationMethodClientCertificate`
+//        // indicates the server requested a client certificate.
+//        if challenge.protectionSpace.authenticationMethod
+//             != NSURLAuthenticationMethodClientCertificate {
+//                completionHandler(.performDefaultHandling, nil)
+//                return
+//        }
+//
+//        guard let file = Bundle(for: HTTPAccessURLSessionDelegate.self).url(forResource: p12Filename, withExtension: "p12"),
+//              let p12Data = try? Data(contentsOf: file) else {
+//            // Loading of the p12 file's data failed.
+//            completionHandler(.performDefaultHandling, nil)
+//            return
+//        }
+//
+//        // Interpret the data in the P12 data blob with
+//        // a little helper class called `PKCS12`.
+//        let password = "MyP12Password" // Obviously this should be stored or entered more securely.
+//        let p12Contents = PKCS12(pkcs12Data: p12Data, password: password)
+//        guard let identity = p12Contents.identity else {
+//            // Creating a PKCS12 never fails, but interpretting th contained data can. So again, no identity? We fall back to default.
+//            completionHandler(.performDefaultHandling, nil)
+//            return
+//        }
+//
+//        // In my case, and as Apple recommends,
+//        // we do not pass the certificate chain into
+//        // the URLCredential used to respond to the challenge.
+//        let credential = URLCredential(identity: identity,
+//                                   certificates: nil,
+//                                    persistence: .none)
+//        challenge.sender?.use(credential, for: challenge)
+//        completionHandler(.useCredential, credential)
+//    }
+//}

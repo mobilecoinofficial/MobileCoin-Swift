@@ -18,16 +18,18 @@ final class DefaultServiceProvider: ServiceProvider {
     init(networkConfig: NetworkConfig, targetQueue: DispatchQueue?) {
         let channelManager = GrpcChannelManager()
 
-        let inner = Inner(channelManager: channelManager, targetQueue: targetQueue)
+        let inner = Inner(channelManager: channelManager, httpRequester: networkConfig.httpRequester, targetQueue: targetQueue)
         self.inner = .init(inner, targetQueue: targetQueue)
 
         self.consensus = ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.blockchain = BlockchainConnection(
             config: networkConfig.blockchain,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.view = FogViewConnection(
             config: networkConfig.fogView,
@@ -37,18 +39,22 @@ final class DefaultServiceProvider: ServiceProvider {
         self.merkleProof = FogMerkleProofConnection(
             config: networkConfig.fogMerkleProof,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.keyImage = FogKeyImageConnection(
             config: networkConfig.fogKeyImage,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.block = FogBlockConnection(
             config: networkConfig.fogBlock,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.untrustedTxOut = FogUntrustedTxOutConnection(
             config: networkConfig.fogUntrustedTxOut,
             channelManager: channelManager,
+            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
     }
 
@@ -94,16 +100,19 @@ final class DefaultServiceProvider: ServiceProvider {
     }
 }
 
+// TODO
 extension DefaultServiceProvider {
     private struct Inner {
         private let targetQueue: DispatchQueue?
         private let channelManager: GrpcChannelManager
+        private let httpRequester: HttpRequester?
 
         private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
         private(set) var transportProtocolOption: TransportProtocol.Option
 
-        init(channelManager: GrpcChannelManager, targetQueue: DispatchQueue?) {
+        init(channelManager: GrpcChannelManager, httpRequester: HttpRequester?, targetQueue: DispatchQueue?) {
             self.targetQueue = targetQueue
+            self.httpRequester = httpRequester
             self.channelManager = channelManager
             self.transportProtocolOption = TransportProtocol.grpc.option
         }
@@ -115,6 +124,7 @@ extension DefaultServiceProvider {
                     url: fogReportUrl,
                     transportProtocolOption: transportProtocolOption,
                     channelManager: channelManager,
+                    httpRequester: httpRequester,
                     targetQueue: targetQueue)
                 reportUrlToReportConnection[config] = reportConnection
                 return reportConnection

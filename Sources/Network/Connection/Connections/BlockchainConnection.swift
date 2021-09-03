@@ -17,6 +17,7 @@ final class BlockchainConnection:
     init(
         config: ConnectionConfig<ConsensusUrl>,
         channelManager: GrpcChannelManager,
+        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?
     ) {
         self.config = config
@@ -33,7 +34,13 @@ final class BlockchainConnection:
                             channelManager: channelManager,
                             targetQueue: targetQueue))
                 case .http:
-                    return .http(httpService: BlockchainHttpConnection(config: config, targetQueue: targetQueue))
+                    guard let requester = httpRequester else {
+                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
+                    }
+                    return .http(httpService: BlockchainHttpConnection(
+                                    config: config,
+                                    requester: RestApiRequester(requester: requester, baseUrl:config.url.httpBasedUrl),
+                                    targetQueue: targetQueue))
                 }
             },
             transportProtocolOption: config.transportProtocolOption,

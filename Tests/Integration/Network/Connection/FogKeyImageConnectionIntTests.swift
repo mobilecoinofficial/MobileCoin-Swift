@@ -121,6 +121,7 @@ extension FogKeyImageConnectionIntTests {
         FogKeyImageConnection(
             config: networkConfig.fogKeyImage,
             channelManager: GrpcChannelManager(),
+            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

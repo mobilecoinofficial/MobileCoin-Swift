@@ -28,7 +28,7 @@ public protocol ConsensusCommon_BlockchainAPIRestClientProtocol: HTTPClient {
 
 extension ConsensusCommon_BlockchainAPIRestClientProtocol {
   public var serviceName: String {
-    return "consensus_common.BlockchainAPIRest"
+    return "consensus_common.BlockchainAPI"
   }
 
   /// Unary call to GetLastBlockInfo
@@ -42,7 +42,7 @@ extension ConsensusCommon_BlockchainAPIRestClientProtocol {
     callOptions: HTTPCallOptions? = nil
   ) ->HTTPUnaryCall<SwiftProtobuf.Google_Protobuf_Empty, ConsensusCommon_LastBlockInfoResponse> {
     return self.makeUnaryCall(
-      path: "/consensus_common.BlockchainAPIRest/GetLastBlockInfo",
+      path: "/consensus_common.BlockchainAPI/GetLastBlockInfo",
       request: request,
       callOptions: callOptions ?? self.defaultHTTPCallOptions
     )
@@ -59,7 +59,7 @@ extension ConsensusCommon_BlockchainAPIRestClientProtocol {
     callOptions: HTTPCallOptions? = nil
   ) ->HTTPUnaryCall<ConsensusCommon_BlocksRequest, ConsensusCommon_BlocksResponse> {
     return self.makeUnaryCall(
-      path: "/consensus_common.BlockchainAPIRest/GetBlocks",
+      path: "/consensus_common.BlockchainAPI/GetBlocks",
       request: request,
       callOptions: callOptions ?? self.defaultHTTPCallOptions
     )

@@ -23,7 +23,7 @@ public struct HTTPUnaryCall<RequestPayload:SwiftProtobuf.Message, ResponsePayloa
     public func cancel() { }
 
     /// The initial metadata returned from the server.
-    public var initialMetadata: HTTPURLResponse? = nil
+    public var metadata: HTTPURLResponse? = nil
 
     /// The request message sent to the server
     public var requestPayload: RequestPayload?

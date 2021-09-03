@@ -17,6 +17,7 @@ final class FogUntrustedTxOutConnection:
     init(
         config: ConnectionConfig<FogUrl>,
         channelManager: GrpcChannelManager,
+        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?
     ) {
         self.config = config
@@ -33,7 +34,13 @@ final class FogUntrustedTxOutConnection:
                             channelManager: channelManager,
                             targetQueue: targetQueue))
                 case .http:
-                    return .http(httpService: FogUntrustedTxOutHttpConnection())
+                    guard let requester = httpRequester else {
+                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
+                    }
+                    return .http(httpService: FogUntrustedTxOutHttpConnection(
+                                    config: config,
+                                    requester: RestApiRequester(requester: requester, baseUrl:config.url.httpBasedUrl),
+                                    targetQueue: targetQueue))
                 }
             },
             transportProtocolOption: config.transportProtocolOption,

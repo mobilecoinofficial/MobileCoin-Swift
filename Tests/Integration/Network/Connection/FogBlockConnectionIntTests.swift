@@ -156,6 +156,7 @@ extension FogBlockConnectionIntTests {
         FogBlockConnection(
             config: networkConfig.fogBlock,
             channelManager: GrpcChannelManager(),
+            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

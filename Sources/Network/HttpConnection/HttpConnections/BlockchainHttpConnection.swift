@@ -8,14 +8,15 @@ import SwiftProtobuf
 
 final class BlockchainHttpConnection: HttpConnection, BlockchainService {
     private let client: ConsensusCommon_BlockchainAPIRestClient
-    private let requester: HTTPRequester
+    private let requester: RestApiRequester
 
     init(
         config: ConnectionConfig<ConsensusUrl>,
+        requester: RestApiRequester,
         targetQueue: DispatchQueue?
     ) {
         self.client = ConsensusCommon_BlockchainAPIRestClient()
-        self.requester = HTTPRequester(baseUrl: config.url.httpBasedUrl, trustRoots: config.trustRoots)
+        self.requester = requester
         super.init(config: config, targetQueue: targetQueue)
     }
 
@@ -30,7 +31,7 @@ final class BlockchainHttpConnection: HttpConnection, BlockchainService {
 extension BlockchainHttpConnection {
     private struct GetLastBlockInfoCall: HttpCallable {
         let client: ConsensusCommon_BlockchainAPIRestClient
-        let requester: HTTPRequester
+        let requester: RestApiRequester
 
         func call(
             request: (),
@@ -38,17 +39,7 @@ extension BlockchainHttpConnection {
             completion: @escaping (HttpCallResult<ConsensusCommon_LastBlockInfoResponse>) -> Void
         ) {
             let clientCall = client.getLastBlockInfo(Google_Protobuf_Empty())
-            requester.makeRequest(call: clientCall) { result in
-                switch result {
-                case .success(let callResult):
-                    completion(callResult)
-                case .failure(let error):
-                    logger.error(error.localizedDescription)
-                }
-            }
-//            let unaryCall =
-//                client.getLastBlockInfo(Google_Protobuf_Empty(), callOptions: callOptions)
-//            unaryCall.callResult.whenSuccess(completion)
+            requester.makeRequest(call: clientCall, completion: completion)
         }
     }
 }

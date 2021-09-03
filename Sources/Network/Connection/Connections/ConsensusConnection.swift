@@ -18,6 +18,7 @@ final class ConsensusConnection:
     init(
         config: AttestedConnectionConfig<ConsensusUrl>,
         channelManager: GrpcChannelManager,
+        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
@@ -40,7 +41,15 @@ final class ConsensusConnection:
                             rng: rng,
                             rngContext: rngContext))
                 case .http:
-                    return .http(httpService: ConsensusHttpConnection())
+                    guard let requester = httpRequester else {
+                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
+                    }
+                    return .http(httpService: ConsensusHttpConnection(
+                                    config: config,
+                                    requester: RestApiRequester(requester: requester, baseUrl:config.url.httpBasedUrl),
+                                    targetQueue: targetQueue,
+                                    rng: rng,
+                                    rngContext: rngContext))
                 }
             },
             transportProtocolOption: config.transportProtocolOption,

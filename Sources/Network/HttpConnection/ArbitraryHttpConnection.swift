@@ -4,18 +4,13 @@
 
 import Foundation
 
-class HttpConnection: ConnectionProtocol {
+
+class ArbitraryHttpConnection {
     private let inner: SerialDispatchLock<Inner>
 
-    init(config: ConnectionConfigProtocol, targetQueue: DispatchQueue?) {
-        let inner = Inner(config: config)
+    init(url: MobileCoinUrlProtocol, targetQueue: DispatchQueue?) {
+        let inner = Inner(url: url)
         self.inner = .init(inner, targetQueue: targetQueue)
-    }
-
-    func setAuthorization(credentials: BasicCredentials) {
-        inner.accessAsync {
-            $0.setAuthorization(credentials: credentials)
-        }
     }
 
     func performCall<Call: HttpCallable>(
@@ -43,34 +38,23 @@ class HttpConnection: ConnectionProtocol {
                 completion(result)
             }
         }
-
         inner.accessAsync {
             logger.info("Performing call... url: \($0.url)", logFunction: false)
 
-            call.call(request: request, callOptions: $0.requestCallOptions(), completion: performCallCallback)
+            let callOptions = $0.requestCallOptions()
+            call.call(request: request, callOptions: callOptions, completion: performCallCallback)
         }
-    }
-
-    func performCall<Call: HttpCallable>(
-        _ call: Call,
-        completion: @escaping (Result<Call.Response, ConnectionError>) -> Void
-    ) where Call.Request == () {
-        performCall(call, request: (), completion: completion)
     }
 }
 
-extension HttpConnection {
+extension ArbitraryHttpConnection {
     private struct Inner {
         let url: MobileCoinUrlProtocol
         private let session: ConnectionSession
 
-        init(config: ConnectionConfigProtocol) {
-            self.url = config.url
-            self.session = ConnectionSession(config: config)
-        }
-
-        func setAuthorization(credentials: BasicCredentials) {
-            session.authorizationCredentials = credentials
+        init(url: MobileCoinUrlProtocol) {
+            self.url = url
+            self.session = ConnectionSession(url: url)
         }
 
         func requestCallOptions() -> HTTPCallOptions {
@@ -81,12 +65,8 @@ extension HttpConnection {
         func processResponse<Response>(callResult: HttpCallResult<Response>)
             -> Result<Response, ConnectionError>
         {
-            guard [403, 401].contains(callResult.status.code) == false else {
-                return .failure(.authorizationFailure("url: \(url)"))
-            }
-
             guard callResult.status.isOk, let response = callResult.response else {
-                return .failure(.connectionFailure("url: \(url), status: \(callResult.status)"))
+                return .failure(.connectionFailure(String(describing: callResult.status)))
             }
 
             if let metadata = callResult.metadata {

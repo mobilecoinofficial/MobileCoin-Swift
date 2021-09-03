@@ -62,6 +62,7 @@ extension FogUntrustedTxOutConnectionIntTests {
         FogUntrustedTxOutConnection(
             config: networkConfig.fogUntrustedTxOut,
             channelManager: GrpcChannelManager(),
+            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

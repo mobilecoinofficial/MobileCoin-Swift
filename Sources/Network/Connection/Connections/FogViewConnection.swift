@@ -10,7 +10,7 @@ final class FogViewConnection:
     Connection<FogViewGrpcConnection, FogViewHttpConnection>, FogViewService
 {
     private let config: AttestedConnectionConfig<FogUrl>
-    //    private let channelManager: GrpcChannelManager
+    private let channelManager: GrpcChannelManager
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
     private let rngContext: Any?
@@ -24,7 +24,7 @@ final class FogViewConnection:
         rngContext: Any? = nil
     ) {
         self.config = config
-        //        self.channelManager = channelManager
+        self.channelManager = channelManager
         self.targetQueue = targetQueue
         self.rng = rng
         self.rngContext = rngContext
@@ -40,13 +40,13 @@ final class FogViewConnection:
                             rng: rng,
                             rngContext: rngContext))
                 case .http:
-                    let httpClientWrapper = HttpClientWrapper(
-                        config: config,
-                        httpRequester: httpRequester)
+                    guard let requester = httpRequester else {
+                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
+                    }
                     return .http(
                         httpService: FogViewHttpConnection(
                             config: config,
-                            client: httpClientWrapper,
+                            requester: RestApiRequester(requester: requester, baseUrl:config.url.httpBasedUrl),
                             targetQueue: targetQueue,
                             rng: rng,
                             rngContext: rngContext))

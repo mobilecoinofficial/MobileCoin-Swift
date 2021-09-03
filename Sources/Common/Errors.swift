@@ -142,6 +142,7 @@ public enum TransactionSubmissionError: Error {
     case invalidTransaction(String = String())
     case feeError(String = String())
     case tombstoneBlockTooFar(String = String())
+    case missingMemo(String = String())
     case inputsAlreadySpent(String = String())
 }
 
@@ -151,6 +152,8 @@ extension TransactionSubmissionError: CustomStringConvertible {
             switch self {
             case .connectionError(let connectionError):
                 return "\(connectionError)"
+            case .missingMemo(let reason):
+                return "Missing memo error\(!reason.isEmpty ? ": \(reason)" : "")"
             case .feeError(let reason):
                 return "Fee error\(!reason.isEmpty ? ": \(reason)" : "")"
             case .invalidTransaction(let reason):

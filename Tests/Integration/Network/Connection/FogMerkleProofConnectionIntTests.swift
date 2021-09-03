@@ -160,6 +160,7 @@ extension FogMerkleProofConnectionIntTests {
         FogMerkleProofConnection(
             config: networkConfig.fogMerkleProof,
             channelManager: GrpcChannelManager(),
+            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

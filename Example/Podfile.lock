@@ -18,42 +18,42 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.6.0)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin (1.1.0):
-    - gRPC-Swift (~> 1.0.0)
+  - LibMobileCoin (1.1.1):
+    - gRPC-Swift (~> 1.0)
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (1.1.0):
-    - MobileCoin/Core (= 1.1.0)
-  - MobileCoin/Core (1.1.0):
+  - MobileCoin (1.1.1):
+    - MobileCoin/Core (= 1.1.1)
+  - MobileCoin/Core (1.1.1):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1)
+    - LibMobileCoin (~> 1.1.1)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.22)
     - SwiftNIOHPACK (~> 1.16)
     - SwiftNIOHTTP1 (~> 2.18)
     - SwiftProtobuf (~> 1.5)
-  - MobileCoin/Core/IntegrationTests (1.1.0):
+  - MobileCoin/Core/IntegrationTests (1.1.1):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1)
+    - LibMobileCoin (~> 1.1.1)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.22)
     - SwiftNIOHPACK (~> 1.16)
     - SwiftNIOHTTP1 (~> 2.18)
     - SwiftProtobuf (~> 1.5)
-  - MobileCoin/Core/PerformanceTests (1.1.0):
+  - MobileCoin/Core/PerformanceTests (1.1.1):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1)
+    - LibMobileCoin (~> 1.1.1)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.22)
     - SwiftNIOHPACK (~> 1.16)
     - SwiftNIOHTTP1 (~> 2.18)
     - SwiftProtobuf (~> 1.5)
-  - MobileCoin/Core/Tests (1.1.0):
+  - MobileCoin/Core/Tests (1.1.1):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1)
+    - LibMobileCoin (~> 1.1.1)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.22)
@@ -157,9 +157,9 @@ SPEC CHECKSUMS:
   CNIOWindows: f2baa102255e986467578337ffa2f777cb6bdf7f
   gRPC-Swift: 77154009a019e97f8c4bd8f2bb75fe9726801157
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: b6f5200b484ceac10bf988a42c1168e1d443bacc
+  LibMobileCoin: 5a070cacfba08e9a1dec3462c9b632785d0ed0a4
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: c59b70afc472ffab517ffebae90a7cfc8a28259c
+  MobileCoin: d9d636ae8ebe8aef9ddc44107c615f5bb19bf5de
   SwiftLint: 99f82d07b837b942dd563c668de129a03fc3fb52
   SwiftNIO: 81d33ce8c500b7e41b6cdde5f2f12330b9750219
   SwiftNIOConcurrencyHelpers: 23fc68bac541a465162d7225d2c743edd2f1012c
@@ -173,6 +173,6 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 896c9a4ac98698d32aa2feea7657ade219ae80bb
   SwiftProtobuf: 3320217e9d8fb75f36b40282e78c482640fd75dd
 
-PODFILE CHECKSUM: a0d081de36bb0e26c2f240e65e5e63f9f111ec19
+PODFILE CHECKSUM: 21810a12546c9ea22d94f5e3fe7d63c8dc089fcf
 
 COCOAPODS: 1.9.3

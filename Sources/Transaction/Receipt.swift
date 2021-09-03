@@ -64,7 +64,9 @@ public struct Receipt {
     }
 
     func matchesTxOut(_ txOut: TxOutProtocol) -> Bool {
-        txOutPublicKeyTyped == txOut.publicKey
+        logger.debug("self.commitment: \n\n\(commitment.hexEncodedString(options: Data32.HexEncodingOptions.upperCase))\n")
+        logger.debug("txOut: \n\n\(txOut.commitment.hexEncodedString(options: Data32.HexEncodingOptions.upperCase))\n")
+        return txOutPublicKeyTyped == txOut.publicKey
             && commitment == txOut.commitment
             && maskedValue == txOut.maskedValue
     }
@@ -78,7 +80,6 @@ public struct Receipt {
 
     func unmaskValue(accountKey: AccountKey) -> Result<UInt64, InvalidInputError> {
         guard let value = TxOutUtils.value(
-            commitment: commitment,
             maskedValue: maskedValue,
             publicKey: txOutPublicKeyTyped,
             viewPrivateKey: accountKey.viewPrivateKey)
@@ -103,7 +104,6 @@ public struct Receipt {
         }
 
         guard let value = TxOutUtils.value(
-                commitment: commitment,
                 maskedValue: maskedValue,
                 publicKey: txOutPublicKeyTyped,
                 viewPrivateKey: accountKey.viewPrivateKey)
@@ -162,5 +162,30 @@ extension External_Receipt {
         self.amount.maskedValue = receipt.maskedValue
         self.confirmation = External_TxOutConfirmationNumber(receipt.confirmationNumber)
         self.tombstoneBlock = receipt.txTombstoneBlockIndex
+    }
+}
+
+
+extension Data32 {
+    struct HexEncodingOptions: OptionSet {
+        let rawValue: Int
+        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
+    }
+
+    func hexEncodedString(options: HexEncodingOptions = []) -> String {
+        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
+        return self.map { String(format: format, $0) }.joined()
+    }
+}
+
+extension Data {
+    struct HexEncodingOptions: OptionSet {
+        let rawValue: Int
+        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
+    }
+
+    func hexEncodedString(options: HexEncodingOptions = []) -> String {
+        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
+        return self.map { String(format: format, $0) }.joined()
     }
 }

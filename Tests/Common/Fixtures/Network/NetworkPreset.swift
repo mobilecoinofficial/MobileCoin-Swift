@@ -108,7 +108,7 @@ extension NetworkPreset {
             return "mc://node1.test.mobilecoin.com"
 
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
-            return "mc://consensus.\(self).mobilecoin.com"
+            return "mc://node1.\(self).mobilecoin.com"
         }
     }
     var fogUrl: String {
@@ -133,13 +133,13 @@ extension NetworkPreset {
         "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
 
     private static let testNetConsensusMrEnclaveHex =
-        "9268c3220a5260e51e4b586f00e4677fed2b80380f1eeaf775af60f8e880fde8"
+        "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
     private static let testNetFogViewMrEnclaveHex =
-        "4e598799faa4bb08a3bd55c0bcda7e1d22e41151d0c591f6c2a48b3562b0881e"
+        "e154f108c7758b5aa7161c3824c176f0c20f63012463bf3cc5651e678f02fb9e"
     private static let testNetFogLedgerMrEnclaveHex =
-        "7330c9987f21b91313b39dcdeaa7da8da5ca101c929f5740c207742c762e6dcd"
+        "768f7bea6171fb83d775ee8485e4b5fcebf5f664ca7e8b9ceef9c7c21e9d9bf3"
     private static let testNetFogReportMrEnclaveHex =
-        "185875464ccd67a879d58181055383505a719b364b12d56d9bef90a40bed07ca"
+        "a4764346f91979b4906d4ce26102228efe3aba39216dec1e7d22e6b06f919f11"
 
     private static let devMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
@@ -309,26 +309,40 @@ extension NetworkPreset {
 }
 
 final class TestHttpRequester: HttpRequester {
+    let configuration : URLSessionConfiguration = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 30
+        return config
+    }()
+    
     func request(
         url: URL,
         method: HTTPMethod,
         headers: [String: String]?,
         body: Data?,
-        completion: @escaping (HTTPResult) -> Void
+        completion: @escaping (Result<HTTPResponse, Error>) -> Void
     ) {
-        let task = URLSession.shared.dataTask(with: url) {data, response, error in
+        var request = URLRequest(url: url.absoluteURL)
+        request.httpMethod = method.rawValue
+        headers?.forEach({ key, value in
+            request.setValue(value, forHTTPHeaderField: key)
+        })
+
+        request.httpBody = body
+
+        let session = URLSession(configuration: configuration)
+        let task = session.dataTask(with: request) {data, response, error in
             if let error = error {
-                completion(.failure(error: error))
+                completion(.failure(error))
                 return
             }
-            guard let response = response as? HTTPURLResponse,
-            (200...299).contains(response.statusCode) else {
-                completion(.failure(error: ConnectionError.invalidServerResponse("")))
+            guard let response = response as? HTTPURLResponse else {
+                completion(.failure(ConnectionError.invalidServerResponse("No Response")))
                 return
             }
             let httpResponse = HTTPResponse(httpUrlResponse: response, responseData: data)
-            completion(.success(response: httpResponse))
-
+            completion(.success(httpResponse))
         }
         task.resume()
     }

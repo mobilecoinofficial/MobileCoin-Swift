@@ -17,6 +17,21 @@ struct LedgerTxOut: TxOutProtocol {
     }
 
     var commitment: Data32 { txOut.commitment }
+    
+    /*
+     public static RistrettoPublic getSharedSecret(
+         @NonNull RistrettoPrivate viewPrivateKey,
+         @NonNull RistrettoPublic txOutPublicKey
+     ) throws TransactionBuilderException {
+       Logger.i(TAG, "Retrieving shared secret", null, "txOut public:", txOutPublicKey);
+       try {
+         long rustObj = get_shared_secret(viewPrivateKey, txOutPublicKey);
+         return RistrettoPublic.fromJNI(rustObj);
+       } catch(Exception ex) {
+         throw new TransactionBuilderException(ex.getLocalizedMessage(), ex);
+       }
+     }
+     */
     var maskedValue: UInt64 { txOut.maskedValue }
     var targetKey: RistrettoPublic { txOut.targetKey }
     var publicKey: RistrettoPublic { txOut.publicKey }
@@ -30,8 +45,8 @@ extension LedgerTxOut: Equatable {}
 extension LedgerTxOut: Hashable {}
 
 extension LedgerTxOut {
-    init?(_ txOutRecord: FogView_TxOutRecord) {
-        guard let partialTxOut = PartialTxOut(txOutRecord) else {
+    init?(_ txOutRecord: FogView_TxOutRecord, viewKey: RistrettoPrivate) {
+        guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else {
             return nil
         }
         let globalIndex = txOutRecord.txOutGlobalIndex

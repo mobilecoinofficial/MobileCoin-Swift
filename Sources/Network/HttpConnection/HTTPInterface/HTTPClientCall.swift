@@ -31,7 +31,7 @@ public protocol HTTPClientCall {
     var options: HTTPCallOptions? { get }
     
     /// Initial response metadata.
-    var initialMetadata: HTTPURLResponse? { get }
+    var metadata: HTTPURLResponse? { get }
     
     /// Status of this call which may be populated by the server or client.
     ///
@@ -49,21 +49,3 @@ public protocol HTTPClientCall {
     /// succeeded, if not already succeeded).
     func cancel()
 }
-
-//public struct HTTPRestCall<RequestPayload, ResponsePayload> : HTTPClientCall {
-//
-//    /// The options used in the URLSession
-//    public var options: HTTP.CallOptions?
-//
-//    /// Cancel this session if it hasn't already completed.
-//    public func cancel() {
-//
-//    }
-//
-//    /// The initial metadata returned from the server.
-//    public var initialMetadata: HTTPURLResponse?
-//
-//    /// The final status of the the session.
-//    public var status: HTTPStatus?
-//}
-//
