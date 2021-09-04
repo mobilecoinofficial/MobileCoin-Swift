@@ -32,10 +32,10 @@ Pod::Spec.new do |s|
 
     subspec.dependency "gRPC-Swift", "~> 1.3"
     subspec.dependency "Logging", "~> 1.4"
-    subspec.dependency "SwiftNIO", "~> 2.28"
-    subspec.dependency "SwiftNIOHPACK", "~> 1.16"
-    subspec.dependency "SwiftNIOHTTP1", "~> 2.18"
-    subspec.dependency "SwiftProtobuf", "~> 1.5"
+    subspec.dependency "SwiftNIO"
+    subspec.dependency "SwiftNIOHPACK"
+    subspec.dependency "SwiftNIOHTTP1"
+    subspec.dependency "SwiftProtobuf"
 
     subspec.test_spec do |test_spec|
       test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
