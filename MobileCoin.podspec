@@ -78,8 +78,6 @@ Pod::Spec.new do |s|
     "SUPPORTS_MACCATALYST" => "NO",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit
     # architectures or for arm64 iphonesimulator.
-    "VALID_ARCHS[sdk=iphoneos*]" => "arm64",
-    "VALID_ARCHS[sdk=iphonesimulator*]" => "x86_64",
   }
 
   unless ENV["MC_ENABLE_WARN_LONG_COMPILE_TIMES"].nil?

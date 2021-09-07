@@ -31,9 +31,9 @@ target 'Example' do
   # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
   # pod 'LibMobileCoin', git: 'https://github.com/mobilecoinofficial/libmobilecoin-ios-artifacts.git'
 
-  pod 'gRPC-Swift', binary: true
-  pod 'SwiftProtobuf', binary: true
-  pod 'SwiftLint', binary: true
+  pod 'gRPC-Swift'
+  pod 'SwiftProtobuf'
+  pod 'SwiftLint'
 end
 
 post_install do |installer|
