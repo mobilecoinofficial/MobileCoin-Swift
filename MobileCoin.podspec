@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
     subspec.dependency "LibMobileCoin", "~> 1.1.1"
 
-    subspec.dependency "gRPC-Swift", "~> 1.3"
+    subspec.dependency "gRPC-Swift", "~> 1.0"
     subspec.dependency "Logging", "~> 1.4"
     subspec.dependency "SwiftNIO"
     subspec.dependency "SwiftNIOHPACK"
