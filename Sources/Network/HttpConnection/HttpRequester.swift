@@ -17,19 +17,6 @@ public protocol HttpRequester {
         completion: @escaping (Result<HTTPResponse, Error>) -> Void)
 }
 
-public struct HTTPResponse {
-    public let httpUrlResponse: HTTPURLResponse
-    public let responseData: Data?
-
-    public var statusCode: Int {
-        httpUrlResponse.statusCode
-    }
-
-    public var allHeaderFields: [AnyHashable: Any] {
-        httpUrlResponse.allHeaderFields
-    }
-}
-
 public class RestApiRequester {
     let requester: HttpRequester
     let baseUrl: URL
@@ -109,121 +96,16 @@ fileprivate extension URL {
 
 fileprivate extension URLRequest {
     mutating func addProtoHeaders() {
-        let contentType = HTTPHeadersConstants.CONTENT_TYPE_PROTOBUF
+        let contentType = (fieldName:"Content-Type", value:"application/x-protobuf")
         self.setValue(contentType.value, forHTTPHeaderField: contentType.fieldName)
         
-        let accept = HTTPHeadersConstants.ACCEPT_PROTOBUF
+        let accept = (fieldName:"Accept", value:"application/x-protobuf")
         self.addValue(accept.value, forHTTPHeaderField: accept.fieldName)
     }
     
     mutating func addHeaders(_ headers: [String:String]) {
         headers.forEach { headerFieldName, value in
             self.setValue(value, forHTTPHeaderField: headerFieldName)
-        }
-    }
-}
-
-struct HTTPHeadersConstants {
-    static var ACCEPT_PROTOBUF = (fieldName:"Accept", value:"application/x-protobuf")
-    static var CONTENT_TYPE_PROTOBUF = (fieldName:"Content-Type", value:"application/x-protobuf")
-}
-
-extension Message {
-    func prettyPrintJSON() -> String {
-        guard let jsonData = try? self.jsonUTF8Data(),
-              let data = try? JSONSerialization.jsonObject(with: jsonData, options: []),
-              let object = try? JSONSerialization.data(withJSONObject: data, options: [.prettyPrinted]),
-              let prettyPrintedString = String(data: object, encoding: String.Encoding.utf8) else {
-              return "Unable to pretty print json"
-        }
-        return prettyPrintedString
-    }
-}
-
-public enum HTTPResponseStatusCodeError : Error {
-    case unauthorized
-    case badRequest
-    case forbidden
-    case notFound
-    case unprocessableEntity
-    case internalServerError
-    case invalidResponseFromExternal
-    case unknown(Int)
-    
-    // TODO add other HTTP errors here
-    init(_ code: Int) {
-        switch code {
-        case 400: self = .badRequest
-        case 401: self = .unauthorized
-        case 403: self = .forbidden
-        case 404: self = .notFound
-        case 422: self = .unprocessableEntity
-        case 500: self = .internalServerError
-        case 502: self = .invalidResponseFromExternal
-        default: self = .unknown(code)
-        }
-    }
-    
-    var value : Int? {
-        switch self {
-        case .badRequest: return 400
-        case .unauthorized: return 401
-        case .forbidden: return 403
-        case .notFound: return 404
-        case .unprocessableEntity: return 422
-        case .internalServerError: return 500
-        case .invalidResponseFromExternal: return 502
-        default: return nil
-        }
-    }
-}
-
-extension HTTPResponseStatusCodeError : CustomStringConvertible {
-    public var localizedDescription: String {
-        return description
-    }
-    
-    public var description: String {
-        switch self {
-        case .badRequest: return "The request is malformed (ex. missing or incorrect parameters)"
-        case .unauthorized: return "Failed to provide proper authentication with the request."
-        case .forbidden: return "The action in the request is not allowed."
-        case .notFound: return "Not Found"
-        case .unprocessableEntity: return "The server understands the content type of the request entity, and the syntax of the request entity is correct, but it was unable to process the contained instructions."
-        case .internalServerError: return "Unhandled exception from one of the other services: the Database, FTX, or the Full Service Wallet."
-        case .invalidResponseFromExternal: return "The server was acting as a gateway or proxy and received an invalid response from the upstream server (ie. one of the other services: the Database, FTX, or the Full Service Wallet.)"
-        case .unknown(let code): return "HTTP Response code \(code)"
-        }
-    }
-}
-
-extension HTTPResponseStatusCodeError : Equatable {
-    public static func == (lhs: HTTPResponseStatusCodeError, rhs: HTTPResponseStatusCodeError) -> Bool {
-        switch (lhs, rhs) {
-        case (.unknown(let lhsValue), .unknown(let rhsValue)):
-            return lhsValue == rhsValue
-        default:
-            return lhs.value ?? -1 == rhs.value ?? -1
-        }
-    }
-}
-
-public enum NetworkingError: Error {
-    case unknownDecodingError
-    case noResponseStatus
-    case noResponse
-    case unknown
-    case noData
-}
-
-extension NetworkingError: CustomStringConvertible {
-    public var description : String {
-        switch self {
-        case .noResponseStatus: return "Response status not explicitly set in proto response"
-        case .noResponse: return "URLResponse object is nil"
-        case .unknownDecodingError: return "Unknown decoding error"
-        case .unknown: return "Unknown netowrking error"
-        case .noData: return "No data in resposne"
         }
     }
 }
