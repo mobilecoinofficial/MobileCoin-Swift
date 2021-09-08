@@ -1,4 +1,5 @@
 //
+
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
@@ -64,8 +65,6 @@ public struct Receipt {
     }
 
     func matchesTxOut(_ txOut: TxOutProtocol) -> Bool {
-        logger.debug("self.commitment: \n\n\(commitment.hexEncodedString(options: Data32.HexEncodingOptions.upperCase))\n")
-        logger.debug("txOut: \n\n\(txOut.commitment.hexEncodedString(options: Data32.HexEncodingOptions.upperCase))\n")
         return txOutPublicKeyTyped == txOut.publicKey
             && commitment == txOut.commitment
             && maskedValue == txOut.maskedValue
@@ -113,7 +112,7 @@ public struct Receipt {
 
         return value
     }
-
+    
     enum ReceivedStatus {
         case notReceived(knownToBeNotReceivedBlockCount: UInt64?)
         case received(block: BlockMetadata)

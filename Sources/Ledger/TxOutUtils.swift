@@ -59,14 +59,17 @@ enum TxOutUtils {
         }
     }
 
-    static func sharedSecret(
+    static func reconstructCommitment(
+        maskedValue: UInt64,
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
-    ) -> RistrettoPublic? {
-        publicKey.asMcBuffer { publicKeyBufferPtr in
+    ) -> Data32? {
+        var mcAmount = McTxOutAmount(masked_value: maskedValue)
+        return publicKey.asMcBuffer { publicKeyBufferPtr in
             viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
                 switch Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
-                    mc_tx_out_shared_secret(
+                    mc_tx_out_reconstruct_commitment(
+                        &mcAmount,
                         publicKeyBufferPtr,
                         viewPrivateKeyPtr,
                         bufferPtr,
@@ -76,7 +79,7 @@ enum TxOutUtils {
                     // Safety: It's safe to skip validation because
                     // mc_tx_out_get_subaddress_spend_public_key should always return a valid
                     // RistrettoPublic on success.
-                    return RistrettoPublic(skippingValidation: bytes)
+                    return bytes as Data32
                 case .failure(let error):
                     switch error.errorCode {
                     case .invalidInput:

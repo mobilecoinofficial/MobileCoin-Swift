@@ -12,18 +12,16 @@ struct KnownTxOut: TxOutProtocol {
     init?(_ ledgerTxOut: LedgerTxOut, accountKey: AccountKey) {
         
         guard let value = ledgerTxOut.value(accountKey: accountKey),
-              let keyImage = ledgerTxOut.keyImage(accountKey: accountKey)
+              let keyImage = ledgerTxOut.keyImage(accountKey: accountKey),
+              let commitment = TxOutUtils.reconstructCommitment(
+                                                   maskedValue: ledgerTxOut.maskedValue,
+                                                   publicKey: ledgerTxOut.publicKey,
+                                                   viewPrivateKey:accountKey.viewPrivateKey)
         else {
             return nil
         }
         
-        
-        guard let commitment = TxOutUtils.sharedSecret(publicKey: ledgerTxOut.publicKey, viewPrivateKey:accountKey.viewPrivateKey) else {
-            return nil
-        }
-        logger.warning("self.commitment: \n\n\(commitment.data.hexEncodedString(options: Data.HexEncodingOptions.upperCase))\n")
-        self.commitment = commitment.data32
-
+        self.commitment = commitment
         self.ledgerTxOut = ledgerTxOut
         self.value = value
         self.keyImage = keyImage
@@ -39,3 +37,4 @@ struct KnownTxOut: TxOutProtocol {
 
 extension KnownTxOut: Equatable {}
 extension KnownTxOut: Hashable {}
+
