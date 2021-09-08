@@ -30,11 +30,11 @@ public struct HTTPStatus : Error {
 }
 
 extension HTTPStatus : CustomStringConvertible {
-    public var description : String {
+    public var description: String {
         codeDescription + (message ?? "")
     }
     
-    private var codeDescription : String {
+    private var codeDescription: String {
         switch code {
         case 1:
             return "Unknown Error: "
@@ -57,6 +57,3 @@ extension HTTPStatus : CustomStringConvertible {
         }
     }
 }
-
-
-

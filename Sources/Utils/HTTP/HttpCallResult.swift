@@ -18,7 +18,6 @@ extension HttpCallResult {
     init(
         status: HTTPStatus
     ) {
-        // TODO REMOVE
         self.init(status: status, metadata: nil, response: nil)
     }
 }

@@ -5,10 +5,10 @@
 import Foundation
 
 public enum HTTPMethod : String {
-    case GET = "GET"
-    case POST = "POST"
-    case PUT = "PUT"
-    case HEAD = "HEAD"
-    case PATCH = "PATCH"
-    case DELETE = "DELETE"
+    case GET
+    case POST
+    case PUT
+    case HEAD
+    case PATCH
+    case DELETE
 }
