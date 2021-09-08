@@ -12,7 +12,12 @@ public protocol HTTPClient {
 }
 
 extension HTTPClient {
-    public func makeUnaryCall<Request, Response>(path: String, request: Request, callOptions: HTTPCallOptions? = nil, responseType: Response.Type = Response.self) -> HTTPUnaryCall<Request, Response> where Request : SwiftProtobuf.Message, Response : SwiftProtobuf.Message {
+    public func makeUnaryCall<Request,Response>(
+        path: String,
+        request: Request,
+        callOptions: HTTPCallOptions? = nil,
+        responseType: Response.Type = Response.self
+    ) -> HTTPUnaryCall<Request, Response> where Request : SwiftProtobuf.Message, Response : SwiftProtobuf.Message {
         HTTPUnaryCall(path: path, options: callOptions, requestPayload: request, responseType: responseType)
     }
 }

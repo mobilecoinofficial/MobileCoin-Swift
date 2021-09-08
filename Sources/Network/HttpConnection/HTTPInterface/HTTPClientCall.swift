@@ -30,22 +30,10 @@ public protocol HTTPClientCall {
     /// The options used to make the session.
     var options: HTTPCallOptions? { get }
     
-    /// Initial response metadata.
+    /// Response metadata.
     var metadata: HTTPURLResponse? { get }
     
-    /// Status of this call which may be populated by the server or client.
+    /// Status of this call.
     ///
-    /// The client may populate the status if, for example, it was not possible to connect to the service.
-    ///
-    /// Note: despite `GRPCStatus` conforming to `Error`, the value will be __always__ delivered as a __success__
-    /// result even if the status represents a __negative__ outcome. This future will __never__ be fulfilled
-    /// with an error.
     var status: HTTPStatus? { get }
-    
-    /// Cancel the current call.
-    ///
-    /// Closes the HTTP/2 stream once it becomes available. Additional writes to the channel will be ignored.
-    /// Any unfulfilled promises will be failed with a cancelled status (excepting `status` which will be
-    /// succeeded, if not already succeeded).
-    func cancel()
 }

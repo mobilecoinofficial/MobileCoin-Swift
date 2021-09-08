@@ -46,7 +46,7 @@ final class FogKeyImageConnection:
                     }
                     return .http(httpService: FogKeyImageHttpConnection(
                                     config: config,
-                                    requester: RestApiRequester(requester: requester, baseUrl:config.url.httpBasedUrl),
+                                    requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
                                     targetQueue: targetQueue,
                                     rng: rng,
                                     rngContext: rngContext))

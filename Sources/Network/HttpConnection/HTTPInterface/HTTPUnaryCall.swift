@@ -19,11 +19,8 @@ public struct HTTPUnaryCall<RequestPayload:SwiftProtobuf.Message, ResponsePayloa
     /// The options used in the URLSession
     public var options: HTTPCallOptions?
 
-    /// Cancel this session if it hasn't already completed.
-    public func cancel() { }
-
     /// The initial metadata returned from the server.
-    public var metadata: HTTPURLResponse? = nil
+    public var metadata: HTTPURLResponse?
 
     /// The request message sent to the server
     public var requestPayload: RequestPayload?
@@ -33,5 +30,5 @@ public struct HTTPUnaryCall<RequestPayload:SwiftProtobuf.Message, ResponsePayloa
     public var responsePayload: ResponsePayload?
 
     /// The final status of the the RPC.
-    public var status: HTTPStatus? = nil
+    public var status: HTTPStatus?
 }

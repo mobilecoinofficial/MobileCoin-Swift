@@ -338,7 +338,7 @@ extension AttestedHttpConnection {
         }
 
         private func requestCallOptions() -> HTTPCallOptions {
-            return HTTPCallOptions(headers: session.requestHeaders)
+            HTTPCallOptions(headers: session.requestHeaders)
         }
 
         private func processResponse<Response>(callResult: HttpCallResult<Response>)

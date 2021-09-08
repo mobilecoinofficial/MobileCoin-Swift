@@ -39,7 +39,7 @@ final class BlockchainConnection:
                     }
                     return .http(httpService: BlockchainHttpConnection(
                                     config: config,
-                                    requester: RestApiRequester(requester: requester, baseUrl:config.url.httpBasedUrl),
+                                    requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
                                     targetQueue: targetQueue))
                 }
             },
