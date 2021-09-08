@@ -6,7 +6,7 @@ import Foundation
 import LibMobileCoin
 
 protocol TxOutProtocol {
-    var commitment: Data32 { get }  // Deprecate ??
+    var commitment: Data32 { get } 
     var maskedValue: UInt64 { get }
     var targetKey: RistrettoPublic { get }
     var publicKey: RistrettoPublic { get }
