@@ -24,14 +24,14 @@ public class RestApiRequester {
     let prefix: String = "gw"
     var challengeDelegate: URLSessionDelegate?
 
-    public init(requester: HttpRequester, baseUrl: URL, trustRoots: [NIOSSLCertificate]? = []) {
+    init(requester: HttpRequester, baseUrl: URL, trustRoots: [NIOSSLCertificate]? = []) {
         self.requester = requester
         self.baseUrl = baseUrl
         self.trustRoots = trustRoots
     }
 }
 
-public protocol Requester {
+protocol Requester {
     func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void)
 }
 
