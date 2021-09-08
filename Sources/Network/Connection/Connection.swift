@@ -25,7 +25,7 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
     func setTransportProtocolOption(_ transportProtocolOption: TransportProtocol.Option) {
         let connectionOptionWrapper = connectionOptionWrapperFactory(transportProtocolOption)
         inner.accessAsync { $0.connectionOptionWrapper = connectionOptionWrapper }
-    } 
+    }
 
     func setAuthorization(credentials: BasicCredentials) {
         inner.accessAsync { $0.setAuthorization(credentials: credentials) }
