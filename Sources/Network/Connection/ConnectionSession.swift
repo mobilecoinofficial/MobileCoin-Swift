@@ -32,6 +32,7 @@ final class ConnectionSession {
         guard let credentials = authorizationCredentials else { return [:] }
         return ["Authorization" : credentials.authorizationHeaderValue]
     }
+
     var requestHeaders: [String : String] {
         var headers : [String: String] = [:]
         headers.merge(cookieHeaders) {  (_, new) in new }
