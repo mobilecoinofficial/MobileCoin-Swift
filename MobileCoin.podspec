@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "1.1.1"
+  s.version      = "1.1.0"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -28,14 +28,14 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.1.1"
+    subspec.dependency "LibMobileCoin", "~> 1.1"
 
     subspec.dependency "gRPC-Swift", "~> 1.0"
     subspec.dependency "Logging", "~> 1.4"
-    subspec.dependency "SwiftNIO"
-    subspec.dependency "SwiftNIOHPACK"
-    subspec.dependency "SwiftNIOHTTP1"
-    subspec.dependency "SwiftProtobuf"
+    subspec.dependency "SwiftNIO", "~> 2.22"
+    subspec.dependency "SwiftNIOHPACK", "~> 1.16"
+    subspec.dependency "SwiftNIOHTTP1", "~> 2.18"
+    subspec.dependency "SwiftProtobuf", "~> 1.5"
 
     subspec.test_spec do |test_spec|
       test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
@@ -80,8 +80,6 @@ Pod::Spec.new do |s|
     # architectures or for arm64 iphonesimulator.
     "VALID_ARCHS[sdk=iphoneos*]" => "arm64",
     "VALID_ARCHS[sdk=iphonesimulator*]" => "x86_64",
-    "EXCLUDED_ARCHS[sdk=iphoneos*]" => "armv7",
-    "EXCLUDED_ARCHS[sdk=iphonesimulator*]" => "i386 arm64"
   }
 
   unless ENV["MC_ENABLE_WARN_LONG_COMPILE_TIMES"].nil?
