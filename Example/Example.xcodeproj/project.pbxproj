@@ -364,7 +364,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 05E35D1FAC2827984EE8B421 /* Pods-Example.debug.xcconfig */;
 			buildSettings = {
-				"ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Example/Preview Content\"";
@@ -387,7 +386,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3AF40DB60A0ADA2CB879AE38 /* Pods-Example.release.xcconfig */;
 			buildSettings = {
-				"ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Example/Preview Content\"";
@@ -399,7 +397,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilecoin.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -466,7 +463,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FC106CAA4E993C2D6301C5CA /* Pods-Example.testable release.xcconfig */;
 			buildSettings = {
-				"ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Example/Preview Content\"";
@@ -478,7 +474,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mobilecoin.Example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
