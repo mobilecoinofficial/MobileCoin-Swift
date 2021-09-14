@@ -41,7 +41,7 @@ Pod::Spec.new do |s|
       test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
       test_spec.resources = [
         "Tests/Common/FixtureData/**/*",
-        "Vendor/libmobilecoin-ios-artifacts/Vendor/fog/mobilecoin/test-vectors/vectors/**/*",
+        "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
       ]
     end
 
