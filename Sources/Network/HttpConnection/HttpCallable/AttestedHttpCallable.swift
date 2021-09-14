@@ -6,24 +6,6 @@ import Foundation
 import LibMobileCoin
 import SwiftProtobuf
 
-//enum AttestedCallError: Error {
-//    case aeadError(AeadError)
-//    case invalidInput(String)
-//}
-//
-//extension AttestedCallError: CustomStringConvertible {
-//    var description: String {
-//        "Attested call error: " + {
-//            switch self {
-//            case .aeadError(let innerError):
-//                return "\(innerError)"
-//            case .invalidInput(let reason):
-//                return "Invalid input: \(reason)"
-//            }
-//        }()
-//    }
-//}
-
 protocol AttestedHttpCallable: HttpCallable {
     associatedtype InnerRequestAad = ()
     associatedtype InnerRequest
