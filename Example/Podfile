@@ -3,7 +3,6 @@ source 'https://cdn.cocoapods.org/'
 platform :ios, '10.0'
 
 plugin 'cocoapods-repo-update'
-plugin 'cocoapods-binary'
 keep_source_code_for_prebuilt_frameworks!
 plugin 'cocoapods-keys', {
   :project => "MobileCoin",
