@@ -484,7 +484,7 @@ extension NetworkPreset {
         case .mainNet, .testNet:
             return false
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
-            return true
+            return false
         }
     }
     var consensusCredentials: BasicCredentials? {

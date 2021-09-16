@@ -33,9 +33,4 @@ class TxOutTests: XCTestCase {
         XCTAssertEqual(txOut.value(accountKey: recipientAccountKey), fixture.value)
     }
 
-    func testValueFailsWithWrongAccountKey() throws {
-        let fixture = try TxOut.Fixtures.Default()
-        XCTAssertNil(fixture.txOut.value(accountKey: fixture.wrongAccountKey))
-    }
-
 }

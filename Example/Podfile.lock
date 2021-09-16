@@ -19,42 +19,42 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.6.0)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin (1.1.1):
+  - LibMobileCoin (1.2.0-pre0):
     - gRPC-Swift (~> 1.0)
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (1.1.1):
-    - MobileCoin/Core (= 1.1.1)
-  - MobileCoin/Core (1.1.1):
+  - MobileCoin (1.2.0-pre0):
+    - MobileCoin/Core (= 1.2.0-pre0)
+  - MobileCoin/Core (1.2.0-pre0):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1.1)
+    - LibMobileCoin (~> 1.2.0-pre0)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
     - SwiftNIOHPACK
     - SwiftNIOHTTP1
     - SwiftProtobuf
-  - MobileCoin/Core/IntegrationTests (1.1.1):
+  - MobileCoin/Core/IntegrationTests (1.2.0-pre0):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1.1)
+    - LibMobileCoin (~> 1.2.0-pre0)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
     - SwiftNIOHPACK
     - SwiftNIOHTTP1
     - SwiftProtobuf
-  - MobileCoin/Core/PerformanceTests (1.1.1):
+  - MobileCoin/Core/PerformanceTests (1.2.0-pre0):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1.1)
+    - LibMobileCoin (~> 1.2.0-pre0)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
     - SwiftNIOHPACK
     - SwiftNIOHTTP1
     - SwiftProtobuf
-  - MobileCoin/Core/Tests (1.1.1):
+  - MobileCoin/Core/Tests (1.2.0-pre0):
     - gRPC-Swift (~> 1.0)
-    - LibMobileCoin (~> 1.1.1)
+    - LibMobileCoin (~> 1.2.0-pre0)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
@@ -178,9 +178,9 @@ SPEC CHECKSUMS:
   CNIOWindows: 310f73e804e6333a63e921b61892dbbaf61bd0cc
   gRPC-Swift: f7a248c42cc639c7a66422e40b6e2797881095d1
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 8848d4fee19d940f07a1b5275c14fac18758cc80
+  LibMobileCoin: 60c3d402358510be00729934aa1f751970b4a4a4
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: f646bf80e351431b6bc8a3a29388cd956d68411c
+  MobileCoin: 48b3671c47ba1dc8cd3e53a0da738160aa3350f7
   SwiftLint: 99f82d07b837b942dd563c668de129a03fc3fb52
   SwiftNIO: 75035e9e47345716eb6f01effaa4e14b9564ae4a
   SwiftNIOConcurrencyHelpers: cdc0919908b59ae643e6924f57030dacdea0499d
