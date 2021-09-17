@@ -32,7 +32,7 @@ extension FogReportConnectionIntTests {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
         return FogReportConnection(
             url: url,
-            transportProtocolOption: .http,
+            transportProtocolOption: try IntegrationTestFixtures.network.networkConfig().transportProtocol.option,
             channelManager: GrpcChannelManager(),
             httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
