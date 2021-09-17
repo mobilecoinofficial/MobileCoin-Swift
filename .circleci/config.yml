@@ -171,8 +171,8 @@ jobs:
       - print-tool-versions
       - run: make build
       - run: make test
-      - run: make docs
-      - run: make lint-docs
+      #- run: make docs
+      #- run: make lint-docs
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
@@ -222,10 +222,10 @@ workflows:
           matrix:
             parameters:
               xcode-version: ["11.7.0", *default-xcode-version]
-      - generate-docs:
-          filters:
-            branches: { only: master }
-      - deploy-docs:
-          requires: [ build-and-test, generate-docs ]
-          filters:
-            branches: { only: master }
+      #- generate-docs:
+          #filters:
+            #branches: { only: master }
+      #- deploy-docs:
+          #requires: [ build-and-test, generate-docs ]
+          #filters:
+            #branches: { only: master }
