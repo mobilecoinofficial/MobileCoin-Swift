@@ -25,7 +25,7 @@ target 'Example' do
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['Tests', 'IntegrationTests']
 
-# pod 'LibMobileCoin'
+  # pod 'LibMobileCoin'
   pod 'LibMobileCoin', path: '../Vendor/libmobilecoin-ios-artifacts'
   # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
   # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin-ios-artifacts.git'

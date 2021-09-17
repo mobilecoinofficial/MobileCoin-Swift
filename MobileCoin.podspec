@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre0"
+    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre1"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
