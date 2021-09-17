@@ -3,7 +3,6 @@ source 'https://cdn.cocoapods.org/'
 platform :ios, '10.0'
 
 plugin 'cocoapods-repo-update'
-plugin 'cocoapods-binary'
 keep_source_code_for_prebuilt_frameworks!
 plugin 'cocoapods-keys', {
   :project => "MobileCoin",
@@ -26,14 +25,14 @@ target 'Example' do
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['Tests', 'IntegrationTests']
 
-  pod 'LibMobileCoin', binary: true
+  pod 'LibMobileCoin'
   # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin-ios-artifacts'
   # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
-  # pod 'LibMobileCoin', git: 'https://github.com/mobilecoinofficial/libmobilecoin-ios-artifacts.git'
+  # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin-ios-artifacts.git'
 
-  pod 'gRPC-Swift', binary: true
-  pod 'SwiftProtobuf', binary: true
-  pod 'SwiftLint', binary: true
+  pod 'gRPC-Swift'
+  pod 'SwiftProtobuf'
+  pod 'SwiftLint'
 end
 
 post_install do |installer|

@@ -6,15 +6,16 @@
 // swiftlint:disable multiline_function_chains operator_usage_whitespace
 
 import Foundation
-import GRPC
 import LibMobileCoin
+import NIO
+import NIOHPACK
 
-enum AttestedConnectionError: Error {
+enum AttestedHttpConnectionError: Error {
     case connectionError(ConnectionError)
     case attestationFailure(String = String())
 }
 
-extension AttestedConnectionError: CustomStringConvertible {
+extension AttestedHttpConnectionError: CustomStringConvertible {
     var description: String {
         "Attested connection error: " + {
             switch self {
@@ -27,17 +28,20 @@ extension AttestedConnectionError: CustomStringConvertible {
     }
 }
 
-class AttestedConnection {
+class AttestedHttpConnection: ConnectionProtocol {
+    private let requester: RestApiRequester
     private let inner: SerialCallbackLock<Inner>
 
     init(
-        client: AttestableGrpcClient,
+        client: AttestableHttpClient,
+        requester: RestApiRequester,
         config: AttestedConnectionConfigProtocol,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) {
-        let inner = Inner(client: client, config: config, rng: rng, rngContext: rngContext)
+        let inner = Inner(client: client, requester: requester, config: config, rng: rng, rngContext: rngContext)
+        self.requester = requester
         self.inner = .init(inner, targetQueue: targetQueue)
     }
 
@@ -47,7 +51,7 @@ class AttestedConnection {
         }
     }
 
-    func performAttestedCall<Call: AttestedGrpcCallable>(
+    func performAttestedCall<Call: AttestedHttpCallable>(
         _ call: Call,
         request: Call.InnerRequest,
         completion: @escaping (Result<Call.InnerResponse, ConnectionError>) -> Void
@@ -55,7 +59,7 @@ class AttestedConnection {
         performAttestedCall(call, requestAad: (), request: request, completion: completion)
     }
 
-    func performAttestedCall<Call: AttestedGrpcCallable>(
+    func performAttestedCall<Call: AttestedHttpCallable>(
         _ call: Call,
         requestAad: Call.InnerRequestAad,
         request: Call.InnerRequest,
@@ -66,7 +70,7 @@ class AttestedConnection {
         }
     }
 
-    func performAttestedCall<Call: AttestedGrpcCallable>(
+    func performAttestedCall<Call: AttestedHttpCallable>(
         _ call: Call,
         request: Call.InnerRequest,
         completion: @escaping (
@@ -77,7 +81,7 @@ class AttestedConnection {
         performAttestedCall(call, requestAad: (), request: request, completion: completion)
     }
 
-    func performAttestedCall<Call: AttestedGrpcCallable>(
+    func performAttestedCall<Call: AttestedHttpCallable>(
         _ call: Call,
         requestAad: Call.InnerRequestAad,
         request: Call.InnerRequest,
@@ -96,7 +100,7 @@ class AttestedConnection {
     }
 }
 
-extension AttestedConnection {
+extension AttestedHttpConnection {
     // Note: Because `SerialCallbackLock` is being used to wrap `AttestedConnection.Inner`, calls
     // to `AttestedConnection.Inner` have exclusive access (other calls will be queued up) until the
     // executing call invokes the completion handler that returns control back to
@@ -109,7 +113,8 @@ extension AttestedConnection {
     private struct Inner {
         private let url: MobileCoinUrlProtocol
         private let session: ConnectionSession
-        private let client: AttestableGrpcClient
+        private let client: AttestableHttpClient
+        private let requester: RestApiRequester
         private let attestAke: AttestAke
 
         private let responderId: String
@@ -118,7 +123,8 @@ extension AttestedConnection {
         private let rngContext: Any?
 
         init(
-            client: AttestableGrpcClient,
+            client: AttestableHttpClient,
+            requester: RestApiRequester,
             config: AttestedConnectionConfigProtocol,
             rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
             rngContext: Any? = nil
@@ -126,6 +132,7 @@ extension AttestedConnection {
             self.url = config.url
             self.session = ConnectionSession(config: config)
             self.client = client
+            self.requester = requester
             self.attestAke = AttestAke()
             self.responderId = config.url.responderId
             self.attestationVerifier = AttestationVerifier(attestation: config.attestation)
@@ -137,7 +144,7 @@ extension AttestedConnection {
             session.authorizationCredentials = credentials
         }
 
-        func performAttestedCallWithAuth<Call: AttestedGrpcCallable>(
+        func performAttestedCallWithAuth<Call: AttestedHttpCallable>(
             _ call: Call,
             requestAad: Call.InnerRequestAad,
             request: Call.InnerRequest,
@@ -154,7 +161,7 @@ extension AttestedConnection {
                 completion: completion)
         }
 
-        private func doPerformAttestedCallWithAuth<Call: AttestedGrpcCallable>(
+        private func doPerformAttestedCallWithAuth<Call: AttestedHttpCallable>(
             _ call: Call,
             requestAad: Call.InnerRequestAad,
             request: Call.InnerRequest,
@@ -262,7 +269,7 @@ extension AttestedConnection {
                 rngContext: rngContext)
 
             doPerformCall(
-                AuthGrpcCallableWrapper(authCallable: client.authCallable),
+                AuthHttpCallableWrapper(authCallable: client.authCallable, requester: requester),
                 request: request
             ) {
                 completion(
@@ -292,14 +299,14 @@ extension AttestedConnection {
             }
         }
 
-        private func doPerformAttestedCall<Call: AttestedGrpcCallable>(
+        private func doPerformAttestedCall<Call: AttestedHttpCallable>(
             _ call: Call,
             requestAad: Call.InnerRequestAad,
             request: Call.InnerRequest,
             attestAkeCipher: AttestAke.Cipher,
             completion: @escaping (
                 Result<(responseAad: Call.InnerResponseAad, response: Call.InnerResponse),
-                       AttestedConnectionError>
+                       AttestedHttpConnectionError>
             ) -> Void
         ) {
             guard let processedRequest =
@@ -318,10 +325,10 @@ extension AttestedConnection {
             }
         }
 
-        private func doPerformCall<Call: GrpcCallable>(
+        private func doPerformCall<Call: HttpCallable>(
             _ call: Call,
             request: Call.Request,
-            completion: @escaping (Result<Call.Response, AttestedConnectionError>) -> Void
+            completion: @escaping (Result<Call.Response, AttestedHttpConnectionError>) -> Void
         ) {
             let callOptions = requestCallOptions()
 
@@ -330,32 +337,30 @@ extension AttestedConnection {
             }
         }
 
-        private func requestCallOptions() -> CallOptions {
-            var callOptions = CallOptions()
-            session.addRequestHeaders(to: &callOptions.customMetadata)
-            return callOptions
+        private func requestCallOptions() -> HTTPCallOptions {
+            HTTPCallOptions(headers: session.requestHeaders)
         }
 
-        private func processResponse<Response>(callResult: UnaryCallResult<Response>)
-            -> Result<Response, AttestedConnectionError>
+        private func processResponse<Response>(callResult: HttpCallResult<Response>)
+            -> Result<Response, AttestedHttpConnectionError>
         {
             // Basic credential authorization failure
-            guard callResult.status.code != .unauthenticated else {
+            guard callResult.status.isOk else {
                 return .failure(.connectionError(.authorizationFailure("url: \(url)")))
             }
 
             // Attestation failure, reattest
-            guard callResult.status.code != .permissionDenied else {
+            guard callResult.status.code != 403 else {
                 return .failure(.attestationFailure())
             }
 
-            guard callResult.status.isOk, let response = callResult.response else {
+            guard callResult.status.code == 200, let response = callResult.response else {
                 return .failure(.connectionError(
-                    .connectionFailure("url: \(url), status: \(callResult.status)")))
+                                    .connectionFailure("url: \(url), status: \(callResult.status.code)")))
             }
-
-            if let initialMetadata = callResult.initialMetadata {
-                session.processResponse(headers: initialMetadata)
+            
+            if let metadata = callResult.metadata {
+                session.processResponse(headers: metadata.allHeaderFields)
             }
 
             return .success(response)

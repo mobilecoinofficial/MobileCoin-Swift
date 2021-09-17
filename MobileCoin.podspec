@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "1.1.0"
+  s.version      = "1.2.0-pre0"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -28,20 +28,20 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.1"
+    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre1"
 
-    subspec.dependency "gRPC-Swift", "~> 1.0"
+    subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
-    subspec.dependency "SwiftNIO", "~> 2.22"
-    subspec.dependency "SwiftNIOHPACK", "~> 1.16"
-    subspec.dependency "SwiftNIOHTTP1", "~> 2.18"
-    subspec.dependency "SwiftProtobuf", "~> 1.5"
+    subspec.dependency "SwiftNIO"
+    subspec.dependency "SwiftNIOHPACK"
+    subspec.dependency "SwiftNIOHTTP1"
+    subspec.dependency "SwiftProtobuf"
 
     subspec.test_spec do |test_spec|
       test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
       test_spec.resources = [
         "Tests/Common/FixtureData/**/*",
-        "Vendor/libmobilecoin-ios-artifacts/Vendor/fog/mobilecoin/test-vectors/vectors/**/*",
+        "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
       ]
     end
 
@@ -75,11 +75,11 @@ Pod::Spec.new do |s|
     # The LibMobileCoin vendored binary doesn't include support for bitcode.
     "ENABLE_BITCODE" => "NO",
     # The LibMobileCoin vendored binary doesn't include support for Mac Catalyst.
-    "SUPPORTS_MACCATALYST" => "NO",
+    "SUPPORTS_MACCATALYST" => "YES",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit
     # architectures or for arm64 iphonesimulator.
     "VALID_ARCHS[sdk=iphoneos*]" => "arm64",
-    "VALID_ARCHS[sdk=iphonesimulator*]" => "x86_64",
+    "VALID_ARCHS[sdk=iphonesimulator*]" => "x86_64 arm64",
   }
 
   unless ENV["MC_ENABLE_WARN_LONG_COMPILE_TIMES"].nil?

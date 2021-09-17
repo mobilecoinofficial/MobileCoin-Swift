@@ -9,7 +9,7 @@ import NIOSSL
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let network: NetworkPreset = .alpha
+    static let network: NetworkPreset = .mobiledev
 }
 
 extension IntegrationTestFixtures {
@@ -105,7 +105,9 @@ extension IntegrationTestFixtures {
         accountKey: AccountKey,
         config: MobileCoinClient.Config
     ) throws -> MobileCoinClient {
-        let client = try MobileCoinClient.make(accountKey: accountKey, config: config).get()
+        var mutableConfig = config
+        mutableConfig.httpRequester = TestHttpRequester()
+        let client = try MobileCoinClient.make(accountKey: accountKey, config: mutableConfig).get()
         if let consensusCredentials = network.consensusCredentials {
             client.setConsensusBasicAuthorization(
                 username: consensusCredentials.username,

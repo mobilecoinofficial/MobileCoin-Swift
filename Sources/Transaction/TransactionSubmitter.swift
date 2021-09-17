@@ -59,6 +59,8 @@ struct TransactionSubmitter {
             return .failure(.feeError())
         case .tombstoneBlockTooFar:
             return .failure(.tombstoneBlockTooFar())
+        case .missingMemo:
+            return .failure(.missingMemo("Missing memo"))
         case .containsSpentKeyImage, .containsExistingOutputPublicKey:
             // This exact Tx might have already been submitted (and succeeded), or else the
             // inputs were already spent by another Tx.

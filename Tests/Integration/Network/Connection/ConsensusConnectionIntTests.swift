@@ -164,6 +164,7 @@ extension ConsensusConnectionIntTests {
         ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: GrpcChannelManager(),
+            httpRequester: networkConfig.httpRequester,
             targetQueue: DispatchQueue.main)
     }
 }

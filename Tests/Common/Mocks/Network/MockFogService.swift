@@ -103,11 +103,11 @@ extension MockFogService {
         }
     }
 
-    var blockServiceBlocks: [FogLedger_Block] {
+    var blockServiceBlocks: [FogLedger_BlockData] {
         var cummulativeTxOutCount: UInt64 = 0
         return blockServiceTxOuts.enumerated().map { index, txOuts in
             cummulativeTxOutCount += UInt64(txOuts.count)
-            var block = FogLedger_Block()
+            var block = FogLedger_BlockData()
             block.index = UInt64(index)
             block.globalTxoCount = cummulativeTxOutCount
             block.outputs = txOuts.map { External_TxOut($0) }

@@ -6,38 +6,55 @@ import Foundation
 import GRPC
 import LibMobileCoin
 
-final class FogBlockConnection: Connection, FogBlockService {
-    private let client: FogLedger_FogBlockAPIClient
+final class FogBlockConnection:
+    Connection<FogBlockGrpcConnection, FogBlockHttpConnection>, FogBlockService
+{
+    private let config: ConnectionConfig<FogUrl>
+    private let channelManager: GrpcChannelManager
+    private let targetQueue: DispatchQueue?
 
     init(
         config: ConnectionConfig<FogUrl>,
         channelManager: GrpcChannelManager,
+        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?
     ) {
-        let channel = channelManager.channel(for: config)
-        self.client = FogLedger_FogBlockAPIClient(channel: channel)
-        super.init(config: config, targetQueue: targetQueue)
+        self.config = config
+        self.channelManager = channelManager
+        self.targetQueue = targetQueue
+
+        super.init(
+            connectionOptionWrapperFactory: { transportProtocolOption in
+                switch transportProtocolOption {
+                case .grpc:
+                    return .grpc(
+                        grpcService: FogBlockGrpcConnection(
+                            config: config,
+                            channelManager: channelManager,
+                            targetQueue: targetQueue))
+                case .http:
+                    guard let requester = httpRequester else {
+                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
+                    }
+                    return .http(httpService: FogBlockHttpConnection(
+                                    config: config,
+                                    requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
+                                    targetQueue: targetQueue))
+                }
+            },
+            transportProtocolOption: config.transportProtocolOption,
+            targetQueue: targetQueue)
     }
 
     func getBlocks(
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
-        performCall(GetBlocksCall(client: client), request: request, completion: completion)
-    }
-}
-
-extension FogBlockConnection {
-    private struct GetBlocksCall: GrpcCallable {
-        let client: FogLedger_FogBlockAPIClient
-
-        func call(
-            request: FogLedger_BlockRequest,
-            callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<FogLedger_BlockResponse>) -> Void
-        ) {
-            let unaryCall = client.getBlocks(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getBlocks(request: request, completion: completion)
+        case .http(let httpConnection):
+            httpConnection.getBlocks(request: request, completion: completion)
         }
     }
 }
