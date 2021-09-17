@@ -11,7 +11,11 @@ Pod::Spec.new do |s|
 
   s.license      = { :type => "GPLv3" }
 
-  s.source       = { :git => "https://github.com/mobilecoinofficial/MobileCoin-Swift.git", :tag => "v#{s.version}" }
+  s.source       = { 
+    :git => "https://github.com/mobilecoinofficial/MobileCoin-Swift.git",
+    :tag => "v#{s.version}",
+    :submodules => true
+  }
 
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
