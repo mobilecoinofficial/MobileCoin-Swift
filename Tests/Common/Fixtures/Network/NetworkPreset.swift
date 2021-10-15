@@ -258,7 +258,7 @@ extension NetworkPreset {
 
     private static let trustRootsB64 = [
         /// MobileCoin-managed Consensus and Fog services use Let's Encrypt with an intermediate
-        /// certificate that's cross-signed by IdenTrust's "DST Root CA X3": https://crt.sh/?d=8395
+        /// certificate ISRG Root X1 that's self-signed https://crt.sh/?id=9314791
         """
             MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw\
             TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh\
