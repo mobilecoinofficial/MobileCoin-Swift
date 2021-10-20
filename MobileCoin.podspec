@@ -76,7 +76,7 @@ Pod::Spec.new do |s|
   # intermediary frameworks. These must be speicifed here for CocoaPods to set them
   # on the framework target and any testspec targets for this pod.
   pod_target_xcconfig = {
-    "ENABLE_BITCODE" => "NO",
+    "ENABLE_BITCODE" => "YES",
     "SUPPORTS_MACCATALYST" => "YES",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit
     # architectures or for arm64 iphonesimulator.
