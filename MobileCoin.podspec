@@ -76,7 +76,6 @@ Pod::Spec.new do |s|
   # intermediary frameworks. These must be speicifed here for CocoaPods to set them
   # on the framework target and any testspec targets for this pod.
   pod_target_xcconfig = {
-    "GCC_GENERATE_DEBUGGING_SYMBOLS" => "NO",
     "GCC_OPTIMIZATION_LEVEL" => "z",
     "ENABLE_BITCODE" => "NO",
     "LLVM_LTO" => "YES",
