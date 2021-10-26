@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "1.2.0-pre0"
+  s.version      = "1.2.0-pre2"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => "GPLv3" }
 
   s.source       = { 
-    :git => "https://github.com/mobilecoinofficial/MobileCoin-Swift.git",
+    :git => "https://github.com/the-real-adammork/MobileCoin-Swift.git",
     :tag => "v#{s.version}",
     :submodules => true
   }
