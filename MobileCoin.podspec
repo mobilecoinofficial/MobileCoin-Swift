@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "1.2.0-pre0"
+  s.version      = "1.2.0-pre2"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre1"
+    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre3"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
@@ -76,9 +76,9 @@ Pod::Spec.new do |s|
   # intermediary frameworks. These must be speicifed here for CocoaPods to set them
   # on the framework target and any testspec targets for this pod.
   pod_target_xcconfig = {
-    # The LibMobileCoin vendored binary doesn't include support for bitcode.
-    "ENABLE_BITCODE" => "NO",
-    # The LibMobileCoin vendored binary doesn't include support for Mac Catalyst.
+    "GCC_OPTIMIZATION_LEVEL" => "z",
+    "LLVM_LTO" => "YES",
+    "ENABLE_BITCODE" => "YES",
     "SUPPORTS_MACCATALYST" => "YES",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit
     # architectures or for arm64 iphonesimulator.
@@ -110,5 +110,5 @@ Pod::Spec.new do |s|
       },
     ]
   end
-
 end
+
