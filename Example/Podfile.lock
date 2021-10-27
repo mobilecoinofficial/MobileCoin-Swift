@@ -19,7 +19,7 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.11.1)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin (1.2.0-pre2):
+  - LibMobileCoin (1.2.0-pre3):
     - gRPC-Swift
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
@@ -27,7 +27,7 @@ PODS:
     - MobileCoin/Core (= 1.2.0-pre2)
   - MobileCoin/Core (1.2.0-pre2):
     - gRPC-Swift
-    - LibMobileCoin (~> 1.2.0-pre2)
+    - LibMobileCoin (~> 1.2.0-pre3)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
@@ -36,7 +36,7 @@ PODS:
     - SwiftProtobuf
   - MobileCoin/Core/IntegrationTests (1.2.0-pre2):
     - gRPC-Swift
-    - LibMobileCoin (~> 1.2.0-pre2)
+    - LibMobileCoin (~> 1.2.0-pre3)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
@@ -45,7 +45,7 @@ PODS:
     - SwiftProtobuf
   - MobileCoin/Core/PerformanceTests (1.2.0-pre2):
     - gRPC-Swift
-    - LibMobileCoin (~> 1.2.0-pre2)
+    - LibMobileCoin (~> 1.2.0-pre3)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
@@ -54,7 +54,7 @@ PODS:
     - SwiftProtobuf
   - MobileCoin/Core/Tests (1.2.0-pre2):
     - gRPC-Swift
-    - LibMobileCoin (~> 1.2.0-pre2)
+    - LibMobileCoin (~> 1.2.0-pre3)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO
@@ -123,7 +123,7 @@ PODS:
 DEPENDENCIES:
   - gRPC-Swift
   - Keys (from `Pods/CocoaPodsKeys`)
-  - LibMobileCoin (from `../Vendor/libmobilecoin-ios-artifacts`)
+  - LibMobileCoin
   - MobileCoin (from `..`)
   - MobileCoin/Core (from `..`)
   - MobileCoin/Core/IntegrationTests (from `..`)
@@ -144,6 +144,7 @@ SPEC REPOS:
     - CNIOLinux
     - CNIOWindows
     - gRPC-Swift
+    - LibMobileCoin
     - Logging
     - SwiftLint
     - SwiftNIO
@@ -164,8 +165,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Keys:
     :path: Pods/CocoaPodsKeys
-  LibMobileCoin:
-    :path: "../Vendor/libmobilecoin-ios-artifacts"
   MobileCoin:
     :path: ".."
 
@@ -181,9 +180,9 @@ SPEC CHECKSUMS:
   CNIOWindows: f5aa9dfb401b440a7b4c9cd911e53e981a787193
   gRPC-Swift: 8942047451bf81413077e6b94bf4213e47b181cc
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 7222c364ec74eb391c37cca1e50a5874c4e5eceb
+  LibMobileCoin: f3c44fb94b8647bd5cac3aedf0b1ca24f6cc7201
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: e5b7cb442b60e86cf59b5568950841e48832c2f7
+  MobileCoin: 339e51b8739b7ea2f0519cc7bdde8c4e05c2b374
   SwiftLint: e5c7f1fba68eccfc51509d5b2ce1699f5502e0c7
   SwiftNIO: bb336ceef32850e9671d3fa0e0cc2b9add3b5948
   SwiftNIOConcurrencyHelpers: ca2594e10749655f42baf5468212be83d2f94fe3
@@ -200,6 +199,6 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 1fbbdb58510af3c53a838a1dbea98f18132dc952
   SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
 
-PODFILE CHECKSUM: fe53a1552f381bfc9efed8667ed7c6c4d56602b1
+PODFILE CHECKSUM: 46e25fe8f13c4beb3ac1e4ab1a9512960701d05d
 
 COCOAPODS: 1.9.3
