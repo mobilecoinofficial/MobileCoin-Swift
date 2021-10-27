@@ -221,7 +221,7 @@ workflows:
           name: build-and-test-xcode-<< matrix.xcode-version >>
           matrix:
             parameters:
-              xcode-version: ["11.7.0", *default-xcode-version]
+              xcode-version: [*default-xcode-version]
       #- generate-docs:
           #filters:
             #branches: { only: master }
