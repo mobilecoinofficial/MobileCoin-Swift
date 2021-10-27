@@ -27,17 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Upgraded LibMobileCoin & Fog to v1.2.0-pre1 (#73)
 
-## [1.2.0-pre0] - 2021-09-17
-
-### Added
-
-- HTTP Interface to API for Network Robustness (#73)
-- Apple Silicon M1 & Mac Catalyst Support (#73)
-
-### Changed
-
-- Upgraded LibMobileCoin & Fog to v1.2.0-pre1 (#73)
-
 ## [1.1.0] - 2021-06-10
 
 ### Added
