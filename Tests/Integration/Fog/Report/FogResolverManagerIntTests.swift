@@ -6,8 +6,16 @@
 import XCTest
 
 class FogResolverManagerIntTests: XCTestCase {
-    func testFogReport() throws {
-        let fogResolverManager = try IntegrationTestFixtures.createFogResolverManager()
+    func testFogReportGRPC() throws {
+        try fogReport(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testFogReportHTTP() throws {
+        try fogReport(transportProtocol: TransportProtocol.http)
+    }
+    
+    func fogReport(transportProtocol: TransportProtocol) throws {
+        let fogResolverManager = try IntegrationTestFixtures.createFogResolverManager(transportProtocol: transportProtocol)
         let publicAddress = try IntegrationTestFixtures.createPublicAddress()
 
         let expect = expectation(description: "Retrieve fog reports")
@@ -19,3 +27,4 @@ class FogResolverManagerIntTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 }
+

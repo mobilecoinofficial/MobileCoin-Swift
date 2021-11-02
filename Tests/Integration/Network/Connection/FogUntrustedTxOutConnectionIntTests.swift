@@ -7,9 +7,17 @@ import LibMobileCoin
 import XCTest
 
 class FogUntrustedTxOutConnectionIntTests: XCTestCase {
-    func testGetTxOutsReturnsNoResultsWithoutPubkeys() throws {
+    func testGetTxOutsReturnsNoResultsWithoutPubkeysGRPC() throws {
+        try getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetTxOutsReturnsNoResultsWithoutPubkeysHTTP() throws {
+        try getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetTxOuts request")
-        try createFogUntrustedTxOutConnection().getTxOuts(request: FogLedger_TxOutRequest()) {
+        try createFogUntrustedTxOutConnection(transportProtocol:transportProtocol).getTxOuts(request: FogLedger_TxOutRequest()) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
             print("numBlocks: \(response.numBlocks)")
             print("globalTxoCount: \(response.globalTxoCount)")
@@ -23,11 +31,19 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    }
+    
+    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog GetTxOuts request")
-        let connection = try createFogUntrustedTxOutConnectionWithInvalidCredentials()
+        let connection = try createFogUntrustedTxOutConnectionWithInvalidCredentials(transportProtocol:transportProtocol)
         connection.getTxOuts(request: FogLedger_TxOutRequest()) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
 
@@ -44,15 +60,15 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
 }
 
 extension FogUntrustedTxOutConnectionIntTests {
-    func createFogUntrustedTxOutConnection() throws -> FogUntrustedTxOutConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+    func createFogUntrustedTxOutConnection(transportProtocol: TransportProtocol) throws -> FogUntrustedTxOutConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
         return createFogUntrustedTxOutConnection(networkConfig: networkConfig)
     }
 
-    func createFogUntrustedTxOutConnectionWithInvalidCredentials() throws
+    func createFogUntrustedTxOutConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws
         -> FogUntrustedTxOutConnection
     {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
         return createFogUntrustedTxOutConnection(networkConfig: networkConfig)
     }
 

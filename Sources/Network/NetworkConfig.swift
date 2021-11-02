@@ -6,12 +6,12 @@ import Foundation
 import NIOSSL
 
 struct NetworkConfig {
-    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig)
+    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol = .grpc)
         -> Result<NetworkConfig, InvalidInputError>
     {
         ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
             FogUrl.make(string: fogUrl).map { fogUrl in
-                NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation)
+                NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation, transportProtocol: transportProtocol)
             }
         }
     }
@@ -31,7 +31,7 @@ struct NetworkConfig {
 
     var httpRequester: HttpRequester?
     
-    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig) {
+    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol = .grpc) {
         self.consensusUrl = consensusUrl
         self.fogUrl = fogUrl
         self.attestation = attestation

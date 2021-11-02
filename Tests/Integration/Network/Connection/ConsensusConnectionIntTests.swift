@@ -8,14 +8,22 @@ import NIOSSL
 import XCTest
 
 class ConsensusConnectionIntTests: XCTestCase {
-    func testAttestationWorks() throws {
+    func testAttestationWorksGRPC() throws {
+        try attestationWorks(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testAttestationWorksHTTP() throws {
+        try attestationWorks(transportProtocol: TransportProtocol.http)
+    }
+    
+    func attestationWorks(transportProtocol: TransportProtocol) throws {
         // Run test multiple times to minimize the chance that the server assigned by the load
         // balancer for the attest call is the same server that is assigned for the proposeTx call.
         for _ in (0..<3) {
             let fixture = try Transaction.Fixtures.Default()
 
             let expect = expectation(description: "Consensus connection")
-            try createConsensusConnection().proposeTx(fixture.tx, completion: {
+            try createConsensusConnection(transportProtocol: transportProtocol).proposeTx(fixture.tx, completion: {
                 guard let response = $0.successOrFulfill(expectation: expect) else { return }
                 print("response: \(response)")
 
@@ -28,9 +36,17 @@ class ConsensusConnectionIntTests: XCTestCase {
         }
     }
 
-    func testMultipleCalls() throws {
+    func testMultipleCallsGRPC() throws {
+        try multipleCalls(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testMultipleCallsHTTP() throws {
+        try multipleCalls(transportProtocol: TransportProtocol.http)
+    }
+    
+    func multipleCalls(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
-        let connection = try createConsensusConnection()
+        let connection = try createConsensusConnection(transportProtocol: transportProtocol)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx) {
@@ -57,13 +73,22 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    }
+    
+    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.consensusRequiresCredentials)
 
         let fixture = try Transaction.Fixtures.Default()
+        let connection = try createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol.grpc)
 
         let expect = expectation(description: "Consensus connection")
-        try createConsensusConnectionWithInvalidCredentials().proposeTx(fixture.tx, completion: {
+        connection.proposeTx(fixture.tx, completion: {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
 
             switch error {
@@ -77,10 +102,18 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testTrustRootWorks() throws {
+    func testTrustRootWorksGRPC() throws {
+        try trustRootWorks(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testTrustRootWorksHTTP() throws {
+        try trustRootWorks(transportProtocol: TransportProtocol.http)
+    }
+    
+    func trustRootWorks(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
-        let connection = try createConsensusConnection(trustRoots: trustRootsFixture.trustRoots)
+        let connection = try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: trustRootsFixture.trustRoots)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -97,12 +130,21 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testExtraTrustRootWorks() throws {
+    func testExtraTrustRootWorksGRPC() throws {
+        try extraTrustRootWorks(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testExtraTrustRootWorksHTTP() throws {
+        try extraTrustRootWorks(transportProtocol: TransportProtocol.http)
+    }
+    
+    func extraTrustRootWorks(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection = try createConsensusConnection(
+            transportProtocol: transportProtocol,
             trustRoots: trustRootsFixture.trustRoots + [trustRootsFixture.wrongTrustRoot])
-
+        
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
@@ -118,14 +160,22 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testWrongTrustRootFails() throws {
+    func testWrongTrustRootFailsGRPC() throws {
+        try wrongTrustRootFails(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testWrongTrustRootFailsHTTP() throws {
+        try wrongTrustRootFails(transportProtocol: TransportProtocol.http)
+    }
+    
+    func wrongTrustRootFails(transportProtocol: TransportProtocol) throws {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
         try XCTSkipIf(true)
-
-        let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection =
-            try createConsensusConnection(trustRoots: [trustRootsFixture.wrongTrustRoot])
+            try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: [trustRootsFixture.wrongTrustRoot])
+
+        let fixture = try Transaction.Fixtures.Default()
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -145,18 +195,18 @@ class ConsensusConnectionIntTests: XCTestCase {
 }
 
 extension ConsensusConnectionIntTests {
-    func createConsensusConnection() throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+    func createConsensusConnection(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> ConsensusConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
-    func createConsensusConnection(trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(trustRoots: trustRoots)
+    func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol, trustRoots: trustRoots)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
-    func createConsensusConnectionWithInvalidCredentials() throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
+    func createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 

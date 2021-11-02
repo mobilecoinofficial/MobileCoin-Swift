@@ -366,12 +366,13 @@ final class TestHttpRequester: HttpRequester {
 
 extension NetworkPreset {
 
-    func networkConfig() throws -> NetworkConfig {
+    func networkConfig(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> NetworkConfig {
         let attestationConfig = try self.attestationConfig()
         var networkConfig = try NetworkConfig.make(
             consensusUrl: consensusUrl,
             fogUrl: fogUrl,
-            attestation: attestationConfig).get()
+            attestation: attestationConfig,
+            transportProtocol: transportProtocol).get()
         networkConfig.httpRequester = TestHttpRequester()
         networkConfig.consensusTrustRoots = try consensusTrustRoots()
         networkConfig.fogTrustRoots = try fogTrustRoots()

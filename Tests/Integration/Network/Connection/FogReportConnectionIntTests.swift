@@ -8,10 +8,18 @@ import XCTest
 
 class FogReportConnectionIntTests: XCTestCase {
 
-    func testGetReports() throws {
+    func testGetReportsGRPC() throws {
+        try getReports(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetReportsHTTP() throws {
+        try getReports(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getReports(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetReports request")
 
-        try createFogReportConnection().getReports(request: Report_ReportRequest()) {
+        try createFogReportConnection(transportProtocol:transportProtocol).getReports(request: Report_ReportRequest()) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertGreaterThan(response.reports.count, 0)
@@ -28,11 +36,11 @@ class FogReportConnectionIntTests: XCTestCase {
 }
 
 extension FogReportConnectionIntTests {
-    func createFogReportConnection() throws -> FogReportConnection {
+    func createFogReportConnection(transportProtocol: TransportProtocol) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
         return FogReportConnection(
             url: url,
-            transportProtocolOption: try IntegrationTestFixtures.network.networkConfig().transportProtocol.option,
+            transportProtocolOption: transportProtocol.option,
             channelManager: GrpcChannelManager(),
             httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)

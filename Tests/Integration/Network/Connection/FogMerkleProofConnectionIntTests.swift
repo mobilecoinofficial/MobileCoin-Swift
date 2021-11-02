@@ -7,13 +7,21 @@ import LibMobileCoin
 import XCTest
 
 class FogMerkleProofConnectionIntTests: XCTestCase {
-    func testGetOutputsRequest() throws {
+    func testGetOutputsRequestGRPC() throws {
+        try getOutputsRequest(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetOutputsRequestHTTP() throws {
+        try getOutputsRequest(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getOutputsRequest(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 
         var request = FogLedger_GetOutputsRequest()
         request.indices = [0]
         request.merkleRootBlock = 10
-        try createFogMerkleProofConnection().getOutputs(request: request) {
+        try createFogMerkleProofConnection(transportProtocol:transportProtocol).getOutputs(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             print("numBlocks: \(response.numBlocks)")
@@ -34,13 +42,21 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndices() throws {
+    func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndicesGRPC() throws {
+        try getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndicesHTTP() throws {
+        try getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 
         var request = FogLedger_GetOutputsRequest()
         request.indices = []
         request.merkleRootBlock = 10
-        try createFogMerkleProofConnection().getOutputs(request: request) {
+        try createFogMerkleProofConnection(transportProtocol:transportProtocol).getOutputs(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.results.count, request.indices.count)
@@ -52,13 +68,21 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsRequestAcceptsUIntMinMerkleRootBlock() throws {
+    func testGetOutputsRequestAcceptsUIntMinMerkleRootBlockGRPC() throws {
+        try getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetOutputsRequestAcceptsUIntMinMerkleRootBlockHTTP() throws {
+        try getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 
         var request = FogLedger_GetOutputsRequest()
         request.indices = [0]
         request.merkleRootBlock = 0
-        try createFogMerkleProofConnection().getOutputs(request: request) {
+        try createFogMerkleProofConnection(transportProtocol:transportProtocol).getOutputs(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.results.count, request.indices.count)
@@ -76,13 +100,21 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlock() throws {
+    func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlockGRPC() throws {
+        try getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlockHTTP() throws {
+        try getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 
         var request = FogLedger_GetOutputsRequest()
         request.indices = [0]
         request.merkleRootBlock = .max
-        try createFogMerkleProofConnection().getOutputs(request: request) {
+        try createFogMerkleProofConnection(transportProtocol:transportProtocol).getOutputs(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.results.count, request.indices.count)
@@ -100,13 +132,21 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsRequestReturnsNotFoundForUIntMax() throws {
+    func testGetOutputsRequestReturnsNotFoundForUIntMaxGRPC() throws {
+        try getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testGetOutputsRequestReturnsNotFoundForUIntMaxHTTP() throws {
+        try getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: TransportProtocol.http)
+    }
+    
+    func getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 
         var request = FogLedger_GetOutputsRequest()
         request.indices = [.max]
         request.merkleRootBlock = .max
-        try createFogMerkleProofConnection().getOutputs(request: request) {
+        try createFogMerkleProofConnection(transportProtocol:transportProtocol).getOutputs(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.results.count, request.indices.count)
@@ -122,7 +162,15 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    }
+    
+    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
@@ -130,7 +178,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         var request = FogLedger_GetOutputsRequest()
         request.indices = [0]
         request.merkleRootBlock = 10
-        try createFogMerkleProofConnectionWithInvalidCredentials().getOutputs(request: request) {
+        try createFogMerkleProofConnectionWithInvalidCredentials(transportProtocol:transportProtocol).getOutputs(request: request) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
 
             switch error {
@@ -146,13 +194,13 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 }
 
 extension FogMerkleProofConnectionIntTests {
-    func createFogMerkleProofConnection() throws -> FogMerkleProofConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+    func createFogMerkleProofConnection(transportProtocol: TransportProtocol) throws -> FogMerkleProofConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
         return createFogMerkleProofConnection(networkConfig: networkConfig)
     }
 
-    func createFogMerkleProofConnectionWithInvalidCredentials() throws -> FogMerkleProofConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
+    func createFogMerkleProofConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> FogMerkleProofConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
         return createFogMerkleProofConnection(networkConfig: networkConfig)
     }
 

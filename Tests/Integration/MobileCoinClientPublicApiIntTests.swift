@@ -9,8 +9,16 @@ import XCTest
 
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
-    func testBalance() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testBalanceGRPC() throws {
+        try balance(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testBalanceHTTP() throws {
+        try balance(transportProtocol: TransportProtocol.http)
+    }
+    
+    func balance(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Updating account balance")
         client.updateBalance {
@@ -26,8 +34,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testAccountActivity() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testAccountActivityGRPC() throws {
+        try accountActivity(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testAccountActivityHTTP() throws {
+        try accountActivity(transportProtocol: TransportProtocol.http)
+    }
+    
+    func accountActivity(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Updating account balance")
         client.updateBalance {
@@ -46,9 +62,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testUpdateBalance() throws {
+    func testUpdateBalanceGRPC() throws {
+        try updateBalance(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testUpdateBalanceHTTP() throws {
+        try updateBalance(transportProtocol: TransportProtocol.http)
+    }
+    
+    func updateBalance(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Updating account balance")
-        try IntegrationTestFixtures.createMobileCoinClient().updateBalance {
+        try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol).updateBalance {
             guard let balance = $0.successOrFulfill(expectation: expect) else { return }
 
             if let amountPicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
@@ -60,11 +84,19 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testPrepareTransaction() throws {
+    func testPrepareTransactionGRPC() throws {
+        try prepareTransaction(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testPrepareTransactionHTTP() throws {
+        try prepareTransaction(transportProtocol: TransportProtocol.http)
+    }
+    
+    func prepareTransaction(transportProtocol: TransportProtocol) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Preparing transaction")
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
                 to: recipient,
@@ -80,11 +112,19 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testSubmitTransaction() throws {
+    func testSubmitTransactionGRPC() throws {
+        try submitTransaction(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testSubmitTransactionHTTP() throws {
+        try submitTransaction(transportProtocol: TransportProtocol.http)
+    }
+    
+    func submitTransaction(transportProtocol: TransportProtocol) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         let expect = expectation(description: "Submitting transaction")
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
                 to: recipient,
@@ -105,9 +145,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testSelfPaymentBalanceChange() throws {
+    func testSelfPaymentBalanceChangeGRPC() throws {
+        try selfPaymentBalanceChange(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testSelfPaymentBalanceChangeHTTP() throws {
+        try selfPaymentBalanceChange(transportProtocol: TransportProtocol.http)
+    }
+    
+    func selfPaymentBalanceChange(transportProtocol: TransportProtocol) throws {
         let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 2)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
 
         let expect = expectation(description: "Self payment")
         func submitTransaction(callback: @escaping (Balance) -> Void) {
@@ -169,9 +217,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testSelfPaymentBalanceChangeFeeLevel() throws {
+    func testSelfPaymentBalanceChangeFeeLevelGRPC() throws {
+        try selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testSelfPaymentBalanceChangeFeeLevelHTTP() throws {
+        try selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol.http)
+    }
+    
+    func selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol) throws {
         let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
 
         let expect = expectation(description: "Self payment")
         func submitTransaction(callback: @escaping (Balance) -> Void) {
@@ -231,8 +287,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testTransactionStatus() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1)
+    func testTransactionStatusGRPC() throws {
+        try transactionStatus(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testTransactionStatusHTTP() throws {
+        try transactionStatus(transportProtocol: TransportProtocol.http)
+    }
+    
+    func transactionStatus(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         let expect = expectation(description: "Checking transaction status")
@@ -303,11 +367,20 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testReceiptStatus() throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0)
+    func testReceiptStatusGRPC() throws {
+        try receiptStatus(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testReceiptStatusHTTP() throws {
+        try receiptStatus(transportProtocol: TransportProtocol.http)
+    }
+    
+    func receiptStatus(transportProtocol: TransportProtocol) throws {
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
         let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
         let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
-            accountKey: receiverAccountKey)
+            accountKey: receiverAccountKey,
+            transportProtocol: transportProtocol)
 
         let expect = expectation(description: "Checking receipt status")
 
@@ -376,11 +449,19 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testConsensusTrustRootWorks() throws {
-        var config = try IntegrationTestFixtures.createMobileCoinClientConfig()
+    func testConsensusTrustRootWorksGRPC() throws {
+        try consensusTrustRootWorks(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testConsensusTrustRootWorksHTTP() throws {
+        try consensusTrustRootWorks(transportProtocol: TransportProtocol.http)
+    }
+    
+    func consensusTrustRootWorks(transportProtocol: TransportProtocol) throws {
+        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
         XCTAssertSuccess(
             config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()))
-        let client = try IntegrationTestFixtures.createMobileCoinClient(config: config)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(config: config, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         let expect = expectation(description: "Submitting transaction")
@@ -411,12 +492,20 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testExtraConsensusTrustRootWorks() throws {
-        var config = try IntegrationTestFixtures.createMobileCoinClientConfig()
+    func testExtraConsensusTrustRootWorksGRPC() throws {
+        try extraConsensusTrustRootWorks(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testExtraConsensusTrustRootWorksHTTP() throws {
+        try extraConsensusTrustRootWorks(transportProtocol: TransportProtocol.http)
+    }
+    
+    func extraConsensusTrustRootWorks(transportProtocol: TransportProtocol) throws {
+        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()
             + [try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes]))
         let client =
-            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, config: config)
+            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, config: config, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Submitting transaction")
@@ -447,16 +536,24 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testWrongConsensusTrustRootReturnsError() throws {
+    func testWrongConsensusTrustRootReturnsErrorGRPC() throws {
+        try wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testWrongConsensusTrustRootReturnsErrorHTTP() throws {
+        try wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol.http)
+    }
+    
+    func wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol) throws {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
         try XCTSkipIf(true)
 
-        var config = try IntegrationTestFixtures.createMobileCoinClientConfig()
+        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots([
             try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
         ]))
         let client =
-            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, config: config)
+            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, config: config, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         let expect = expectation(description: "Submitting transaction")
