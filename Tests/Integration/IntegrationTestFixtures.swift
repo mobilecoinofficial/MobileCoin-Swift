@@ -55,25 +55,25 @@ extension IntegrationTestFixtures {
         try Account.make(accountKey: createAccountKey(accountIndex: accountIndex)).get()
     }
 
-    static func createNetworkConfig() throws -> NetworkConfig {
-        try network.networkConfig()
+    static func createNetworkConfig(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> NetworkConfig {
+        try network.networkConfig(transportProtocol:transportProtocol)
     }
 
-    static func createNetworkConfig(trustRoots: [NIOSSLCertificate]) throws -> NetworkConfig {
+    static func createNetworkConfig(transportProtocol: TransportProtocol = TransportProtocol.grpc, trustRoots: [NIOSSLCertificate]) throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.consensusTrustRoots = trustRoots
         networkConfig.fogTrustRoots = trustRoots
         return networkConfig
     }
 
-    static func createNetworkConfigWithInvalidCredentials() throws -> NetworkConfig {
+    static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.consensusAuthorization = network.invalidCredentials
         networkConfig.fogUserAuthorization = network.invalidCredentials
         return networkConfig
     }
 
-    static func createMobileCoinClientConfig() throws -> MobileCoinClient.Config {
+    static func createMobileCoinClientConfig(transportProtocol: TransportProtocol = .grpc) throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
             consensusUrl: network.consensusUrl,
             consensusAttestation: network.consensusAttestation(),
@@ -81,29 +81,35 @@ extension IntegrationTestFixtures {
             fogViewAttestation: network.fogViewAttestation(),
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
-            fogReportAttestation: network.fogReportAttestation()).get()
+            fogReportAttestation: network.fogReportAttestation(),
+            transportProtocol: transportProtocol).get()
     }
 
-    static func createMobileCoinClient(accountIndex: Int = 0) throws -> MobileCoinClient {
+    static func createMobileCoinClient(
+        accountIndex: Int = 0,
+        transportProtocol: TransportProtocol = .grpc
+    ) throws -> MobileCoinClient {
         try createMobileCoinClient(accountKey: createAccountKey(accountIndex: accountIndex))
     }
 
     static func createMobileCoinClient(
         accountIndex: Int = 0,
-        config: MobileCoinClient.Config
+        config: MobileCoinClient.Config,
+        transportProtocol: TransportProtocol = .grpc
     ) throws -> MobileCoinClient {
         let accountKey = try createAccountKey(accountIndex: accountIndex)
         return try createMobileCoinClient(accountKey: accountKey, config: config)
     }
 
-    static func createMobileCoinClient(accountKey: AccountKey) throws -> MobileCoinClient {
-        let config = try createMobileCoinClientConfig()
+    static func createMobileCoinClient(accountKey: AccountKey, transportProtocol: TransportProtocol = .grpc) throws -> MobileCoinClient {
+        let config = try createMobileCoinClientConfig(transportProtocol: transportProtocol)
         return try createMobileCoinClient(accountKey: accountKey, config: config)
     }
 
     static func createMobileCoinClient(
         accountKey: AccountKey,
-        config: MobileCoinClient.Config
+        config: MobileCoinClient.Config,
+        transportProtocol: TransportProtocol = .grpc
     ) throws -> MobileCoinClient {
         var mutableConfig = config
         mutableConfig.httpRequester = TestHttpRequester()
@@ -124,6 +130,7 @@ extension IntegrationTestFixtures {
     static func createMobileCoinClientWithBalance(
         accountIndex: Int = 0,
         expectation: XCTestExpectation,
+        transportProtocol: TransportProtocol = .grpc,
         completion: @escaping (MobileCoinClient) -> Void
     ) throws {
         let accountKey = try createAccountKey(accountIndex: accountIndex)
@@ -136,6 +143,7 @@ extension IntegrationTestFixtures {
     static func createMobileCoinClientWithBalance(
         accountKey: AccountKey,
         expectation: XCTestExpectation,
+        transportProtocol: TransportProtocol = .grpc,
         completion: @escaping (MobileCoinClient) -> Void
     ) throws {
         let client = try createMobileCoinClient(accountKey: accountKey)
@@ -150,27 +158,27 @@ extension IntegrationTestFixtures {
         }
     }
 
-    static func createServiceProvider() throws -> ServiceProvider {
-        let networkConfig = try createNetworkConfig()
+    static func createServiceProvider(transportProtocol: TransportProtocol) throws -> ServiceProvider {
+        let networkConfig = try createNetworkConfig(transportProtocol: transportProtocol)
         return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
     }
 
-    static func createFogReportManager() throws -> FogReportManager {
-        let serviceProvider = try createServiceProvider()
+    static func createFogReportManager(transportProtocol: TransportProtocol) throws -> FogReportManager {
+        let serviceProvider = try createServiceProvider(transportProtocol: transportProtocol)
         return FogReportManager(serviceProvider: serviceProvider, targetQueue: DispatchQueue.main)
     }
 
-    static func createFogResolverManager() throws -> FogResolverManager {
-        let serviceProvider = try createServiceProvider()
-        let reportAttestation = try createNetworkConfig().fogReportAttestation
+    static func createFogResolverManager(transportProtocol: TransportProtocol) throws -> FogResolverManager {
+        let serviceProvider = try createServiceProvider(transportProtocol: transportProtocol)
+        let reportAttestation = try createNetworkConfig(transportProtocol: transportProtocol).fogReportAttestation
         return FogResolverManager(
             fogReportAttestation: reportAttestation,
             serviceProvider: serviceProvider,
             targetQueue: DispatchQueue.main)
     }
 
-    static func createFogViewKeyScanner(accountKey: AccountKey) throws -> FogViewKeyScanner {
-        let serviceProvider = try createServiceProvider()
+    static func createFogViewKeyScanner(transportProtocol: TransportProtocol, accountKey: AccountKey) throws -> FogViewKeyScanner {
+        let serviceProvider = try createServiceProvider(transportProtocol: transportProtocol)
         return FogViewKeyScanner(
             accountKey: accountKey,
             fogBlockService: serviceProvider.fogBlockService)

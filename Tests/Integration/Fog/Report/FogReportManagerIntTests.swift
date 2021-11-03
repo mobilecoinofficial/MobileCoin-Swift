@@ -6,8 +6,16 @@
 import XCTest
 
 class FogReportManagerIntTests: XCTestCase {
-    func testFogReport() throws {
-        let fogReportManager = try IntegrationTestFixtures.createFogReportManager()
+    func testFogReportGRPC() throws {
+        try fogReport(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testFogReportHTTP() throws {
+        try fogReport(transportProtocol: TransportProtocol.http)
+    }
+    
+    func fogReport(transportProtocol: TransportProtocol) throws {
+        let fogReportManager = try IntegrationTestFixtures.createFogReportManager(transportProtocol: transportProtocol)
         let reportUrl = try IntegrationTestFixtures.fogReportUrlTyped()
 
         let expect = expectation(description: "Retrieve fog reports")

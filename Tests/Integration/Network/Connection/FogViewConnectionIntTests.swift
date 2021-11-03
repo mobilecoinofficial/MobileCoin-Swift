@@ -9,8 +9,16 @@ import LibMobileCoin
 import XCTest
 
 class FogViewConnectionIntTests: XCTestCase {
-    func testEnclaveRequest() throws {
-        let fogViewConnection = try createFogViewConnection()
+    func testEnclaveRequestGRPC() throws {
+        try enclaveRequest(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestHTTP() throws {
+        try enclaveRequest(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequest(transportProtocol: TransportProtocol) throws {
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
         fogViewConnection.query(
@@ -34,9 +42,17 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsTxOuts() throws {
+    func testEnclaveRequestReturnsTxOutsGRPC() throws {
+        try enclaveRequestReturnsTxOuts(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestReturnsTxOutsHTTP() throws {
+        try enclaveRequestReturnsTxOuts(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequestReturnsTxOuts(transportProtocol: TransportProtocol) throws {
         let accountKey = try IntegrationTestFixtures.createAccountKey()
-        let fogViewConnection = try createFogViewConnection()
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
 
@@ -85,8 +101,16 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsNotFoundForFakeData() throws {
-        let fogViewConnection = try createFogViewConnection()
+    func testEnclaveRequestReturnsNotFoundForFakeDataGRPC() throws {
+        try enclaveRequestReturnsNotFoundForFakeData(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestReturnsNotFoundForFakeDataHTTP() throws {
+        try enclaveRequestReturnsNotFoundForFakeData(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequestReturnsNotFoundForFakeData(transportProtocol: TransportProtocol) throws {
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
 
@@ -110,8 +134,16 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKey() throws {
-        let fogViewConnection = try createFogViewConnection()
+    func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKeyGRPC() throws {
+        try enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKeyHTTP() throws {
+        try enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: TransportProtocol) throws {
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
 
@@ -135,8 +167,16 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKey() throws {
-        let fogViewConnection = try createFogViewConnection()
+    func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKeyGRPC() throws {
+        try enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKeyHTTP() throws {
+        try enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: TransportProtocol) throws {
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
 
@@ -161,8 +201,16 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKey() throws {
-        let fogViewConnection = try createFogViewConnection()
+    func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKeyGRPC() throws {
+        try enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKeyHTTP() throws {
+        try enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: TransportProtocol) throws {
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
 
@@ -187,8 +235,16 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKey() throws {
-        let fogViewConnection = try createFogViewConnection()
+    func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKeyGRPC() throws {
+        try enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKeyHTTP() throws {
+        try enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: TransportProtocol.http)
+    }
+    
+    func enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: TransportProtocol) throws {
+        let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Making Fog View enclave request")
 
@@ -213,11 +269,19 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
+        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    }
+    
+    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Making Fog View enclave request")
-        try createFogViewConnectionWithInvalidCredentials().query(
+        try createFogViewConnectionWithInvalidCredentials(transportProtocol:transportProtocol).query(
             requestAad: FogView_QueryRequestAAD(),
             request: FogView_QueryRequest()
         ) {
@@ -236,13 +300,13 @@ class FogViewConnectionIntTests: XCTestCase {
 }
 
 extension FogViewConnectionIntTests {
-    func createFogViewConnection() throws -> FogViewConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig()
+    func createFogViewConnection(transportProtocol: TransportProtocol) throws -> FogViewConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
         return createFogViewConnection(networkConfig: networkConfig)
     }
 
-    func createFogViewConnectionWithInvalidCredentials() throws -> FogViewConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials()
+    func createFogViewConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> FogViewConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
         return createFogViewConnection(networkConfig: networkConfig)
     }
 

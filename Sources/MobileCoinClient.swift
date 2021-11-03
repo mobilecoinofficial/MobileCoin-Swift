@@ -307,7 +307,8 @@ extension MobileCoinClient {
             fogViewAttestation: Attestation,
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
-            fogReportAttestation: Attestation
+            fogReportAttestation: Attestation,
+            transportProtocol: TransportProtocol = .grpc
         ) -> Result<Config, InvalidInputError> {
             ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
                 FogUrl.make(string: fogUrl).map { fogUrl in
@@ -320,7 +321,8 @@ extension MobileCoinClient {
                     let networkConfig = NetworkConfig(
                         consensusUrl: consensusUrl,
                         fogUrl: fogUrl,
-                        attestation: attestationConfig)
+                        attestation: attestationConfig,
+                        transportProtocol: transportProtocol)
                     return Config(networkConfig: networkConfig)
                 }
             }

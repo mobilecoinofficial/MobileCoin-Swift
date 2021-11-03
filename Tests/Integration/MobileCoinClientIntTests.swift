@@ -9,11 +9,19 @@ import XCTest
 
 class MobileCoinClientIntTests: XCTestCase {
 
-    func testTransactionDoubleSubmissionFails() throws {
+    func testTransactionDoubleSubmissionFailsGRPC() throws {
+        try transactionDoubleSubmissionFails(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testTransactionDoubleSubmissionFailsHTTP() throws {
+        try transactionDoubleSubmissionFails(transportProtocol: TransportProtocol.http)
+    }
+    
+    func transactionDoubleSubmissionFails(transportProtocol: TransportProtocol) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Submitting transaction twice")
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
                 to: recipient,
@@ -44,8 +52,16 @@ class MobileCoinClientIntTests: XCTestCase {
 
     /// Tests that the transaction status check fails if the inputs were spent by another
     /// transaction
-    func testTransactionStatusFailsWhenInputIsAlreadySpent() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0)
+    func testTransactionStatusFailsWhenInputIsAlreadySpentGRPC() throws {
+        try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testTransactionStatusFailsWhenInputIsAlreadySpentHTTP() throws {
+        try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol.http)
+    }
+    
+    func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Checking transaction status")
@@ -125,8 +141,16 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testTransactionStatusDoesNotSucceedWithoutSubmission() throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0)
+    func testTransactionStatusDoesNotSucceedWithoutSubmissionGRPC() throws {
+        try transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testTransactionStatusDoesNotSucceedWithoutSubmissionHTTP() throws {
+        try transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.http)
+    }
+    
+    func transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol) throws {
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Checking transaction status")
@@ -181,11 +205,20 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testReceiptStatusDoesNotSucceedWithoutSubmission() throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0)
+    func testReceiptStatusDoesNotSucceedWithoutSubmissionGRPC() throws {
+        try receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testReceiptStatusDoesNotSucceedWithoutSubmissionHTTP() throws {
+        try receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.http)
+    }
+    
+    func receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol) throws {
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
         let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
         let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
-            accountKey: receiverAccountKey)
+            accountKey: receiverAccountKey,
+            transportProtocol: transportProtocol)
 
         let expect = expectation(description: "Checking receipt status fails")
         func updateBalances(callback: @escaping () -> Void) {
@@ -255,8 +288,16 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 60)
     }
 
-    func testConcurrentBalanceChecks() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testConcurrentBalanceChecksGRPC() throws {
+        try concurrentBalanceChecks(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testConcurrentBalanceChecksHTTP() throws {
+        try concurrentBalanceChecks(transportProtocol: TransportProtocol.http)
+    }
+    
+    func concurrentBalanceChecks(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Checking account balance")
         client.updateBalance {
@@ -290,8 +331,16 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testConcurrentBalanceChecksWhileUpdating() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testConcurrentBalanceChecksWhileUpdatingGRPC() throws {
+        try concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testConcurrentBalanceChecksWhileUpdatingHTTP() throws {
+        try concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol.http)
+    }
+    
+    func concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Checking account balance")
         let group = DispatchGroup()
@@ -329,8 +378,16 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 120)
     }
 
-    func testConcurrentBalanceUpdates() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testConcurrentBalanceUpdatesGRPC() throws {
+        try concurrentBalanceUpdates(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testConcurrentBalanceUpdatesHTTP() throws {
+        try concurrentBalanceUpdates(transportProtocol: TransportProtocol.http)
+    }
+    
+    func concurrentBalanceUpdates(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
 
         let expect = expectation(description: "Checking account balance")
         let group = DispatchGroup()

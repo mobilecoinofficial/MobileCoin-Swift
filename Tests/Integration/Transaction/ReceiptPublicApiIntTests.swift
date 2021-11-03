@@ -7,8 +7,16 @@ import XCTest
 
 class ReceiptPublicApiIntTests: XCTestCase {
 
-    func testSerializedData() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testSerializedDataGRPC() throws {
+        try serializedData(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testSerializedDataHTTP() throws {
+        try serializedData(transportProtocol: TransportProtocol.http)
+    }
+    
+    func serializedData(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Testing Receipt serialization")
@@ -31,9 +39,17 @@ class ReceiptPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testValidateAndUnmaskValueAccepts() throws {
+    func testValidateAndUnmaskValueAcceptsGRPC() throws {
+        try validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testValidateAndUnmaskValueAcceptsHTTP() throws {
+        try validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol.http)
+    }
+    
+    func validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol) throws {
         let accountKey = try IntegrationTestFixtures.createAccountKey()
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
 
         let expect = expectation(description: "testing confirmation number")
         client.updateBalance {
@@ -56,11 +72,19 @@ class ReceiptPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testValidateAndUnmaskValueRejects() throws {
+    func testValidateAndUnmaskValueRejectsGRPC() throws {
+        try validateAndUnmaskValueRejects(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testValidateAndUnmaskValueRejectsHTTP() throws {
+        try validateAndUnmaskValueRejects(transportProtocol: TransportProtocol.http)
+    }
+    
+    func validateAndUnmaskValueRejects(transportProtocol: TransportProtocol) throws {
         let accountKey = try IntegrationTestFixtures.createAccountKey()
         let accountKey2 = try IntegrationTestFixtures.createAccountKey(accountIndex: 2)
         let accountKey3 = try IntegrationTestFixtures.createAccountKey(accountIndex: 3)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
 
         let expect = expectation(description: "testing confirmation number")
         client.updateBalance {

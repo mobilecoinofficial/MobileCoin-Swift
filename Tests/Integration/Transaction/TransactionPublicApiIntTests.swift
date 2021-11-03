@@ -7,8 +7,16 @@ import XCTest
 
 class TransactionPublicApiIntTests: XCTestCase {
 
-    func testSerializedData() throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient()
+    func testSerializedDataGRPC() throws {
+        try serializedData(transportProtocol: TransportProtocol.grpc)
+    }
+    
+    func testSerializedDataHTTP() throws {
+        try serializedData(transportProtocol: TransportProtocol.http)
+    }
+    
+    func serializedData(transportProtocol: TransportProtocol) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Testing Transaction serialization")
