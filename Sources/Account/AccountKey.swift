@@ -35,7 +35,8 @@ public struct AccountKey {
     let subaddressIndex: UInt64
 
     public let publicAddress: PublicAddress
-
+    public let publicChangeAddress: PublicAddress
+    
     init(
         viewPrivateKey: RistrettoPrivate,
         spendPrivateKey: RistrettoPrivate,
@@ -51,6 +52,11 @@ public struct AccountKey {
             spendPrivateKey: spendPrivateKey,
             accountKeyFogInfo: fogInfo,
             subaddressIndex: subaddressIndex)
+        self.publicChangeAddress = PublicAddress(
+            viewPrivateKey: viewPrivateKey,
+            spendPrivateKey: spendPrivateKey,
+            accountKeyFogInfo: fogInfo,
+            subaddressIndex: McConstants.DEFAULT_CHANGE_SUBADDRESS_INDEX)
     }
 
     /// - Returns: `nil` when the input is not deserializable.
@@ -86,6 +92,17 @@ public struct AccountKey {
             spendPrivateKey: spendPrivateKey,
             subaddressIndex: subaddressIndex
         ).subaddressSpendPrivateKey
+    }
+    
+    func subaddressIndex(forSubaddressPublicSpendKey subaddressPublicSpendKey: RistrettoPublic) -> Int? {
+        // subaddressPublicSpendKey by index
+        ([McConstants.DEFAULT_SUBADDRESS_INDEX, McConstants.DEFAULT_CHANGE_SUBADDRESS_INDEX].map {
+            AccountKeyUtils.publicAddressPublicKeys(
+                viewPrivateKey: viewPrivateKey,
+                spendPrivateKey: spendPrivateKey,
+                subaddressIndex: $0
+            ).spendPublicKey
+        }).firstIndex(of: subaddressPublicSpendKey)
     }
 }
 

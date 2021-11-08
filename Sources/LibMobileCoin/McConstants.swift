@@ -73,6 +73,8 @@ extension McConstants {
     /// An account's "default address" is its zero^th subaddress.
     static let DEFAULT_SUBADDRESS_INDEX: UInt64 = 0
 
+    /// An account's "default change address" is its one^th subaddress.
+    static let DEFAULT_CHANGE_SUBADDRESS_INDEX: UInt64 = 0
 }
 
 // MARK: - Keys
