@@ -23,7 +23,7 @@ class TxOutTests: XCTestCase {
         let fixture = try TxOut.Fixtures.Default()
         let txOut = fixture.txOut
         let recipientAccountKey = fixture.recipientAccountKey
-        XCTAssertEqual(txOut.keyImage(accountKey: recipientAccountKey), fixture.keyImage)
+        XCTAssertEqual(txOut.keyImage(accountKey: recipientAccountKey)?.keyImage, fixture.keyImage)
     }
 
     func testValue() throws {

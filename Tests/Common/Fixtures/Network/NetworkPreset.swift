@@ -124,13 +124,22 @@ extension NetworkPreset {
     }
 
     private static let mainNetConsensusMrEnclaveHex =
-        "e66db38b8a43a33f6c1610d335a361963bb2b31e056af0dc0a895ac6c857cab9"
+        "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
     private static let mainNetFogViewMrEnclaveHex =
-        "ddd59da874fdf3239d5edb1ef251df07a8728c9ef63057dd0b50ade5a9ddb041"
+        "dd84abda7f05116e21fcd1ee6361b0ec29445fff0472131eaf37bf06255b567a"
     private static let mainNetFogLedgerMrEnclaveHex =
-        "511eab36de691ded50eb08b173304194da8b9d86bfdd7102001fe6bb279c3666"
+        "89db0d1684fcc98258295c39f4ab68f7de5917ef30f0004d9a86f29930cebbbd"
     private static let mainNetFogReportMrEnclaveHex =
-        "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
+        "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
+    
+//    private static let mainNetConsensusMrEnclaveHex =
+//        "e66db38b8a43a33f6c1610d335a361963bb2b31e056af0dc0a895ac6c857cab9"
+//    private static let mainNetFogViewMrEnclaveHex =
+//        "ddd59da874fdf3239d5edb1ef251df07a8728c9ef63057dd0b50ade5a9ddb041"
+//    private static let mainNetFogLedgerMrEnclaveHex =
+//        "511eab36de691ded50eb08b173304194da8b9d86bfdd7102001fe6bb279c3666"
+//    private static let mainNetFogReportMrEnclaveHex =
+//        "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
 
     private static let testNetConsensusMrEnclaveHex =
         "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
