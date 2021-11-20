@@ -1,8 +1,8 @@
-# MobileCoin
+# MobileCoin SDK
 
 ![MobileCoin logo](images/mobilecoin-logo.png)
 
-## iOS (SWIFT) Integration Guide For MobileCoin Wallet
+## iOS (SWIFT) Integration Guide for developing MobileCoin wallet applications
 
 Product of MobileCoin™
 
@@ -13,7 +13,7 @@ Product of MobileCoin™
 * [About this guide](about.md)
   * Who should read this guide
   * How to use this guide
-  * Special symbols used in this guide
+  * Special notations used in this guide
 * [MobileCoin Overview](mobilecoin.md)
   * About MobileCoin
   * Understanding the MobileCoin SDK

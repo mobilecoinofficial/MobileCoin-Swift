@@ -1,6 +1,6 @@
-# Check Transaction Status (for Sender)
+# Check transaction status (for sender)
 
-Senders can check their transaction status on their smartphone’s MobileCoin wallet app by looking up their balance history in their Settings:
+Senders can check their transaction status on their smartphone’s MobileCoin wallet app by looking up their balance history in the app's  *Settings*:
 
 ![Locate the balance history in the Settings.](images/balance-history.jpeg) ![Users can check their transaction status of their recent sent payments on their smartphone’s MobileCoin wallet app by looking up their balance history in their Settings.](images/transaction-status.jpeg)
 

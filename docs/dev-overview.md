@@ -1,6 +1,6 @@
 # Developing the code for a MobileCoin wallet app
 
-When developing the MobileCoin wWallet app, you will need to develop code for the following:  
+When developing a MobileCoin wallet app, you will need to utilize code for the following:  
 
 1. [Create an account key.](create-account-key.md)
 2. [Share public addresses.](share-public-addresses.md)
@@ -16,4 +16,4 @@ When developing the MobileCoin wWallet app, you will need to develop code for th
 
 2. The code you as the developer need to create in your mobile wallet app for an iOS mobile device.
 
-These two elements provide the goal (user experience) and code (implementation) for successful implementation of the MobileCoin functionality.
+These two elements provide the goal (*user experience*) and code (*implementation*) for successful implementation of the MobileCoin functionality.

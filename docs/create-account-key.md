@@ -1,6 +1,6 @@
 # Create an account key
 
-In order for new users to create a MobileCoin wallet on their smartphone, they must add an **account key** by importing an account or scan a QR Code from their camera’s library.
+In order for new users to create a MobileCoin wallet on their smartphone, they must add an [**account key**](glossary.md) by importing an account or scan a QR Code from their camera’s library.
 
 ![Importing an account](images/import-account.jpeg)
 

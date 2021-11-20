@@ -1,8 +1,12 @@
-# Calculate Fee
+# Calculate fee
+
+### User experience
 
 In order for users to send transactions, users must pay the **transaction fee**:
 
 ![Users must be able to be charged a transaction fee when they send payments from their smartphone.](images/calculate-fee.jpeg)
+
+### Implementation
 
 As an iOS/SWIFT developer, you will need the following code enable the user to be charged a transaction fee:
 

@@ -23,7 +23,7 @@ View, Ledger, and Consensus services use Intel’s SGX enclaves, so clients must
 
 The *View Server* enables users to view their transactions and get their balances.
 
-The *Ledger Server* allows users to get “materials” to construct new private transactions. These materials include other *transaction outputs* ([**TxOuts** or “*mixins*](glossary.md) and [**Merkle Proofs of Membership**](glossary.md). Each TxOut is like a coin, where every transaction uses TxOuts as inputs to create new TxOuts as the outputs of a transaction.
+The *Ledger Server* allows users to get “materials” to construct new private transactions. These materials include other *transaction outputs* ([**TxOuts** or “*mixins*](glossary.md)) and [**Merkle Proofs of Membership**](glossary.md). Each TxOut is like a coin, where every transaction uses TxOuts as inputs to create new TxOuts as the outputs of a transaction.
 
 **NOTE**: MobileCoin preserves the privacy of the sender by mixing in random coins from the ledger (*mixins*), with the coins the user wants to spend. A Merkle Proof of Membership is provided with each *mixin* as proof that the input is included in the MobileCoin Ledger, so that new coins cannot be forged.
 
