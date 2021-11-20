@@ -35,7 +35,7 @@ Please check your country's laws before downloading or using this software.
 ## Repository Structure
 |Directory |Description |
 | :-- | :-- |
-| [Docs](./docs) | Documentation. |
+| [Docs](./docs) | Documentation. | 
 | [Example](./Example) | Example application. |
 | [Sources](./Sources) | Sources for the MobileCoin Swift SDK. |
 | [Tests](./Tests) | Tests. |
