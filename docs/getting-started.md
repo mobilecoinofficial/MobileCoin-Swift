@@ -6,7 +6,7 @@ This guide is specifically for developers who have chosen to enable their custom
 
 This chapter focuses on the requirements that messaging services must meet in order to implement a MobileCoin wallet app, as well as how the MobileCoin SDK works.
 
-## MobileCoin Mobile Integration Requirements
+## MobileCoin integration requirements
 
 Before implementing the MobileCoin SDK, your messaging service must meet a certain number of requirements. These include the ability to:
 
