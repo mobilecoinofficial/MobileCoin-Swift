@@ -29,12 +29,13 @@ MobileCoin is a privacy-preserving payments network designed for use on mobile d
 MobileCoin is available under open-source licenses. Please read the [*LICENSE.md*](./LICENSE.md) and corresponding [*LICENSE*](./LICENSE).
 
 ## Cryptography Notice
-This distribution includes cryptographic software. Your country may have restrictions on the use of encryption software. 
+This distribution includes cryptographic software. Your country may have restrictions on the use of encryption software.
 Please check your country's laws before downloading or using this software.
 
 ## Repository Structure
 |Directory |Description |
 | :-- | :-- |
+| [Docs](./docs) | Documentation. |
 | [Example](./Example) | Example application. |
 | [Sources](./Sources) | Sources for the MobileCoin Swift SDK. |
 | [Tests](./Tests) | Tests. |
@@ -68,10 +69,10 @@ Note: To build libmobilecoin, run `make` in [libmobilecoin-ios-artifacts](./Vend
 
 ## Overview
 
-MobileCoin is a payment network with no central authority. The fundamental goal of the network is to safely and 
-efficiently enable the exchange of value, represented as fractional ownership of the total value of the network. 
-Like most cryptocurrencies, MobileCoin maintains a permanent and immutable record of all successfully completed 
-payments in a blockchain data structure. Cryptography is used extensively to establish ownership, control transfers, 
+MobileCoin is a payment network with no central authority. The fundamental goal of the network is to safely and
+efficiently enable the exchange of value, represented as fractional ownership of the total value of the network.
+Like most cryptocurrencies, MobileCoin maintains a permanent and immutable record of all successfully completed
+payments in a blockchain data structure. Cryptography is used extensively to establish ownership, control transfers,
 and to preserve cash-like privacy for users.
 
 For more information about the cryptocurrency, see [MobileCoinFoundation/MobileCoin](https://github.com/mobilecoinfoundation/mobilecoin).
