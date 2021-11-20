@@ -10,24 +10,24 @@ Product of MobileCoin™
 
 ## Table of Contents
 
-* About this Manual
-  * Who Should Read this Manual
-  * How to Use this Manual
-  * Special Symbols Used in this Manual
-* MobileCoin Overview
-* About MobileCoin
+* [About this guide](about.md)
+  * Who should read this guide
+  * How to use this guide
+  * Special symbols used in this guide
+* [MobileCoin Overview](mobilecoin.md)
+  * About MobileCoin
   * Understanding the MobileCoin SDK
   * Understanding MobileCoin Fog Services
   * Understanding MobileCoin Consensus Services
-* Getting Started
+* [Getting Started](getting-started.md)
   * MobileCoin Mobile Integration Requirements
-* Developing the Code for the MobileCoin Wallet App
-  * Create an Account Key
-  * Share Public Addresses
-  * Get Balance
-  * Send Transaction
-  * Calculate Fee
-  * Check Transaction Status (for Sender)
-  * Transaction Receipts (for Recipient)
-* Glossary
-* Frequently Asked Questions
+* [Developing the Code for the MobileCoin Wallet App]()
+  * [Create an Account Key](create-account-key.md)
+  * [Share Public Addresses](share-public-addresses.md)
+  * [Get Balance](get-balance.md)
+  * [Send Transaction](send-transaction.md)
+  * [Calculate Fee](calculate-fee.md)
+  * [Check Transaction Status (for Sender)](check-transaction-status.md)
+  * [Transaction Receipts (for Recipient)](transaction-receipts.md)
+* [Glossary](glossary.md)
+* [Frequently Asked Questions](faq.md)
