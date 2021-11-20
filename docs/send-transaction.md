@@ -4,7 +4,7 @@ To send a transaction, users need to enter the transaction amount and send to a 
 
 ![Users can send transactions to other users, if they know their public addresses (QR Codes).](images/send-transaction.jpeg)
 
-As an iOS/SWIFT developer, you will need the following code to enable the user to send transasctions:
+As an iOS/SWIFT developer, you will need the following code to enable the user to send transactions:
 
 ```SWIFT
 accountOps.prepareTransaction(

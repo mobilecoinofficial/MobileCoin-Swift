@@ -21,7 +21,7 @@ Product of MobileCoin™
   * Understanding MobileCoin Consensus Services
 * [Getting Started](getting-started.md)
   * MobileCoin Mobile Integration Requirements
-* [Developing the Code for the MobileCoin Wallet App]()
+* [Developing the Code for the MobileCoin Wallet App](dev-overview.md)
   * [Create an Account Key](create-account-key.md)
   * [Share Public Addresses](share-public-addresses.md)
   * [Get Balance](get-balance.md)

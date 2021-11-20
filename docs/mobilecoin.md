@@ -18,13 +18,14 @@ The MobileCoin nNetwork is an open-source software ecosystem that introduces sev
 ## The MobileCoin SDK architecture
 
 ![The MobileCoin SDK Architecture.](images/mobilecoin-sdk-architecture.png)
+
 View, Ledger, and Consensus services use Intel’s SGX enclaves, so clients must establish attested connections to these services. The MobileCoin SDK handles the logic for attestation.
 
 The *View Server* enables users to view their transactions and get their balances.
 
-The *Ledger Server* allows users to get “materials” to construct new private transactions. These materials include other *transaction outputs* (**TxOuts** or “*mixins*) and **Merkle Proofs of Membership**. Each TxOut is like a coin, where every transaction uses TxOuts as inputs to create new TxOuts as the outputs of a transaction.
+The *Ledger Server* allows users to get “materials” to construct new private transactions. These materials include other *transaction outputs* ([**TxOuts** or “*mixins*](glossary.md) and [**Merkle Proofs of Membership**](glossary.md). Each TxOut is like a coin, where every transaction uses TxOuts as inputs to create new TxOuts as the outputs of a transaction.
 
-**NOTE** MobileCoin preserves the privacy of the sender by mixing in random coins from the ledger (mixins), with the coins the user wants to spend. A Merkle Proof of Membership is provided with each mixin as proof that the input is included in the MobileCoin Ledger, so that new coins cannot be forged.
+**NOTE**: MobileCoin preserves the privacy of the sender by mixing in random coins from the ledger (*mixins*), with the coins the user wants to spend. A Merkle Proof of Membership is provided with each *mixin* as proof that the input is included in the MobileCoin Ledger, so that new coins cannot be forged.
 
 ## Understanding the MobileCoin SDK
 

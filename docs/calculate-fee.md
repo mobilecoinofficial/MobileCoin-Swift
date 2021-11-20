@@ -1,6 +1,6 @@
 # Calculate Fee
 
-In order for users to send transactions, users must pay the **transaction fee**:.
+In order for users to send transactions, users must pay the **transaction fee**:
 
 ![Users must be able to be charged a transaction fee when they send payments from their smartphone.](images/calculate-fee.jpeg)
 

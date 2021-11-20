@@ -8,7 +8,7 @@ In order for new users to share their public addresses from their MobileCoin wal
 
 ![Share public address](images/share-public-address.jpeg)
 
-As an iOS/SWIFT developer, you will need the following code to enable the user to generate a request code.
+As an iOS/SWIFT developer, you will need the following code to enable the user to generate a request code:
 
 ```SWIFT
 let bytes = account.publicAddress

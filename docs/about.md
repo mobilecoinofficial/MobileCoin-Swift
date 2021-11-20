@@ -2,7 +2,7 @@
 
 MobileCoin has developed a Software Developer Kit (**SDK**) for companies or independent developers who want to develop a mobile wallet app on a messaging service. This mobile wallet app will enable cryptocurrency users to *send* and *receive* mobilecoins (**MOB**) via their mobile devices. The MobileCoin SDK Architecture provides a layer of business logic and cryptographic operations to enable companies and developers to get started quickly in developing their wallet app.
 
-For more information about the MobileCoin Network, check out the [MobileCoin Ecosystem]() -- a brief document about the MobileCoin open-source software network.
+For more information about the MobileCoin Network, check out the [MobileCoin Ecosystem](link here?) -- a brief document about the MobileCoin open-source software network.
 
 This manual provides a comprehensive overview of the MobileCoin SDK Architecture, and how to utilize the MobileCoin SDK when developing a mobile wallet app, including how the **account key** operates, and how to send and receive transactions.
 
