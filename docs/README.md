@@ -6,7 +6,7 @@
 
 Product of MobileCoin™
 
-*Copyright © 2020 MobileCoin™. No part of this manual may be reproduced in whole or in part without the express written permission of MobileCoin. MobileCoin reserves the right to change product design and specifications at any time without prior notice. MobileCoin™TM is a trademark of MobileCoin, Inc. All company, brand, and product names are registered trademarks of their respective holders.*
+*Copyright © 2021 MobileCoin™. No part of this manual may be reproduced in whole or in part without the express written permission of MobileCoin. MobileCoin reserves the right to change product design and specifications at any time without prior notice. MobileCoin™T is a trademark of MobileCoin, Inc. All company, brand, and product names are registered trademarks of their respective holders.*
 
 ## Table of Contents
 
