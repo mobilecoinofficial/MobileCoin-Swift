@@ -8,13 +8,13 @@ In order for new users to share their public addresses from their MobileCoin wal
 
 **NOTE**: Users can share their public addresses without sending a transaction.
 
-![Share public address](images/share-public-address.jpeg)
+![Share public address](../images/share-public-address.jpeg)
 
 ### Implementation
 
 As an iOS/SWIFT developer, you will need the following code to enable the user to generate a request code:
 
-```SWIFT
+```
 let bytes = account.publicAddress
 .serializedProtoBytes
 /* -------------------------- */

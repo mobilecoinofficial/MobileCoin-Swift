@@ -1,8 +1,8 @@
 # About the MobileCoin SDK Documentation Guide (for iOS/SWIFT)
 
-MobileCoin has developed a Software Developer Kit (**SDK**) for companies or independent developers who want to develop a mobile wallet app on a messaging service. This mobile wallet app will enable cryptocurrency users to *send* and *receive* mobilecoins ([**MOB**](glossary.md)) via their mobile devices. The MobileCoin SDK Architecture provides a layer of business logic and cryptographic operations to enable companies and developers to get started quickly in developing their wallet app.
+MobileCoin has developed a Software Developer Kit (**SDK**) for companies or independent developers who want to develop a mobile wallet app on a messaging service. This mobile wallet app will enable cryptocurrency users to _send_ and _receive_ mobilecoins ([**MOB**](glossary.md)) via their mobile devices. The MobileCoin SDK Architecture provides a layer of business logic and cryptographic operations to enable companies and developers to get started quickly in developing their wallet app.
 
-For more information about the MobileCoin Network, check out the [MobileCoin Ecosystem](link here?) -- a brief document about the MobileCoin open-source software network.
+For more information about the MobileCoin Network, check out the \[MobileCoin Ecosystem]\(link here?) -- a brief document about the MobileCoin open-source software network.
 
 This manual provides a comprehensive overview of the MobileCoin SDK Architecture, and how to utilize the MobileCoin SDK when developing a mobile wallet app, including how the **account key** operates, and how to send and receive transactions.
 
@@ -12,7 +12,7 @@ This guide should be read and referenced by developers, who have been entrusted 
 
 ## How to use this guide
 
-Take a moment to familiarize yourself with this iOS/SWIFT Integration Guide by reading the [Table of Contents](README.md). Each section referenced in the TOC should be read carefully so that you can quickly and easily integrate your wallet app with the MobileCoin network.
+Take a moment to familiarize yourself with this iOS/SWIFT Integration Guide by reading the [Table of Contents](../). Each section referenced in the TOC should be read carefully so that you can quickly and easily integrate your wallet app with the MobileCoin network.
 
 ### Special symbols used in this guide
 

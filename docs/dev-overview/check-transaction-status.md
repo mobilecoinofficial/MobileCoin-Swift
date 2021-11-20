@@ -2,15 +2,15 @@
 
 ### User experience
 
-Senders can check their transaction status on their smartphone’s MobileCoin wallet app by looking up their balance history in the app's  *Settings*:
+Senders can check their transaction status on their smartphone’s MobileCoin wallet app by looking up their balance history in the app's _Settings_:
 
-![Locate the balance history in the Settings.](images/balance-history.jpeg) ![Users can check their transaction status of their recent sent payments on their smartphone’s MobileCoin wallet app by looking up their balance history in their Settings.](images/transaction-status.jpeg)
+![Locate the balance history in the Settings.](../images/balance-history.jpeg) ![Users can check their transaction status of their recent sent payments on their smartphone’s MobileCoin wallet app by looking up their balance history in their Settings.](../images/transaction-status.jpeg)
 
 ### Implementation
 
 As an iOS/SWIFT developer, you will need the following code to enable the user to check their transaction status:
 
-```SWIFT
+```
 let status = accountOps.status(
 account: account,
 transaction: transaction)
