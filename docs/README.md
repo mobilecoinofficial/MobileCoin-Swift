@@ -1,15 +1,14 @@
-#MobileCoin
+# MobileCoin
 
 ![MobileCoin logo](images/mobilecoin-logo.png)
 
-##iOS (SWIFT) Integration Guide For MobileCoin Wallet
+## iOS (SWIFT) Integration Guide For MobileCoin Wallet
 
-Product of
-MobileCoin™TM
+Product of MobileCoin™
 
-Copyright © 2020 MobileCoin™TM. No part of this manual may be reproduced in whole or in part without the express written permission of MobileCoin. MobileCoin reserves the right to change product design and specifications at any time without prior notice. MobileCoin™TM is a trademark of MobileCoin, Inc. All company, brand, and product names are registered trademarks of their respective holders.
+*Copyright © 2020 MobileCoin™. No part of this manual may be reproduced in whole or in part without the express written permission of MobileCoin. MobileCoin reserves the right to change product design and specifications at any time without prior notice. MobileCoin™TM is a trademark of MobileCoin, Inc. All company, brand, and product names are registered trademarks of their respective holders.*
 
-##Table of Contents
+## Table of Contents
 
 * About this Manual
   * Who Should Read this Manual
