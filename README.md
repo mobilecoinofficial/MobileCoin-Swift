@@ -1,6 +1,6 @@
 # MobileCoin SDK
 
-![MobileCoin logo](docs/docs/images/mobilecoin-logo.png)
+![MobileCoin logo](.gitbook/assets/mobilecoin-logo.png)
 
 ## iOS (SWIFT) Integration Guide for developing MobileCoin wallet applications
 
