@@ -1,6 +1,6 @@
 # Table of contents
 
-* [iOS/SWIFT Integration Guide for MobileCoin SDK](docs/integration-guide.md)
+* [iOS/SWIFT Integration Guide for MobileCoin SDK](README.md)
   * [About the MobileCoin SDK Documentation Guide (for iOS/SWIFT)](docs/about.md)
   * [MobileCoin Overview](docs/mobilecoin.md)
   * [Getting started](docs/getting-started.md)

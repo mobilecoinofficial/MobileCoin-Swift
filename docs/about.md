@@ -12,7 +12,7 @@ This guide should be read and referenced by developers, who have been entrusted 
 
 ## How to use this guide
 
-Take a moment to familiarize yourself with this iOS/SWIFT Integration Guide by reading the [Table of Contents](../#table-of-contents). Each section referenced in the TOC should be read carefully so that you can quickly and easily integrate your wallet app with the MobileCoin network.
+Take a moment to familiarize yourself with this iOS/SWIFT Integration Guide by reading the Table of Contents. Each section referenced in the TOC should be read carefully so that you can quickly and easily integrate your wallet app with the MobileCoin network.
 
 ### Special symbols used in this guide
 
