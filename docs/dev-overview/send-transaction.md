@@ -10,7 +10,7 @@ To send a transaction, users need to enter the transaction amount and send to a 
 
 As an iOS/SWIFT developer, you will need the following code to enable the user to send transactions:
 
-```
+```swift
 accountOps.prepareTransaction(
 from: account,
 to: recipient,

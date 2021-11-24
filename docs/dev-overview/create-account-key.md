@@ -2,7 +2,7 @@
 
 ### User experience
 
-In order for new users to create a MobileCoin wallet on their smartphone, they must add an [**account key**](../glossary.md) by importing an account or scan a QR Code from their camera’s library.
+In order for new users to create a MobileCoin wallet on their smartphone, they must add an [**account key**](../glossary.md) by importing an account or adding a QR Code using their device's photo library.
 
 ![Importing an account](../images/import-account.jpeg)
 
@@ -12,7 +12,7 @@ In order for new users to create a MobileCoin wallet on their smartphone, they m
 
 As an iOS/SWIFT developer, you need the following code to enable the user to create/import the account key:
 
-```
+```swift
 let rootEntropy = Data(/* bytes */)
 let account = try Account(
 rootEntropy: rootEntropy,

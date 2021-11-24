@@ -8,16 +8,20 @@ This manual provides a comprehensive overview of the MobileCoin SDK Architecture
 
 ## Who should read this guide
 
-This guide should be read and referenced by developers, who have been entrusted with setting up and managing the integration of MobileCoin wallet functionality on a messaging service to enable its customers to exchange MOB. The developer will be implementing a unique MobileCoin wallet application to integrate with MobileCoin’s network.
+This guide should be read and referenced by developers, who have been entrusted with setting up and managing the integration of MobileCoin wallet functionality on a messaging service to enable users to exchange MOB. The developer will be implementing a unique MobileCoin wallet application to integrate with MobileCoin’s network.
 
 ## How to use this guide
 
-Take a moment to familiarize yourself with this iOS/SWIFT Integration Guide by reading the [Table of Contents](README.md). Each section referenced in the TOC should be read carefully so that you can quickly and easily integrate your wallet app with the MobileCoin network.
+Take a moment to familiarize yourself with this iOS/SWIFT Integration Guide by reading the [Table of Contents](../#table-of-contents). Each section referenced in the TOC should be read carefully so that you can quickly and easily integrate your wallet app with the MobileCoin network.
 
 ### Special symbols used in this guide
 
 At times when we want to emphasize important information and valuable tips associated with the MobileCoin mobile integration app, we'll be using the the **NOTE** and **WARNING** notations with following meanings that you should heed:
 
-**NOTE**: Important information concerning the integration of your MobileCoin wallet app with the MobileCoin network.
+{% hint style="info" %}
+Important information concerning the integration of your MobileCoin wallet app with the MobileCoin network.
+{% endhint %}
 
-**WARNING**: Failure to follow directions may result in preventing your MobileCoin wallet app from operating successfully on the MobileCoin network.
+{% hint style="danger" %}
+Failure to follow directions may result in preventing your MobileCoin wallet app from operating successfully on the MobileCoin network.
+{% endhint %}

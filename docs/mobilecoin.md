@@ -1,10 +1,12 @@
 # MobileCoin Overview
 
-MobileCoin aspires to be the most trusted payment system in the world. We designed and built our network with the most secure open-source protocols available. Our encrypted payments are created using secret keys that never leave the user’s device.
+### Why MobileCoin?
+
+[MobileCoin](https://mobilecoin.com) aspires to be the most trusted payment system in the world. We designed and built our network with the most secure open-source protocols available. Our encrypted payments are created using secret keys that never leave the user’s device.
 
 ## About MobileCoin
 
-The MobileCoin nNetwork is an open-source software ecosystem that introduces several innovations to the cryptocurrency community, including:
+The MobileCoin Network is an open-source software ecosystem that introduces several innovations to the cryptocurrency community, including:
 
 * **MobileCoin Ledger**: a new privacy-preserving blockchain built on a technology foundation that includes CryptoNote and Ring Confidential Transactions (RingCT);
 * **MobileCoin Consensus Protocol**: a high-performance solution to the Byzantine Agreement Problem that allows new payments to be rapidly confirmed rapidly;
@@ -21,11 +23,13 @@ The MobileCoin nNetwork is an open-source software ecosystem that introduces sev
 
 View, Ledger, and Consensus services use Intel’s SGX enclaves, so clients must establish attested connections to these services. The MobileCoin SDK handles the logic for attestation.
 
-The *View Server* enables users to view their transactions and get their balances.
+The _View Server_ enables users to view their transactions and get their balances.
 
-The *Ledger Server* allows users to get “materials” to construct new private transactions. These materials include other *transaction outputs* ([**TxOuts** or “*mixins*](glossary.md)) and [**Merkle Proofs of Membership**](glossary.md). Each TxOut is like a coin, where every transaction uses TxOuts as inputs to create new TxOuts as the outputs of a transaction.
+The _Ledger Server_ allows users to get “materials” to construct new private transactions. These materials include other _transaction outputs_ ([**TxOuts** or “_mixins_](glossary.md)) and [**Merkle Proofs of Membership**](glossary.md). Each TxOut is like a coin, where every transaction uses TxOuts as inputs to create new TxOuts as the outputs of a transaction.
 
-**NOTE**: MobileCoin preserves the privacy of the sender by mixing in random coins from the ledger (*mixins*), with the coins the user wants to spend. A Merkle Proof of Membership is provided with each *mixin* as proof that the input is included in the MobileCoin Ledger, so that new coins cannot be forged.
+{% hint style="info" %}
+MobileCoin preserves the privacy of the sender by mixing in random coins from the ledger ([_mixins_](glossary.md)), with the coins the user wants to spend. A Merkle Proof of Membership is provided with each _mixin_ as proof that the input is included in the MobileCoin Ledger, so that new coins cannot be forged.
+{% endhint %}
 
 ## Understanding the MobileCoin SDK
 
@@ -33,19 +37,19 @@ MobileCoin has developed an SDK for developers to get started quickly in develop
 
 The three most important steps to implementing a MobileCoin wallet app on your messaging service include:
 
-1. *Managing account keys*: The custom mobile app must manage the account keys for the users’ smartphone wallet.
-2. *Sending transactions*: The app must be able to receive Fog data, such as view and spend information.
-3. *Checking balances* and *receiving transactions*: The app must be able to connect to the Consensus Server to send and validate new transactions.
+1. _Managing account keys_: The custom mobile app must manage the account keys for the users’ smartphone wallet.
+2. _Sending transactions_: The app must be able to receive Fog data, such as view and spend information.
+3. _Checking balances_ and _receiving transactions_: The app must be able to connect to the Consensus Server to send and validate new transactions.
 
 A user's **account key** consists of secret keys as well as public addresses.
 
 ![How the mobile wallet app manages the mobile wallet’s secret keys, Fog data, and public addresses across different platforms.](images/mobilecoin-account.png)
 
-The *view secret key* allows the user to decrypt received transactions uniquely, while the *spend secret key* provides spend authority over the user's MOB.
+The _view secret key_ allows the user to decrypt received transactions uniquely, while the _spend secret key_ provides spend authority over the user's MOB.
 
-The public components of the view and spend keys create the *public address*, which a user can provide to others in order to receive MOB.
+The public components of the view and spend keys create the _public address_, which a user can provide to others in order to receive MOB.
 
-In addition, **FogData** (see below) is included in the account key so that mobile users can transact without needing to download the entire ledger. This FogData is available through the *public address*, and is required in order to receive MOB on a mobile device. The SDK also provides *cross-platform serialization formats*, so that wallets can communicate public addresses and transaction materials across different platforms.
+In addition, **FogData** (see below) is included in the account key so that mobile users can transact without needing to download the entire ledger. This FogData is available through the _public address_, and is required in order to receive MOB on a mobile device. The SDK also provides _cross-platform serialization formats_, so that wallets can communicate public addresses and transaction materials across different platforms.
 
 ## Understanding MobileCoin Fog Services
 

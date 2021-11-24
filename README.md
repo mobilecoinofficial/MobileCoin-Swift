@@ -1,12 +1,24 @@
-# MobileCoin SDK
+---
+description: For developing MobileCoin wallet applications
+---
+
+# iOS/SWIFT Integration Guide for MobileCoin SDK
 
 ![MobileCoin logo](.gitbook/assets/mobilecoin-logo.png)
 
-## iOS (SWIFT) Integration Guide for developing MobileCoin wallet applications
+### Welcome!
 
-Product of MobileCoin™
+We're thrilled to have you here!
 
-_Copyright © 2021 MobileCoin™. No part of this manual may be reproduced in whole or in part without the express written permission of MobileCoin. MobileCoin reserves the right to change product design and specifications at any time without prior notice. MobileCoin™T is a trademark of MobileCoin, Inc. All company, brand, and product names are registered trademarks of their respective holders._
+In this Integration Guide you'll find all the necessary information and code examples for developing MobileCoin functionality in your custom wallet app.
+
+If you're new to MobileCoin, we recommend reading through the rest of the content in the Dev Portal. You'll find a shorter overview in [MobileCoin overview](docs/mobilecoin.md), as well as a [Glossary](docs/glossary.md) with the most important terms and definitions, and a regularly updated [FAQ](docs/faq.md).
+
+If you're already familiar with MobileCoin, but new to developing with the MobileCoin SDK, head to the [Getting Started](docs/getting-started.md) chapter.
+
+For quick reference of functionality, see [Developing the code](docs/dev-overview/).
+
+_Happy developing!_
 
 ## Table of Contents
 
@@ -31,3 +43,7 @@ _Copyright © 2021 MobileCoin™. No part of this manual may be reproduced in wh
   * [Transaction receipts (for recipient)](docs/docs/dev-overview/transaction-receipts.md)
 * [Glossary](docs/docs/glossary.md)
 * [Frequently Asked Questions](docs/docs/faq.md)
+
+Product of MobileCoin™
+
+_Copyright © 2021 MobileCoin™. No part of this manual may be reproduced in whole or in part without the express written permission of MobileCoin. MobileCoin reserves the right to change product design and specifications at any time without prior notice. MobileCoin™ is a trademark of MobileCoin, Inc. All company, brand, and product names are registered trademarks of their respective holders._

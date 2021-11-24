@@ -10,7 +10,7 @@ In order for users to receive transactions (that is, get their balance), they mu
 
 As an iOS/SWIFT developer, you will need the following code to enable the user to get their balance:
 
-```
+```swift
 let accountOps = AccountOperations(
 fogUrl: fogUrl,
 consensusUrl: consensusUrl)
