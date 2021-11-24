@@ -12,7 +12,7 @@ test_output/
 Pods/
 
 # Jazzy
-#/docs/
+/docs/
 
 # npm
 node_modules/
