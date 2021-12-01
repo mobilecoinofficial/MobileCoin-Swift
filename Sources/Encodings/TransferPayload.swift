@@ -27,7 +27,8 @@ public struct TransferPayload {
 
     public var rootEntropy: Data {
         guard let rootEntropy = rootEntropy32 else {
-            logger.error("rootEntropy not availabe in TransferPayload")
+            let errorMessage = "rootEntropy not available in TransferPayload"
+            logger.error(errorMessage, logFunction: false)
             return Data()
         }
         return rootEntropy.data
@@ -35,7 +36,8 @@ public struct TransferPayload {
     
     public var bip39: Data {
         guard let bip39 = bip39_32 else {
-            logger.error("bip39 not availabe in TransferPayload")
+            let errorMessage = "bip39 not available in TransferPayload"
+            logger.error(errorMessage, logFunction: false)
             return Data()
         }
         return bip39.data
