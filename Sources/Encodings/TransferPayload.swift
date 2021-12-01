@@ -17,7 +17,7 @@ public struct TransferPayload {
         self.txOutPublicKey = txOutPublicKey
         self.memo = memo?.isEmpty == false ? memo : nil
     }
-    
+
     init(bip39: Data32, txOutPublicKey: RistrettoPublic, memo: String? = nil) {
         self.bip39_32 = bip39
         self.rootEntropy32 = nil
@@ -25,22 +25,12 @@ public struct TransferPayload {
         self.memo = memo?.isEmpty == false ? memo : nil
     }
 
-    public var rootEntropy: Data {
-        guard let rootEntropy = rootEntropy32 else {
-            let errorMessage = "rootEntropy not available in TransferPayload"
-            logger.error(errorMessage, logFunction: false)
-            return Data()
-        }
-        return rootEntropy.data
+    public var rootEntropy: Data? {
+        rootEntropy32?.data
     }
-    
-    public var bip39: Data {
-        guard let bip39 = bip39_32 else {
-            let errorMessage = "bip39 not available in TransferPayload"
-            logger.error(errorMessage, logFunction: false)
-            return Data()
-        }
-        return bip39.data
+
+    public var bip39: Data? {
+        bip39_32?.data
     }
 }
 
@@ -52,7 +42,7 @@ extension TransferPayload {
         guard let txOutPublicKey = RistrettoPublic(transferPayload.txOutPublicKey.data) else {
             return nil
         }
-        
+
         let rootEntropy = Data32(transferPayload.rootEntropy)
         let bip39 = Data32(transferPayload.bip39Entropy)
         switch (bip39, rootEntropy) {
@@ -65,7 +55,7 @@ extension TransferPayload {
         default:
             return nil
         }
-        
+
         self.txOutPublicKey = txOutPublicKey
         self.memo = !transferPayload.memo.isEmpty ? transferPayload.memo : nil
     }
@@ -74,8 +64,8 @@ extension TransferPayload {
 extension Printable_TransferPayload {
     init(_ transferPayload: TransferPayload) {
         self.init()
-        self.rootEntropy = transferPayload.rootEntropy
-        self.bip39Entropy = transferPayload.bip39
+        self.rootEntropy = transferPayload.rootEntropy ?? self.rootEntropy
+        self.bip39Entropy = transferPayload.bip39 ?? self.bip39Entropy
         self.txOutPublicKey = External_CompressedRistretto(transferPayload.txOutPublicKey)
         if let memo = transferPayload.memo {
             self.memo = memo
