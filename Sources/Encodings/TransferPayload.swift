@@ -56,10 +56,10 @@ extension TransferPayload {
         switch (bip39, rootEntropy) {
         case let (.some(bip39_32), _) where bip39_32 != Data32():
             self.bip39_32 = bip39_32
-            self.rootEntropy32 = Data32()
+            self.rootEntropy32 = nil
         case let (_, .some(rootEntropy_32)) where rootEntropy_32 != Data32():
             self.rootEntropy32 = rootEntropy_32
-            self.bip39_32 = Data32()
+            self.bip39_32 = nil
         default:
             return nil
         }
