@@ -8,12 +8,10 @@ import NIOSSL
 import XCTest
 
 class ConsensusConnectionIntTests: XCTestCase {
-    func testAttestationWorksGRPC() throws {
-        try attestationWorks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testAttestationWorksHTTP() throws {
-        try attestationWorks(transportProtocol: TransportProtocol.http)
+    func testAttestationWorks() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try attestationWorks(transportProtocol: transportProtocol)
+        }
     }
     
     func attestationWorks(transportProtocol: TransportProtocol) throws {
@@ -200,11 +198,11 @@ extension ConsensusConnectionIntTests {
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
-    func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol, trustRoots: trustRoots)
-        return createConsensusConnection(networkConfig: networkConfig)
-    }
-
+//    func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
+//        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol, trustRoots: trustRoots)
+//        return createConsensusConnection(networkConfig: networkConfig)
+//    }
+//
     func createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)

@@ -12,7 +12,8 @@ final class GrpcChannelManager {
     private var addressToChannel: [GrpcChannelConfig: GRPCChannel] = [:]
 
     func channel(for config: ConnectionConfigProtocol) -> GRPCChannel {
-        channel(for: config.url, trustRoots: config.trustRoots)
+        let wrappedTrustRoots = config.trustRoots as? WrappedNIOSSLCertificate
+        return channel(for: config.url, trustRoots: wrappedTrustRoots?.trustRoots)
     }
 
     func channel(for url: MobileCoinUrlProtocol, trustRoots: [NIOSSLCertificate]? = nil)

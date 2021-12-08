@@ -5,7 +5,7 @@
 import Foundation
 
 class WrappedNIOSSLCertificateValidator : NIOSSLCertificateValidator {
-    func validate(possibleCertificateData bytes: [Data]) -> Result<PossibleNIOSSLCertificate, InvalidInputError> {
+    func validate(_ bytes: [Data]) -> Result<PossibleNIOSSLCertificate, InvalidInputError> {
          WrappedNIOSSLCertificate.make(trustRootBytes: bytes)
     }
 }

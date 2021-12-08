@@ -355,14 +355,12 @@ extension MobileCoinClient {
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
-            networkConfig.consensusTrustRootsBytes = trustRoots
-            return .success(())
+            networkConfig.setConsensusTrustRoots(trustRoots)
         }
 
         public mutating func setFogTrustRoots(_ trustRoots: [Data]) -> Result<(), InvalidInputError>
         {
-            networkConfig.fogTrustRootsBytes = trustRoots
-            return .success(())
+            networkConfig.setFogTrustRoots(trustRoots)
         }
 
         public mutating func setConsensusBasicAuthorization(username: String, password: String) {
