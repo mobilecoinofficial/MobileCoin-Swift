@@ -27,6 +27,46 @@ Pod::Spec.new do |s|
 
   s.default_subspec = "Core"
 
+  s.subspec "CoreHTTP" do |subspec|
+    subspec.source_files = [
+      "Sources/**/*.{h,m,swift}",
+    ]
+
+    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre4"
+
+    subspec.dependency "gRPC-Swift"
+    subspec.dependency "Logging", "~> 1.4"
+    subspec.dependency "SwiftNIO"
+    subspec.dependency "SwiftNIOHPACK"
+    subspec.dependency "SwiftNIOHTTP1"
+    subspec.dependency "SwiftProtobuf"
+
+    subspec.test_spec do |test_spec|
+      test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
+      test_spec.resources = [
+        "Tests/Common/FixtureData/**/*",
+        "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
+      ]
+    end
+
+    subspec.test_spec 'IntegrationTests' do |test_spec|
+      test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+      test_spec.resource = "Tests/Common/FixtureData/**/*"
+    end
+
+    subspec.test_spec 'PerformanceTests' do |test_spec|
+      test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
+
+      test_spec.test_type = :ui
+      test_spec.requires_app_host = true
+    end
+
+    unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
+      subspec.dependency 'SwiftLint'
+    end
+  end
+
+
   s.subspec "Core" do |subspec|
     subspec.source_files = [
       "Sources/**/*.{h,m,swift}",
