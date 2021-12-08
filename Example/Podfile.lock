@@ -34,6 +34,10 @@ PODS:
     - SwiftNIOHPACK
     - SwiftNIOHTTP1
     - SwiftProtobuf
+  - MobileCoin/CoreHTTP (1.2.0-pre5):
+    - LibMobileCoin (~> 1.2.0-pre4)
+    - Logging (~> 1.4)
+    - SwiftLint
   - MobileCoin/IntegrationTests (1.2.0-pre5)
   - MobileCoin/PerformanceTests (1.2.0-pre5)
   - MobileCoin/Tests (1.2.0-pre5)

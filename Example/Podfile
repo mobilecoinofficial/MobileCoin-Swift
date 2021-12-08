@@ -70,7 +70,7 @@ post_install do |installer|
 
   # Add Keys framework to Integration Tests for injecting values using cocoapods-keys
   installer.pods_project.targets.each do |target|
-    next unless target.name == 'MobileCoin-Unit-Core-IntegrationTests'
+    next unless target.name == 'MobileCoin-Unit-IntegrationTests'
     installer.pods_project.targets.each do |keys_target|
       next unless keys_target.name == 'Keys'
       target.add_dependency(keys_target)
@@ -85,7 +85,7 @@ post_install do |installer|
 
   # Disable bitcode on test targets
   installer.pods_project.targets.each do |target|
-    next unless ['MobileCoin-Unit-Core-IntegrationTests', 'MobileCoin-UI-Core-PerformanceTests', 'MobileCoin-Unit-Core-Tests'].find_index(target.name) != nil
+    next unless ['MobileCoin-Unit-IntegrationTests', 'MobileCoin-UI-PerformanceTests', 'MobileCoin-Unit-Tests'].find_index(target.name) != nil
     target.build_configurations.each do |config|
       config.build_settings['ENABLE_BITCODE'] = 'NO'
     end
