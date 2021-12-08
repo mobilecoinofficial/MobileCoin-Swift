@@ -25,6 +25,7 @@ Pod::Spec.new do |s|
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
+<<<<<<< Updated upstream
   s.default_subspec = "CoreHTTP"
 
   s.test_spec do |test_spec|
@@ -46,6 +47,8 @@ Pod::Spec.new do |s|
     test_spec.test_type = :ui
     test_spec.requires_app_host = true
   end
+
+  s.default_subspec = "Core"
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
@@ -104,7 +107,6 @@ Pod::Spec.new do |s|
       subspec.dependency 'SwiftLint'
     end
   end
-
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

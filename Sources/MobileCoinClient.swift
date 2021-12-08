@@ -355,16 +355,14 @@ extension MobileCoinClient {
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
-                networkConfig.consensusTrustRoots = $0
-            }
+            networkConfig.consensusTrustRootsBytes = trustRoots
+            return .success(())
         }
 
         public mutating func setFogTrustRoots(_ trustRoots: [Data]) -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
-                networkConfig.fogTrustRoots = $0
-            }
+            networkConfig.fogTrustRootsBytes = trustRoots
+            return .success(())
         }
 
         public mutating func setConsensusBasicAuthorization(username: String, password: String) {
@@ -380,24 +378,6 @@ extension MobileCoinClient {
         public var httpRequester: HttpRequester? {
             get { networkConfig.httpRequester }
             set { networkConfig.httpRequester = newValue }
-        }
-
-        private static func parseTrustRoots(trustRootsBytes: [Data])
-            -> Result<[NIOSSLCertificate], InvalidInputError>
-        {
-            var trustRoots: [NIOSSLCertificate] = []
-            for trustRootBytes in trustRootsBytes {
-                do {
-                    trustRoots.append(
-                        try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .der))
-                } catch {
-                    let errorMessage = "Error parsing trust root certificate: " +
-                        "\(trustRootBytes.base64EncodedString()) - Error: \(error)"
-                    logger.error(errorMessage, logFunction: false)
-                    return .failure(InvalidInputError(errorMessage))
-                }
-            }
-            return .success(trustRoots)
         }
     }
 }

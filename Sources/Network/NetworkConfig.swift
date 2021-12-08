@@ -5,6 +5,15 @@
 import Foundation
 import NIOSSL
 
+/**
+ 
+ TODO
+ 
+ - Create AttestedConnection protocol with default implementations for all re-attest logic, remove GRPC specific code and encapsulate into factory/DI
+ - Go through each "XXYYConnection" concrete class and delegate Connection<Y,Y> creation to factory pattern or similar
+ - Move PossibleNIOSSLCertificate change into all protocols and shared code
+ - Move GrpcChannelManager() into a DI call on TransportProtocol option ? or nil and set only from Grpc init code ?
+ */
 struct NetworkConfig {
     static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol = .grpc)
         -> Result<NetworkConfig, InvalidInputError>
@@ -23,8 +32,8 @@ struct NetworkConfig {
 
     var transportProtocol: TransportProtocol = .grpc
 
-    var consensusTrustRoots: [NIOSSLCertificate]?
-    var fogTrustRoots: [NIOSSLCertificate]?
+    var possibleConsensusTrustRoots: PossibleNIOSSLCertificate
+    var possibleFogTrustRoots: PossibleNIOSSLCertificate
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?
@@ -35,6 +44,7 @@ struct NetworkConfig {
         self.consensusUrl = consensusUrl
         self.fogUrl = fogUrl
         self.attestation = attestation
+        self.transportProtocol = transportProtocol
     }
 
     var consensus: AttestedConnectionConfig<ConsensusUrl> {
@@ -98,6 +108,18 @@ struct NetworkConfig {
     }
 
     var fogReportAttestation: Attestation { attestation.fogReport }
+    
+    public func setConsensusTrustRoots(_ trustRoots: [Data])
+        -> Result<(), InvalidInputError>
+    {
+        switch transportProtocol.certificateValidator.validate(trustRoots) {
+        case .success(let certificate):
+            self.consensusTrustRoots = certificate
+            return .success(())
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
 }
 
 extension NetworkConfig {
@@ -108,4 +130,7 @@ extension NetworkConfig {
         let fogMerkleProof: Attestation
         let fogReport: Attestation
     }
+}
+
+extension NetworkConfig {
 }
