@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.default_subspec = "Core"
+  s.default_subspec = "CoreHTTP"
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [
@@ -41,7 +41,7 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHTTP1"
     subspec.dependency "SwiftProtobuf"
 
-    subspec.test_spec do |test_spec|
+    subspec.test_spec 'UnitTestsHTTP' do |test_spec|
       test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
       test_spec.resources = [
         "Tests/Common/FixtureData/**/*",
@@ -49,17 +49,19 @@ Pod::Spec.new do |s|
       ]
     end
 
-    subspec.test_spec 'IntegrationTests' do |test_spec|
+    subspec.test_spec 'IntegrationTestsHTTP' do |test_spec|
       test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
       test_spec.resource = "Tests/Common/FixtureData/**/*"
     end
 
-    subspec.test_spec 'PerformanceTests' do |test_spec|
+    subspec.test_spec 'PerformanceTestsHTTP' do |test_spec|
       test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
 
       test_spec.test_type = :ui
       test_spec.requires_app_host = true
     end
+
+    subspec.pod_target_xcconfig = { "NETWORK_PROTOCOLS" => "HTTP" }
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'
@@ -67,7 +69,7 @@ Pod::Spec.new do |s|
   end
 
 
-  s.subspec "Core" do |subspec|
+  s.subspec "CoreGRPC" do |subspec|
     subspec.source_files = [
       "Sources/**/*.{h,m,swift}",
     ]
@@ -81,7 +83,7 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHTTP1"
     subspec.dependency "SwiftProtobuf"
 
-    subspec.test_spec do |test_spec|
+    subspec.test_spec 'UnitTests' do |test_spec|
       test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
       test_spec.resources = [
         "Tests/Common/FixtureData/**/*",
@@ -100,6 +102,8 @@ Pod::Spec.new do |s|
       test_spec.test_type = :ui
       test_spec.requires_app_host = true
     end
+
+    subspec.pod_target_xcconfig = { "NETWORK_PROTOCOLS" => "GRPC" }
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'

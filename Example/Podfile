@@ -18,8 +18,8 @@ ENV['MC_ENABLE_SWIFTLINT_SCRIPT'] = '1'
 ENV['MC_ENABLE_WARN_LONG_COMPILE_TIMES'] = '1'
 
 target 'Example' do
-  pod 'MobileCoin', path: '..'
-  pod 'MobileCoin/Core', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
+  pod 'MobileCoin/CoreHTTP', path: '..', testspecs: ['UnitTestsHTTP', 'IntegrationTestsHTTP', 'PerformanceTestsHTTP']
+  # pod 'MobileCoin/Core', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
   # pod 'MobileCoin', podspec: '../MobileCoin.podspec'
   # pod 'MobileCoin/Core', podspec: '../MobileCoin.podspec', testspecs: ['Tests', 'IntegrationTests']
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
