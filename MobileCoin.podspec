@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.default_subspec = "CoreHTTP"
+  s.default_subspec = "Core"
 
   s.test_spec do |test_spec|
     test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
@@ -46,8 +46,6 @@ Pod::Spec.new do |s|
     test_spec.test_type = :ui
     test_spec.requires_app_host = true
   end
-
-  s.default_subspec = "Core"
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
