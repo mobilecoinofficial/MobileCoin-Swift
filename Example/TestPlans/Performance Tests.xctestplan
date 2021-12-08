@@ -17,7 +17,7 @@
       "target" : {
         "containerPath" : "container:Pods\/Pods.xcodeproj",
         "identifier" : "E8A0545E992AC3A0A6B313DAF029D326",
-        "name" : "MobileCoin-UI-Core-PerformanceTests"
+        "name" : "MobileCoin-UI-PerformanceTests"
       }
     }
   ],

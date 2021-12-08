@@ -4,6 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>GRPC Network Protocol Supported</key>
+	<string>$(NETWORK_PROTOCOL_GRPC)</string>
+	<key>HTTP Network Protocol Supported</key>
+	<string>$(NETWORK_PROTOCOL_HTTP)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

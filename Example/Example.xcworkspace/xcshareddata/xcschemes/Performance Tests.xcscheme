@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E8A0545E992AC3A0A6B313DAF029D326"
-               BuildableName = "MobileCoin-UI-Core-PerformanceTests.xctest"
-               BlueprintName = "MobileCoin-UI-Core-PerformanceTests"
+               BuildableName = "MobileCoin-UI-PerformanceTests.xctest"
+               BlueprintName = "MobileCoin-UI-PerformanceTests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -55,8 +55,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E8A0545E992AC3A0A6B313DAF029D326"
-            BuildableName = "MobileCoin-UI-Core-PerformanceTests.xctest"
-            BlueprintName = "MobileCoin-UI-Core-PerformanceTests"
+            BuildableName = "MobileCoin-UI-PerformanceTests.xctest"
+            BlueprintName = "MobileCoin-UI-PerformanceTests"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

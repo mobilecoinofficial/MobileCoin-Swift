@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C10663274EBBCA6839AB2898903FF5CB"
-               BuildableName = "MobileCoin-Unit-Core-Tests.xctest"
-               BlueprintName = "MobileCoin-Unit-Core-Tests"
+               BuildableName = "MobileCoin-Unit-CoreHTTP-Tests.xctest"
+               BlueprintName = "MobileCoin-Unit-CoreHTTP-Tests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -55,8 +55,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C10663274EBBCA6839AB2898903FF5CB"
-            BuildableName = "MobileCoin-Unit-Core-Tests.xctest"
-            BlueprintName = "MobileCoin-Unit-Core-Tests"
+            BuildableName = "MobileCoin-Unit-CoreHTTP-Tests.xctest"
+            BlueprintName = "MobileCoin-Unit-CoreHTTP-Tests"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

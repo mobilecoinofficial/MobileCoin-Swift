@@ -12,24 +12,24 @@ bootstrap:
 .PHONY: build
 build:
 	bundle exec fastlane gym \
-		--scheme "Unit Tests HTTP" \
+		--scheme "Unit Tests" \
 		--skip_archive \
 		--skip_codesigning
 	bundle exec fastlane gym \
-		--scheme "Integration Tests HTTP" \
+		--scheme "Integration Tests" \
 		--skip_archive \
 		--skip_codesigning
 	bundle exec fastlane gym \
-		--scheme "Performance Tests HTTP" \
+		--scheme "Performance Tests" \
 		--skip_archive \
 		--skip_codesigning
 
 .PHONY: test
 test:
 	bundle exec fastlane scan \
-		--scheme "Unit Tests HTTP"
+		--scheme "Unit Tests"
 	bundle exec fastlane scan \
-		--scheme "Performance Tests HTTP"
+		--scheme "Performance Tests"
 
 .PHONY: clean
 clean:
