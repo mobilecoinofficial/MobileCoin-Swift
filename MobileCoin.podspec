@@ -25,7 +25,6 @@ Pod::Spec.new do |s|
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-<<<<<<< Updated upstream
   s.default_subspec = "CoreHTTP"
 
   s.test_spec do |test_spec|
