@@ -62,11 +62,11 @@ class HttpConnection: ConnectionProtocol {
 extension HttpConnection {
     private struct Inner {
         let url: MobileCoinUrlProtocol
-        private let session: ConnectionSession
+        private let session: HttpConnectionSession
 
         init(config: ConnectionConfigProtocol) {
             self.url = config.url
-            self.session = ConnectionSession(config: config)
+            self.session = HttpConnectionSession(config: config)
         }
 
         func setAuthorization(credentials: BasicCredentials) {

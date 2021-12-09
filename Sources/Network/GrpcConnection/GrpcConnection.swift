@@ -64,11 +64,11 @@ class GrpcConnection: ConnectionProtocol {
 extension GrpcConnection {
     private struct Inner {
         let url: MobileCoinUrlProtocol
-        private let session: ConnectionSession
+        private let session: GrpcConnectionSession
 
         init(config: ConnectionConfigProtocol) {
             self.url = config.url
-            self.session = ConnectionSession(config: config)
+            self.session = GrpcConnectionSession(config: config)
         }
 
         func setAuthorization(credentials: BasicCredentials) {

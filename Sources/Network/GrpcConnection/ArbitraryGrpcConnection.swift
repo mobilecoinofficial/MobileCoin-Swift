@@ -50,11 +50,11 @@ class ArbitraryGrpcConnection {
 extension ArbitraryGrpcConnection {
     private struct Inner {
         let url: MobileCoinUrlProtocol
-        private let session: ConnectionSession
+        private let session: GrpcConnectionSession
 
         init(url: MobileCoinUrlProtocol) {
             self.url = url
-            self.session = ConnectionSession(url: url)
+            self.session = GrpcConnectionSession(url: url)
         }
 
         func requestCallOptions() -> CallOptions {
