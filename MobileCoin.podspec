@@ -38,7 +38,6 @@ Pod::Spec.new do |s|
   s.test_spec 'IntegrationTests' do |test_spec|
     test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
     test_spec.resource = "Tests/Common/FixtureData/**/*"
-    test_spec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES", "NETWORK_PROTOCOL_GRPC" => "YES" }
   end
 
   s.test_spec 'PerformanceTests' do |test_spec|
@@ -46,7 +45,6 @@ Pod::Spec.new do |s|
 
     test_spec.test_type = :ui
     test_spec.requires_app_host = true
-    test_spec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES", "NETWORK_PROTOCOL_GRPC" => "YES" }
   end
 
   s.subspec "Core" do |subspec|
@@ -64,6 +62,11 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftProtobuf"
 
     subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES", "NETWORK_PROTOCOL_GRPC" => "YES" }
+
+    subspec.test_spec 'ProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/{Http,Grpc}/**/*.swift"
+      test_spec.resource = "Tests/Common/FixtureData/**/*"
+    end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'

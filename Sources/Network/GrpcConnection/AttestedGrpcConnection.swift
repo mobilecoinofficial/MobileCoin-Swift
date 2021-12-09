@@ -108,7 +108,7 @@ extension AttestedGrpcConnection {
     // invokes the completion handler.
     private struct Inner {
         private let url: MobileCoinUrlProtocol
-        private let session: GrpcConnectionSession
+        private let session: ConnectionSession
         private let client: AttestableGrpcClient
         private let attestAke: AttestAke
 
@@ -124,7 +124,7 @@ extension AttestedGrpcConnection {
             rngContext: Any? = nil
         ) {
             self.url = config.url
-            self.session = GrpcConnectionSession(config: config)
+            self.session = ConnectionSession(config: config)
             self.client = client
             self.attestAke = AttestAke()
             self.responderId = config.url.responderId

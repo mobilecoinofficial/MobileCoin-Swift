@@ -50,11 +50,11 @@ class ArbitraryHttpConnection {
 extension ArbitraryHttpConnection {
     private struct Inner {
         let url: MobileCoinUrlProtocol
-        private let session: HttpConnectionSession
+        private let session: ConnectionSession
 
         init(url: MobileCoinUrlProtocol) {
             self.url = url
-            self.session = HttpConnectionSession(url: url)
+            self.session = ConnectionSession(url: url)
         }
 
         func requestCallOptions() -> HTTPCallOptions {

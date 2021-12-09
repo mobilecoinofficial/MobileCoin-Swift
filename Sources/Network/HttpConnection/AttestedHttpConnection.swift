@@ -112,7 +112,7 @@ extension AttestedHttpConnection {
     // invokes the completion handler.
     private struct Inner {
         private let url: MobileCoinUrlProtocol
-        private let session: HttpConnectionSession
+        private let session: ConnectionSession
         private let client: AttestableHttpClient
         private let requester: RestApiRequester
         private let attestAke: AttestAke
@@ -130,7 +130,7 @@ extension AttestedHttpConnection {
             rngContext: Any? = nil
         ) {
             self.url = config.url
-            self.session = HttpConnectionSession(config: config)
+            self.session = ConnectionSession(config: config)
             self.client = client
             self.requester = requester
             self.attestAke = AttestAke()

@@ -7,7 +7,7 @@ import NIOHPACK
 import XCTest
 
 // TODO
-class ConnectionSessionTests: XCTestCase {
+class GrpcConnectionSessionTests: XCTestCase {
 
     func testAuth() throws {
         let fixture = try ConnectionSession.Fixtures.Default()
