@@ -11,3 +11,4 @@ struct EmptyNIOSSLCertificate {
         return nil
     }
 }
+

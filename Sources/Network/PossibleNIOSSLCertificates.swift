@@ -4,7 +4,7 @@
 
 import Foundation
 
-protocol PossibleNIOSSLCertificate {
+protocol PossibleNIOSSLCertificates {
     var trustRootsBytes : [Data] { get }
     
     init?(trustRootBytes: [Data]) throws
@@ -12,7 +12,7 @@ protocol PossibleNIOSSLCertificate {
     static func trustRoots() -> Result<Any, InvalidInputError>
 }
 
-extension PossibleNIOSSLCertificate {
+extension PossibleNIOSSLCertificates {
     init?(trustRootBytes: [Data]) {
         return nil
     }
@@ -21,7 +21,7 @@ extension PossibleNIOSSLCertificate {
         return .failure(InvalidInputError("Not implemented"))
     }
     
-    static func make(trustRootBytes: [Data]) -> Result<PossibleNIOSSLCertificate, InvalidInputError> {
+    static func make(trustRootBytes: [Data]) -> Result<PossibleNIOSSLCertificates, InvalidInputError> {
         do {
             let certificate = try Self.init(trustRootBytes: trustRootBytes)
             if let certificate = certificate {

@@ -32,8 +32,8 @@ struct NetworkConfig {
 
     var transportProtocol: TransportProtocol = .grpc
 
-    var possibleConsensusTrustRoots: PossibleNIOSSLCertificate?
-    var possibleFogTrustRoots: PossibleNIOSSLCertificate?
+    var possibleConsensusTrustRoots: PossibleNIOSSLCertificates?
+    var possibleFogTrustRoots: PossibleNIOSSLCertificates?
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?

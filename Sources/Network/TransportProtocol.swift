@@ -34,11 +34,11 @@ extension TransportProtocol {
 
 extension TransportProtocol {
     static var grpcProtocolSupported : Bool {
-        Bundle.main.object(forInfoDictionaryKey: .grpcKey) as? Bool ?? false
+        Bundle.testBundle?.boolean(forInfoDictionaryKey: .grpcKey) ?? false
     }
     
     static var httpProtocolSupported : Bool {
-        Bundle.main.object(forInfoDictionaryKey: .httpKey) as? Bool ?? false
+        Bundle.testBundle?.boolean(forInfoDictionaryKey: .httpKey) ?? false
     }
     
     static var supportedProtocols : [TransportProtocol] {
@@ -51,8 +51,8 @@ extension TransportProtocol {
 
 // swiftlint:disable no_extension_access_modifier
 fileprivate extension String {
-    static let grpcKey : String = "GRPC Network Protocol Supported"
-    static let httpKey : String = "HTTP Network Protocol Supported"
+    static let grpcKey : String = "GRPCNetworkProtocolSupported"
+    static let httpKey : String = "HTTPNetworkProtocolSupported"
 }
 
 struct EmptyConnectionProtocol : ConnectionProtocol {
@@ -62,4 +62,19 @@ struct EmptyConnectionProtocol : ConnectionProtocol {
 }
 
 extension TransportProtocol {
+}
+
+
+extension Bundle {
+    static var testBundle : Bundle? {
+        Bundle.allBundles.first(where: {$0.bundleURL.path.contains("Tests")})
+    }
+    
+    func boolean(forInfoDictionaryKey key: String) -> Bool? {
+        guard let value = self.object(forInfoDictionaryKey: key) as? String
+        else {
+            return nil
+        }
+        return value == "YES"
+    }
 }

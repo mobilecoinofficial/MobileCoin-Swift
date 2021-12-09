@@ -5,7 +5,7 @@
 import Foundation
 import NIOSSL
 
-struct WrappedNIOSSLCertificate : PossibleNIOSSLCertificate {
+struct WrappedNIOSSLCertificate : PossibleNIOSSLCertificates {
     let trustRootsBytes: [Data]
     
     var trustRoots: [NIOSSLCertificate] = []
@@ -27,7 +27,8 @@ struct WrappedNIOSSLCertificate : PossibleNIOSSLCertificate {
         for trustRootBytes in bytes {
             do {
                 trustRoots.append(
-                    try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .der))
+                    try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .der)
+                )
             } catch {
                 let errorMessage = "Error parsing trust root certificate: " +
                     "\(trustRootBytes.base64EncodedString())  Error: \(error)"

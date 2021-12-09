@@ -6,6 +6,7 @@
 import NIOHPACK
 import XCTest
 
+// TODO
 class ConnectionSessionTests: XCTestCase {
 
     func testAuth() throws {

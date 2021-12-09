@@ -5,7 +5,6 @@
 // swiftlint:disable function_default_parameter_at_end multiline_function_chains
 
 @testable import MobileCoin
-import NIOSSL
 import XCTest
 
 enum IntegrationTestFixtures {
@@ -59,13 +58,13 @@ extension IntegrationTestFixtures {
         try network.networkConfig(transportProtocol:transportProtocol)
     }
 
-//    static func createNetworkConfig(transportProtocol: TransportProtocol = TransportProtocol.grpc, trustRoots: [NIOSSLCertificate]) throws -> NetworkConfig {
-//        var networkConfig = try network.networkConfig()
-//        networkConfig.setConsensusTrustRoots(trustRoots)
-//        networkConfig.setFogTrustRoots(trustRoots)
-//        return networkConfig
-//    }
-//
+    static func createNetworkConfig(transportProtocol: TransportProtocol = TransportProtocol.grpc, trustRoots: [Data]) throws -> NetworkConfig {
+        var networkConfig = try network.networkConfig()
+        networkConfig.setConsensusTrustRoots(trustRoots)
+        networkConfig.setFogTrustRoots(trustRoots)
+        return networkConfig
+    }
+
     static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.consensusAuthorization = network.invalidCredentials

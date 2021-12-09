@@ -383,8 +383,8 @@ extension NetworkPreset {
             attestation: attestationConfig,
             transportProtocol: transportProtocol).get()
         networkConfig.httpRequester = TestHttpRequester()
-        networkConfig.consensusTrustRoots = try consensusTrustRoots()
-        networkConfig.fogTrustRoots = try fogTrustRoots()
+        try networkConfig.setConsensusTrustRoots(Self.trustRootsBytes())
+        try networkConfig.setFogTrustRoots(Self.trustRootsBytes())
         networkConfig.consensusAuthorization = consensusCredentials
         networkConfig.fogUserAuthorization = fogUserCredentials
         return networkConfig
@@ -494,13 +494,15 @@ extension NetworkPreset {
         ])
     }
 
-    func consensusTrustRoots() throws -> [NIOSSLCertificate] { try Self.trustRoots() }
-    func fogTrustRoots() throws -> [NIOSSLCertificate] { try Self.trustRoots() }
-
-    static func trustRoots() throws -> [NIOSSLCertificate] {
-        let trustRootsBytes = try self.trustRootsBytes()
-        return try trustRootsBytes.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
-    }
+//    func consensusTrustRoots() throws -> [NIOSSLCertificate] { try Self.trustRoots() }
+//    func fogTrustRoots() throws -> [NIOSSLCertificate] { try Self.trustRoots() }
+//
+    
+//    static func trustRoots() throws -> PossibleNIOSSLCertificates? {
+//        let trustRootsBytes = try self.trustRootsBytes()
+//        return try trustRootsBytes.map { try NIOSSLCertificate(bytes: Array($0), format: .der) }
+//    }
+    
     static func trustRootsBytes() throws -> [Data] {
         try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
     }

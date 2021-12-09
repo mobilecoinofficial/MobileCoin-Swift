@@ -4,12 +4,11 @@
 
 import LibMobileCoin
 @testable import MobileCoin
-import NIOSSL
 import XCTest
 
 class ConsensusConnectionIntTests: XCTestCase {
     func testAttestationWorks() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+       try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try attestationWorks(transportProtocol: transportProtocol)
         }
     }
@@ -111,7 +110,7 @@ class ConsensusConnectionIntTests: XCTestCase {
     func trustRootWorks(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
-        let connection = try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: trustRootsFixture.trustRoots)
+        let connection = try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: trustRootsFixture.trustRootsBytes)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -141,7 +140,7 @@ class ConsensusConnectionIntTests: XCTestCase {
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection = try createConsensusConnection(
             transportProtocol: transportProtocol,
-            trustRoots: trustRootsFixture.trustRoots + [trustRootsFixture.wrongTrustRoot])
+            trustRoots: trustRootsFixture.trustRootsBytes + [trustRootsFixture.wrongTrustRootBytes])
         
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -171,7 +170,7 @@ class ConsensusConnectionIntTests: XCTestCase {
         try XCTSkipIf(true)
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection =
-            try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: [trustRootsFixture.wrongTrustRoot])
+            try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: [trustRootsFixture.wrongTrustRootBytes])
 
         let fixture = try Transaction.Fixtures.Default()
 
@@ -198,11 +197,11 @@ extension ConsensusConnectionIntTests {
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
-//    func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [NIOSSLCertificate]) throws -> ConsensusConnection {
-//        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol, trustRoots: trustRoots)
-//        return createConsensusConnection(networkConfig: networkConfig)
-//    }
-//
+    func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [Data]) throws -> ConsensusConnection {
+        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol, trustRoots: trustRoots)
+        return createConsensusConnection(networkConfig: networkConfig)
+    }
+
     func createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)

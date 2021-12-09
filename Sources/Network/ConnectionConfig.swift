@@ -7,20 +7,20 @@ import Foundation
 protocol ConnectionConfigProtocol {
     var url: MobileCoinUrlProtocol { get }
     var transportProtocolOption: TransportProtocol.Option { get }
-    var trustRoots: PossibleNIOSSLCertificate? { get }
+    var trustRoots: PossibleNIOSSLCertificates? { get }
     var authorization: BasicCredentials? { get }
 }
 
 struct ConnectionConfig<Url: MobileCoinUrlProtocol>: ConnectionConfigProtocol {
     let urlTyped: Url
     let transportProtocolOption: TransportProtocol.Option
-    let trustRoots: PossibleNIOSSLCertificate?
+    let trustRoots: PossibleNIOSSLCertificates?
     let authorization: BasicCredentials?
 
     init(
         url: Url,
         transportProtocolOption: TransportProtocol.Option,
-        trustRoots: PossibleNIOSSLCertificate?,
+        trustRoots: PossibleNIOSSLCertificates?,
         authorization: BasicCredentials?
     ) {
         self.urlTyped = url

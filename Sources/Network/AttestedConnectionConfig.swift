@@ -12,14 +12,14 @@ struct AttestedConnectionConfig<Url: MobileCoinUrlProtocol>: AttestedConnectionC
     let urlTyped: Url
     let transportProtocolOption: TransportProtocol.Option
     let attestation: Attestation
-    let trustRoots: PossibleNIOSSLCertificate?
+    let trustRoots: PossibleNIOSSLCertificates?
     let authorization: BasicCredentials?
 
     init(
         url: Url,
         transportProtocolOption: TransportProtocol.Option,
         attestation: Attestation,
-        trustRoots: PossibleNIOSSLCertificate?,
+        trustRoots: PossibleNIOSSLCertificates?,
         authorization: BasicCredentials?
     ) {
         self.urlTyped = url

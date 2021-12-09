@@ -5,5 +5,5 @@
 import Foundation
 
 protocol NIOSSLCertificateValidator {
-    func validate(_ certificateData: [Data]) -> Result<PossibleNIOSSLCertificate, InvalidInputError>
+    func validate(_ certificateData: [Data]) -> Result<PossibleNIOSSLCertificates, InvalidInputError>
 }
