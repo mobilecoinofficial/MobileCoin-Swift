@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C10663274EBBCA6839AB2898903FF5CB"
+               BlueprintIdentifier = "15BC995FC0FAFC663C79A25F3AAC145E"
                BuildableName = "MobileCoin-Unit-Tests.xctest"
                BlueprintName = "MobileCoin-Unit-Tests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -54,7 +54,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C10663274EBBCA6839AB2898903FF5CB"
+            BlueprintIdentifier = "15BC995FC0FAFC663C79A25F3AAC145E"
             BuildableName = "MobileCoin-Unit-Tests.xctest"
             BlueprintName = "MobileCoin-Unit-Tests"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">

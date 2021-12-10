@@ -14,22 +14,22 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D5D361214576459A821056D5621DE63E"
-               BuildableName = "MobileCoin-UI-PerformanceTests.xctest"
-               BlueprintName = "MobileCoin-UI-PerformanceTests"
+               BlueprintIdentifier = "2BF84E79B25A197D38AD1E3AF062600E"
+               BuildableName = "MobileCoin-Unit-Core-ProtocolUnitTests.xctest"
+               BlueprintName = "MobileCoin-Unit-Core-ProtocolUnitTests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Testable Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:TestPlans/Performance Tests.xctestplan"
+            reference = "container:TestPlans/Protocol-Unit Tests.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -54,15 +54,15 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D5D361214576459A821056D5621DE63E"
-            BuildableName = "MobileCoin-UI-PerformanceTests.xctest"
-            BlueprintName = "MobileCoin-UI-PerformanceTests"
+            BlueprintIdentifier = "2BF84E79B25A197D38AD1E3AF062600E"
+            BuildableName = "MobileCoin-Unit-Core-ProtocolUnitTests.xctest"
+            BlueprintName = "MobileCoin-Unit-Core-ProtocolUnitTests"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Testable Release">
+      buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Testable Release"
