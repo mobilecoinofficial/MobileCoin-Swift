@@ -63,9 +63,14 @@ Pod::Spec.new do |s|
 
     subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES", "NETWORK_PROTOCOL_GRPC" => "YES" }
 
-    subspec.test_spec 'ProtocolUnitTests' do |test_spec|
-      test_spec.source_files = "Tests/{Http,Grpc}/**/*.swift"
-      test_spec.resource = "Tests/Common/FixtureData/**/*"
+    subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/Http/**/*.swift"
+      test_spec.resource = "Tests/Http/FixtureData/**/*"
+    end
+
+    subspec.test_spec 'GrpcProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/Grpc/**/*.swift"
+      test_spec.resource = "Tests/Grpc/FixtureData/**/*"
     end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
@@ -84,7 +89,7 @@ Pod::Spec.new do |s|
 
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/Http/**/*.swift"
-      test_spec.resource = "Tests/Common/FixtureData/**/*"
+      test_spec.resource = "Tests/Http/FixtureData/**/*"
     end
 
     subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES" }
