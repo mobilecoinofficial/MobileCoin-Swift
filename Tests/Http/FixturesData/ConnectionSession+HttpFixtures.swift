@@ -2,9 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import GRPC
 @testable import MobileCoin
-import NIOHPACK
 import XCTest
 
 extension ConnectionSession {
@@ -25,8 +23,8 @@ extension ConnectionSession.Fixtures {
         let http1ResponseHeadersWithSetCookie2 =
             Self.http1ResponseHeadersWithSetCookie(cookie: Self.cookie2)
 
-        let headersWithCookie1 = Self.headersWithCookie(cookie: Self.cookie1)
-        let headersWithCookie2 = Self.headersWithCookie(cookie: Self.cookie2)
+        let headersWithCookie1 = Self.headersWithCookie(cookie: Self.cookie1) as! [String: String]
+        let headersWithCookie2 = Self.headersWithCookie(cookie: Self.cookie2) as! [String: String]
         let headersWithAuthAndCookie1 = Self.headersWithAuthorizationAndCookie(cookie: Self.cookie1)
 
         init() throws {
@@ -45,8 +43,7 @@ extension ConnectionSession.Fixtures {
             let session = defaultFixture.session
             session.processResponse(headers: defaultFixture.responseHeadersWithSetCookie1)
 
-            var headers = HPACKHeaders()
-            session.addRequestHeaders(to: &headers)
+            let headers = session.requestHeaders
             XCTAssertEqual(headers, defaultFixture.headersWithCookie1)
 
             self.session = session
@@ -79,23 +76,23 @@ extension ConnectionSession.Fixtures.Default {
     fileprivate static let cookie1 = "INGRESSCOOKIE=35b2f12510e6a173ad22758a8880619b"
     fileprivate static let cookie2 = "INGRESSCOOKIE=788eaf4b8baca6ba6957d541da88199d"
 
-    fileprivate static var headersWithAuthorization: HPACKHeaders {
+    fileprivate static var headersWithAuthorization: [String: String] {
         ["authorization": "Basic dXNlcjE6cGFzc3dvcmQx"]
     }
 
-    fileprivate static func http1ResponseHeadersWithSetCookie(cookie: String) -> HPACKHeaders {
+    fileprivate static func http1ResponseHeadersWithSetCookie(cookie: String) -> [String: String] {
         ["Set-Cookie": "\(cookie); Max-Age=3600; Path=/; Secure; HttpOnly"]
     }
 
-    fileprivate static func responseHeadersWithSetCookie(cookie: String) -> HPACKHeaders {
+    fileprivate static func responseHeadersWithSetCookie(cookie: String) -> [String: String] {
         ["set-cookie": "\(cookie); Max-Age=3600; Path=/; Secure; HttpOnly"]
     }
 
-    fileprivate static func headersWithCookie(cookie: String) -> HPACKHeaders {
+    fileprivate static func headersWithCookie(cookie: String) -> [String: String] {
         ["cookie": cookie]
     }
 
-    fileprivate static func headersWithAuthorizationAndCookie(cookie: String) -> HPACKHeaders {
+    fileprivate static func headersWithAuthorizationAndCookie(cookie: String) -> [String: String] {
         [
             "authorization": "Basic dXNlcjE6cGFzc3dvcmQx",
             "cookie": cookie,

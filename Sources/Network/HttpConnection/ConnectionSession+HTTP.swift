@@ -29,18 +29,18 @@ extension ConnectionSession {
 extension ConnectionSession {
     var authorizationHeaders : [String: String] {
         guard let credentials = authorizationCredentials else { return [:] }
-        return ["Authorization" : credentials.authorizationHeaderValue]
+        return ["Authorization": credentials.authorizationHeaderValue]
     }
     
-    var cookieHeaders : [String:String] {
+    var cookieHeaders : [String: String] {
         guard let cookies = cookieStorage.cookies(for: url) else { return [:] }
         return HTTPCookie.requestHeaderFields(with: cookies)
     }
 
-    var requestHeaders: [String : String] {
+    var requestHeaders: [String: String] {
         var headers : [String: String] = [:]
-        headers.merge(cookieHeaders) {  (_, new) in new }
-        headers.merge(authorizationHeaders) {  (_, new) in new }
+        headers.merge(cookieHeaders) { (_, new) in new }
+        headers.merge(authorizationHeaders) { (_, new) in new }
         return headers
     }
 }
