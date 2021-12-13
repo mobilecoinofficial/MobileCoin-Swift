@@ -28,6 +28,7 @@
 		27A39C3D24C2622600B44786 /* Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Unit Tests.xctestplan"; sourceTree = "<group>"; };
 		3AF40DB60A0ADA2CB879AE38 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		4C0382FE8E8E7AAAC02CECA3 /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		665FE0302767D5A000A0BA19 /* ProtocolUnitTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = ProtocolUnitTests.xctestplan; path = TestPlans/ProtocolUnitTests.xctestplan; sourceTree = "<group>"; };
 		FC106CAA4E993C2D6301C5CA /* Pods-Example.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.testable release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.testable release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -46,6 +47,7 @@
 		270686802474C4D800B82C57 = {
 			isa = PBXGroup;
 			children = (
+				665FE0302767D5A000A0BA19 /* ProtocolUnitTests.xctestplan */,
 				2706868B2474C4D800B82C57 /* Example */,
 				27A39C3B24C2622600B44786 /* TestPlans */,
 				2706868A2474C4D800B82C57 /* Products */,

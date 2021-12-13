@@ -9,6 +9,7 @@ import XCTest
 class HttpConnectionSessionTests: XCTestCase {
 
     func testAuth() throws {
+        XCTAssertTrue(true)
 //        let fixture = try ConnectionSession.Fixtures.Default()
 //        let session = fixture.session
 //

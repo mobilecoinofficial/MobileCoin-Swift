@@ -82,6 +82,11 @@ Pod::Spec.new do |s|
 
     subspec.dependency "Logging", "~> 1.4"
 
+    subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/Http/**/*.swift"
+      test_spec.resource = "Tests/Common/FixtureData/**/*"
+    end
+
     subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES" }
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
@@ -102,6 +107,11 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHPACK"
     subspec.dependency "SwiftNIOHTTP1"
     subspec.dependency "SwiftProtobuf"
+
+    subspec.test_spec 'GrpcProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/Grpc/**/*.swift"
+      test_spec.resource = "Tests/Common/FixtureData/**/*"
+    end
 
     subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_GRPC" => "YES" }
 
