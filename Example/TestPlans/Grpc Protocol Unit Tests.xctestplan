@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "FA5ACA43-9E47-4376-8532-0B734AD42755",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Pods\/Pods.xcodeproj",
+        "identifier" : "966DA1F600A3C0931D2A11E07D2C7FAF",
+        "name" : "MobileCoin-Unit-Core-GrpcProtocolUnitTests"
+      }
+    }
+  ],
+  "version" : 1
+}
