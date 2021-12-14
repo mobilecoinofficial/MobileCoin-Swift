@@ -21,6 +21,12 @@ final class DefaultServiceProvider: ServiceProvider {
         let inner = Inner(channelManager: channelManager, httpRequester: networkConfig.httpRequester, targetQueue: targetQueue)
         self.inner = .init(inner, targetQueue: targetQueue)
 
+        /**
+         - Write EmptyConnection that implements ConnectionProtocol
+         - Use DI & Factory Pattern & Extensions on TransportProtocol Option to create/return connectionOptionWrapperFactory function.
+         - ConnectionFactory class,  default implementation returns
+         */
+        
         self.consensus = ConsensusConnection(
             config: networkConfig.consensus,
             channelManager: channelManager,
