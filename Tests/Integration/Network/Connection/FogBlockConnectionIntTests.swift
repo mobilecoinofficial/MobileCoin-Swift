@@ -9,14 +9,12 @@ import LibMobileCoin
 import XCTest
 
 class FogBlockConnectionIntTests: XCTestCase {
-    func testGetBlocksGRPC() throws {
-        try getBlocks(transportProtocol: TransportProtocol.grpc)
+    func testGetBlocks() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getBlocks(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testGetBlocksHTTP() throws {
-        try getBlocks(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func getBlocks(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetBlocks request")
 
@@ -43,12 +41,10 @@ class FogBlockConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetBlockZeroGRPC() throws {
-        try getBlockZero(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetBlockZeroHTTP() throws {
-        try getBlockZero(transportProtocol: TransportProtocol.http)
+    func testGetBlockZero() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getBlockZero(transportProtocol: transportProtocol)
+        }
     }
     
     func getBlockZero(transportProtocol: TransportProtocol) throws {
@@ -77,12 +73,10 @@ class FogBlockConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 60)
     }
 
-    func testGetBlocksReturnsNoBlocksWithoutRangeGRPC() throws {
-        try getBlocksReturnsNoBlocksWithoutRange(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetBlocksReturnsNoBlocksWithoutRangeHTTP() throws {
-        try getBlocksReturnsNoBlocksWithoutRange(transportProtocol: TransportProtocol.http)
+    func testGetBlocksReturnsNoBlocksWithoutRange() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getBlocksReturnsNoBlocksWithoutRange(transportProtocol: transportProtocol)
+        }
     }
     
     func getBlocksReturnsNoBlocksWithoutRange(transportProtocol: TransportProtocol) throws {
@@ -100,12 +94,10 @@ class FogBlockConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetBlocksReturnsNoBlocksForEmptyRangeGRPC() throws {
-        try getBlocksReturnsNoBlocksForEmptyRange(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetBlocksReturnsNoBlocksForEmptyRangeHTTP() throws {
-        try getBlocksReturnsNoBlocksForEmptyRange(transportProtocol: TransportProtocol.http)
+    func testGetBlocksReturnsNoBlocksForEmptyRange() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getBlocksReturnsNoBlocksForEmptyRange(transportProtocol: transportProtocol)
+        }
     }
     
     func getBlocksReturnsNoBlocksForEmptyRange(transportProtocol: TransportProtocol) throws {
@@ -125,12 +117,10 @@ class FogBlockConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testDoSGetBlocksGRPC() throws {
-        try doSGetBlocks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testDoSGetBlocksHTTP() throws {
-        try doSGetBlocks(transportProtocol: TransportProtocol.http)
+    func testDoSGetBlocks() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try doSGetBlocks(transportProtocol: transportProtocol)
+        }
     }
     
     func doSGetBlocks(transportProtocol: TransportProtocol) throws {
@@ -159,12 +149,10 @@ class FogBlockConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
+        }
     }
     
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {

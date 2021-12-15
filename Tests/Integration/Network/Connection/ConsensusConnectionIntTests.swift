@@ -10,7 +10,7 @@ class ConsensusConnectionIntTests: XCTestCase {
     func testAttestationWorks() throws {
        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try attestationWorks(transportProtocol: transportProtocol)
-        }
+       }
     }
     
     func attestationWorks(transportProtocol: TransportProtocol) throws {
@@ -33,12 +33,10 @@ class ConsensusConnectionIntTests: XCTestCase {
         }
     }
 
-    func testMultipleCallsGRPC() throws {
-        try multipleCalls(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testMultipleCallsHTTP() throws {
-        try multipleCalls(transportProtocol: TransportProtocol.http)
+    func testMultipleCalls() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try multipleCalls(transportProtocol: transportProtocol)
+        }
     }
     
     func multipleCalls(transportProtocol: TransportProtocol) throws {
@@ -70,12 +68,10 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
+        }
     }
     
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
@@ -99,12 +95,10 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testTrustRootWorksGRPC() throws {
-        try trustRootWorks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testTrustRootWorksHTTP() throws {
-        try trustRootWorks(transportProtocol: TransportProtocol.http)
+    func testTrustRootWorks() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try trustRootWorks(transportProtocol: transportProtocol)
+        }
     }
     
     func trustRootWorks(transportProtocol: TransportProtocol) throws {
@@ -127,12 +121,10 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testExtraTrustRootWorksGRPC() throws {
-        try extraTrustRootWorks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testExtraTrustRootWorksHTTP() throws {
-        try extraTrustRootWorks(transportProtocol: TransportProtocol.http)
+    func testExtraTrustRootWorks() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try extraTrustRootWorks(transportProtocol: transportProtocol)
+        }
     }
     
     func extraTrustRootWorks(transportProtocol: TransportProtocol) throws {
@@ -157,12 +149,10 @@ class ConsensusConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testWrongTrustRootFailsGRPC() throws {
-        try wrongTrustRootFails(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testWrongTrustRootFailsHTTP() throws {
-        try wrongTrustRootFails(transportProtocol: TransportProtocol.http)
+    func testWrongTrustRootFails() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try wrongTrustRootFails(transportProtocol: transportProtocol)
+        }
     }
     
     func wrongTrustRootFails(transportProtocol: TransportProtocol) throws {

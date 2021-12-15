@@ -7,12 +7,10 @@ import XCTest
 
 class TransactionPublicApiIntTests: XCTestCase {
 
-    func testSerializedDataGRPC() throws {
-        try serializedData(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testSerializedDataHTTP() throws {
-        try serializedData(transportProtocol: TransportProtocol.http)
+    func testSerializedData() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try serializedData(transportProtocol: transportProtocol)
+        }
     }
     
     func serializedData(transportProtocol: TransportProtocol) throws {

@@ -7,14 +7,12 @@ import XCTest
 
 class ReceiptPublicApiIntTests: XCTestCase {
 
-    func testSerializedDataGRPC() throws {
-        try serializedData(transportProtocol: TransportProtocol.grpc)
+    func testSerializedData() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try serializedData(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testSerializedDataHTTP() throws {
-        try serializedData(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func serializedData(transportProtocol: TransportProtocol) throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
@@ -39,12 +37,10 @@ class ReceiptPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testValidateAndUnmaskValueAcceptsGRPC() throws {
-        try validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testValidateAndUnmaskValueAcceptsHTTP() throws {
-        try validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol.http)
+    func testValidateAndUnmaskValueAccepts() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try validateAndUnmaskValueAccepts(transportProtocol: transportProtocol)
+        }
     }
     
     func validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol) throws {
@@ -72,12 +68,10 @@ class ReceiptPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testValidateAndUnmaskValueRejectsGRPC() throws {
-        try validateAndUnmaskValueRejects(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testValidateAndUnmaskValueRejectsHTTP() throws {
-        try validateAndUnmaskValueRejects(transportProtocol: TransportProtocol.http)
+    func testValidateAndUnmaskValueRejects() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try validateAndUnmaskValueRejects(transportProtocol: transportProtocol)
+        }
     }
     
     func validateAndUnmaskValueRejects(transportProtocol: TransportProtocol) throws {

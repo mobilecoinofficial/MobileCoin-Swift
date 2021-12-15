@@ -7,14 +7,12 @@ import LibMobileCoin
 import XCTest
 
 class FogUntrustedTxOutConnectionIntTests: XCTestCase {
-    func testGetTxOutsReturnsNoResultsWithoutPubkeysGRPC() throws {
-        try getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol.grpc)
+    func testGetTxOutsReturnsNoResultsWithoutPubkeys() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testGetTxOutsReturnsNoResultsWithoutPubkeysHTTP() throws {
-        try getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetTxOuts request")
         try createFogUntrustedTxOutConnection(transportProtocol:transportProtocol).getTxOuts(request: FogLedger_TxOutRequest()) {
@@ -31,12 +29,10 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
+        }
     }
     
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {

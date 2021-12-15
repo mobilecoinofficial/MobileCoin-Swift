@@ -9,14 +9,12 @@ import XCTest
 
 class MobileCoinClientIntTests: XCTestCase {
 
-    func testTransactionDoubleSubmissionFailsGRPC() throws {
-        try transactionDoubleSubmissionFails(transportProtocol: TransportProtocol.grpc)
+    func testTransactionDoubleSubmissionFails() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try transactionDoubleSubmissionFails(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testTransactionDoubleSubmissionFailsHTTP() throws {
-        try transactionDoubleSubmissionFails(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func transactionDoubleSubmissionFails(transportProtocol: TransportProtocol) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
@@ -52,12 +50,10 @@ class MobileCoinClientIntTests: XCTestCase {
 
     /// Tests that the transaction status check fails if the inputs were spent by another
     /// transaction
-    func testTransactionStatusFailsWhenInputIsAlreadySpentGRPC() throws {
-        try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testTransactionStatusFailsWhenInputIsAlreadySpentHTTP() throws {
-        try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol.http)
+    func testTransactionStatusFailsWhenInputIsAlreadySpent() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: transportProtocol)
+        }
     }
     
     func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol) throws {
@@ -141,12 +137,10 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testTransactionStatusDoesNotSucceedWithoutSubmissionGRPC() throws {
-        try transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testTransactionStatusDoesNotSucceedWithoutSubmissionHTTP() throws {
-        try transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.http)
+    func testTransactionStatusDoesNotSucceedWithoutSubmission() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: transportProtocol)
+        }
     }
     
     func transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol) throws {
@@ -205,12 +199,10 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testReceiptStatusDoesNotSucceedWithoutSubmissionGRPC() throws {
-        try receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testReceiptStatusDoesNotSucceedWithoutSubmissionHTTP() throws {
-        try receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol.http)
+    func testReceiptStatusDoesNotSucceedWithoutSubmission() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: transportProtocol)
+        }
     }
     
     func receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol) throws {
@@ -288,12 +280,10 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 60)
     }
 
-    func testConcurrentBalanceChecksGRPC() throws {
-        try concurrentBalanceChecks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testConcurrentBalanceChecksHTTP() throws {
-        try concurrentBalanceChecks(transportProtocol: TransportProtocol.http)
+    func testConcurrentBalanceChecks() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try concurrentBalanceChecks(transportProtocol: transportProtocol)
+        }
     }
     
     func concurrentBalanceChecks(transportProtocol: TransportProtocol) throws {
@@ -331,12 +321,10 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testConcurrentBalanceChecksWhileUpdatingGRPC() throws {
-        try concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testConcurrentBalanceChecksWhileUpdatingHTTP() throws {
-        try concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol.http)
+    func testConcurrentBalanceChecksWhileUpdating() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try concurrentBalanceChecksWhileUpdating(transportProtocol: transportProtocol)
+        }
     }
     
     func concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol) throws {
@@ -378,12 +366,10 @@ class MobileCoinClientIntTests: XCTestCase {
         waitForExpectations(timeout: 120)
     }
 
-    func testConcurrentBalanceUpdatesGRPC() throws {
-        try concurrentBalanceUpdates(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testConcurrentBalanceUpdatesHTTP() throws {
-        try concurrentBalanceUpdates(transportProtocol: TransportProtocol.http)
+    func testConcurrentBalanceUpdates() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try concurrentBalanceUpdates(transportProtocol: transportProtocol)
+        }
     }
     
     func concurrentBalanceUpdates(transportProtocol: TransportProtocol) throws {

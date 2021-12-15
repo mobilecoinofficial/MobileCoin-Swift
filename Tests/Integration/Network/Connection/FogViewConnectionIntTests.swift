@@ -9,14 +9,12 @@ import LibMobileCoin
 import XCTest
 
 class FogViewConnectionIntTests: XCTestCase {
-    func testEnclaveRequestGRPC() throws {
-        try enclaveRequest(transportProtocol: TransportProtocol.grpc)
+    func testEnclaveRequest() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequest(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testEnclaveRequestHTTP() throws {
-        try enclaveRequest(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func enclaveRequest(transportProtocol: TransportProtocol) throws {
         let fogViewConnection = try createFogViewConnection(transportProtocol:transportProtocol)
 
@@ -42,12 +40,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsTxOutsGRPC() throws {
-        try enclaveRequestReturnsTxOuts(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testEnclaveRequestReturnsTxOutsHTTP() throws {
-        try enclaveRequestReturnsTxOuts(transportProtocol: TransportProtocol.http)
+    func testEnclaveRequestReturnsTxOuts() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequestReturnsTxOuts(transportProtocol: transportProtocol)
+        }
     }
     
     func enclaveRequestReturnsTxOuts(transportProtocol: TransportProtocol) throws {
@@ -101,12 +97,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsNotFoundForFakeDataGRPC() throws {
-        try enclaveRequestReturnsNotFoundForFakeData(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testEnclaveRequestReturnsNotFoundForFakeDataHTTP() throws {
-        try enclaveRequestReturnsNotFoundForFakeData(transportProtocol: TransportProtocol.http)
+    func testEnclaveRequestReturnsNotFoundForFakeData() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequestReturnsNotFoundForFakeData(transportProtocol: transportProtocol)
+        }
     }
     
     func enclaveRequestReturnsNotFoundForFakeData(transportProtocol: TransportProtocol) throws {
@@ -134,12 +128,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKeyGRPC() throws {
-        try enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKeyHTTP() throws {
-        try enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: TransportProtocol.http)
+    func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKey() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: transportProtocol)
+        }
     }
     
     func enclaveRequestReturnsBadSearchKeyForEmptySearchKey(transportProtocol: TransportProtocol) throws {
@@ -167,12 +159,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKeyGRPC() throws {
-        try enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKeyHTTP() throws {
-        try enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: TransportProtocol.http)
+    func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKey() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: transportProtocol)
+        }
     }
     
     func enclaveRequestReturnsBadSearchKeyForInvalidSearchKey(transportProtocol: TransportProtocol) throws {
@@ -201,12 +191,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKeyGRPC() throws {
-        try enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKeyHTTP() throws {
-        try enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: TransportProtocol.http)
+    func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKey() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: transportProtocol)
+        }
     }
     
     func enclaveRequestReturnsBadSearchKeyForTooShortSearchKey(transportProtocol: TransportProtocol) throws {
@@ -235,12 +223,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKeyGRPC() throws {
-        try enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKeyHTTP() throws {
-        try enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: TransportProtocol.http)
+    func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKey() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: transportProtocol)
+        }
     }
     
     func enclaveRequestReturnsBadSearchKeyForTooLongSearchKey(transportProtocol: TransportProtocol) throws {
@@ -269,12 +255,10 @@ class FogViewConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
+        }
     }
     
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {

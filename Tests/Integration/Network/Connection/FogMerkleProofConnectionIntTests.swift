@@ -7,14 +7,12 @@ import LibMobileCoin
 import XCTest
 
 class FogMerkleProofConnectionIntTests: XCTestCase {
-    func testGetOutputsRequestGRPC() throws {
-        try getOutputsRequest(transportProtocol: TransportProtocol.grpc)
+    func testGetOutputsRequest() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getOutputsRequest(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testGetOutputsRequestHTTP() throws {
-        try getOutputsRequest(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func getOutputsRequest(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Making Fog MerkleProof GetOutputs request")
 
@@ -42,12 +40,10 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndicesGRPC() throws {
-        try getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndicesHTTP() throws {
-        try getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: TransportProtocol.http)
+    func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndices() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: transportProtocol)
+        }
     }
     
     func getOutputsReturnsNoResultsWhenSearchingForZeroIndices(transportProtocol: TransportProtocol) throws {
@@ -68,12 +64,10 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsRequestAcceptsUIntMinMerkleRootBlockGRPC() throws {
-        try getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetOutputsRequestAcceptsUIntMinMerkleRootBlockHTTP() throws {
-        try getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: TransportProtocol.http)
+    func testGetOutputsRequestAcceptsUIntMinMerkleRootBlock() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: transportProtocol)
+        }
     }
     
     func getOutputsRequestAcceptsUIntMinMerkleRootBlock(transportProtocol: TransportProtocol) throws {
@@ -100,12 +94,10 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlockGRPC() throws {
-        try getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlockHTTP() throws {
-        try getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: TransportProtocol.http)
+    func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlock() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: transportProtocol)
+        }
     }
     
     func getOutputsRequestAcceptsUIntMaxMerkleRootBlock(transportProtocol: TransportProtocol) throws {
@@ -132,12 +124,10 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testGetOutputsRequestReturnsNotFoundForUIntMaxGRPC() throws {
-        try getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetOutputsRequestReturnsNotFoundForUIntMaxHTTP() throws {
-        try getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: TransportProtocol.http)
+    func testGetOutputsRequestReturnsNotFoundForUIntMax() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: transportProtocol)
+        }
     }
     
     func getOutputsRequestReturnsNotFoundForUIntMax(transportProtocol: TransportProtocol) throws {
@@ -162,12 +152,10 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
+        }
     }
     
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {

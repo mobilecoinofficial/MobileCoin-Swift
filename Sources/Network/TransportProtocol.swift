@@ -33,7 +33,7 @@ extension TransportProtocol {
 }
 
 extension TransportProtocol {
-    static var grpcProtocolSupported: Bool {
+    public static var grpcProtocolSupported: Bool {
         Bundle.testBundle?.boolean(forInfoDictionaryKey: .grpcKey) ?? false
     }
     
@@ -41,7 +41,7 @@ extension TransportProtocol {
         Bundle.testBundle?.boolean(forInfoDictionaryKey: .httpKey) ?? false
     }
     
-    static var supportedProtocols: [TransportProtocol] {
+    public static var supportedProtocols: [TransportProtocol] {
         [(TransportProtocol.grpc, TransportProtocol.grpcProtocolSupported),
          (TransportProtocol.http, TransportProtocol.httpProtocolSupported)]
             .filter({$0.1})
