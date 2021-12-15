@@ -5,7 +5,6 @@
 // swiftlint:disable function_parameter_count multiline_arguments multiline_function_chains
 
 import Foundation
-import NIOSSL
 
 public final class MobileCoinClient {
     /// - Returns: `InvalidInputError` when `accountKey` isn't configured to use Fog.

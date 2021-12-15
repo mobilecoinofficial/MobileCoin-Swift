@@ -6,7 +6,6 @@
 
 import Foundation
 import SwiftProtobuf
-import NIOSSL
 
 public protocol HttpRequester {
     func request(
@@ -20,11 +19,11 @@ public protocol HttpRequester {
 public class RestApiRequester {
     let requester: HttpRequester
     let baseUrl: URL
-    let trustRoots: [NIOSSLCertificate]?
+    let trustRoots: [Data]?
     let prefix: String = "gw"
     var challengeDelegate: URLSessionDelegate?
 
-    init(requester: HttpRequester, baseUrl: URL, trustRoots: [NIOSSLCertificate]? = []) {
+    init(requester: HttpRequester, baseUrl: URL, trustRoots: [Data]? = []) {
         self.requester = requester
         self.baseUrl = baseUrl
         self.trustRoots = trustRoots

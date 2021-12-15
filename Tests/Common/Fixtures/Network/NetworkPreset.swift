@@ -5,7 +5,6 @@
 // swiftlint:disable file_length inclusive_language multiline_function_chains
 
 @testable import MobileCoin
-import NIOSSL
 import XCTest
 
 #if canImport(Keys)

@@ -6,7 +6,6 @@
 
 import Foundation
 @testable import MobileCoin
-import NIOSSL
 
 extension MobileCoinClient.Config {
     enum Fixtures {}

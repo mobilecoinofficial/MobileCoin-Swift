@@ -26,18 +26,9 @@ final class DefaultServiceProvider: ServiceProvider {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
         
-        // TODO
-        let channelManager = GrpcChannelManager()
-        let inner = Inner(channelManager: channelManager, httpRequester: networkConfig.httpRequester, targetQueue: targetQueue)
+        let inner = Inner(httpFactory:httpConnectionFactory, grpcFactory:grpcConnectionFactory, targetQueue: targetQueue)
         self.inner = .init(inner, targetQueue: targetQueue)
-        // END TODO
 
-        /**
-         - Write EmptyConnection that implements ConnectionProtocol
-         - Use DI & Factory Pattern & Extensions on TransportProtocol Option to create/return connectionOptionWrapperFactory function.
-         - ConnectionFactory class,  default implementation returns
-         */
-        
         self.consensus = ConsensusConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
@@ -117,33 +108,31 @@ final class DefaultServiceProvider: ServiceProvider {
     }
 }
 
-// TODO
 extension DefaultServiceProvider {
     private struct Inner {
+        private let httpFactory: HttpProtocolConnectionFactory
+        private let grpcFactory: GrpcProtocolConnectionFactory
         private let targetQueue: DispatchQueue?
-        private let channelManager: GrpcChannelManager
-        private let httpRequester: HttpRequester?
 
-        private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
+        private var reportUrlToReportConnection: [FogUrl: FogReportConnection] = [:]
         private(set) var transportProtocolOption: TransportProtocol.Option
 
-        init(channelManager: GrpcChannelManager, httpRequester: HttpRequester?, targetQueue: DispatchQueue?) {
+        init(httpFactory: HttpProtocolConnectionFactory, grpcFactory:GrpcProtocolConnectionFactory, targetQueue: DispatchQueue?) {
+            self.httpFactory = httpFactory
+            self.grpcFactory = grpcFactory
             self.targetQueue = targetQueue
-            self.httpRequester = httpRequester
-            self.channelManager = channelManager
             self.transportProtocolOption = TransportProtocol.grpc.option
         }
 
         mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
-            let config = GrpcChannelConfig(url: fogReportUrl)
-            guard let reportConnection = reportUrlToReportConnection[config] else {
+            guard let reportConnection = reportUrlToReportConnection[fogReportUrl] else {
                 let reportConnection = FogReportConnection(
+                    httpFactory: httpFactory,
+                    grpcFactory: grpcFactory,
                     url: fogReportUrl,
                     transportProtocolOption: transportProtocolOption,
-                    channelManager: channelManager,
-                    httpRequester: httpRequester,
                     targetQueue: targetQueue)
-                reportUrlToReportConnection[config] = reportConnection
+                reportUrlToReportConnection[fogReportUrl] = reportConnection
                 return reportConnection
             }
             return reportConnection

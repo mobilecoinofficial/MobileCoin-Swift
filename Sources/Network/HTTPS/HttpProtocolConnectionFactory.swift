@@ -96,6 +96,17 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
                         targetQueue: targetQueue)
     }
+
+    func makeFogReportService(
+        url: FogUrl,
+        transportProtocolOption: TransportProtocol.Option,
+        targetQueue: DispatchQueue?
+    ) -> FogReportHttpConnection {
+        FogReportHttpConnection(
+            url: url,
+            requester: RestApiRequester(requester: requester, baseUrl: url.httpBasedUrl),
+            targetQueue: targetQueue)
+    }
 }
 
 class DefaultHttpRequester: HttpRequester {

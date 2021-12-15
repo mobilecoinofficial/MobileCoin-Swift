@@ -93,5 +93,13 @@ class GrpcProtocolConnectionFactory : ProtocolConnectionFactory {
             channelManager: channelManager,
             targetQueue: targetQueue)
     }
+    
+    func makeFogReportService(
+        url: FogUrl,
+        transportProtocolOption: TransportProtocol.Option,
+        targetQueue: DispatchQueue?
+    ) -> FogReportGrpcConnection {
+        FogReportGrpcConnection(url: url, channelManager: channelManager, targetQueue: targetQueue)
+    }
 }
 

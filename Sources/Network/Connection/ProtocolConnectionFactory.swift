@@ -13,6 +13,7 @@ protocol ProtocolConnectionFactory {
     associatedtype FogKeyImageServiceProvider: FogKeyImageServiceConnection
     associatedtype FogBlockServiceProvider: FogBlockServiceConnection
     associatedtype FogUntrustedTxOutServiceProvider: FogUntrustedTxOutServiceConnection
+    associatedtype FogReportServiceProvider: FogReportService
     
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
@@ -56,6 +57,12 @@ protocol ProtocolConnectionFactory {
         config: ConnectionConfig<FogUrl>,
         targetQueue: DispatchQueue?
     ) -> FogUntrustedTxOutServiceProvider
+    
+    func makeFogReportService(
+        url: FogUrl,
+        transportProtocolOption: TransportProtocol.Option,
+        targetQueue: DispatchQueue?
+    ) -> FogReportServiceProvider
 }
 
 class EmptyProtocolConnectionFactory : ProtocolConnectionFactory {
@@ -115,6 +122,14 @@ class EmptyProtocolConnectionFactory : ProtocolConnectionFactory {
     ) -> EmptyFogUntrustedTxOutService {
         EmptyFogUntrustedTxOutService()
     }
+    
+    func makeFogReportService(
+        url: FogUrl,
+        transportProtocolOption: TransportProtocol.Option,
+        targetQueue: DispatchQueue?
+    ) -> EmptyFogReportService {
+        EmptyFogReportService()
+    }
 }
 
 class EmptyConsensusService : ConsensusService, ConnectionProtocol, ConsensusServiceConnection {
@@ -155,6 +170,12 @@ class EmptyFogBlockService : FogBlockService, ConnectionProtocol, FogBlockServic
 
 class EmptyFogUntrustedTxOutService : FogUntrustedTxOutService, ConnectionProtocol, FogUntrustedTxOutServiceConnection {
     func getTxOuts(request: FogLedger_TxOutRequest, completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void) {
+        logger.assertionFailure("Not Implemented")
+    }
+}
+
+class EmptyFogReportService : FogReportService {
+    func getReports(request: Report_ReportRequest, completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }
 }

@@ -7,8 +7,6 @@
 
 import Foundation
 import LibMobileCoin
-import NIO
-import NIOHPACK
 
 enum AttestedHttpConnectionError: Error {
     case connectionError(ConnectionError)

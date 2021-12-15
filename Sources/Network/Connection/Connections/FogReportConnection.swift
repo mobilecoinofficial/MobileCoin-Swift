@@ -3,25 +3,26 @@
 //
 
 import Foundation
-import GRPC
 import LibMobileCoin
 
 final class FogReportConnection:
     ArbitraryConnection<FogReportGrpcConnection, FogReportHttpConnection>, FogReportService
 {
+    private let httpFactory: HttpProtocolConnectionFactory
+    private let grpcFactory: GrpcProtocolConnectionFactory
     private let url: FogUrl
-    private let channelManager: GrpcChannelManager
     private let targetQueue: DispatchQueue?
 
     init(
+        httpFactory: HttpProtocolConnectionFactory,
+        grpcFactory: GrpcProtocolConnectionFactory,
         url: FogUrl,
         transportProtocolOption: TransportProtocol.Option,
-        channelManager: GrpcChannelManager,
-        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?
     ) {
+        self.httpFactory = httpFactory
+        self.grpcFactory = grpcFactory
         self.url = url
-        self.channelManager = channelManager
         self.targetQueue = targetQueue
 
         super.init(
@@ -29,18 +30,17 @@ final class FogReportConnection:
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
-                        grpcService: FogReportGrpcConnection(
-                            url: url,
-                            channelManager: channelManager,
-                            targetQueue: targetQueue))
+                        grpcService:
+                            grpcFactory.makeFogReportService(
+                                url: url,
+                                transportProtocolOption: transportProtocolOption,
+                                targetQueue: targetQueue))
                 case .http:
-                    guard let requester = httpRequester else {
-                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
-                    }
-                    return .http(httpService: FogReportHttpConnection(
-                                    url: url,
-                                    requester: RestApiRequester(requester: requester, baseUrl: url.httpBasedUrl),
-                                    targetQueue: targetQueue))
+                    return .http(httpService:
+                            httpFactory.makeFogReportService(
+                                url: url,
+                                transportProtocolOption: transportProtocolOption,
+                                targetQueue: targetQueue))
                 }
             },
             transportProtocolOption: transportProtocolOption,

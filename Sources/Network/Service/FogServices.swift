@@ -69,5 +69,3 @@ protocol FogReportService {
         request: Report_ReportRequest,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void)
 }
-
-protocol FogReportServiceConnection: FogReportService, ConnectionProtocol {}

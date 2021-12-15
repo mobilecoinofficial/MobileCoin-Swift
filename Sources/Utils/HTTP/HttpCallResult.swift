@@ -3,8 +3,6 @@
 //
 
 import Foundation
-import NIO
-import NIOHPACK
 
 
 public struct HttpCallResult<ResponsePayload> {
