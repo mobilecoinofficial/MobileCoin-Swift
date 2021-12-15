@@ -34,24 +34,14 @@ PODS:
     - SwiftNIOHPACK
     - SwiftNIOHTTP1
     - SwiftProtobuf
-  - MobileCoin/Core/GrpcProtocolUnitTests (1.2.0-pre5):
-    - gRPC-Swift
+  - MobileCoin/CoreHTTP (1.2.0-pre5):
     - LibMobileCoin (~> 1.2.0-pre4)
     - Logging (~> 1.4)
     - SwiftLint
-    - SwiftNIO
-    - SwiftNIOHPACK
-    - SwiftNIOHTTP1
-    - SwiftProtobuf
-  - MobileCoin/Core/HttpProtocolUnitTests (1.2.0-pre5):
-    - gRPC-Swift
+  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (1.2.0-pre5):
     - LibMobileCoin (~> 1.2.0-pre4)
     - Logging (~> 1.4)
     - SwiftLint
-    - SwiftNIO
-    - SwiftNIOHPACK
-    - SwiftNIOHTTP1
-    - SwiftProtobuf
   - MobileCoin/IntegrationTests (1.2.0-pre5)
   - MobileCoin/PerformanceTests (1.2.0-pre5)
   - MobileCoin/Tests (1.2.0-pre5)
@@ -119,9 +109,8 @@ DEPENDENCIES:
   - Keys (from `Pods/CocoaPodsKeys`)
   - LibMobileCoin
   - MobileCoin (from `..`)
-  - MobileCoin/Core (from `..`)
-  - MobileCoin/Core/GrpcProtocolUnitTests (from `..`)
-  - MobileCoin/Core/HttpProtocolUnitTests (from `..`)
+  - MobileCoin/CoreHTTP (from `..`)
+  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (from `..`)
   - MobileCoin/IntegrationTests (from `..`)
   - MobileCoin/PerformanceTests (from `..`)
   - MobileCoin/Tests (from `..`)
@@ -195,6 +184,6 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 1fbbdb58510af3c53a838a1dbea98f18132dc952
   SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
 
-PODFILE CHECKSUM: 962b6d2da42d1101f0a653a7e97077790ca10ee3
+PODFILE CHECKSUM: 56fe9005de2a0569f9cc32f3b83558b884773981
 
 COCOAPODS: 1.11.2
