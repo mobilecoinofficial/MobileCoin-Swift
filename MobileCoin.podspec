@@ -78,11 +78,16 @@ Pod::Spec.new do |s|
     end
   end
 
+
+
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [
       "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog}/**/*.{h,m,swift}",
-      "Sources/{Ledger,LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/{Ledger,LibMobileCoin,Mnemonic,Storage,Transaction}/**/*.{h,m,swift}",
+      "Sources/Utils/HTTP/**/*.{h,m,swift}",
+      "Sources/Utils/{Async,Callback,CollectionSubscripts,Data,Encoding}/**/*.{h,m,swift}",
+      "Sources/Utils/{InfiniteIterator,Locks,SafeArithmetic,Serialization,TypeConstraints}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
       "Sources/Network/HttpConnection/**/*.{h,m,swift}",
@@ -109,7 +114,10 @@ Pod::Spec.new do |s|
     subspec.source_files = [
       "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog}/**/*.{h,m,swift}",
-      "Sources/{Ledger,LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/{Ledger,LibMobileCoin,Mnemonic,Storage,Transaction}/**/*.{h,m,swift}",
+      "Sources/Utils/GRPC/**/*.{h,m,swift}",
+      "Sources/Utils/{Async,Callback,CollectionSubscripts,Data,Encoding}/**/*.{h,m,swift}",
+      "Sources/Utils/{InfiniteIterator,Locks,SafeArithmetic,Serialization,TypeConstraints}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/GRPC/**/*.{h,m,swift}",
       "Sources/Network/GrpcConnection/**/*.{h,m,swift}",
