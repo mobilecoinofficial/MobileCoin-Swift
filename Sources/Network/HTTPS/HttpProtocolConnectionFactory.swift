@@ -4,21 +4,7 @@
 
 import Foundation
 
-class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
-    //    typealias ConsensusServiceProvider = ConsensusGrpcConnection
-    //
-    //    typealias BlockchainServiceProvider = BlockchainGrpcConnection
-    //
-    //    typealias FogViewServiceProvider = FogViewGrpcConnection
-    //
-    //    typealias FogMerkleProofServiceProvider = FogMerkleProofGrpcConnection
-    //
-    //    typealias FogKeyImageServiceProvider = FogKeyImageGrpcConnection
-    //
-    //    typealias FogBlockServiceProvider = FogBlockGrpcConnection
-    //
-    //    typealias FogUntrustedTxOutServiceProvider = FogUntrustedTxOutGrpcConnection
-    //
+class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     let requester : HttpRequester
     
     init(httpRequester: HttpRequester?) {
@@ -30,7 +16,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> ConsensusService {
+    ) -> ConsensusHttpConnection {
         ConsensusHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
@@ -42,7 +28,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
     func makeBlockchainService(
         config: ConnectionConfig<ConsensusUrl>,
         targetQueue: DispatchQueue?
-    ) -> BlockchainService {
+    ) -> BlockchainHttpConnection {
         BlockchainHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
@@ -54,7 +40,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> FogViewService {
+    ) -> FogViewHttpConnection {
         FogViewHttpConnection(
                 config: config,
                 requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
@@ -68,7 +54,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> FogMerkleProofService {
+    ) -> FogMerkleProofHttpConnection {
         FogMerkleProofHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
@@ -82,7 +68,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> FogKeyImageService {
+    ) -> FogKeyImageHttpConnection {
         FogKeyImageHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
@@ -94,7 +80,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
     func makeFogBlockService(
         config: ConnectionConfig<FogUrl>,
         targetQueue: DispatchQueue?
-    ) -> FogBlockService {
+    ) -> FogBlockHttpConnection {
         FogBlockHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
@@ -104,7 +90,7 @@ class HttpProtocolConnectionFactory : ProtocolConnectionFactory {
     func makeFogUntrustedTxOutService(
         config: ConnectionConfig<FogUrl>,
         targetQueue: DispatchQueue?
-    ) -> FogUntrustedTxOutService {
+    ) -> FogUntrustedTxOutHttpConnection {
         FogUntrustedTxOutHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),

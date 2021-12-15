@@ -44,3 +44,5 @@ extension FogBlockHttpConnection {
         }
     }
 }
+
+extension FogBlockHttpConnection: FogBlockServiceConnection {}

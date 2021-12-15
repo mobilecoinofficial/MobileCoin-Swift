@@ -43,3 +43,5 @@ extension BlockchainHttpConnection {
         }
     }
 }
+
+extension BlockchainHttpConnection: BlockchainServiceConnection {}

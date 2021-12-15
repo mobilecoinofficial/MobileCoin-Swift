@@ -42,3 +42,5 @@ extension FogUntrustedTxOutHttpConnection {
         }
     }
 }
+
+extension FogUntrustedTxOutHttpConnection: FogUntrustedTxOutServiceConnection {}

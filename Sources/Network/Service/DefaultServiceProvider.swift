@@ -28,9 +28,9 @@ final class DefaultServiceProvider: ServiceProvider {
         
         // TODO
         let channelManager = GrpcChannelManager()
-
         let inner = Inner(channelManager: channelManager, httpRequester: networkConfig.httpRequester, targetQueue: targetQueue)
         self.inner = .init(inner, targetQueue: targetQueue)
+        // END TODO
 
         /**
          - Write EmptyConnection that implements ConnectionProtocol
@@ -44,34 +44,34 @@ final class DefaultServiceProvider: ServiceProvider {
             config: networkConfig.consensus,
             targetQueue: targetQueue)
         self.blockchain = BlockchainConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.blockchain,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
-        self.view = FogViewConnection(
+            self.view = FogViewConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogView,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.merkleProof = FogMerkleProofConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogMerkleProof,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.keyImage = FogKeyImageConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogKeyImage,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.block = FogBlockConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogBlock,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.untrustedTxOut = FogUntrustedTxOutConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogUntrustedTxOut,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
     }
 

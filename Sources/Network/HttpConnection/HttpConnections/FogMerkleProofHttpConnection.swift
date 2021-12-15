@@ -57,5 +57,6 @@ extension FogMerkleProofHttpConnection {
     }
 }
 
+extension FogMerkleProofHttpConnection: FogMerkleProofServiceConnection {}
 extension FogLedger_FogMerkleProofAPIRestClient: AuthHttpCallee, OutputsHttpCallee {}
 

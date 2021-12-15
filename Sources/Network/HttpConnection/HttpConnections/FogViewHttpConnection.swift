@@ -60,4 +60,5 @@ extension FogViewHttpConnection {
     }
 }
 
+extension FogViewHttpConnection: FogViewServiceConnection {}
 extension FogView_FogViewAPIRestClient: AuthHttpCallee, QueryHttpCallee, HTTPClient {}

@@ -201,10 +201,12 @@ extension FogBlockConnectionIntTests {
     }
 
     func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
-        FogBlockConnection(
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        return FogBlockConnection(
+            httpFactory: httpFactory,
+            grpcFactory: grpcFactory,
             config: networkConfig.fogBlock,
-            channelManager: GrpcChannelManager(),
-            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

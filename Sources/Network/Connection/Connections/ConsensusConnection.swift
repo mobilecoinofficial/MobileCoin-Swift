@@ -6,14 +6,14 @@ import Foundation
 import LibMobileCoin
 
 final class ConsensusConnection:
-    Connection<HttpProtocolConnectionFactory.ConsensusServiceProvider, GrpcProtocolConnectionFactory.ConsensusServiceProvider>, ConsensusService
+    Connection<GrpcProtocolConnectionFactory.ConsensusServiceProvider, HttpProtocolConnectionFactory.ConsensusServiceProvider>, ConsensusService
 {
+    private let httpFactory: HttpProtocolConnectionFactory
+    private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: AttestedConnectionConfig<ConsensusUrl>
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
     private let rngContext: Any?
-    private let grpcFactory: GrpcProtocolConnectionFactory
-    private let httpFactory: HttpProtocolConnectionFactory
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
@@ -25,7 +25,6 @@ final class ConsensusConnection:
     ) {
         self.httpFactory = httpFactory
         self.grpcFactory = grpcFactory
-        
         self.config = config
         self.targetQueue = targetQueue
         self.rng = rng
@@ -65,4 +64,3 @@ final class ConsensusConnection:
         }
     }
 }
-

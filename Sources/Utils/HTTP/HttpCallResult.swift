@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import GRPC
 import NIO
 import NIOHPACK
 

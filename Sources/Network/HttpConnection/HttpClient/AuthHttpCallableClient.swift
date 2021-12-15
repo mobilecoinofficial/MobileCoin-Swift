@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import GRPC
 import LibMobileCoin
 
 protocol AuthHttpCallableClient: AttestableHttpClient, AuthHttpCallable {

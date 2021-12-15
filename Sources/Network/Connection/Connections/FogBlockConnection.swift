@@ -3,24 +3,25 @@
 //
 
 import Foundation
-import GRPC
 import LibMobileCoin
 
 final class FogBlockConnection:
-    Connection<FogBlockGrpcConnection, FogBlockHttpConnection>, FogBlockService
+    Connection<GrpcProtocolConnectionFactory.FogBlockServiceProvider, HttpProtocolConnectionFactory.FogBlockServiceProvider>, FogBlockService
 {
+    private let httpFactory: HttpProtocolConnectionFactory
+    private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: ConnectionConfig<FogUrl>
-    private let channelManager: GrpcChannelManager
     private let targetQueue: DispatchQueue?
 
     init(
+        httpFactory: HttpProtocolConnectionFactory,
+        grpcFactory: GrpcProtocolConnectionFactory,
         config: ConnectionConfig<FogUrl>,
-        channelManager: GrpcChannelManager,
-        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?
     ) {
+        self.httpFactory = httpFactory
+        self.grpcFactory = grpcFactory
         self.config = config
-        self.channelManager = channelManager
         self.targetQueue = targetQueue
 
         super.init(
@@ -28,18 +29,15 @@ final class FogBlockConnection:
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
-                        grpcService: FogBlockGrpcConnection(
-                            config: config,
-                            channelManager: channelManager,
-                            targetQueue: targetQueue))
+                        grpcService:
+                            grpcFactory.makeFogBlockService(
+                                config: config,
+                                targetQueue: targetQueue))
                 case .http:
-                    guard let requester = httpRequester else {
-                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
-                    }
-                    return .http(httpService: FogBlockHttpConnection(
-                                    config: config,
-                                    requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
-                                    targetQueue: targetQueue))
+                    return .http(httpService:
+                            httpFactory.makeFogBlockService(
+                                config: config,
+                                targetQueue: targetQueue))
                 }
             },
             transportProtocolOption: config.transportProtocolOption,

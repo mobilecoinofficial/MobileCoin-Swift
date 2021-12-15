@@ -205,10 +205,12 @@ extension FogMerkleProofConnectionIntTests {
     }
 
     func createFogMerkleProofConnection(networkConfig: NetworkConfig) -> FogMerkleProofConnection {
-        FogMerkleProofConnection(
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        return FogMerkleProofConnection(
+            httpFactory: httpFactory,
+            grpcFactory: grpcFactory,
             config: networkConfig.fogMerkleProof,
-            channelManager: GrpcChannelManager(),
-            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

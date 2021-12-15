@@ -58,4 +58,5 @@ extension FogKeyImageHttpConnection {
     }
 }
 
+extension FogKeyImageHttpConnection: FogKeyImageServiceConnection {}
 extension FogLedger_FogKeyImageAPIRestClient: AuthHttpCallee, CheckKeyImagesCallee, HTTPClient {}

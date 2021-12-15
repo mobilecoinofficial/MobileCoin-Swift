@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import GRPC
 
 /// Encapsulates the result of a HTTP call.
 public struct HTTPStatus : Error {
