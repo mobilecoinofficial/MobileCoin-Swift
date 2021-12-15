@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.default_subspec = "Core"
+  s.default_subspec = :none
 
   s.test_spec do |test_spec|
     test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
@@ -52,7 +52,7 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre4"
+    subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre4"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
@@ -83,7 +83,7 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre4"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 1.2.0-pre4"
 
     subspec.dependency "Logging", "~> 1.4"
 
@@ -104,7 +104,7 @@ Pod::Spec.new do |s|
       "Sources/**/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre4"
+    subspec.dependency "LibMobileCoin/CoreGRPC", "~> 1.2.0-pre4"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
