@@ -208,10 +208,12 @@ extension ConsensusConnectionIntTests {
     }
 
     func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
-        ConsensusConnection(
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        return ConsensusConnection(
+            httpFactory: httpFactory,
+            grpcFactory: grpcFactory,
             config: networkConfig.consensus,
-            channelManager: GrpcChannelManager(),
-            httpRequester: networkConfig.httpRequester,
             targetQueue: DispatchQueue.main)
     }
 }

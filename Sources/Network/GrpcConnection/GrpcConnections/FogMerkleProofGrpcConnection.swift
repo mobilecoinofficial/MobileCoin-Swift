@@ -55,4 +55,5 @@ extension FogMerkleProofGrpcConnection {
     }
 }
 
+extension FogMerkleProofGrpcConnection: FogMerkleProofServiceConnection {}
 extension FogLedger_FogMerkleProofAPIClient: AuthGrpcCallableClient {}

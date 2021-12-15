@@ -41,3 +41,5 @@ extension FogUntrustedTxOutGrpcConnection {
         }
     }
 }
+
+extension FogUntrustedTxOutGrpcConnection: FogUntrustedTxOutServiceConnection {}

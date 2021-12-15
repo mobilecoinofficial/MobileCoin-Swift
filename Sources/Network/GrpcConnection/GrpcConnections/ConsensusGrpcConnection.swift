@@ -55,4 +55,6 @@ extension ConsensusGrpcConnection {
     }
 }
 
+extension ConsensusGrpcConnection: ConsensusServiceConnection {}
+
 extension Attest_AttestedApiClient: AuthGrpcCallableClient {}

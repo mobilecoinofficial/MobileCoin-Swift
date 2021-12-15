@@ -58,4 +58,5 @@ extension FogViewGrpcConnection {
     }
 }
 
+extension FogViewGrpcConnection: FogViewServiceConnection {}
 extension FogView_FogViewAPIClient: AuthGrpcCallableClient {}

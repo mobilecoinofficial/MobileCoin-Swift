@@ -55,4 +55,5 @@ extension FogKeyImageGrpcConnection {
     }
 }
 
+extension FogKeyImageGrpcConnection: FogKeyImageServiceConnection {}
 extension FogLedger_FogKeyImageAPIClient: AuthGrpcCallableClient {}

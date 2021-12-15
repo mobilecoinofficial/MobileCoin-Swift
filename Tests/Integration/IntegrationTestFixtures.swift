@@ -159,7 +159,9 @@ extension IntegrationTestFixtures {
 
     static func createServiceProvider(transportProtocol: TransportProtocol) throws -> ServiceProvider {
         let networkConfig = try createNetworkConfig(transportProtocol: transportProtocol)
-        return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main)
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main, grpcConnectionFactory: grpcFactory, httpConnectionFactory: httpFactory)
     }
 
     static func createFogReportManager(transportProtocol: TransportProtocol) throws -> FogReportManager {

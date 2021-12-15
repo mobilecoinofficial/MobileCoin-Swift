@@ -43,3 +43,5 @@ extension BlockchainGrpcConnection {
         }
     }
 }
+
+extension BlockchainGrpcConnection: BlockchainServiceConnection

@@ -14,8 +14,19 @@ final class DefaultServiceProvider: ServiceProvider {
     private let keyImage: FogKeyImageConnection
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
+    private let grpcConnectionFactory: GrpcProtocolConnectionFactory
+    private let httpConnectionFactory: HttpProtocolConnectionFactory
 
-    init(networkConfig: NetworkConfig, targetQueue: DispatchQueue?) {
+    init(
+        networkConfig: NetworkConfig,
+        targetQueue: DispatchQueue?,
+        grpcConnectionFactory: GrpcProtocolConnectionFactory,
+        httpConnectionFactory: HttpProtocolConnectionFactory
+    ) {
+        self.grpcConnectionFactory = grpcConnectionFactory
+        self.httpConnectionFactory = httpConnectionFactory
+        
+        // TODO
         let channelManager = GrpcChannelManager()
 
         let inner = Inner(channelManager: channelManager, httpRequester: networkConfig.httpRequester, targetQueue: targetQueue)
@@ -28,9 +39,9 @@ final class DefaultServiceProvider: ServiceProvider {
          */
         
         self.consensus = ConsensusConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.consensus,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.blockchain = BlockchainConnection(
             config: networkConfig.blockchain,

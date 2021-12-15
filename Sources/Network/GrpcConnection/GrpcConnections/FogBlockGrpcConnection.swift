@@ -41,3 +41,5 @@ extension FogBlockGrpcConnection {
         }
     }
 }
+
+extension FogBlockGrpcConnection: FogBlockServiceConnection {}

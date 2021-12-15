@@ -33,15 +33,15 @@ extension TransportProtocol {
 }
 
 extension TransportProtocol {
-    static var grpcProtocolSupported : Bool {
+    static var grpcProtocolSupported: Bool {
         Bundle.testBundle?.boolean(forInfoDictionaryKey: .grpcKey) ?? false
     }
     
-    static var httpProtocolSupported : Bool {
+    static var httpProtocolSupported: Bool {
         Bundle.testBundle?.boolean(forInfoDictionaryKey: .httpKey) ?? false
     }
     
-    static var supportedProtocols : [TransportProtocol] {
+    static var supportedProtocols: [TransportProtocol] {
         [(TransportProtocol.grpc, TransportProtocol.grpcProtocolSupported),
          (TransportProtocol.http, TransportProtocol.httpProtocolSupported)]
             .filter({$0.1})
@@ -51,11 +51,11 @@ extension TransportProtocol {
 
 // swiftlint:disable no_extension_access_modifier
 fileprivate extension String {
-    static let grpcKey : String = "GRPCNetworkProtocolSupported"
-    static let httpKey : String = "HTTPNetworkProtocolSupported"
+    static let grpcKey: String = "GRPCNetworkProtocolSupported"
+    static let httpKey: String = "HTTPNetworkProtocolSupported"
 }
 
-struct EmptyConnectionProtocol : ConnectionProtocol {
+struct EmptyConnectionProtocol: ConnectionProtocol {
     func setAuthorization(credentials: BasicCredentials) {
         logger.fatalError("Not implemented in this transport protocol")
     }

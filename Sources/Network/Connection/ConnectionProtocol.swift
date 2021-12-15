@@ -11,11 +11,6 @@ protocol ConnectionProtocol {
 extension ConnectionProtocol {
     func setAuthorization(credentials: BasicCredentials) {
         // Do nothing
-    }
-}
-
-struct EmptyConnectionProtocol: ConnectionProtocol {
-    func setAuthorization(credentials: BasicCredentials) {
-        logger.assertionFailure("ConnectionProtocol not implemented")
+         logger.assertionFailure("ConnectionProtocol not implemented")
     }
 }
