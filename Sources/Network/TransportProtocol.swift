@@ -54,6 +54,14 @@ extension TransportProtocol {
         Bundle.allBundles.forEach { bundle in
             print("\(bundle.bundlePath)")
             print("\(bundle.infoDictionary?.keys)")
+            if let keys = bundle.infoDictionary?.keys,
+                keys.contains("GRPCNetworkProtocolSupported") {
+                print("found")
+            }
+            
+            if let path = bundle.path(forResource: "MobileCoin-Core-Info", ofType: "plist") {
+                print("found")
+            }
         }
         print("Supported Protocols == \(v.count)")
         return v

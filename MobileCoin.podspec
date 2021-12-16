@@ -35,11 +35,6 @@ Pod::Spec.new do |s|
     ]
   end
 
-  s.test_spec 'IntegrationTests' do |test_spec|
-    test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*"
-  end
-
   s.test_spec 'PerformanceTests' do |test_spec|
     test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
 
@@ -86,7 +81,7 @@ Pod::Spec.new do |s|
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [
-      "Sources/*.{h,m,swift}",
+      "Sources/*.{h,m,swift,plist}",
       "Sources/{Account,Common,Crypto,Encodings,Fog}/**/*.{h,m,swift}",
       "Sources/{Ledger,LibMobileCoin,Mnemonic,Storage,Transaction}/**/*.{h,m,swift}",
       "Sources/Utils/HTTP/**/*.{h,m,swift}",
@@ -109,7 +104,15 @@ Pod::Spec.new do |s|
       test_spec.resource = "Tests/Http/FixtureData/**/*"
     end
 
-    subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES" }
+    subspec.test_spec 'IntegrationTests' do |test_spec|
+      test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+      test_spec.resource = "Tests/Common/FixtureData/**/*"
+    end
+
+    subspec.pod_target_xcconfig = { 
+      "NETWORK_PROTOCOL_HTTP" => "YES",
+      "INFOPLIST_FILE" => "${PODS_TARGET_SRCROOT}/Sources/MobileCoin-Core-Info.plist" 
+    }
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'
