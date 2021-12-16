@@ -65,7 +65,7 @@ protocol ProtocolConnectionFactory {
     ) -> FogReportServiceProvider
 }
 
-class EmptyProtocolConnectionFactory : ProtocolConnectionFactory {
+extension ProtocolConnectionFactory {
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
         targetQueue: DispatchQueue?,
@@ -179,3 +179,5 @@ class EmptyFogReportService : FogReportService {
         logger.assertionFailure("Not Implemented")
     }
 }
+
+class EmptyProtocolConnectionFactory : ProtocolConnectionFactory { }
