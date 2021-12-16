@@ -35,6 +35,11 @@ Pod::Spec.new do |s|
     ]
   end
 
+  s.test_spec 'IntegrationTests' do |test_spec|
+    test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+    test_spec.resource = "Tests/Common/FixtureData/**/*"
+  end
+
   s.test_spec 'PerformanceTests' do |test_spec|
     test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
 
@@ -102,11 +107,6 @@ Pod::Spec.new do |s|
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/Http/**/*.swift"
       test_spec.resource = "Tests/Http/FixtureData/**/*"
-    end
-
-    subspec.test_spec 'IntegrationTests' do |test_spec|
-      test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
-      test_spec.resource = "Tests/Common/FixtureData/**/*"
     end
 
     subspec.pod_target_xcconfig = { 
