@@ -91,6 +91,7 @@ Pod::Spec.new do |s|
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
       "Sources/Network/HttpConnection/**/*.{h,m,swift}",
+      "Sources/Network/GrpcEmpties/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
 
@@ -120,6 +121,7 @@ Pod::Spec.new do |s|
       "Sources/Utils/{InfiniteIterator,Locks,SafeArithmetic,Serialization,TypeConstraints}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/GRPC/**/*.{h,m,swift}",
+      "Sources/Network/HttpEmpties/**/*.{h,m,swift}",
       "Sources/Network/GrpcConnection/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
