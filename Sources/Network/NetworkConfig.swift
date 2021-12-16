@@ -5,7 +5,7 @@
 import Foundation
 
 struct NetworkConfig {
-    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol = .http)
+    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol)
         -> Result<NetworkConfig, InvalidInputError>
     {
         ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
@@ -20,6 +20,7 @@ struct NetworkConfig {
 
     private let attestation: AttestationConfig
 
+    // TODO
     var transportProtocol: TransportProtocol = .http
 
     var possibleConsensusTrustRoots: PossibleNIOSSLCertificates?
@@ -30,7 +31,7 @@ struct NetworkConfig {
 
     var httpRequester: HttpRequester?
     
-    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol = .http) {
+    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
         self.consensusUrl = consensusUrl
         self.fogUrl = fogUrl
         self.attestation = attestation

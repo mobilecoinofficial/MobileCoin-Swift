@@ -50,6 +50,11 @@ extension TransportProtocol {
             .filter({$0.1})
             .map({$0.0})
         
+        
+        Bundle.allBundles.forEach { bundle in
+            print("\(bundle.bundlePath)")
+            print("\(bundle.infoDictionary?.keys)")
+        }
         print("Supported Protocols == \(v.count)")
         return v
     }

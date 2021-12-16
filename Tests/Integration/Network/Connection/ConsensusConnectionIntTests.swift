@@ -182,7 +182,7 @@ class ConsensusConnectionIntTests: XCTestCase {
 }
 
 extension ConsensusConnectionIntTests {
-    func createConsensusConnection(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> ConsensusConnection {
+    func createConsensusConnection(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }

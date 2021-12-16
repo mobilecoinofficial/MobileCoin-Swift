@@ -49,7 +49,7 @@ Pod::Spec.new do |s|
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
-      "Sources/**/*.{h,m,swift}",
+      "Sources/**/*.{h,m,swift,plist}",
     ]
 
     subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre4"
@@ -61,7 +61,11 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHTTP1"
     subspec.dependency "SwiftProtobuf"
 
-    subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_HTTP" => "YES", "NETWORK_PROTOCOL_GRPC" => "YES" }
+    subspec.pod_target_xcconfig = { 
+      "NETWORK_PROTOCOL_HTTP" => "YES",
+      "NETWORK_PROTOCOL_GRPC" => "YES",
+      "INFOPLIST_FILE" => "${PODS_TARGET_SRCROOT}/Sources/MobileCoin-Core-Info.plist" 
+    }
 
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/Http/**/*.swift"

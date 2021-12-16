@@ -54,25 +54,25 @@ extension IntegrationTestFixtures {
         try Account.make(accountKey: createAccountKey(accountIndex: accountIndex)).get()
     }
 
-    static func createNetworkConfig(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> NetworkConfig {
+    static func createNetworkConfig(transportProtocol: TransportProtocol) throws -> NetworkConfig {
         try network.networkConfig(transportProtocol:transportProtocol)
     }
 
-    static func createNetworkConfig(transportProtocol: TransportProtocol = TransportProtocol.http, trustRoots: [Data]) throws -> NetworkConfig {
+    static func createNetworkConfig(transportProtocol: TransportProtocol, trustRoots: [Data]) throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.setConsensusTrustRoots(trustRoots)
         networkConfig.setFogTrustRoots(trustRoots)
         return networkConfig
     }
 
-    static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> NetworkConfig {
+    static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.consensusAuthorization = network.invalidCredentials
         networkConfig.fogUserAuthorization = network.invalidCredentials
         return networkConfig
     }
 
-    static func createMobileCoinClientConfig(transportProtocol: TransportProtocol = .http) throws -> MobileCoinClient.Config {
+    static func createMobileCoinClientConfig(transportProtocol: TransportProtocol) throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
             consensusUrl: network.consensusUrl,
             consensusAttestation: network.consensusAttestation(),
@@ -86,29 +86,29 @@ extension IntegrationTestFixtures {
 
     static func createMobileCoinClient(
         accountIndex: Int = 0,
-        transportProtocol: TransportProtocol = .http
+        transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
-        try createMobileCoinClient(accountKey: createAccountKey(accountIndex: accountIndex))
+        try createMobileCoinClient(accountKey: createAccountKey(accountIndex: accountIndex), transportProtocol: transportProtocol)
     }
 
     static func createMobileCoinClient(
         accountIndex: Int = 0,
         config: MobileCoinClient.Config,
-        transportProtocol: TransportProtocol = .http
+        transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
         let accountKey = try createAccountKey(accountIndex: accountIndex)
-        return try createMobileCoinClient(accountKey: accountKey, config: config)
+        return try createMobileCoinClient(accountKey: accountKey, config: config, transportProtocol: transportProtocol)
     }
 
-    static func createMobileCoinClient(accountKey: AccountKey, transportProtocol: TransportProtocol = .http) throws -> MobileCoinClient {
+    static func createMobileCoinClient(accountKey: AccountKey, transportProtocol: TransportProtocol) throws -> MobileCoinClient {
         let config = try createMobileCoinClientConfig(transportProtocol: transportProtocol)
-        return try createMobileCoinClient(accountKey: accountKey, config: config)
+        return try createMobileCoinClient(accountKey: accountKey, config: config, transportProtocol: transportProtocol)
     }
 
     static func createMobileCoinClient(
         accountKey: AccountKey,
         config: MobileCoinClient.Config,
-        transportProtocol: TransportProtocol = .http
+        transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
         var mutableConfig = config
         mutableConfig.httpRequester = TestHttpRequester()
@@ -129,23 +129,24 @@ extension IntegrationTestFixtures {
     static func createMobileCoinClientWithBalance(
         accountIndex: Int = 0,
         expectation: XCTestExpectation,
-        transportProtocol: TransportProtocol = .http,
+        transportProtocol: TransportProtocol,
         completion: @escaping (MobileCoinClient) -> Void
     ) throws {
         let accountKey = try createAccountKey(accountIndex: accountIndex)
         return try createMobileCoinClientWithBalance(
             accountKey: accountKey,
             expectation: expectation,
+            transportProtocol: transportProtocol,
             completion: completion)
     }
 
     static func createMobileCoinClientWithBalance(
         accountKey: AccountKey,
         expectation: XCTestExpectation,
-        transportProtocol: TransportProtocol = .http,
+        transportProtocol: TransportProtocol,
         completion: @escaping (MobileCoinClient) -> Void
     ) throws {
-        let client = try createMobileCoinClient(accountKey: accountKey)
+        let client = try createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
         client.updateBalance {
             guard let balance = $0.successOrFulfill(expectation: expectation) else { return }
             guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
