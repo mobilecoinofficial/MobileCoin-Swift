@@ -3,3 +3,9 @@
 //
 
 import Foundation
+
+class WrappedNIOSSLCertificateValidator : NIOSSLCertificateValidator {
+    func validate(_ possibleCertificateData: [Data]) -> Result<PossibleNIOSSLCertificates, InvalidInputError> {
+        return .failure(InvalidInputError("NIOSSLCertificates not supported with HTTP only target"))
+    }
+}
