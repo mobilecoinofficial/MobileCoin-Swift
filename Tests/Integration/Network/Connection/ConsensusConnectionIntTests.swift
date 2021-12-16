@@ -78,7 +78,7 @@ class ConsensusConnectionIntTests: XCTestCase {
         try XCTSkipUnless(IntegrationTestFixtures.network.consensusRequiresCredentials)
 
         let fixture = try Transaction.Fixtures.Default()
-        let connection = try createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol.grpc)
+        let connection = try createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol.http)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -182,7 +182,7 @@ class ConsensusConnectionIntTests: XCTestCase {
 }
 
 extension ConsensusConnectionIntTests {
-    func createConsensusConnection(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> ConsensusConnection {
+    func createConsensusConnection(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> ConsensusConnection {
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }

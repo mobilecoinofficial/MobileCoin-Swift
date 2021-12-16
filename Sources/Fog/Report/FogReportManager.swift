@@ -52,7 +52,7 @@ extension FogReportManager {
     private struct Inner {
         private let sharedSerialExclusionQueue: DispatchQueue
 
-        private var networkConfigToServer: [GrpcChannelConfig: FogReportServer] = [:]
+        private var networkConfigToServer: [FogUrl: FogReportServer] = [:]
 
         init(targetQueue: DispatchQueue?) {
             self.sharedSerialExclusionQueue = DispatchQueue(
@@ -61,10 +61,9 @@ extension FogReportManager {
         }
 
         mutating func reportServer(for reportUrl: FogUrl) -> FogReportServer {
-            let config = GrpcChannelConfig(url: reportUrl)
-            return networkConfigToServer[config] ?? {
+            return networkConfigToServer[reportUrl] ?? {
                 let reportServer = FogReportServer(serialExclusionQueue: sharedSerialExclusionQueue)
-                networkConfigToServer[config] = reportServer
+                networkConfigToServer[reportUrl] = reportServer
                 return reportServer
             }()
         }

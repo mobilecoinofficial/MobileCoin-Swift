@@ -41,11 +41,17 @@ extension TransportProtocol {
         Bundle.testBundle?.boolean(forInfoDictionaryKey: .httpKey) ?? false
     }
     
+    // TODO
+    // Migrate all "config" code that uses .grpc as the "default" TransportProtocol, to instead
+    // not have a static default, or choose from supported options, preferring .grpc if avail.
     public static var supportedProtocols: [TransportProtocol] {
-        [(TransportProtocol.grpc, TransportProtocol.grpcProtocolSupported),
+        let v = [(TransportProtocol.grpc, TransportProtocol.grpcProtocolSupported),
          (TransportProtocol.http, TransportProtocol.httpProtocolSupported)]
             .filter({$0.1})
             .map({$0.0})
+        
+        print("Supported Protocols == \(v.count)")
+        return v
     }
 }
 

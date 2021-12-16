@@ -374,7 +374,7 @@ final class TestHttpRequester: HttpRequester {
 
 extension NetworkPreset {
 
-    func networkConfig(transportProtocol: TransportProtocol = TransportProtocol.grpc) throws -> NetworkConfig {
+    func networkConfig(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> NetworkConfig {
         let attestationConfig = try self.attestationConfig()
         var networkConfig = try NetworkConfig.make(
             consensusUrl: consensusUrl,

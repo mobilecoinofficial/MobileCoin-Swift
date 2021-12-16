@@ -121,7 +121,7 @@ extension DefaultServiceProvider {
             self.httpFactory = httpFactory
             self.grpcFactory = grpcFactory
             self.targetQueue = targetQueue
-            self.transportProtocolOption = TransportProtocol.grpc.option
+            self.transportProtocolOption = TransportProtocol.http.option //TODO
         }
 
         mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
