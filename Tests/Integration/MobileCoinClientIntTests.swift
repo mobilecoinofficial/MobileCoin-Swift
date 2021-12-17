@@ -196,7 +196,7 @@ class MobileCoinClientIntTests: XCTestCase {
             }
             checkStatus()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testReceiptStatusDoesNotSucceedWithoutSubmission() throws {
@@ -396,7 +396,7 @@ class MobileCoinClientIntTests: XCTestCase {
         group.notify(queue: DispatchQueue.main) {
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
 }
