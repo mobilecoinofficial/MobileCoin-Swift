@@ -12,7 +12,13 @@
 
   },
   "testTargets" : [
-
+    {
+      "target" : {
+        "containerPath" : "container:Pods\/Pods.xcodeproj",
+        "identifier" : "D05A7A6B62372D952C49A93AA190B978",
+        "name" : "MobileCoin-Unit-CoreHTTP-HttpProtocolUnitTests"
+      }
+    }
   ],
   "version" : 1
 }
