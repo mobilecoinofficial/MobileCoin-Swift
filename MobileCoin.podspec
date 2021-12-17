@@ -49,7 +49,13 @@ Pod::Spec.new do |s|
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
-      "Sources/**/*.{h,m,swift,plist}",
+      "Sources/*.{h,m,swift}",
+      "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
+      "Sources/Network/{GRPC,HTTPS}/**/*.{h,m,swift}",
+      "Sources/Network/ProtocolSpecific/Combined/**/*.{h,m,swift}",
+      "Sources/Network/*.{h,m,swift}",
     ]
 
     subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre4"
@@ -91,6 +97,7 @@ Pod::Spec.new do |s|
       "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
+      "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
 
@@ -120,6 +127,7 @@ Pod::Spec.new do |s|
       "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/GRPC/**/*.{h,m,swift}",
+      "Sources/Network/ProtocolSpecific/GRPCOnly/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
 
