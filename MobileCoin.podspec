@@ -67,12 +67,6 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHTTP1"
     subspec.dependency "SwiftProtobuf"
 
-    subspec.pod_target_xcconfig = { 
-      "NETWORK_PROTOCOL_HTTP" => "YES",
-      "NETWORK_PROTOCOL_GRPC" => "YES",
-      "INFOPLIST_FILE" => "${PODS_TARGET_SRCROOT}/Sources/MobileCoin-Core-Info.plist" 
-    }
-
     subspec.test_spec 'ProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/{Http,Grpc}/**/*.swift"
       test_spec.resource = "Tests/{Http,Grpc}/FixtureData/**/*"
@@ -104,11 +98,6 @@ Pod::Spec.new do |s|
       test_spec.source_files = "Tests/Http/**/*.swift"
       test_spec.resource = "Tests/Http/FixtureData/**/*"
     end
-
-    subspec.pod_target_xcconfig = { 
-      "NETWORK_PROTOCOL_HTTP" => "YES",
-      "INFOPLIST_FILE" => "${PODS_TARGET_SRCROOT}/Sources/MobileCoin-Core-Info.plist" 
-    }
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'
