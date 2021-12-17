@@ -124,11 +124,6 @@ Pod::Spec.new do |s|
 #    subspec.dependency "SwiftNIOHTTP1"
 #    subspec.dependency "SwiftProtobuf"
 #
-#    subspec.test_spec 'GrpcProtocolUnitTests' do |test_spec|
-#      test_spec.source_files = "Tests/Grpc/**/*.swift"
-#      test_spec.resource = "Tests/Common/FixtureData/**/*"
-#    end
-#
 #    subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_GRPC" => "YES" }
 #
 #    unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
