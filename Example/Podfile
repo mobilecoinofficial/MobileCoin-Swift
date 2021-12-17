@@ -19,16 +19,16 @@ ENV['MC_ENABLE_WARN_LONG_COMPILE_TIMES'] = '1'
 
 target 'Example' do
   pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
-  # pod 'MobileCoin/Core', path: '..', testspecs: ['ProtocolUnitTests']
-  pod 'MobileCoin/CoreHTTP', path: '..', testspecs: ['HttpProtocolUnitTests']
+  pod 'MobileCoin/Core', path: '..', testspecs: ['ProtocolUnitTests']
+  # pod 'MobileCoin/CoreHTTP', path: '..', testspecs: ['HttpProtocolUnitTests']
   # pod 'MobileCoin', podspec: '../MobileCoin.podspec'
   # pod 'MobileCoin/Core', podspec: '../MobileCoin.podspec', testspecs: ['ProtocolUnitTests']
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['ProtocolUnitTests']
 
   # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin-ios-artifacts'
-  # pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin-ios-artifacts'
-  pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin-ios-artifacts'
+  pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin-ios-artifacts'
+  # pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin-ios-artifacts'
   # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
   # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin-ios-artifacts.git'
 
