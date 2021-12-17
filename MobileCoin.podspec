@@ -104,33 +104,6 @@ Pod::Spec.new do |s|
     end
   end
 
-#  s.subspec "CoreGRPC" do |subspec|
-#    subspec.source_files = [
-#      "Sources/*.{h,m,swift}",
-#      "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-#      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
-#      "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
-#      "Sources/Network/GRPC/**/*.{h,m,swift}",
-#      "Sources/Network/ProtocolSpecific/GRPCOnly/**/*.{h,m,swift}",
-#      "Sources/Network/*.{h,m,swift}",
-#    ]
-#
-#    subspec.dependency "LibMobileCoin/CoreGRPC", "~> 1.2.0-pre4"
-#
-#    subspec.dependency "gRPC-Swift"
-#    subspec.dependency "Logging", "~> 1.4"
-#    subspec.dependency "SwiftNIO"
-#    subspec.dependency "SwiftNIOHPACK"
-#    subspec.dependency "SwiftNIOHTTP1"
-#    subspec.dependency "SwiftProtobuf"
-#
-#    subspec.pod_target_xcconfig = { "NETWORK_PROTOCOL_GRPC" => "YES" }
-#
-#    unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
-#      subspec.dependency 'SwiftLint'
-#    end
-#  end
-
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.swift_version = "5.2"
