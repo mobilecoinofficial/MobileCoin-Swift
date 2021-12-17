@@ -73,14 +73,9 @@ Pod::Spec.new do |s|
       "INFOPLIST_FILE" => "${PODS_TARGET_SRCROOT}/Sources/MobileCoin-Core-Info.plist" 
     }
 
-    subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
-      test_spec.source_files = "Tests/Http/**/*.swift"
-      test_spec.resource = "Tests/Http/FixtureData/**/*"
-    end
-
-    subspec.test_spec 'GrpcProtocolUnitTests' do |test_spec|
-      test_spec.source_files = "Tests/Grpc/**/*.swift"
-      test_spec.resource = "Tests/Grpc/FixtureData/**/*"
+    subspec.test_spec 'ProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/{Http,Grpc}/**/*.swift"
+      test_spec.resource = "Tests/{Http,Grpc}/FixtureData/**/*"
     end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
@@ -151,7 +146,7 @@ Pod::Spec.new do |s|
 #      subspec.dependency 'SwiftLint'
 #    end
 #  end
-#
+
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.swift_version = "5.2"
