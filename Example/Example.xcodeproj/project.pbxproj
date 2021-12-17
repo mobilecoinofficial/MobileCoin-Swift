@@ -28,6 +28,7 @@
 		27A39C3D24C2622600B44786 /* Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Unit Tests.xctestplan"; sourceTree = "<group>"; };
 		3AF40DB60A0ADA2CB879AE38 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		4C0382FE8E8E7AAAC02CECA3 /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6672CD67276C080E00AE2DAE /* Http Protocol Unit Tests CoreHTTP.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Http Protocol Unit Tests CoreHTTP.xctestplan"; sourceTree = "<group>"; };
 		669DA84E2767E0AA009BF80D /* Grpc Protocol Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Grpc Protocol Unit Tests.xctestplan"; sourceTree = "<group>"; };
 		669DA84F2767E0C5009BF80D /* Http Protocol Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Http Protocol Unit Tests.xctestplan"; sourceTree = "<group>"; };
 		FC106CAA4E993C2D6301C5CA /* Pods-Example.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.testable release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.testable release.xcconfig"; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 				27A1FABE24E8B89C001A0614 /* Performance Tests.xctestplan */,
 				669DA84E2767E0AA009BF80D /* Grpc Protocol Unit Tests.xctestplan */,
 				669DA84F2767E0C5009BF80D /* Http Protocol Unit Tests.xctestplan */,
+				6672CD67276C080E00AE2DAE /* Http Protocol Unit Tests CoreHTTP.xctestplan */,
 			);
 			path = TestPlans;
 			sourceTree = "<group>";
