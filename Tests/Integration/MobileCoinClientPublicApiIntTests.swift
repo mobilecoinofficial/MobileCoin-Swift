@@ -432,7 +432,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testConsensusTrustRootWorks() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
+        try XCTSkipIf(onlyHTTPSupported)
+        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
             try consensusTrustRootWorks(transportProtocol: transportProtocol)
         }
     }
@@ -473,7 +476,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testExtraConsensusTrustRootWorks() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
+        try XCTSkipIf(onlyHTTPSupported)
+        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
             try extraConsensusTrustRootWorks(transportProtocol: transportProtocol)
         }
     }
@@ -515,7 +521,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testWrongConsensusTrustRootReturnsError() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
+        try XCTSkipIf(onlyHTTPSupported)
+        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
             try wrongConsensusTrustRootReturnsError(transportProtocol: transportProtocol)
         }
     }

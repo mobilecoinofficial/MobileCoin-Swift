@@ -21,6 +21,8 @@ extension TransportProtocol {
     }
 }
 
+extension TransportProtocol : Equatable { }
+
 extension TransportProtocol {
     var certificateValidator: NIOSSLCertificateValidator {
         switch self.option {
