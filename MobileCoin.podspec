@@ -81,7 +81,7 @@ Pod::Spec.new do |s|
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [
-      "Sources/*.{h,m,swift,plist}",
+      "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
       "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
