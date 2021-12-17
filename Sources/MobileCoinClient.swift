@@ -307,7 +307,7 @@ extension MobileCoinClient {
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
             fogReportAttestation: Attestation,
-            transportProtocol: TransportProtocol = .http
+            transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
             ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
                 FogUrl.make(string: fogUrl).map { fogUrl in
