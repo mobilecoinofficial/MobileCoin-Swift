@@ -6,7 +6,7 @@ import Foundation
 
 
 extension TransportProtocol: SupportedProtocols {
-    static var supportedProtocols: [TransportProtocol] { 
+    public static var supportedProtocols: [TransportProtocol] { 
         [.http]
     }
 }
