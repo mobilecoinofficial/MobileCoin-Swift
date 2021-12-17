@@ -31,6 +31,7 @@
 		6672CD67276C080E00AE2DAE /* Http Protocol Unit Tests CoreHTTP.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Http Protocol Unit Tests CoreHTTP.xctestplan"; sourceTree = "<group>"; };
 		669DA84E2767E0AA009BF80D /* Grpc Protocol Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Grpc Protocol Unit Tests.xctestplan"; sourceTree = "<group>"; };
 		669DA84F2767E0C5009BF80D /* Http Protocol Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Http Protocol Unit Tests.xctestplan"; sourceTree = "<group>"; };
+		66EF3932276C1F2300753388 /* Protocol Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Protocol Unit Tests.xctestplan"; path = "/Users/adam/Projects/MobileCoin/MobileCoin-Swift/Example/TestPlans/Protocol Unit Tests.xctestplan"; sourceTree = "<absolute>"; };
 		FC106CAA4E993C2D6301C5CA /* Pods-Example.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.testable release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.testable release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -93,6 +94,7 @@
 				27A1FABE24E8B89C001A0614 /* Performance Tests.xctestplan */,
 				669DA84E2767E0AA009BF80D /* Grpc Protocol Unit Tests.xctestplan */,
 				669DA84F2767E0C5009BF80D /* Http Protocol Unit Tests.xctestplan */,
+				66EF3932276C1F2300753388 /* Protocol Unit Tests.xctestplan */,
 				6672CD67276C080E00AE2DAE /* Http Protocol Unit Tests CoreHTTP.xctestplan */,
 			);
 			path = TestPlans;

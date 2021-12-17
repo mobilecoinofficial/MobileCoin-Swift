@@ -9,7 +9,7 @@ import XCTest
 class GrpcConnectionSessionTests: XCTestCase {
 
     func testAuth() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.GrpcFixtures.Default()
         let session = fixture.session
 
         session.authorizationCredentials = fixture.credentials
@@ -20,7 +20,7 @@ class GrpcConnectionSessionTests: XCTestCase {
     }
 
     func testSetCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.GrpcFixtures.Default()
         let session = fixture.session
 
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
@@ -31,7 +31,7 @@ class GrpcConnectionSessionTests: XCTestCase {
     }
 
     func testSetCookieOverridesExistingCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.GrpcFixtures.Default()
         let session = fixture.session
 
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
@@ -43,7 +43,7 @@ class GrpcConnectionSessionTests: XCTestCase {
     }
 
     func testHttp1SetCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.GrpcFixtures.Default()
         let session = fixture.session
 
         session.processResponse(headers: fixture.http1ResponseHeadersWithSetCookie1)
@@ -54,7 +54,7 @@ class GrpcConnectionSessionTests: XCTestCase {
     }
 
     func testSetCookieInsecure() throws {
-        let fixture = try ConnectionSession.Fixtures.Insecure()
+        let fixture = try ConnectionSession.GrpcFixtures.Insecure()
         let session = fixture.session
 
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
@@ -65,7 +65,7 @@ class GrpcConnectionSessionTests: XCTestCase {
     }
 
     func testAuthAndCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.GrpcFixtures.Default()
         let session = fixture.session
 
         session.authorizationCredentials = fixture.credentials

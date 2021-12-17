@@ -10,7 +10,7 @@ class HttpConnectionSessionTests: XCTestCase {
 
     func testAuth() throws {
         XCTAssertTrue(true)
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.HttpFixtures.Default()
         let session = fixture.session
         
         session.authorizationCredentials = fixture.credentials
@@ -19,7 +19,7 @@ class HttpConnectionSessionTests: XCTestCase {
     }
 
     func testSetCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.HttpFixtures.Default()
         let session = fixture.session
 
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
@@ -28,7 +28,7 @@ class HttpConnectionSessionTests: XCTestCase {
     }
 
     func testSetCookieOverridesExistingCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.HttpFixtures.Default()
         let session = fixture.session
 
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
@@ -38,7 +38,7 @@ class HttpConnectionSessionTests: XCTestCase {
     }
 
     func testHttp1SetCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.HttpFixtures.Default()
         let session = fixture.session
 
         session.processResponse(headers: fixture.http1ResponseHeadersWithSetCookie1)
@@ -47,7 +47,7 @@ class HttpConnectionSessionTests: XCTestCase {
     }
 
     func testSetCookieInsecure() throws {
-        let fixture = try ConnectionSession.Fixtures.Insecure()
+        let fixture = try ConnectionSession.HttpFixtures.Insecure()
         let session = fixture.session
 
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
@@ -56,7 +56,7 @@ class HttpConnectionSessionTests: XCTestCase {
     }
 
     func testAuthAndCookie() throws {
-        let fixture = try ConnectionSession.Fixtures.Default()
+        let fixture = try ConnectionSession.HttpFixtures.Default()
         let session = fixture.session
 
         session.authorizationCredentials = fixture.credentials

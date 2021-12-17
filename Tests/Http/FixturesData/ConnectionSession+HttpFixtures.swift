@@ -6,10 +6,10 @@
 import XCTest
 
 extension ConnectionSession {
-    enum Fixtures {}
+    enum HttpFixtures {}
 }
 
-extension ConnectionSession.Fixtures {
+extension ConnectionSession.HttpFixtures {
     struct Default {
         let session: ConnectionSession
 
@@ -34,7 +34,7 @@ extension ConnectionSession.Fixtures {
     }
 }
 
-extension ConnectionSession.Fixtures {
+extension ConnectionSession.HttpFixtures {
     struct DefaultWithCookie {
         let session: ConnectionSession
 
@@ -51,7 +51,7 @@ extension ConnectionSession.Fixtures {
     }
 }
 
-extension ConnectionSession.Fixtures {
+extension ConnectionSession.HttpFixtures {
     struct Insecure {
         let session: ConnectionSession
 
@@ -65,7 +65,7 @@ extension ConnectionSession.Fixtures {
     }
 }
 
-extension ConnectionSession.Fixtures.Default {
+extension ConnectionSession.HttpFixtures.Default {
 
     fileprivate static func url() throws -> MobileCoinUrlProtocol {
         try ConsensusUrl.make(string: "mc://node1.fake.mobilecoin.com").get()
@@ -101,7 +101,7 @@ extension ConnectionSession.Fixtures.Default {
 
 }
 
-extension ConnectionSession.Fixtures.Insecure {
+extension ConnectionSession.HttpFixtures.Insecure {
 
     fileprivate static func url() throws -> MobileCoinUrlProtocol {
         try ConsensusUrl.make(string: "insecure-mc://node1.fake.mobilecoin.com").get()

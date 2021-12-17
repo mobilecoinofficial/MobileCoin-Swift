@@ -8,10 +8,10 @@ import NIOHPACK
 import XCTest
 
 extension ConnectionSession {
-    enum Fixtures {}
+    enum GrpcFixtures {}
 }
 
-extension ConnectionSession.Fixtures {
+extension ConnectionSession.GrpcFixtures {
     struct Default {
         let session: ConnectionSession
 
@@ -36,7 +36,7 @@ extension ConnectionSession.Fixtures {
     }
 }
 
-extension ConnectionSession.Fixtures {
+extension ConnectionSession.GrpcFixtures {
     struct DefaultWithCookie {
         let session: ConnectionSession
 
@@ -54,7 +54,7 @@ extension ConnectionSession.Fixtures {
     }
 }
 
-extension ConnectionSession.Fixtures {
+extension ConnectionSession.GrpcFixtures {
     struct Insecure {
         let session: ConnectionSession
 
@@ -68,7 +68,7 @@ extension ConnectionSession.Fixtures {
     }
 }
 
-extension ConnectionSession.Fixtures.Default {
+extension ConnectionSession.GrpcFixtures.Default {
 
     fileprivate static func url() throws -> MobileCoinUrlProtocol {
         try ConsensusUrl.make(string: "mc://node1.fake.mobilecoin.com").get()
@@ -104,7 +104,7 @@ extension ConnectionSession.Fixtures.Default {
 
 }
 
-extension ConnectionSession.Fixtures.Insecure {
+extension ConnectionSession.GrpcFixtures.Insecure {
 
     fileprivate static func url() throws -> MobileCoinUrlProtocol {
         try ConsensusUrl.make(string: "insecure-mc://node1.fake.mobilecoin.com").get()
