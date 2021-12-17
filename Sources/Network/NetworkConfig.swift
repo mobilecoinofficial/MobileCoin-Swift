@@ -20,8 +20,7 @@ struct NetworkConfig {
 
     private let attestation: AttestationConfig
 
-    // TODO
-    var transportProtocol: TransportProtocol = .http
+    var transportProtocol: TransportProtocol
 
     var possibleConsensusTrustRoots: PossibleNIOSSLCertificates?
     var possibleFogTrustRoots: PossibleNIOSSLCertificates?

@@ -26,7 +26,7 @@ final class DefaultServiceProvider: ServiceProvider {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
         
-        let inner = Inner(httpFactory:httpConnectionFactory, grpcFactory:grpcConnectionFactory, targetQueue: targetQueue)
+        let inner = Inner(httpFactory:httpConnectionFactory, grpcFactory:grpcConnectionFactory, targetQueue: targetQueue, transportProtocolOption: networkConfig.transportProtocol.option)
         self.inner = .init(inner, targetQueue: targetQueue)
 
         self.consensus = ConsensusConnection(
@@ -117,11 +117,16 @@ extension DefaultServiceProvider {
         private var reportUrlToReportConnection: [FogUrl: FogReportConnection] = [:]
         private(set) var transportProtocolOption: TransportProtocol.Option
 
-        init(httpFactory: HttpProtocolConnectionFactory, grpcFactory:GrpcProtocolConnectionFactory, targetQueue: DispatchQueue?) {
+        init(
+            httpFactory: HttpProtocolConnectionFactory,
+            grpcFactory:GrpcProtocolConnectionFactory,
+            targetQueue: DispatchQueue?,
+            transportProtocolOption: TransportProtocol.Option)
+        {
             self.httpFactory = httpFactory
             self.grpcFactory = grpcFactory
             self.targetQueue = targetQueue
-            self.transportProtocolOption = TransportProtocol.http.option //TODO
+            self.transportProtocolOption = transportProtocolOption
         }
 
         mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
