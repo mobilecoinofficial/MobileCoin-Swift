@@ -133,6 +133,3 @@ extension NetworkConfig {
         let fogReport: Attestation
     }
 }
-
-extension NetworkConfig {
-}

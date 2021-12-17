@@ -12,20 +12,15 @@ extension NetworkConfig {
 extension NetworkConfig.Fixtures {
     struct TrustRoots {
         let trustRootsBytes: [Data]
-//        let trustRoots: [NIOSSLCertificate]
 
         let wrongTrustRootBytes: Data
-//        let wrongTrustRoot: NIOSSLCertificate
 
         let invalidTrustRootBytes: Data
 
         init() throws {
             self.trustRootsBytes = try NetworkPreset.trustRootsBytes()
-//            self.trustRoots = try NetworkPreset.trustRoots()
 
             self.wrongTrustRootBytes = try XCTUnwrap(Data(base64Encoded: Self.wrongTrustRootB64))
-//            self.wrongTrustRoot =
-//                try NIOSSLCertificate(bytes: Array(wrongTrustRootBytes), format: .der)
 
             self.invalidTrustRootBytes =
                 try XCTUnwrap(Data(base64Encoded: Self.invalidTrustRootB64))
