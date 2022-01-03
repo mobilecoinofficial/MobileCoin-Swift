@@ -49,7 +49,8 @@ extension MobileCoinClient.Config.Fixtures {
                 fogViewAttestation: initFixture.fogViewAttestation,
                 fogKeyImageAttestation: initFixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: initFixture.fogMerkleProofAttestation,
-                fogReportAttestation: initFixture.fogReportAttestation).get()
+                fogReportAttestation: initFixture.fogReportAttestation,
+                transportProtocol: TransportProtocol.http).get()
         }
     }
 }
