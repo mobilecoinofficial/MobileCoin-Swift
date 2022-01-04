@@ -58,7 +58,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre4"
+    subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre5"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
@@ -90,7 +90,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 1.2.0-pre4"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 1.2.0-pre5"
 
     subspec.dependency "Logging", "~> 1.4"
 
@@ -113,8 +113,6 @@ Pod::Spec.new do |s|
   # intermediary frameworks. These must be speicifed here for CocoaPods to set them
   # on the framework target and any testspec targets for this pod.
   pod_target_xcconfig = {
-    "GCC_OPTIMIZATION_LEVEL" => "z",
-    "LLVM_LTO" => "YES",
     "ENABLE_BITCODE" => "YES",
     "SUPPORTS_MACCATALYST" => "YES",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit
