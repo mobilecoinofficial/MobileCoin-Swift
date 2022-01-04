@@ -7,7 +7,7 @@
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
-            buildForTesting = "YES"
+            buildForTesting = "NO"
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
@@ -26,8 +26,79 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      codeCoverageEnabled = "YES">
+      <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "D5D361214576459A821056D5621DE63E"
+            BuildableName = "MobileCoin-UI-PerformanceTests.xctest"
+            BlueprintName = "MobileCoin-UI-PerformanceTests"
+            ReferencedContainer = "container:Pods/Pods.xcodeproj">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "2BF84E79B25A197D38AD1E3AF062600E"
+            BuildableName = "MobileCoin-Unit-Core-ProtocolUnitTests.xctest"
+            BlueprintName = "MobileCoin-Unit-Core-ProtocolUnitTests"
+            ReferencedContainer = "container:Pods/Pods.xcodeproj">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
+            BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
+            BlueprintName = "MobileCoin-Unit-IntegrationTests"
+            ReferencedContainer = "container:Pods/Pods.xcodeproj">
+         </BuildableReference>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "15BC995FC0FAFC663C79A25F3AAC145E"
+            BuildableName = "MobileCoin-Unit-Tests.xctest"
+            BlueprintName = "MobileCoin-Unit-Tests"
+            ReferencedContainer = "container:Pods/Pods.xcodeproj">
+         </BuildableReference>
+      </CodeCoverageTargets>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D5D361214576459A821056D5621DE63E"
+               BuildableName = "MobileCoin-UI-PerformanceTests.xctest"
+               BlueprintName = "MobileCoin-UI-PerformanceTests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2BF84E79B25A197D38AD1E3AF062600E"
+               BuildableName = "MobileCoin-Unit-Core-ProtocolUnitTests.xctest"
+               BlueprintName = "MobileCoin-Unit-Core-ProtocolUnitTests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
+               BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
+               BlueprintName = "MobileCoin-Unit-IntegrationTests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "15BC995FC0FAFC663C79A25F3AAC145E"
+               BuildableName = "MobileCoin-Unit-Tests.xctest"
+               BlueprintName = "MobileCoin-Unit-Tests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
