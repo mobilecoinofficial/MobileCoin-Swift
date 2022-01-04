@@ -51,16 +51,22 @@ class MobileCoinClientIntTests: XCTestCase {
     /// Tests that the transaction status check fails if the inputs were spent by another
     /// transaction
     func testTransactionStatusFailsWhenInputIsAlreadySpent() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: transportProtocol)
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
+            let expect = expectation(description: "Checking transaction status")
+            try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: transportProtocol, expectation: expect)
+            waitForExpectations(timeout: 20)
+            
+            if index != (supportedProtocols.count - 1) {
+                sleep(10)
+            }
         }
     }
     
-    func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol) throws {
+func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
-        let expect = expectation(description: "Checking transaction status")
         let submitTransaction = { (callback: @escaping (Transaction) -> Void) in
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
@@ -134,7 +140,6 @@ class MobileCoinClientIntTests: XCTestCase {
             }
             checkStatus()
         }
-        waitForExpectations(timeout: 20)
     }
 
     func testTransactionStatusDoesNotSucceedWithoutSubmission() throws {

@@ -105,15 +105,21 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testSubmitTransaction() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try submitTransaction(transportProtocol: transportProtocol)
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
+            let expect = expectation(description: "Submitting transaction")
+            try submitTransaction(transportProtocol: transportProtocol, expectation: expect)
+            waitForExpectations(timeout: 20)
+            
+            if index != (supportedProtocols.count - 1) {
+                sleep(10)
+            }
         }
     }
     
-    func submitTransaction(transportProtocol: TransportProtocol) throws {
+    func submitTransaction(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
-        let expect = expectation(description: "Submitting transaction")
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
@@ -132,7 +138,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 }
             }
         }
-        waitForExpectations(timeout: 20)
     }
 
     func testSelfPaymentBalanceChange() throws {
