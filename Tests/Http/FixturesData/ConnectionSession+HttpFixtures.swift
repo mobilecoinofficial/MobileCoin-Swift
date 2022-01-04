@@ -23,8 +23,8 @@ extension ConnectionSession.HttpFixtures {
         let http1ResponseHeadersWithSetCookie2 =
             Self.http1ResponseHeadersWithSetCookie(cookie: Self.cookie2)
 
-        let headersWithCookie1 = Self.headersWithCookie(cookie: Self.cookie1) as! [String: String]
-        let headersWithCookie2 = Self.headersWithCookie(cookie: Self.cookie2) as! [String: String]
+        let headersWithCookie1 = Self.headersWithCookie(cookie: Self.cookie1) 
+        let headersWithCookie2 = Self.headersWithCookie(cookie: Self.cookie2) 
         let headersWithAuthAndCookie1 = Self.headersWithAuthorizationAndCookie(cookie: Self.cookie1)
 
         init() throws {
