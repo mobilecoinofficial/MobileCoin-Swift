@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "98A4F1B1-FE76-43E0-BD61-A2B0B7F719FC",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "uiTestingScreenshotsLifetime" : "keepNever",
+    "userAttachmentLifetime" : "keepNever"
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Pods\/Pods.xcodeproj",
+        "identifier" : "E8A0545E992AC3A0A6B313DAF029D326",
+        "name" : "MobileCoin-UI-PerformanceTests"
+      }
+    }
+  ],
+  "version" : 1
+}

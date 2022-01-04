@@ -7,22 +7,27 @@ default: setup bootstrap build test
 setup:
 	bundle install
 	@$(MAKE) --directory=Example setup
+	@$(MAKE) --directory=ExampleHTTP setup
 
 .PHONY: bootstrap
 bootstrap:
 	@$(MAKE) --directory=Example bootstrap
+	@$(MAKE) --directory=ExampleHTTP bootstrap
 
 .PHONY: build
 build:
 	@$(MAKE) --directory=Example build
+	@$(MAKE) --directory=ExampleHTTP build
 
 .PHONY: test
 test:
 	@$(MAKE) --directory=Example test
+	@$(MAKE) --directory=ExampleHTTP test
 
 .PHONY: clean
 clean: clean-docs
 	@$(MAKE) --directory=Example clean
+	@$(MAKE) --directory=ExampleHTTP clean
 
 .PHONY: lint
 lint: swiftlint
