@@ -37,6 +37,7 @@ Please check your country's laws before downloading or using this software.
 | :-- | :-- |
 | [Docs](./docs) | Integration Guide. |
 | [Example](./Example) | Example application. |
+| [ExampleHTTP](./ExampleHTTP) | Example "HTTP Only" application. |
 | [Sources](./Sources) | Sources for the MobileCoin Swift SDK. |
 | [Tests](./Tests) | Tests. |
 | [Vendor](./Vendor) | iOS Artifacts. |
