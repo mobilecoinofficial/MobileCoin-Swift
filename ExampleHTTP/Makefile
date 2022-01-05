@@ -23,6 +23,10 @@ build:
 		--scheme "Performance Tests" \
 		--skip_archive \
 		--skip_codesigning
+	bundle exec fastlane gym \
+		--scheme "Http Protocol Unit Tests" \
+		--skip_archive \
+		--skip_codesigning
 
 .PHONY: test
 test:
@@ -30,6 +34,8 @@ test:
 		--scheme "Unit Tests"
 	bundle exec fastlane scan \
 		--scheme "Performance Tests"
+	bundle exec fastlane scan \
+		--scheme "Http Protocol Unit Tests"
 
 .PHONY: clean
 clean:
