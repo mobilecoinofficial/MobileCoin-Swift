@@ -105,6 +105,7 @@ PODS:
   - SwiftProtobuf (1.18.0)
 
 DEPENDENCIES:
+  - gRPC-Swift
   - Keys (from `Pods/CocoaPodsKeys`)
   - LibMobileCoin/Core (from `../Vendor/libmobilecoin-ios-artifacts`)
   - MobileCoin (from `..`)
@@ -167,7 +168,7 @@ SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
   LibMobileCoin: 5767ae83c2127d176f608e509f4145603b52655f
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: a0d01b6a644ba9652555f9210e6244d9b2b74498
+  MobileCoin: de646644c718c637ce73d92ea1bc09a7ae1cd1cc
   SwiftLint: e5c7f1fba68eccfc51509d5b2ce1699f5502e0c7
   SwiftNIO: bb336ceef32850e9671d3fa0e0cc2b9add3b5948
   SwiftNIOConcurrencyHelpers: ca2594e10749655f42baf5468212be83d2f94fe3
@@ -184,6 +185,6 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 1fbbdb58510af3c53a838a1dbea98f18132dc952
   SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
 
-PODFILE CHECKSUM: acaa8c80c863d08e76e03a4d5a4a121239ff381d
+PODFILE CHECKSUM: 7d2f58823b670a258c26e93d3ab390010eb33536
 
 COCOAPODS: 1.11.2
