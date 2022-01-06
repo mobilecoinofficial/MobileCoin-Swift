@@ -96,6 +96,32 @@ commands:
           paths:
             - Example/.vendor/bundle
 
+  install-example-http-gems:
+    description: Install gems for ExampleHTTP project
+    parameters:
+      ruby-version:
+        type: string
+        default: *default-ruby-version
+    steps:
+      - restore_cache:
+          name: Restore Ruby gem cache for ExampleHTTP project
+          keys:
+            - v0-example-http-ruby-<< parameters.ruby-version >>-gems-{{ checksum "ExampleHTTP/Gemfile.lock" }}
+            - v0-example-http-ruby-<< parameters.ruby-version >>-gems-
+      - run:
+          name: Install ExampleHTTP project bundler dependencies
+          working_directory: ExampleHTTP
+          command: |
+            bundle config set --local deployment 'true'
+            bundle config set --local path '.vendor/bundle'
+            bundle config set --local clean 'true'
+            bundle check || bundle install
+      - save_cache:
+          name: Save Ruby gem cache for ExampleHTTP project
+          key: v0-example-http-ruby-<< parameters.ruby-version >>-gems-{{ checksum "ExampleHTTP/Gemfile.lock" }}
+          paths:
+            - ExampleHTTP/.vendor/bundle
+
   install-example-pods:
     description: Install pods for Example project
     parameters:
@@ -113,6 +139,24 @@ commands:
           key: v0-xcode-<< parameters.xcode-version >>-example-pods-{{ checksum "Example/Podfile.lock" }}
           paths:
             - Example/Pods
+
+  install-example-http-pods:
+    description: Install pods for ExampleHTTP project
+    parameters:
+      xcode-version:
+        type: string
+    steps:
+      - restore_cache:
+          name: Restore CocoaPods cache
+          keys:
+            - v0-xcode-<< parameters.xcode-version >>-example-http-pods-{{ checksum "ExampleHTTP/Podfile.lock" }}
+            - v0-xcode-<< parameters.xcode-version >>-example-http-pods-
+      - run: cd ExampleHTTP && bundle exec pod install --deployment
+      - save_cache:
+          name: Save CocoaPods cache
+          key: v0-xcode-<< parameters.xcode-version >>-example-http-pods-{{ checksum "ExampleHTTP/Podfile.lock" }}
+          paths:
+            - ExampleHTTP/Pods
 
   install-gh-pages:
     description: Install gh-pages npm package
@@ -166,7 +210,10 @@ jobs:
       - set-ruby-version
       - install-gems
       - install-example-gems
+      - install-example-http-gems
       - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
+      - install-example-http-pods:
           xcode-version: << parameters.xcode-version >>
       - print-tool-versions
       - run: make build
@@ -192,7 +239,10 @@ jobs:
       - init-artifacts-submodule
       - set-ruby-version
       - install-example-gems
+      - install-example-http-gems
       - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
+      - install-example-http-pods:
           xcode-version: << parameters.xcode-version >>
       - install-gems
       - run:

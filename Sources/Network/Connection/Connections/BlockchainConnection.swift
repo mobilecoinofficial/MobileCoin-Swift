@@ -3,25 +3,26 @@
 //
 
 import Foundation
-import GRPC
 import LibMobileCoin
 import SwiftProtobuf
 
 final class BlockchainConnection:
-    Connection<BlockchainGrpcConnection, BlockchainHttpConnection>, BlockchainService
+    Connection<GrpcProtocolConnectionFactory.BlockchainServiceProvider, HttpProtocolConnectionFactory.BlockchainServiceProvider>, BlockchainService
 {
+    private let httpFactory: HttpProtocolConnectionFactory
+    private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: ConnectionConfig<ConsensusUrl>
-    private let channelManager: GrpcChannelManager
     private let targetQueue: DispatchQueue?
 
     init(
+        httpFactory: HttpProtocolConnectionFactory,
+        grpcFactory: GrpcProtocolConnectionFactory,
         config: ConnectionConfig<ConsensusUrl>,
-        channelManager: GrpcChannelManager,
-        httpRequester: HttpRequester?,
         targetQueue: DispatchQueue?
     ) {
+        self.httpFactory = httpFactory
+        self.grpcFactory = grpcFactory
         self.config = config
-        self.channelManager = channelManager
         self.targetQueue = targetQueue
 
         super.init(
@@ -29,18 +30,15 @@ final class BlockchainConnection:
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
-                        grpcService: BlockchainGrpcConnection(
-                            config: config,
-                            channelManager: channelManager,
-                            targetQueue: targetQueue))
+                        grpcService:
+                            grpcFactory.makeBlockchainService(
+                                config: config,
+                                targetQueue: targetQueue))
                 case .http:
-                    guard let requester = httpRequester else {
-                        logger.fatalError("Transport Protocol is .http but no HttpRequester provided")
-                    }
-                    return .http(httpService: BlockchainHttpConnection(
-                                    config: config,
-                                    requester: RestApiRequester(requester: requester, baseUrl: config.url.httpBasedUrl),
-                                    targetQueue: targetQueue))
+                    return .http(httpService:
+                            httpFactory.makeBlockchainService(
+                                config: config,
+                                targetQueue: targetQueue))
                 }
             },
             transportProtocolOption: config.transportProtocolOption,

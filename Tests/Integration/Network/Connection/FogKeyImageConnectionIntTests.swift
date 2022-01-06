@@ -7,14 +7,12 @@ import LibMobileCoin
 import XCTest
 
 class FogKeyImageConnectionIntTests: XCTestCase {
-    func testCheckKeyImagesReturnsNotSpentForFakeKeyImageGRPC() throws {
-        try checkKeyImagesReturnsNotSpentForFakeKeyImage(transportProtocol: TransportProtocol.grpc)
+    func testCheckKeyImagesReturnsNotSpentForFakeKeyImage() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try checkKeyImagesReturnsNotSpentForFakeKeyImage(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testCheckKeyImagesReturnsNotSpentForFakeKeyImageHTTP() throws {
-        try checkKeyImagesReturnsNotSpentForFakeKeyImage(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func checkKeyImagesReturnsNotSpentForFakeKeyImage(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog CheckKeyImages request")
 
@@ -47,12 +45,10 @@ class FogKeyImageConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testCheckKeyImagesResponseIsPaddedForTooShortKeyImageGRPC() throws {
-        try checkKeyImagesResponseIsPaddedForTooShortKeyImage(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testCheckKeyImagesResponseIsPaddedForTooShortKeyImageHTTP() throws {
-        try checkKeyImagesResponseIsPaddedForTooShortKeyImage(transportProtocol: TransportProtocol.http)
+    func testCheckKeyImagesResponseIsPaddedForTooShortKeyImage() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try checkKeyImagesResponseIsPaddedForTooShortKeyImage(transportProtocol: transportProtocol)
+        }
     }
     
     func checkKeyImagesResponseIsPaddedForTooShortKeyImage(transportProtocol: TransportProtocol) throws {
@@ -82,12 +78,10 @@ class FogKeyImageConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testCheckKeyImagesResponseFailsForTooLongKeyImageGRPC() throws {
-        try checkKeyImagesResponseFailsForTooLongKeyImage(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testCheckKeyImagesResponseFailsForTooLongKeyImageHTTP() throws {
-        try checkKeyImagesResponseFailsForTooLongKeyImage(transportProtocol: TransportProtocol.http)
+    func testCheckKeyImagesResponseFailsForTooLongKeyImage() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try checkKeyImagesResponseFailsForTooLongKeyImage(transportProtocol: transportProtocol)
+        }
     }
     
     func checkKeyImagesResponseFailsForTooLongKeyImage(transportProtocol: TransportProtocol) throws {
@@ -106,12 +100,10 @@ class FogKeyImageConnectionIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testInvalidCredentialsReturnsAuthorizationFailureGRPC() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testInvalidCredentialsReturnsAuthorizationFailureHTTP() throws {
-        try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol.http)
+    func testInvalidCredentialsReturnsAuthorizationFailure() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
+        }
     }
     
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
@@ -150,10 +142,12 @@ extension FogKeyImageConnectionIntTests {
     }
 
     func createFogKeyImageConnection(networkConfig: NetworkConfig) -> FogKeyImageConnection {
-        FogKeyImageConnection(
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        return FogKeyImageConnection(
+            httpFactory: httpFactory,
+            grpcFactory: grpcFactory,
             config: networkConfig.fogKeyImage,
-            channelManager: GrpcChannelManager(),
-            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

@@ -9,14 +9,12 @@ import XCTest
 
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
-    func testBalanceGRPC() throws {
-        try balance(transportProtocol: TransportProtocol.grpc)
+    func testBalance() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try balance(transportProtocol: transportProtocol)
+        }
     }
-    
-    func testBalanceHTTP() throws {
-        try balance(transportProtocol: TransportProtocol.http)
-    }
-    
+
     func balance(transportProtocol: TransportProtocol) throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
 
@@ -34,12 +32,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testAccountActivityGRPC() throws {
-        try accountActivity(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testAccountActivityHTTP() throws {
-        try accountActivity(transportProtocol: TransportProtocol.http)
+    func testAccountActivity() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try accountActivity(transportProtocol: transportProtocol)
+        }
     }
     
     func accountActivity(transportProtocol: TransportProtocol) throws {
@@ -62,12 +58,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testUpdateBalanceGRPC() throws {
-        try updateBalance(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testUpdateBalanceHTTP() throws {
-        try updateBalance(transportProtocol: TransportProtocol.http)
+    func testUpdateBalance() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try updateBalance(transportProtocol: transportProtocol)
+        }
     }
     
     func updateBalance(transportProtocol: TransportProtocol) throws {
@@ -84,12 +78,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testPrepareTransactionGRPC() throws {
-        try prepareTransaction(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testPrepareTransactionHTTP() throws {
-        try prepareTransaction(transportProtocol: TransportProtocol.http)
+    func testPrepareTransaction() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try prepareTransaction(transportProtocol: transportProtocol)
+        }
     }
     
     func prepareTransaction(transportProtocol: TransportProtocol) throws {
@@ -112,18 +104,22 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testSubmitTransactionGRPC() throws {
-        try submitTransaction(transportProtocol: TransportProtocol.grpc)
+    func testSubmitTransaction() throws {
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
+            let expect = expectation(description: "Submitting transaction")
+            try submitTransaction(transportProtocol: transportProtocol, expectation: expect)
+            waitForExpectations(timeout: 20)
+            
+            if index != (supportedProtocols.count - 1) {
+                sleep(10)
+            }
+        }
     }
     
-    func testSubmitTransactionHTTP() throws {
-        try submitTransaction(transportProtocol: TransportProtocol.http)
-    }
-    
-    func submitTransaction(transportProtocol: TransportProtocol) throws {
+    func submitTransaction(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
-        let expect = expectation(description: "Submitting transaction")
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
@@ -142,15 +138,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 }
             }
         }
-        waitForExpectations(timeout: 20)
     }
 
-    func testSelfPaymentBalanceChangeGRPC() throws {
-        try selfPaymentBalanceChange(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testSelfPaymentBalanceChangeHTTP() throws {
-        try selfPaymentBalanceChange(transportProtocol: TransportProtocol.http)
+    func testSelfPaymentBalanceChange() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try selfPaymentBalanceChange(transportProtocol: transportProtocol)
+        }
     }
     
     func selfPaymentBalanceChange(transportProtocol: TransportProtocol) throws {
@@ -217,12 +210,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testSelfPaymentBalanceChangeFeeLevelGRPC() throws {
-        try selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testSelfPaymentBalanceChangeFeeLevelHTTP() throws {
-        try selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol.http)
+    func testSelfPaymentBalanceChangeFeeLevel() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try selfPaymentBalanceChangeFeeLevel(transportProtocol: transportProtocol)
+        }
     }
     
     func selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol) throws {
@@ -287,12 +278,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testTransactionStatusGRPC() throws {
-        try transactionStatus(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testTransactionStatusHTTP() throws {
-        try transactionStatus(transportProtocol: TransportProtocol.http)
+    func testTransactionStatus() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try transactionStatus(transportProtocol: transportProtocol)
+        }
     }
     
     func transactionStatus(transportProtocol: TransportProtocol) throws {
@@ -367,12 +356,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testReceiptStatusGRPC() throws {
-        try receiptStatus(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testReceiptStatusHTTP() throws {
-        try receiptStatus(transportProtocol: TransportProtocol.http)
+    func testReceiptStatus() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try receiptStatus(transportProtocol: transportProtocol)
+        }
     }
     
     func receiptStatus(transportProtocol: TransportProtocol) throws {
@@ -446,15 +433,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             }
             checkStatus()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
-    func testConsensusTrustRootWorksGRPC() throws {
-        try consensusTrustRootWorks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testConsensusTrustRootWorksHTTP() throws {
-        try consensusTrustRootWorks(transportProtocol: TransportProtocol.http)
+    func testConsensusTrustRootWorks() throws {
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
+        try XCTSkipIf(onlyHTTPSupported)
+        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
+            try consensusTrustRootWorks(transportProtocol: transportProtocol)
+        }
     }
     
     func consensusTrustRootWorks(transportProtocol: TransportProtocol) throws {
@@ -492,12 +480,13 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testExtraConsensusTrustRootWorksGRPC() throws {
-        try extraConsensusTrustRootWorks(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testExtraConsensusTrustRootWorksHTTP() throws {
-        try extraConsensusTrustRootWorks(transportProtocol: TransportProtocol.http)
+    func testExtraConsensusTrustRootWorks() throws {
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
+        try XCTSkipIf(onlyHTTPSupported)
+        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
+            try extraConsensusTrustRootWorks(transportProtocol: transportProtocol)
+        }
     }
     
     func extraConsensusTrustRootWorks(transportProtocol: TransportProtocol) throws {
@@ -536,12 +525,13 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         waitForExpectations(timeout: 20)
     }
 
-    func testWrongConsensusTrustRootReturnsErrorGRPC() throws {
-        try wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testWrongConsensusTrustRootReturnsErrorHTTP() throws {
-        try wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol.http)
+    func testWrongConsensusTrustRootReturnsError() throws {
+        let supportedProtocols = TransportProtocol.supportedProtocols
+        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
+        try XCTSkipIf(onlyHTTPSupported)
+        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
+            try wrongConsensusTrustRootReturnsError(transportProtocol: transportProtocol)
+        }
     }
     
     func wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol) throws {

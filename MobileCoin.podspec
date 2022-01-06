@@ -25,14 +25,40 @@ Pod::Spec.new do |s|
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.default_subspec = "Core"
+  s.default_subspec = :none
+
+  s.test_spec do |test_spec|
+    test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
+    test_spec.resources = [
+      "Tests/Common/FixtureData/**/*",
+      "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
+    ]
+  end
+
+  s.test_spec 'IntegrationTests' do |test_spec|
+    test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+    test_spec.resource = "Tests/Common/FixtureData/**/*"
+  end
+
+  s.test_spec 'PerformanceTests' do |test_spec|
+    test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
+
+    test_spec.test_type = :ui
+    test_spec.requires_app_host = true
+  end
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
-      "Sources/**/*.{h,m,swift}",
+      "Sources/*.{h,m,swift}",
+      "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
+      "Sources/Network/{GRPC,HTTPS}/**/*.{h,m,swift}",
+      "Sources/Network/ProtocolSpecific/Combined/**/*.{h,m,swift}",
+      "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin", "~> 1.2.0-pre4"
+    subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre5"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
@@ -41,24 +67,9 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHTTP1"
     subspec.dependency "SwiftProtobuf"
 
-    subspec.test_spec do |test_spec|
-      test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
-      test_spec.resources = [
-        "Tests/Common/FixtureData/**/*",
-        "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
-      ]
-    end
-
-    subspec.test_spec 'IntegrationTests' do |test_spec|
-      test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
-      test_spec.resource = "Tests/Common/FixtureData/**/*"
-    end
-
-    subspec.test_spec 'PerformanceTests' do |test_spec|
-      test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
-
-      test_spec.test_type = :ui
-      test_spec.requires_app_host = true
+    subspec.test_spec 'ProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/{Http,Grpc}/**/*.swift"
+      test_spec.resource = "Tests/{Http,Grpc}/FixtureData/**/*"
     end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
@@ -66,6 +77,32 @@ Pod::Spec.new do |s|
     end
   end
 
+
+
+  s.subspec "CoreHTTP" do |subspec|
+    subspec.source_files = [
+      "Sources/*.{h,m,swift}",
+      "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
+      "Sources/Network/HTTPS/**/*.{h,m,swift}",
+      "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",
+      "Sources/Network/*.{h,m,swift}",
+    ]
+
+    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 1.2.0-pre5"
+
+    subspec.dependency "Logging", "~> 1.4"
+
+    subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/Http/**/*.swift"
+      test_spec.resource = "Tests/Http/FixtureData/**/*"
+    end
+
+    unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
+      subspec.dependency 'SwiftLint'
+    end
+  end
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 

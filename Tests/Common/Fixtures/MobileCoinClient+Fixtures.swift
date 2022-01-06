@@ -6,7 +6,6 @@
 
 import Foundation
 @testable import MobileCoin
-import NIOSSL
 
 extension MobileCoinClient.Config {
     enum Fixtures {}
@@ -50,7 +49,8 @@ extension MobileCoinClient.Config.Fixtures {
                 fogViewAttestation: initFixture.fogViewAttestation,
                 fogKeyImageAttestation: initFixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: initFixture.fogMerkleProofAttestation,
-                fogReportAttestation: initFixture.fogReportAttestation).get()
+                fogReportAttestation: initFixture.fogReportAttestation,
+                transportProtocol: TransportProtocol.http).get()
         }
     }
 }

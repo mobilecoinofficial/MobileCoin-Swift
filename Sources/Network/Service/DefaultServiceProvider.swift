@@ -14,47 +14,55 @@ final class DefaultServiceProvider: ServiceProvider {
     private let keyImage: FogKeyImageConnection
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
+    private let grpcConnectionFactory: GrpcProtocolConnectionFactory
+    private let httpConnectionFactory: HttpProtocolConnectionFactory
 
-    init(networkConfig: NetworkConfig, targetQueue: DispatchQueue?) {
-        let channelManager = GrpcChannelManager()
-
-        let inner = Inner(channelManager: channelManager, httpRequester: networkConfig.httpRequester, targetQueue: targetQueue)
+    init(
+        networkConfig: NetworkConfig,
+        targetQueue: DispatchQueue?,
+        grpcConnectionFactory: GrpcProtocolConnectionFactory,
+        httpConnectionFactory: HttpProtocolConnectionFactory
+    ) {
+        self.grpcConnectionFactory = grpcConnectionFactory
+        self.httpConnectionFactory = httpConnectionFactory
+        
+        let inner = Inner(httpFactory:httpConnectionFactory, grpcFactory:grpcConnectionFactory, targetQueue: targetQueue, transportProtocolOption: networkConfig.transportProtocol.option)
         self.inner = .init(inner, targetQueue: targetQueue)
 
         self.consensus = ConsensusConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.consensus,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.blockchain = BlockchainConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.blockchain,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
-        self.view = FogViewConnection(
+            self.view = FogViewConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogView,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.merkleProof = FogMerkleProofConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogMerkleProof,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.keyImage = FogKeyImageConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogKeyImage,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.block = FogBlockConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogBlock,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
         self.untrustedTxOut = FogUntrustedTxOutConnection(
+            httpFactory: self.httpConnectionFactory,
+            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogUntrustedTxOut,
-            channelManager: channelManager,
-            httpRequester: networkConfig.httpRequester,
             targetQueue: targetQueue)
     }
 
@@ -100,33 +108,36 @@ final class DefaultServiceProvider: ServiceProvider {
     }
 }
 
-// TODO
 extension DefaultServiceProvider {
     private struct Inner {
+        private let httpFactory: HttpProtocolConnectionFactory
+        private let grpcFactory: GrpcProtocolConnectionFactory
         private let targetQueue: DispatchQueue?
-        private let channelManager: GrpcChannelManager
-        private let httpRequester: HttpRequester?
 
-        private var reportUrlToReportConnection: [GrpcChannelConfig: FogReportConnection] = [:]
+        private var reportUrlToReportConnection: [FogUrl: FogReportConnection] = [:]
         private(set) var transportProtocolOption: TransportProtocol.Option
 
-        init(channelManager: GrpcChannelManager, httpRequester: HttpRequester?, targetQueue: DispatchQueue?) {
+        init(
+            httpFactory: HttpProtocolConnectionFactory,
+            grpcFactory:GrpcProtocolConnectionFactory,
+            targetQueue: DispatchQueue?,
+            transportProtocolOption: TransportProtocol.Option)
+        {
+            self.httpFactory = httpFactory
+            self.grpcFactory = grpcFactory
             self.targetQueue = targetQueue
-            self.httpRequester = httpRequester
-            self.channelManager = channelManager
-            self.transportProtocolOption = TransportProtocol.grpc.option
+            self.transportProtocolOption = transportProtocolOption
         }
 
         mutating func fogReportService(for fogReportUrl: FogUrl) -> FogReportService {
-            let config = GrpcChannelConfig(url: fogReportUrl)
-            guard let reportConnection = reportUrlToReportConnection[config] else {
+            guard let reportConnection = reportUrlToReportConnection[fogReportUrl] else {
                 let reportConnection = FogReportConnection(
+                    httpFactory: httpFactory,
+                    grpcFactory: grpcFactory,
                     url: fogReportUrl,
                     transportProtocolOption: transportProtocolOption,
-                    channelManager: channelManager,
-                    httpRequester: httpRequester,
                     targetQueue: targetQueue)
-                reportUrlToReportConnection[config] = reportConnection
+                reportUrlToReportConnection[fogReportUrl] = reportConnection
                 return reportConnection
             }
             return reportConnection

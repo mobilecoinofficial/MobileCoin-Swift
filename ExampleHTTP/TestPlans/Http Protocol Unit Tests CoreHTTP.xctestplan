@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "DE0F3FA2-2894-4F9F-90EE-901B1FAEDF42",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Pods\/Pods.xcodeproj",
+        "identifier" : "D05A7A6B62372D952C49A93AA190B978",
+        "name" : "MobileCoin-Unit-CoreHTTP-HttpProtocolUnitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

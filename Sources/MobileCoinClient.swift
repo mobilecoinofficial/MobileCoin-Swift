@@ -5,7 +5,6 @@
 // swiftlint:disable function_parameter_count multiline_arguments multiline_function_chains
 
 import Foundation
-import NIOSSL
 
 public final class MobileCoinClient {
     /// - Returns: `InvalidInputError` when `accountKey` isn't configured to use Fog.
@@ -47,7 +46,7 @@ public final class MobileCoinClient {
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
         self.serviceProvider =
-            DefaultServiceProvider(networkConfig: config.networkConfig, targetQueue: serialQueue)
+        DefaultServiceProvider(networkConfig: config.networkConfig, targetQueue: serialQueue, grpcConnectionFactory: GrpcProtocolConnectionFactory(), httpConnectionFactory: HttpProtocolConnectionFactory(httpRequester: config.networkConfig.httpRequester))
         self.fogResolverManager = FogResolverManager(
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
@@ -308,7 +307,7 @@ extension MobileCoinClient {
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
             fogReportAttestation: Attestation,
-            transportProtocol: TransportProtocol = .grpc
+            transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
             ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
                 FogUrl.make(string: fogUrl).map { fogUrl in
@@ -355,16 +354,12 @@ extension MobileCoinClient {
         public mutating func setConsensusTrustRoots(_ trustRoots: [Data])
             -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
-                networkConfig.consensusTrustRoots = $0
-            }
+            networkConfig.setConsensusTrustRoots(trustRoots)
         }
 
         public mutating func setFogTrustRoots(_ trustRoots: [Data]) -> Result<(), InvalidInputError>
         {
-            Self.parseTrustRoots(trustRootsBytes: trustRoots).map {
-                networkConfig.fogTrustRoots = $0
-            }
+            networkConfig.setFogTrustRoots(trustRoots)
         }
 
         public mutating func setConsensusBasicAuthorization(username: String, password: String) {
@@ -380,24 +375,6 @@ extension MobileCoinClient {
         public var httpRequester: HttpRequester? {
             get { networkConfig.httpRequester }
             set { networkConfig.httpRequester = newValue }
-        }
-
-        private static func parseTrustRoots(trustRootsBytes: [Data])
-            -> Result<[NIOSSLCertificate], InvalidInputError>
-        {
-            var trustRoots: [NIOSSLCertificate] = []
-            for trustRootBytes in trustRootsBytes {
-                do {
-                    trustRoots.append(
-                        try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .der))
-                } catch {
-                    let errorMessage = "Error parsing trust root certificate: " +
-                        "\(trustRootBytes.base64EncodedString()) - Error: \(error)"
-                    logger.error(errorMessage, logFunction: false)
-                    return .failure(InvalidInputError(errorMessage))
-                }
-            }
-            return .success(trustRoots)
         }
     }
 }

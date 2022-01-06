@@ -3,10 +3,9 @@
 //
 
 import Foundation
-import NIOSSL
 
 struct NetworkConfig {
-    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol = .grpc)
+    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol)
         -> Result<NetworkConfig, InvalidInputError>
     {
         ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
@@ -21,20 +20,21 @@ struct NetworkConfig {
 
     private let attestation: AttestationConfig
 
-    var transportProtocol: TransportProtocol = .grpc
+    var transportProtocol: TransportProtocol
 
-    var consensusTrustRoots: [NIOSSLCertificate]?
-    var fogTrustRoots: [NIOSSLCertificate]?
+    var possibleConsensusTrustRoots: PossibleNIOSSLCertificates?
+    var possibleFogTrustRoots: PossibleNIOSSLCertificates?
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?
 
     var httpRequester: HttpRequester?
     
-    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol = .grpc) {
+    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
         self.consensusUrl = consensusUrl
         self.fogUrl = fogUrl
         self.attestation = attestation
+        self.transportProtocol = transportProtocol
     }
 
     var consensus: AttestedConnectionConfig<ConsensusUrl> {
@@ -42,7 +42,7 @@ struct NetworkConfig {
             url: consensusUrl,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.consensus,
-            trustRoots: consensusTrustRoots,
+            trustRoots: possibleConsensusTrustRoots,
             authorization: consensusAuthorization)
     }
 
@@ -50,7 +50,7 @@ struct NetworkConfig {
         ConnectionConfig(
             url: consensusUrl,
             transportProtocolOption: transportProtocol.option,
-            trustRoots: consensusTrustRoots,
+            trustRoots: possibleConsensusTrustRoots,
             authorization: consensusAuthorization)
     }
 
@@ -59,7 +59,7 @@ struct NetworkConfig {
             url: fogUrl,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogView,
-            trustRoots: fogTrustRoots,
+            trustRoots: possibleFogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
@@ -68,7 +68,7 @@ struct NetworkConfig {
             url: fogUrl,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogMerkleProof,
-            trustRoots: fogTrustRoots,
+            trustRoots: possibleFogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
@@ -77,7 +77,7 @@ struct NetworkConfig {
             url: fogUrl,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogKeyImage,
-            trustRoots: fogTrustRoots,
+            trustRoots: possibleFogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
@@ -85,7 +85,7 @@ struct NetworkConfig {
         ConnectionConfig(
             url: fogUrl,
             transportProtocolOption: transportProtocol.option,
-            trustRoots: fogTrustRoots,
+            trustRoots: possibleFogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
@@ -93,11 +93,35 @@ struct NetworkConfig {
         ConnectionConfig(
             url: fogUrl,
             transportProtocolOption: transportProtocol.option,
-            trustRoots: fogTrustRoots,
+            trustRoots: possibleFogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
     var fogReportAttestation: Attestation { attestation.fogReport }
+    
+    @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
+        -> Result<(), InvalidInputError>
+    {
+        switch transportProtocol.certificateValidator.validate(trustRoots) {
+        case .success(let certificate):
+            self.possibleConsensusTrustRoots = certificate
+            return .success(())
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+    
+    @discardableResult mutating public func setFogTrustRoots(_ trustRoots: [Data])
+        -> Result<(), InvalidInputError>
+    {
+        switch transportProtocol.certificateValidator.validate(trustRoots) {
+        case .success(let certificate):
+            self.possibleFogTrustRoots = certificate
+            return .success(())
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
 }
 
 extension NetworkConfig {

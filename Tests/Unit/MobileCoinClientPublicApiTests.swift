@@ -16,7 +16,8 @@ class MobileCoinClientPublicApiTests: XCTestCase {
             fogViewAttestation: fixture.fogViewAttestation,
             fogKeyImageAttestation: fixture.fogKeyImageAttestation,
             fogMerkleProofAttestation: fixture.fogMerkleProofAttestation,
-            fogReportAttestation: fixture.fogReportAttestation))
+            fogReportAttestation: fixture.fogReportAttestation,
+            transportProtocol: TransportProtocol.http))
     }
 
     func testWrongConsensusUrlSchemeFails() throws {
@@ -34,7 +35,8 @@ class MobileCoinClientPublicApiTests: XCTestCase {
                 fogViewAttestation: fixture.fogViewAttestation,
                 fogKeyImageAttestation: fixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: fixture.fogMerkleProofAttestation,
-                fogReportAttestation: fixture.fogReportAttestation))
+                fogReportAttestation: fixture.fogReportAttestation,
+                transportProtocol: TransportProtocol.http))
         }
     }
 
@@ -54,7 +56,8 @@ class MobileCoinClientPublicApiTests: XCTestCase {
                 fogViewAttestation: fixture.fogViewAttestation,
                 fogKeyImageAttestation: fixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: fixture.fogMerkleProofAttestation,
-                fogReportAttestation: fixture.fogReportAttestation))
+                fogReportAttestation: fixture.fogReportAttestation,
+                transportProtocol: TransportProtocol.http))
         }
     }
 

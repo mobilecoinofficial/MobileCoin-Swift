@@ -8,12 +8,10 @@ import XCTest
 
 class FogReportConnectionIntTests: XCTestCase {
 
-    func testGetReportsGRPC() throws {
-        try getReports(transportProtocol: TransportProtocol.grpc)
-    }
-    
-    func testGetReportsHTTP() throws {
-        try getReports(transportProtocol: TransportProtocol.http)
+    func testGetReports() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            try getReports(transportProtocol: transportProtocol)
+        }
     }
     
     func getReports(transportProtocol: TransportProtocol) throws {
@@ -38,11 +36,13 @@ class FogReportConnectionIntTests: XCTestCase {
 extension FogReportConnectionIntTests {
     func createFogReportConnection(transportProtocol: TransportProtocol) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: TestHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogReportConnection(
+            httpFactory: httpFactory,
+            grpcFactory: grpcFactory,
             url: url,
             transportProtocolOption: transportProtocol.option,
-            channelManager: GrpcChannelManager(),
-            httpRequester: TestHttpRequester(),
             targetQueue: DispatchQueue.main)
     }
 }

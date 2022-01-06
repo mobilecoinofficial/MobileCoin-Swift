@@ -7,3 +7,10 @@ import Foundation
 protocol ConnectionProtocol {
     func setAuthorization(credentials: BasicCredentials)
 }
+
+extension ConnectionProtocol {
+    func setAuthorization(credentials: BasicCredentials) {
+        // Do nothing
+         logger.assertionFailure("ConnectionProtocol not implemented")
+    }
+}
