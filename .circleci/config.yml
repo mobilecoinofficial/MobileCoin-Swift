@@ -174,7 +174,7 @@ commands:
       - run:
           name: Set git credentials
           command: |
-            git config user.email "mobilecoin-ci@mobilecoin.com"
+            git config user.email "infrastructure@mobilecoin.com"
             git config user.name "mobilecoin-ci"
 
   push-docs:
@@ -337,6 +337,7 @@ workflows:
           filters:
             branches: { only: master }
       - publish-pod-release:
+          requires: [ prepare-pod-release ]
           filters:
             branches: { only: master }
       #- generate-docs:
