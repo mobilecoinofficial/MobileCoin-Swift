@@ -121,6 +121,17 @@ extension NetworkPreset {
             return "fog://fog.\(self).mobilecoin.com"
         }
     }
+    var fogShortUrl: String {
+        switch self {
+        case .mainNet:
+            return "fog://fog-rpt-prd.namda.net"
+        case .testNet:
+            return "fog://fog-rpt-stg.namda.net"
+            
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return ""
+        }
+    }
 
     private static let mainNetConsensusMrEnclaveHex =
         "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
@@ -390,6 +401,7 @@ extension NetworkPreset {
     }
 
     var fogReportUrl: String { fogUrl }
+    var fogReportShortUrl: String { fogShortUrl }
     var fogReportId: String { "" }
 
     func fogAuthoritySpki() throws -> Data {
@@ -533,6 +545,15 @@ extension NetworkPreset {
         }
     }
 
+    var fogShortURLSupported: Bool {
+        switch self {
+        case .mainNet, .testNet:
+            return true
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return false
+        }
+    }
+    
     var invalidCredentials: BasicCredentials {
         BasicCredentials(username: Self.invalidCredUsername, password: Self.invalidCredPassword)
     }
