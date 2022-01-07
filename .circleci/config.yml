@@ -218,6 +218,7 @@ jobs:
       - print-tool-versions
       - run: make build
       - run: make test
+      - run: make lint-locally-podspec
       #- run: make docs
       #- run: make lint-docs
       - store_artifacts: { path: output }
