@@ -48,7 +48,7 @@ tag-release:
 
 # MobileCoin pod
 
-.PHONY: lint-podspec
+.PHONY: lint-locally-podspec
 lint-locally-podspec:
 	bundle exec pod lib lint MobileCoin.podspec --skip-tests
 
