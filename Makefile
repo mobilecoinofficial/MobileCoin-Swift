@@ -53,23 +53,23 @@ clean-example: clean-docs
 .PHONY: setup-example-http
 setup-example-http:
 	bundle install
-	@$(MAKE) --directory=Example setup
+	@$(MAKE) --directory=ExampleHTTP setup
 
 .PHONY: bootstrap-example-http
 bootstrap-example-http:
-	@$(MAKE) --directory=Example bootstrap
+	@$(MAKE) --directory=ExampleHTTP bootstrap
 
 .PHONY: build-example-http
 build-example-http:
-	@$(MAKE) --directory=Example build
+	@$(MAKE) --directory=ExampleHTTP build
 
 .PHONY: test-example-http
 test-example-http:
-	@$(MAKE) --directory=Example test
+	@$(MAKE) --directory=ExampleHTTP test
 
 .PHONY: clean-example-http
 clean-example-http: clean-docs
-	@$(MAKE) --directory=Example clean
+	@$(MAKE) --directory=ExampleHTTP clean
 
 .PHONY: lint
 lint: swiftlint
