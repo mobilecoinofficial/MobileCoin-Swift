@@ -27,6 +27,48 @@ test:
 .PHONY: clean
 clean: clean-docs
 	@$(MAKE) --directory=Example clean
+
+
+.PHONY: setup-example
+setup-example:
+	bundle install
+	@$(MAKE) --directory=Example setup
+
+.PHONY: bootstrap-example
+bootstrap-example:
+	@$(MAKE) --directory=Example bootstrap
+
+.PHONY: build-example
+build-example:
+	@$(MAKE) --directory=Example build
+
+.PHONY: test-example
+test-example:
+	@$(MAKE) --directory=Example test
+
+.PHONY: clean-example
+clean-example: clean-docs
+	@$(MAKE) --directory=Example clean
+
+.PHONY: setup-example-http
+setup-example-http:
+	bundle install
+	@$(MAKE) --directory=ExampleHTTP setup
+
+.PHONY: bootstrap-example-http
+bootstrap-example-http:
+	@$(MAKE) --directory=ExampleHTTP bootstrap
+
+.PHONY: build-example-http
+build-example-http:
+	@$(MAKE) --directory=ExampleHTTP build
+
+.PHONY: test-example-http
+test-example-http:
+	@$(MAKE) --directory=ExampleHTTP test
+
+.PHONY: clean-example-http
+clean-example-http: clean-docs
 	@$(MAKE) --directory=ExampleHTTP clean
 
 .PHONY: lint

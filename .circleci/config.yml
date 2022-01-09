@@ -219,17 +219,67 @@ jobs:
       - set-ruby-version
       - install-gems
       - install-example-gems
-      - install-example-http-gems
       - install-example-pods:
           xcode-version: << parameters.xcode-version >>
+      - print-tool-versions
+      - run: make build-example
+      - run: make test-example
+      #- run: make docs
+      #- run: make lint-docs
+      - store_artifacts: { path: output }
+      - store_test_results: { path: output/scan }
+      - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
+      - check-dirty-git
+
+  build-and-test-example-http:
+    parameters:
+      xcode-version:
+        type: string
+        default: *default-xcode-version
+    macos:
+      xcode: << parameters.xcode-version >>
+    environment:
+      <<: *default-environment
+      FL_BUILDLOG_PATH: ../output/buildlogs
+      SCAN_OUTPUT_DIRECTORY: ../output/scan
+      SCAN_OUTPUT_TYPES: junit
+    steps:
+      - checkout
+      - init-artifacts-submodule
+      - set-ruby-version
+      - install-gems
+      - install-example-http-gems
       - install-example-http-pods:
           xcode-version: << parameters.xcode-version >>
       - print-tool-versions
-      - run: make build
-      - run: make test
-      - run: make lint-locally-podspec
+      - run: make build-example-http
+      - run: make test-example-http
       #- run: make docs
       #- run: make lint-docs
+      - store_artifacts: { path: output }
+      - store_test_results: { path: output/scan }
+      - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
+      - check-dirty-git
+
+  pod-lib-lint:
+    parameters:
+      xcode-version:
+        type: string
+        default: *default-xcode-version
+    macos:
+      xcode: << parameters.xcode-version >>
+    environment:
+      <<: *default-environment
+      FL_BUILDLOG_PATH: ../output/buildlogs
+      SCAN_OUTPUT_DIRECTORY: ../output/scan
+      SCAN_OUTPUT_TYPES: junit
+    steps:
+      - checkout
+      - init-artifacts-submodule
+      - set-ruby-version
+      - install-gems
+      - print-tool-versions
+      - run: make lint-locally-podspec
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
@@ -273,30 +323,6 @@ jobs:
       - install-gh-pages
       - push-docs
 
-  prepare-pod-release:
-    parameters:
-      xcode-version:
-        type: string
-        default: *default-xcode-version
-    macos:
-      xcode: << parameters.xcode-version >>
-    environment:
-      <<: *default-environment
-    steps:
-      - checkout
-      - init-artifacts-submodule
-      - set-ruby-version
-      - install-example-gems
-      - install-example-http-gems
-      - install-example-pods:
-          xcode-version: << parameters.xcode-version >>
-      - install-example-http-pods:
-          xcode-version: << parameters.xcode-version >>
-      - install-gems
-      - run:
-          name: Pod Spec Lint
-          command: make lint-podspec
-
   publish-pod-release:
     parameters:
       xcode-version:
@@ -310,19 +336,11 @@ jobs:
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
-      - install-example-gems
-      - install-example-http-gems
-      - install-example-pods:
-          xcode-version: << parameters.xcode-version >>
-      - install-example-http-pods:
-          xcode-version: << parameters.xcode-version >>
       - install-gems
       - set-git-credentials
       - run:
           name: Publish Pod to Trunk
           command: make publish
-
-
 
 workflows:
   version: 2
@@ -333,11 +351,17 @@ workflows:
           matrix:
             parameters:
               xcode-version: [*default-xcode-version]
-      - prepare-pod-release:
-          filters:
-            branches: { only: master }
+      - build-and-test-example-http:
+          name: build-and-test-example-http-xcode-<< matrix.xcode-version >>
+          matrix:
+            parameters:
+              xcode-version: [*default-xcode-version]
+      - pod-lib-lint:
+          name: pod-lib-lint-<< matrix.xcode-version >>
+          matrix:
+            parameters:
+              xcode-version: [*default-xcode-version]
       - publish-pod-release:
-          requires: [ prepare-pod-release ]
           filters:
             branches: { only: master }
       #- generate-docs:
