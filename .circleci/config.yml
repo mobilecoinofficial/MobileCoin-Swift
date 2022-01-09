@@ -201,7 +201,7 @@ commands:
             fi
 
 jobs:
-  build-and-test-example:
+  build-and-test:
     parameters:
       xcode-version:
         type: string
