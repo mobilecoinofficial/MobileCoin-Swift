@@ -177,6 +177,15 @@ commands:
             git config user.email "mobilecoin-ci@mobilecoin.com"
             git config user.name "mobilecoin-ci"
 
+  publish-to-trunk:
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "c2:90:32:ec:0e:38:09:a0:b0:d7:20:23:68:bc:8d:6f"
+      - run:
+          name: Publish Pod to Trunk
+          command: make publish
+
   push-docs:
     steps:
       - add_ssh_keys:
@@ -338,9 +347,7 @@ jobs:
       - set-ruby-version
       - install-gems
       - set-git-credentials
-      - run:
-          name: Publish Pod to Trunk
-          command: make publish
+      - publish-to-trunk
 
 workflows:
   version: 2
