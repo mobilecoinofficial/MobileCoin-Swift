@@ -8,160 +8,158 @@ import XCTest
 
 class PaymentRequestTests: XCTestCase {
 
-    static let publicAddress = (try? PublicAddress.Fixtures.Init())!.accountKey.publicAddress
-    static let externalPublicAddress = External_PublicAddress(publicAddress)
     static let value: UInt64 = 123
     static let memo = "test memo"
 
     func testEncodingToPrintableNoValueNoMemom() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create PaymentRequest
-            let paymentRequest = PaymentRequest(publicAddress: Self.publicAddress)
-            XCTAssertNotNil(paymentRequest)
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create Printable_PaymentRequest from PaymentRequest
-            let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+        // create PaymentRequest
+        let paymentRequest = PaymentRequest(publicAddress: publicAddress)
+        XCTAssertNotNil(paymentRequest)
 
-            // Validate
-            XCTAssertNotNil(printablePaymentRequest)
-            XCTAssertEqual(printablePaymentRequest.publicAddress, Self.externalPublicAddress)
-            XCTAssertEqual(printablePaymentRequest.value, 0)
-            XCTAssertEqual(printablePaymentRequest.memo.count, 0)
-        })
+        // create Printable_PaymentRequest from PaymentRequest
+        let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+
+        // Validate
+        XCTAssertNotNil(printablePaymentRequest)
+        XCTAssertEqual(printablePaymentRequest.publicAddress, External_PublicAddress(publicAddress))
+        XCTAssertEqual(printablePaymentRequest.value, 0)
+        XCTAssertEqual(printablePaymentRequest.memo.count, 0)
     }
 
     func testDecodingFromPrintableNoValueNoMemo() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create Printable_PaymentRequest
-            var printablePaymentRequest = Printable_PaymentRequest()
-            printablePaymentRequest.publicAddress = Self.externalPublicAddress
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create PaymentRequest from Printable_PaymentRequest
-            let paymentRequest = PaymentRequest(printablePaymentRequest)
+        // create Printable_PaymentRequest
+        var printablePaymentRequest = Printable_PaymentRequest()
+        printablePaymentRequest.publicAddress = External_PublicAddress(publicAddress)
 
-            // Validate
-            XCTAssertNotNil(paymentRequest)
-            if let paymentRequest = paymentRequest {
-                XCTAssertEqual(paymentRequest.publicAddress, Self.publicAddress)
-                XCTAssertNil(paymentRequest.value)
-                XCTAssertNil(paymentRequest.memo)
-            }
-        })
+        // create PaymentRequest from Printable_PaymentRequest
+        let paymentRequest = PaymentRequest(printablePaymentRequest)
+
+        // Validate
+        XCTAssertNotNil(paymentRequest)
+        if let paymentRequest = paymentRequest {
+            XCTAssertEqual(paymentRequest.publicAddress, publicAddress)
+            XCTAssertNil(paymentRequest.value)
+            XCTAssertNil(paymentRequest.memo)
+        }
     }
 
     func testEncodingToPrintableNoMemo() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create PaymentRequest
-            let paymentRequest = PaymentRequest(publicAddress: Self.publicAddress,
-                                                value: Self.value)
-            XCTAssertNotNil(paymentRequest)
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create Printable_PaymentRequest from PaymentRequest
-            let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+        // create PaymentRequest
+        let paymentRequest = PaymentRequest(publicAddress: publicAddress,
+                                            value: Self.value)
+        XCTAssertNotNil(paymentRequest)
 
-            // Validate
-            XCTAssertNotNil(printablePaymentRequest)
-            XCTAssertEqual(printablePaymentRequest.publicAddress, Self.externalPublicAddress)
-            XCTAssertEqual(printablePaymentRequest.value, Self.value)
-            XCTAssertEqual(printablePaymentRequest.memo.count, 0)
-        })
+        // create Printable_PaymentRequest from PaymentRequest
+        let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+
+        // Validate
+        XCTAssertNotNil(printablePaymentRequest)
+        XCTAssertEqual(printablePaymentRequest.publicAddress, External_PublicAddress(publicAddress))
+        XCTAssertEqual(printablePaymentRequest.value, Self.value)
+        XCTAssertEqual(printablePaymentRequest.memo.count, 0)
     }
 
     func testDecodingFromPrintableNoMemo() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create Printable_PaymentRequest
-            var printablePaymentRequest = Printable_PaymentRequest()
-            printablePaymentRequest.publicAddress = Self.externalPublicAddress
-            printablePaymentRequest.value = Self.value
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create PaymentRequest from Printable_PaymentRequest
-            let paymentRequest = PaymentRequest(printablePaymentRequest)
+        // create Printable_PaymentRequest
+        var printablePaymentRequest = Printable_PaymentRequest()
+        printablePaymentRequest.publicAddress = External_PublicAddress(publicAddress)
+        printablePaymentRequest.value = Self.value
 
-            // Validate
-            XCTAssertNotNil(paymentRequest)
-            if let paymentRequest = paymentRequest {
-                XCTAssertEqual(paymentRequest.publicAddress, Self.publicAddress)
-                XCTAssertEqual(paymentRequest.value, Self.value)
-                XCTAssertNil(paymentRequest.memo)
-            }
-        })
+        // create PaymentRequest from Printable_PaymentRequest
+        let paymentRequest = PaymentRequest(printablePaymentRequest)
+
+        // Validate
+        XCTAssertNotNil(paymentRequest)
+        if let paymentRequest = paymentRequest {
+            XCTAssertEqual(paymentRequest.publicAddress, publicAddress)
+            XCTAssertEqual(paymentRequest.value, Self.value)
+            XCTAssertNil(paymentRequest.memo)
+        }
     }
 
     func testEncodingToPrintableNoValue() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create PaymentRequest
-            let paymentRequest = PaymentRequest(publicAddress: Self.publicAddress, memo: Self.memo)
-            XCTAssertNotNil(paymentRequest)
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create Printable_PaymentRequest from PaymentRequest
-            let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+        // create PaymentRequest
+        let paymentRequest = PaymentRequest(publicAddress: publicAddress, memo: Self.memo)
+        XCTAssertNotNil(paymentRequest)
 
-            // Validate
-            XCTAssertNotNil(printablePaymentRequest)
-            XCTAssertEqual(printablePaymentRequest.publicAddress, Self.externalPublicAddress)
-            XCTAssertEqual(printablePaymentRequest.value, 0)
-            XCTAssertEqual(printablePaymentRequest.memo, Self.memo)
-        })
+        // create Printable_PaymentRequest from PaymentRequest
+        let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+
+        // Validate
+        XCTAssertNotNil(printablePaymentRequest)
+        XCTAssertEqual(printablePaymentRequest.publicAddress, External_PublicAddress(publicAddress))
+        XCTAssertEqual(printablePaymentRequest.value, 0)
+        XCTAssertEqual(printablePaymentRequest.memo, Self.memo)
     }
 
     func testDecodingFromPrintableNoValue() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create Printable_PaymentRequest
-            var printablePaymentRequest = Printable_PaymentRequest()
-            printablePaymentRequest.publicAddress = Self.externalPublicAddress
-            printablePaymentRequest.memo = Self.memo
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create PaymentRequest from Printable_PaymentRequest
-            let paymentRequest = PaymentRequest(printablePaymentRequest)
+        // create Printable_PaymentRequest
+        var printablePaymentRequest = Printable_PaymentRequest()
+        printablePaymentRequest.publicAddress = External_PublicAddress(publicAddress)
+        printablePaymentRequest.memo = Self.memo
 
-            // Validate
-            XCTAssertNotNil(paymentRequest)
-            if let paymentRequest = paymentRequest {
-                XCTAssertEqual(paymentRequest.publicAddress, Self.publicAddress)
-                XCTAssertNil(paymentRequest.value)
-                XCTAssertEqual(paymentRequest.memo, Self.memo)
-            }
-        })
+        // create PaymentRequest from Printable_PaymentRequest
+        let paymentRequest = PaymentRequest(printablePaymentRequest)
+
+        // Validate
+        XCTAssertNotNil(paymentRequest)
+        if let paymentRequest = paymentRequest {
+            XCTAssertEqual(paymentRequest.publicAddress, publicAddress)
+            XCTAssertNil(paymentRequest.value)
+            XCTAssertEqual(paymentRequest.memo, Self.memo)
+        }
     }
 
     func testEncodingToPrintable() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create PaymentRequest
-            let paymentRequest = PaymentRequest(publicAddress: Self.publicAddress,
-                                                value: Self.value,
-                                                memo: Self.memo)
-            XCTAssertNotNil(paymentRequest)
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create Printable_PaymentRequest from PaymentRequest
-            let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+        // create PaymentRequest
+        let paymentRequest = PaymentRequest(publicAddress: publicAddress,
+                                            value: Self.value,
+                                            memo: Self.memo)
+        XCTAssertNotNil(paymentRequest)
 
-            // Validate
-            XCTAssertNotNil(printablePaymentRequest)
-            XCTAssertEqual(printablePaymentRequest.publicAddress, Self.externalPublicAddress)
-            XCTAssertEqual(printablePaymentRequest.value, Self.value)
-            XCTAssertEqual(printablePaymentRequest.memo, Self.memo)
-        })
+        // create Printable_PaymentRequest from PaymentRequest
+        let printablePaymentRequest = Printable_PaymentRequest(paymentRequest)
+
+        // Validate
+        XCTAssertNotNil(printablePaymentRequest)
+        XCTAssertEqual(printablePaymentRequest.publicAddress, External_PublicAddress(publicAddress))
+        XCTAssertEqual(printablePaymentRequest.value, Self.value)
+        XCTAssertEqual(printablePaymentRequest.memo, Self.memo)
     }
 
     func testDecodingFromPrintable() throws {
-        XCTAssertNoThrow(evaluating: {
-            // create Printable_PaymentRequest
-            var printablePaymentRequest = Printable_PaymentRequest()
-            printablePaymentRequest.publicAddress = Self.externalPublicAddress
-            printablePaymentRequest.value = Self.value
-            printablePaymentRequest.memo = Self.memo
+        let publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
 
-            // create PaymentRequest from Printable_PaymentRequest
-            let paymentRequest = PaymentRequest(printablePaymentRequest)
+        // create Printable_PaymentRequest
+        var printablePaymentRequest = Printable_PaymentRequest()
+        printablePaymentRequest.publicAddress = External_PublicAddress(publicAddress)
+        printablePaymentRequest.value = Self.value
+        printablePaymentRequest.memo = Self.memo
 
-            // Validate
-            XCTAssertNotNil(paymentRequest)
-            if let paymentRequest = paymentRequest {
-                XCTAssertEqual(paymentRequest.publicAddress, Self.publicAddress)
-                XCTAssertEqual(paymentRequest.value, Self.value)
-                XCTAssertEqual(paymentRequest.memo, Self.memo)
-            }
-        })
+        // create PaymentRequest from Printable_PaymentRequest
+        let paymentRequest = PaymentRequest(printablePaymentRequest)
+
+        // Validate
+        XCTAssertNotNil(paymentRequest)
+        if let paymentRequest = paymentRequest {
+            XCTAssertEqual(paymentRequest.publicAddress, publicAddress)
+            XCTAssertEqual(paymentRequest.value, Self.value)
+            XCTAssertEqual(paymentRequest.memo, Self.memo)
+        }
     }
 
 }
