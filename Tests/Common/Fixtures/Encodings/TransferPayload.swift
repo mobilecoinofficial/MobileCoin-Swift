@@ -16,20 +16,23 @@ extension TransferPayload.Fixtures {
         let ristretto: RistrettoPublic
         let ristrettoCompressed: External_CompressedRistretto
         let memo = "test memo"
-        
+
         init() throws {
             guard let entropyData = Data(base64Encoded: Self.base64Entropy) else {
-                throw TestInitializationError("TransferPayload.Fixture: entropyData is nil, likely an invalid base64Entropy value")
+                throw TestInitializationError("TransferPayload.Fixture: entropyData is nil,"
+                                              + " likely an invalid base64Entropy value")
             }
             self.entropyData = entropyData
-            
+
             guard let entropyData32 = Data32(entropyData) else {
-                throw TestInitializationError("TransferPayload.Fixture: entropyData32 is nil, likely an invalid base64Entropy value")
+                throw TestInitializationError("TransferPayload.Fixture: entropyData32 is nil,"
+                                              + " likely an invalid base64Entropy value")
             }
             self.entropyData32 = entropyData32
-            
+
             guard let ristretto = RistrettoPublic(base64Encoded: Self.base64Ristretto) else {
-                throw TestInitializationError("TransferPayload.Fixture: ristretto is nil, likely an invalid base64Ristretto value")
+                throw TestInitializationError("TransferPayload.Fixture: ristretto is nil,"
+                                              + " likely an invalid base64Ristretto value")
             }
             self.ristretto = ristretto
 

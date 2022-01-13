@@ -15,7 +15,7 @@ extension PaymentRequest.Fixtures {
         let externalPublicAddress: External_PublicAddress
         let paymentValue: UInt64 = 123
         let memo = "test memo"
-        
+
         init() throws {
             self.publicAddress = try PublicAddress.Fixtures.Init().accountKey.publicAddress
             self.externalPublicAddress = External_PublicAddress(publicAddress)
