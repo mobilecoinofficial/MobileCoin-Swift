@@ -160,4 +160,16 @@ class PaymentRequestTests: XCTestCase {
         }
     }
 
+    func testDecodingFromPrintableWithInvalidPublicAddress() throws {
+        // create Printable_PaymentRequest
+        var printablePaymentRequest = Printable_PaymentRequest()
+        printablePaymentRequest.publicAddress = External_PublicAddress()
+
+        // create PaymentRequest from Printable_PaymentRequest
+        let paymentRequest = PaymentRequest(printablePaymentRequest)
+
+        // Validate
+        XCTAssertNil(paymentRequest)
+    }
+
 }
