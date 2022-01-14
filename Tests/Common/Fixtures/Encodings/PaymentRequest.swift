@@ -22,8 +22,3 @@ extension PaymentRequest.Fixtures {
         }
     }
 }
-
-extension TransferPayload.Fixtures.Default {
-    fileprivate static let base64Entropy = "ajaEQTHHDeZEZDk1rGYQRF0ErcpmcPa7buRpNchz4hQ="
-    fileprivate static let base64Ristretto = "VECBlIdhtmTFaXtlWphlqELpDL04EKMbbPWu3CoJ2UE="
-}
