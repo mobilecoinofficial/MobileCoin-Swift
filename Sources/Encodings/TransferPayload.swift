@@ -43,21 +43,27 @@ extension TransferPayload {
             return nil
         }
 
-        let rootEntropy = Data32(transferPayload.rootEntropy)
-        let bip39 = Data32(transferPayload.bip39Entropy)
-        switch (bip39, rootEntropy) {
-        case let (.some(bip39_32), _) where bip39_32 != Data32():
-            self.bip39_32 = bip39_32
-            self.rootEntropy32 = nil
-        case let (_, .some(rootEntropy_32)) where rootEntropy_32 != Data32():
-            self.rootEntropy32 = rootEntropy_32
-            self.bip39_32 = nil
-        default:
+        // this is to verify against setting both rootEntropy and bip39 to
+        // to non-empty data (can fall through later checks if exactly one is valid Data32)
+        let hasRootEntropy = !transferPayload.rootEntropy.isEmpty
+        let hasBip39 = !transferPayload.bip39Entropy.isEmpty
+        guard !(hasRootEntropy && hasBip39) else {
             return nil
         }
 
-        self.txOutPublicKey = txOutPublicKey
-        self.memo = !transferPayload.memo.isEmpty ? transferPayload.memo : nil
+        // convert to Data32 in order to be able to verify the raw Data is valid
+        let rootEntropy = Data32(transferPayload.rootEntropy)
+        let bip39 = Data32(transferPayload.bip39Entropy)
+        
+        // must have exactly one of bip39 or rootEntropy
+        switch (bip39, rootEntropy) {
+        case (.some(let bip39), nil):
+            self.init(bip39:bip39, txOutPublicKey:txOutPublicKey, memo:transferPayload.memo)
+        case (nil, .some(let rootEntropy)):
+            self.init(rootEntropy:rootEntropy, txOutPublicKey:txOutPublicKey, memo:transferPayload.memo)
+        default:
+            return nil
+        }
     }
 }
 

@@ -179,4 +179,84 @@ class TransferPayloadTests: XCTestCase {
             XCTAssertEqual(transferPayload.memo, defaultFixture.memo)
         }
     }
+
+    func testDecodingFailsWithValidRootEntropyInvalidNonEmptyBip39() throws {
+        let defaultFixture = try TransferPayload.Fixtures.Default()
+
+        // create invalid Printable_TransferPayload with both bip39 and rootEntropy
+        var printableTransferPayload = Printable_TransferPayload()
+        printableTransferPayload.rootEntropy = defaultFixture.entropyData
+        printableTransferPayload.bip39Entropy = Data(count: 10)
+        printableTransferPayload.txOutPublicKey = defaultFixture.ristrettoCompressed
+        printableTransferPayload.memo = defaultFixture.memo
+
+        // attempt to create TransferPayload from Printable_TransferPayload - should fail
+        let transferPayload = TransferPayload(printableTransferPayload)
+
+        XCTAssertNil(transferPayload)
+    }
+
+    func testDecodingFailsWithValidBip39InvalidNonEmptyRootEntropy() throws {
+        let defaultFixture = try TransferPayload.Fixtures.Default()
+
+        // create invalid Printable_TransferPayload with both bip39 and rootEntropy
+        var printableTransferPayload = Printable_TransferPayload()
+        printableTransferPayload.rootEntropy = Data(count: 10)
+        printableTransferPayload.bip39Entropy = defaultFixture.entropyData
+        printableTransferPayload.txOutPublicKey = defaultFixture.ristrettoCompressed
+        printableTransferPayload.memo = defaultFixture.memo
+
+        // attempt to create TransferPayload from Printable_TransferPayload - should fail
+        let transferPayload = TransferPayload(printableTransferPayload)
+
+        XCTAssertNil(transferPayload)
+    }
+
+    func testDecodingFailsWithBothBip39AndRootEntropySet() throws {
+        let defaultFixture = try TransferPayload.Fixtures.Default()
+
+        // create invalid Printable_TransferPayload with both bip39 and rootEntropy
+        var printableTransferPayload = Printable_TransferPayload()
+        printableTransferPayload.rootEntropy = defaultFixture.entropyData
+        printableTransferPayload.bip39Entropy = defaultFixture.entropyData
+        printableTransferPayload.txOutPublicKey = defaultFixture.ristrettoCompressed
+        printableTransferPayload.memo = defaultFixture.memo
+
+        // attempt to create TransferPayload from Printable_TransferPayload - should fail
+        let transferPayload = TransferPayload(printableTransferPayload)
+
+        XCTAssertNil(transferPayload)
+    }
+
+    func testDecodingFailsWithBip39AndRootEntropySetToEmptyData() throws {
+        let defaultFixture = try TransferPayload.Fixtures.Default()
+
+        // create invalid Printable_TransferPayload with both bip39 and rootEntropy
+        var printableTransferPayload = Printable_TransferPayload()
+        printableTransferPayload.rootEntropy = Data()
+        printableTransferPayload.bip39Entropy = Data()
+        printableTransferPayload.txOutPublicKey = defaultFixture.ristrettoCompressed
+        printableTransferPayload.memo = defaultFixture.memo
+
+        // attempt to create TransferPayload from Printable_TransferPayload - should fail
+        let transferPayload = TransferPayload(printableTransferPayload)
+
+        XCTAssertNil(transferPayload)
+    }
+
+    func testDecodingFailsWhenNoTxOutPublicKey() throws {
+        let defaultFixture = try TransferPayload.Fixtures.Default()
+
+        // create invalid Printable_TransferPayload with both bip39 and rootEntropy
+        var printableTransferPayload = Printable_TransferPayload()
+        printableTransferPayload.rootEntropy = defaultFixture.entropyData
+        printableTransferPayload.bip39Entropy = Data()
+        printableTransferPayload.txOutPublicKey = External_CompressedRistretto()
+        printableTransferPayload.memo = defaultFixture.memo
+
+        // attempt to create TransferPayload from Printable_TransferPayload - should fail
+        let transferPayload = TransferPayload(printableTransferPayload)
+
+        XCTAssertNil(transferPayload)
+    }
 }
