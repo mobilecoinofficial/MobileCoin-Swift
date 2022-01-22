@@ -8,6 +8,11 @@ public struct HTTPResponse {
     public let httpUrlResponse: HTTPURLResponse
     public let responseData: Data?
 
+    public init(httpUrlResponse: HTTPURLResponse, responseData: Data?) {
+        self.httpUrlResponse = httpUrlResponse
+        self.responseData = responseData
+    }
+    
     public var statusCode: Int {
         httpUrlResponse.statusCode
     }

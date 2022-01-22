@@ -343,12 +343,24 @@ extension NetworkPreset {
 
 }
 
-final class TestHttpRequester: HttpRequester {
-    let configuration : URLSessionConfiguration = {
+final class TestHttpRequester: NSObject, HttpRequester {
+    static let certPinningEnabled = true
+
+    static let defaultConfiguration : URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
         config.timeoutIntervalForResource = 30
         return config
+    }()
+    
+    private static let operationQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.underlyingQueue = .global()
+        return queue
+    }()
+
+    private lazy var session: URLSession = {
+       URLSession(configuration: TestHttpRequester.defaultConfiguration, delegate: self, delegateQueue: Self.operationQueue)
     }()
     
     func request(
@@ -366,7 +378,6 @@ final class TestHttpRequester: HttpRequester {
 
         request.httpBody = body
 
-        let session = URLSession(configuration: configuration)
         let task = session.dataTask(with: request) {data, response, error in
             if let error = error {
                 completion(.failure(error))
@@ -381,6 +392,67 @@ final class TestHttpRequester: HttpRequester {
         }
         task.resume()
     }
+}
+
+extension TestHttpRequester {
+    public typealias URLAuthenticationChallengeCompletion = (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+
+    fileprivate func urlSession(didReceive challenge: URLAuthenticationChallenge,
+                                completionHandler: @escaping URLAuthenticationChallengeCompletion) {
+
+        var disposition: URLSession.AuthChallengeDisposition = .performDefaultHandling
+        var credential: URLCredential?
+
+        guard Self.certPinningEnabled else {
+            disposition = .performDefaultHandling
+            completionHandler(disposition, credential)
+            return
+        }
+
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+           let serverTrust = challenge.protectionSpace.serverTrust {
+
+            // TODO - Remove
+            disposition = .performDefaultHandling
+
+            // 
+            // AFNetworking.AFSecurityPolicy example implementation:
+            //
+
+//            if securityPolicy.evaluateServerTrust(serverTrust, forDomain: challenge.protectionSpace.host) {
+//                credential = URLCredential(trust: serverTrust)
+//                disposition = .useCredential
+//            } else {
+//                disposition = .cancelAuthenticationChallenge
+//            }
+        } else {
+            disposition = .performDefaultHandling
+        }
+
+        completionHandler(disposition, credential)
+    }
+}
+
+extension TestHttpRequester: URLSessionDelegate {
+
+    public func urlSession(_ session: URLSession,
+                           didReceive challenge: URLAuthenticationChallenge,
+                           completionHandler: @escaping URLAuthenticationChallengeCompletion) {
+        urlSession(didReceive: challenge, completionHandler: completionHandler)
+    }
+
+}
+
+extension TestHttpRequester: URLSessionTaskDelegate {
+
+    public func urlSession(_ session: URLSession,
+                           task: URLSessionTask,
+                           didReceive challenge: URLAuthenticationChallenge,
+                           completionHandler: @escaping URLAuthenticationChallengeCompletion) {
+
+        urlSession(didReceive: challenge, completionHandler: completionHandler)
+    }
+
 }
 
 extension NetworkPreset {

@@ -21,7 +21,6 @@ public class RestApiRequester {
     let baseUrl: URL
     let trustRoots: [Data]?
     let prefix: String = "gw"
-    var challengeDelegate: URLSessionDelegate?
 
     init(requester: HttpRequester, baseUrl: URL, trustRoots: [Data]? = []) {
         self.requester = requester
