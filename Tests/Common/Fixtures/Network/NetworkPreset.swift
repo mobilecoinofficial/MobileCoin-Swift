@@ -343,7 +343,20 @@ extension NetworkPreset {
 
 }
 
+// TODO: Rename PossibleSSLCertificates protocol to SSLCertificates.
+
 final class TestHttpRequester: NSObject, HttpRequester {
+    var fogTrustRoots: SSLCertificates?
+    var consensusTrustRoots: SSLCertificates?
+    
+    var pinnedKeys: [SecKey] {
+        [fogTrustRoots, consensusTrustRoots].compactMap {
+            $0 as? SecSSLCertificates
+        }.compactMap {
+            $0.publicKeys
+        }.flatMap { $0 }
+    }
+    
     static let certPinningEnabled = true
 
     static let defaultConfiguration : URLSessionConfiguration = {
@@ -392,44 +405,45 @@ final class TestHttpRequester: NSObject, HttpRequester {
         }
         task.resume()
     }
+    
+    func setConsensusTrustRoots(_ trustRoots: SSLCertificates?) {
+        consensusTrustRoots = trustRoots
+    }
+    
+    func setFogTrustRoots(_ trustRoots: SSLCertificates?) {
+        fogTrustRoots = trustRoots
+    }
 }
 
 extension TestHttpRequester {
     public typealias URLAuthenticationChallengeCompletion = (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
 
-    fileprivate func urlSession(didReceive challenge: URLAuthenticationChallenge,
-                                completionHandler: @escaping URLAuthenticationChallengeCompletion) {
-
-        var disposition: URLSession.AuthChallengeDisposition = .performDefaultHandling
-        var credential: URLCredential?
-
-        guard Self.certPinningEnabled else {
-            disposition = .performDefaultHandling
-            completionHandler(disposition, credential)
+    func urlSession(didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping URLAuthenticationChallengeCompletion) {
+        guard let trust = challenge.protectionSpace.serverTrust, SecTrustGetCertificateCount(trust) > 0 else {
+            // This case will probably get handled by ATS, but still...
+            completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
 
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-           let serverTrust = challenge.protectionSpace.serverTrust {
-
-            // TODO - Remove
-            disposition = .performDefaultHandling
-
-            // 
-            // AFNetworking.AFSecurityPolicy example implementation:
-            //
-
-//            if securityPolicy.evaluateServerTrust(serverTrust, forDomain: challenge.protectionSpace.host) {
-//                credential = URLCredential(trust: serverTrust)
-//                disposition = .useCredential
-//            } else {
-//                disposition = .cancelAuthenticationChallenge
-//            }
-        } else {
-            disposition = .performDefaultHandling
+        guard Self.certPinningEnabled && pinnedKeys.isNotEmpty else {
+            completionHandler(.performDefaultHandling, nil)
+            return
         }
 
-        completionHandler(disposition, credential)
+        /// Compare the public keys
+        let serverCertificateKey = SecTrustGetCertificateAtIndex(trust, 0)?.asPublicKey()
+        switch serverCertificateKey {
+        case .success(let key) where pinnedKeys.contains(key):
+            completionHandler(.useCredential, URLCredential(trust: trust))
+        case .failure(let error):
+            /// Failing here means that the public key of the server does not match the stored one. This can
+            /// either indicate a MITM attack, or that the backend certificate and the private key changed,
+            /// most likely due to expiration.
+            logger.error("Error: \(error)")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        default:
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
     }
 }
 
@@ -437,7 +451,8 @@ extension TestHttpRequester: URLSessionDelegate {
 
     public func urlSession(_ session: URLSession,
                            didReceive challenge: URLAuthenticationChallenge,
-                           completionHandler: @escaping URLAuthenticationChallengeCompletion) {
+                           completionHandler: @escaping URLAuthenticationChallengeCompletion)
+    {
         urlSession(didReceive: challenge, completionHandler: completionHandler)
     }
 
@@ -448,8 +463,8 @@ extension TestHttpRequester: URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession,
                            task: URLSessionTask,
                            didReceive challenge: URLAuthenticationChallenge,
-                           completionHandler: @escaping URLAuthenticationChallengeCompletion) {
-
+                           completionHandler: @escaping URLAuthenticationChallengeCompletion)
+    {
         urlSession(didReceive: challenge, completionHandler: completionHandler)
     }
 

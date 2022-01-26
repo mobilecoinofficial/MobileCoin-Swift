@@ -438,21 +438,24 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func testConsensusTrustRootWorks() throws {
         let supportedProtocols = TransportProtocol.supportedProtocols
-        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
-        try XCTSkipIf(onlyHTTPSupported)
-        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
-            try consensusTrustRootWorks(transportProtocol: transportProtocol)
+        try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
+            let expect = expectation(description: "Submitting transaction")
+            try consensusTrustRootWorks(transportProtocol: transportProtocol, expectation: expect)
+            waitForExpectations(timeout: 20)
+            
+            if index != (supportedProtocols.count - 1) {
+                sleep(10)
+            }
         }
     }
     
-    func consensusTrustRootWorks(transportProtocol: TransportProtocol) throws {
+    func consensusTrustRootWorks(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
         XCTAssertSuccess(
             config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()))
         let client = try IntegrationTestFixtures.createMobileCoinClient(config: config, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
-        let expect = expectation(description: "Submitting transaction")
         client.updateBalance {
             guard let balance = $0.successOrFulfill(expectation: expect) else { return }
             guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
@@ -477,19 +480,22 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 }
             }
         }
-        waitForExpectations(timeout: 20)
     }
 
     func testExtraConsensusTrustRootWorks() throws {
         let supportedProtocols = TransportProtocol.supportedProtocols
-        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
-        try XCTSkipIf(onlyHTTPSupported)
-        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
-            try extraConsensusTrustRootWorks(transportProtocol: transportProtocol)
+        try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
+            let expect = expectation(description: "Submitting transaction")
+            try extraConsensusTrustRootWorks(transportProtocol: transportProtocol, expect: expect)
+            waitForExpectations(timeout: 20)
+            
+            if index != (supportedProtocols.count - 1) {
+                sleep(10)
+            }
         }
     }
     
-    func extraConsensusTrustRootWorks(transportProtocol: TransportProtocol) throws {
+    func extraConsensusTrustRootWorks(transportProtocol: TransportProtocol, expect: XCTestExpectation) throws {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()
             + [try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes]))
@@ -497,7 +503,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, config: config, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
-        let expect = expectation(description: "Submitting transaction")
         client.updateBalance {
             guard let balance = $0.successOrFulfill(expectation: expect) else { return }
             guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
@@ -522,14 +527,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 }
             }
         }
-        waitForExpectations(timeout: 20)
     }
 
     func testWrongConsensusTrustRootReturnsError() throws {
-        let supportedProtocols = TransportProtocol.supportedProtocols
-        let onlyHTTPSupported = supportedProtocols.count == 1 && supportedProtocols.contains(where: {$0 == TransportProtocol.http})
-        try XCTSkipIf(onlyHTTPSupported)
-        try supportedProtocols.filter({$0 != TransportProtocol.http}).forEach { transportProtocol in
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try wrongConsensusTrustRootReturnsError(transportProtocol: transportProtocol)
         }
     }

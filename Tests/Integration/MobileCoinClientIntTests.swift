@@ -63,7 +63,7 @@ class MobileCoinClientIntTests: XCTestCase {
         }
     }
     
-func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+    func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
