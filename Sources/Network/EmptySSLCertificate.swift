@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct EmptyNIOSSLCertificate {
+struct EmptySSLCertificate {
     var trustRootsBytes : [Data]? = nil
 
     init?(trustRootBytes bytes: [Data]) throws {

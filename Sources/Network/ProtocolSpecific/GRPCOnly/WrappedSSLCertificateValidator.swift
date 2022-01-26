@@ -4,8 +4,9 @@
 
 import Foundation
 
-class WrappedNIOSSLCertificateValidator : SSLCertificateValidator {
+class WrappedSSLCertificateValidator : SSLCertificateValidator {
     func validate(_ possibleCertificateData: [Data]) -> Result<PossibleSSLCertificates, InvalidInputError> {
-        return .failure(InvalidInputError("NIOSSLCertificates not supported with HTTP only target"))
+        return .failure(InvalidInputError("Standard SSLCertificate validation not supported with GRPC only target"))
     }
 }
+

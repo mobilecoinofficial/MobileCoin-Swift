@@ -22,14 +22,15 @@ extension TransportProtocol {
 }
 
 extension TransportProtocol : Equatable { }
+extension TransportProtocol : Hashable { }
 
 extension TransportProtocol {
-    var certificateValidator: NIOSSLCertificateValidator {
+    var certificateValidator: SSLCertificateValidator {
         switch self.option {
         case .grpc:
             return WrappedNIOSSLCertificateValidator()
         case .http:
-            return EmptyNIOSSLCertificateValidator()
+            return SecSSLCertificateValidator()
         }
     }
 }
