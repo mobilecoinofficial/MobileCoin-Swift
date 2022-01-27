@@ -30,8 +30,8 @@ struct NetworkConfig {
 
     var httpRequester: HttpRequester? {
         didSet {
-            httpRequester?.setFogTrustRoots(fogTrustRoots[.http])
-            httpRequester?.setConsensusTrustRoots(consensusTrustRoots[.http])
+            httpRequester?.setFogTrustRoots(fogTrustRoots[.http] as? SecSSLCertificates)
+            httpRequester?.setConsensusTrustRoots(consensusTrustRoots[.http] as? SecSSLCertificates)
         }
     }
     
@@ -111,7 +111,7 @@ struct NetworkConfig {
         
         self.consensusTrustRoots[.grpc] = try? grpc.get()
         self.consensusTrustRoots[.http] = try? http.get()
-        self.httpRequester?.setConsensusTrustRoots(try? http.get())
+        self.httpRequester?.setConsensusTrustRoots(try? http.get() as? SecSSLCertificates)
         
         return currentProtocolValidation(grpc: grpc, http: http)
     }
@@ -123,7 +123,7 @@ struct NetworkConfig {
         
         self.fogTrustRoots[.grpc] = try? grpc.get()
         self.fogTrustRoots[.http] = try? http.get()
-        self.httpRequester?.setFogTrustRoots(try? http.get())
+        self.httpRequester?.setFogTrustRoots(try? http.get() as? SecSSLCertificates)
         
         return currentProtocolValidation(grpc: grpc, http: http)
     }

@@ -8,8 +8,6 @@ public protocol SSLCertificates {
     var trustRootsBytes : [Data] { get }
     
     init?(trustRootBytes: [Data]) throws
-    
-    static func trustRoots() -> Result<Any, InvalidInputError>
 }
 
 extension SSLCertificates {
@@ -17,11 +15,7 @@ extension SSLCertificates {
         return nil
     }
     
-    public static func trustRoots() -> Result<Any, InvalidInputError> {
-        return .failure(InvalidInputError("Not implemented"))
-    }
-    
-    static func make(trustRootBytes: [Data]) -> Result<SSLCertificates, InvalidInputError> {
+    public static func make(trustRootBytes: [Data]) -> Result<SSLCertificates, InvalidInputError> {
         do {
             let certificate = try Self.init(trustRootBytes: trustRootBytes)
             if let certificate = certificate {

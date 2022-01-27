@@ -33,6 +33,8 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
        URLSession(configuration: DefaultHttpRequester.defaultConfiguration, delegate: self, delegateQueue: Self.operationQueue)
     }()
     
+    override public init() { }
+    
     public func request(
         url: URL,
         method: HTTPMethod,
