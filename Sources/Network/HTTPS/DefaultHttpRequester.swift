@@ -4,15 +4,13 @@
 
 import Foundation
 
-class DefaultHttpRequester: NSObject, HttpRequester {
-    var fogTrustRoots: SSLCertificates?
-    var consensusTrustRoots: SSLCertificates?
+public class DefaultHttpRequester: NSObject, HttpRequester {
+    private var fogTrustRoots: SecSSLCertificates?
+    private var consensusTrustRoots: SecSSLCertificates?
     
-    var pinnedKeys: [SecKey] {
+    private var pinnedKeys: [SecKey] {
         [fogTrustRoots, consensusTrustRoots].compactMap {
-            $0 as? SecSSLCertificates
-        }.compactMap {
-            $0.publicKeys
+            $0?.publicKeys
         }.flatMap { $0 }
     }
     
@@ -35,7 +33,7 @@ class DefaultHttpRequester: NSObject, HttpRequester {
        URLSession(configuration: DefaultHttpRequester.defaultConfiguration, delegate: self, delegateQueue: Self.operationQueue)
     }()
     
-    func request(
+    public func request(
         url: URL,
         method: HTTPMethod,
         headers: [String: String]?,
@@ -65,11 +63,11 @@ class DefaultHttpRequester: NSObject, HttpRequester {
         task.resume()
     }
     
-    func setConsensusTrustRoots(_ trustRoots: SSLCertificates?) {
+    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
         consensusTrustRoots = trustRoots
     }
     
-    func setFogTrustRoots(_ trustRoots: SSLCertificates?) {
+    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
         fogTrustRoots = trustRoots
     }
 }

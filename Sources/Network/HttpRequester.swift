@@ -15,15 +15,15 @@ public protocol HttpRequester {
         body: Data?,
         completion: @escaping (Result<HTTPResponse, Error>) -> Void)
     
-    func setFogTrustRoots(_ trustRoots: SSLCertificates?)
-    func setConsensusTrustRoots(_ trustRoots: SSLCertificates?)
+    func setFogTrustRoots(_ trustRoots: SecSSLCertificates?)
+    func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?)
 }
 
 extension HttpRequester {
-    func setFogTrustRoots(_ trustRoots: SSLCertificates?) {
+    func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
         logger.debug("setting fog trust roots not implemented")
     }
-    func setConsensusTrustRoots(_ trustRoots: SSLCertificates?) {
+    func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
         logger.debug("setting consensus trust roots not implemented")
     }
 }
