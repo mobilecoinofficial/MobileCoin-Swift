@@ -67,29 +67,3 @@ extension RestApiRequester : Requester {
     
 }
 
-fileprivate extension URL {
-    static func prefix(_ url: URL, pathComponents: [String]) -> URL? {
-        let prunedComponents = pathComponents.map({ $0.hasPrefix("/") ? String($0.dropFirst()) : $0})
-        var components = URLComponents()
-        components.scheme = url.scheme
-        components.host = url.host
-        components.path = "/" + (url.pathComponents + prunedComponents).joined(separator: "/")
-        return components.url
-    }
-}
-
-fileprivate extension URLRequest {
-    mutating func addProtoHeaders() {
-        let contentType = (fieldName:"Content-Type", value:"application/x-protobuf")
-        self.setValue(contentType.value, forHTTPHeaderField: contentType.fieldName)
-        
-        let accept = (fieldName:"Accept", value:"application/x-protobuf")
-        self.addValue(accept.value, forHTTPHeaderField: accept.fieldName)
-    }
-    
-    mutating func addHeaders(_ headers: [String:String]) {
-        headers.forEach { headerFieldName, value in
-            self.setValue(value, forHTTPHeaderField: headerFieldName)
-        }
-    }
-}
