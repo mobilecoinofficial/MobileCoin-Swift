@@ -5,11 +5,11 @@
 import Foundation
 
 extension Data {
-    func asPinnedCertificate() -> Result<SecCertificate, InvalidInputError> {
+    public func asPinnedCertificate() -> Result<SecCertificate, InvalidInputError> {
         Self.pinnedCertificate(for: self)
     }
     
-    static func pinnedCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
+    public static func pinnedCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
         let pinnedCertificateData = data as CFData
         if let pinnedCertificate = SecCertificateCreateWithData(nil, pinnedCertificateData) {
             return .success(pinnedCertificate)
@@ -21,7 +21,7 @@ extension Data {
         }
     }
     
-    static func pinnedCertificateKeys(for data: [Data]) -> Result<[SecKey], Error> {
+    public static func pinnedCertificateKeys(for data: [Data]) -> Result<[SecKey], Error> {
         do {
             let keys = try data.map { bytes in
                 try bytes.asPinnedCertificate().get()
@@ -36,11 +36,11 @@ extension Data {
 }
 
 extension SecCertificate {
-    func asPublicKey() -> Result<SecKey, SecurityError> {
+    public func asPublicKey() -> Result<SecKey, SecurityError> {
         Self.publicKey(for: self)
     }
     
-    static func publicKey(for certificate: SecCertificate) -> Result<SecKey, SecurityError> {
+    public static func publicKey(for certificate: SecCertificate) -> Result<SecKey, SecurityError> {
         var publicKey: SecKey?
         let policy = SecPolicyCreateBasicX509()
         var trust: SecTrust?
@@ -63,7 +63,7 @@ extension SecCertificate {
         return .success(key)
     }
     
-    var data: Data {
+    public var data: Data {
         SecCertificateCopyData(self) as Data
     }
 }

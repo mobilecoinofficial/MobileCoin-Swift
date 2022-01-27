@@ -4,11 +4,11 @@
 
 import Foundation
 
-struct SecSSLCertificates : SSLCertificates {
-    let trustRootsBytes: [Data]
-    let publicKeys: [SecKey]
+public struct SecSSLCertificates : SSLCertificates {
+    public let trustRootsBytes: [Data]
+    public let publicKeys: [SecKey]
     
-    init?(trustRootBytes bytes: [Data]) throws {
+    public init?(trustRootBytes bytes: [Data]) throws {
         switch Self.trustRoots(from: bytes) {
         case .success(let keys):
             self.publicKeys = keys
@@ -18,7 +18,7 @@ struct SecSSLCertificates : SSLCertificates {
         }
     }
 
-    static func trustRoots(from bytes: [Data]) -> Result<[SecKey], InvalidInputError> {
+    public static func trustRoots(from bytes: [Data]) -> Result<[SecKey], InvalidInputError> {
         Data.pinnedCertificateKeys(for: bytes).mapError {
             let errorMessage = "Error: \($0)"
             logger.error(errorMessage, logFunction: false)

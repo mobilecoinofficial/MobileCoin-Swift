@@ -17,7 +17,7 @@ extension SSLCertificates {
         return nil
     }
     
-    static func trustRoots() -> Result<Any, InvalidInputError> {
+    public static func trustRoots() -> Result<Any, InvalidInputError> {
         return .failure(InvalidInputError("Not implemented"))
     }
     
