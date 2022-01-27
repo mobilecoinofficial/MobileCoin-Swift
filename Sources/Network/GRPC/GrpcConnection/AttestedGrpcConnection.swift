@@ -123,11 +123,11 @@ extension AttestedGrpcConnection {
             rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
             rngContext: Any? = nil
         ) {
-            self.url = config.url
+            self.url = config.currentUrl!
             self.session = ConnectionSession(config: config)
             self.client = client
             self.attestAke = AttestAke()
-            self.responderId = config.url.responderId
+            self.responderId = config.currentUrl!.responderId
             self.attestationVerifier = AttestationVerifier(attestation: config.attestation)
             self.rng = rng
             self.rngContext = rngContext

@@ -19,7 +19,7 @@ class ConnectionSession {
     var authorizationCredentials: BasicCredentials?
 
     convenience init(config: ConnectionConfigProtocol) {
-        self.init(url: config.url, authorization: config.authorization)
+        self.init(url: config.currentUrl!, authorization: config.authorization)
     }
 
     init(url: MobileCoinUrlProtocol, authorization: BasicCredentials? = nil) {

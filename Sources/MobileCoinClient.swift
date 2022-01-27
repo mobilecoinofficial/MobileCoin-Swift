@@ -238,8 +238,8 @@ extension MobileCoinClient {
     private static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
         return """
-            Consensus url: \(config.networkConfig.consensusUrl.url)
-            Fog url: \(config.networkConfig.fogUrl.url)
+            Consensus urls: \(config.networkConfig.consensusUrls)
+            Fog urls: \(config.networkConfig.fogUrls)
             AccountKey PublicAddress: \
             \(redacting: Base58Coder.encode(accountKey.accountKey.publicAddress))
             AccountKey Fog Report url: \(fogInfo.reportUrl.url)
@@ -309,17 +309,50 @@ extension MobileCoinClient {
             fogReportAttestation: Attestation,
             transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
-            ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
-                FogUrl.make(string: fogUrl).map { fogUrl in
+            Self.make(consensusUrls: [consensusUrl],
+                      consensusAttestation: consensusAttestation,
+                      fogUrls: [fogUrl],
+                      fogViewAttestation: fogViewAttestation,
+                      fogKeyImageAttestation: fogKeyImageAttestation,
+                      fogMerkleProofAttestation: fogMerkleProofAttestation,
+                      fogReportAttestation: fogReportAttestation,
+                      transportProtocol: transportProtocol)
+        }
+
+        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
+        ///     with the appropriate schemes.
+        public static func make(
+            consensusUrls: [String],
+            consensusAttestation: Attestation,
+            fogUrls: [String],
+            fogViewAttestation: Attestation,
+            fogKeyImageAttestation: Attestation,
+            fogMerkleProofAttestation: Attestation,
+            fogReportAttestation: Attestation,
+            transportProtocol: TransportProtocol
+        ) -> Result<Config, InvalidInputError> {
+
+            guard !consensusUrls.isEmpty else {
+                return .failure(InvalidInputError("consensusUrls array cannot be empty"))
+            }
+
+            guard !fogUrls.isEmpty else {
+                return .failure(InvalidInputError("fogUrls array cannot be empty"))
+            }
+
+            return ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
+                FogUrl.make(strings: fogUrls).map { fogUrls in
+
                     let attestationConfig = NetworkConfig.AttestationConfig(
                         consensus: consensusAttestation,
                         fogView: fogViewAttestation,
                         fogKeyImage: fogKeyImageAttestation,
                         fogMerkleProof: fogMerkleProofAttestation,
                         fogReport: fogReportAttestation)
+
                     let networkConfig = NetworkConfig(
-                        consensusUrl: consensusUrl,
-                        fogUrl: fogUrl,
+                        consensusUrls: consensusUrls,
+                        fogUrls: fogUrls,
                         attestation: attestationConfig,
                         transportProtocol: transportProtocol)
                     return Config(networkConfig: networkConfig)

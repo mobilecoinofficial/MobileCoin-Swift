@@ -67,7 +67,7 @@ extension GrpcConnection {
         private let session: ConnectionSession
 
         init(config: ConnectionConfigProtocol) {
-            self.url = config.url
+            self.url = config.currentUrl!
             self.session = ConnectionSession(config: config)
         }
 

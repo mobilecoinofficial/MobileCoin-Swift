@@ -9,25 +9,25 @@ protocol AttestedConnectionConfigProtocol: ConnectionConfigProtocol {
 }
 
 struct AttestedConnectionConfig<Url: MobileCoinUrlProtocol>: AttestedConnectionConfigProtocol {
-    let urlTyped: Url
+    let urlLoadBalancer: RandomUrlLoadBalancer<Url>
     let transportProtocolOption: TransportProtocol.Option
     let attestation: Attestation
     let trustRoots: PossibleNIOSSLCertificates?
     let authorization: BasicCredentials?
 
     init(
-        url: Url,
+        urlLoadBalancer: RandomUrlLoadBalancer<Url>,
         transportProtocolOption: TransportProtocol.Option,
         attestation: Attestation,
         trustRoots: PossibleNIOSSLCertificates?,
         authorization: BasicCredentials?
     ) {
-        self.urlTyped = url
+        self.urlLoadBalancer = urlLoadBalancer
         self.transportProtocolOption = transportProtocolOption
         self.attestation = attestation
         self.trustRoots = trustRoots
         self.authorization = authorization
     }
 
-    var url: MobileCoinUrlProtocol { urlTyped }
-}
+    var currentUrl: MobileCoinUrlProtocol? { self.urlLoadBalancer.currentUrl }
+    func nextUrl() { _ = self.urlLoadBalancer.nextUrl() }}

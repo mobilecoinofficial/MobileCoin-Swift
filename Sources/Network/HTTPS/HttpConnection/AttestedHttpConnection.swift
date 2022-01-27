@@ -127,12 +127,12 @@ extension AttestedHttpConnection {
             rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
             rngContext: Any? = nil
         ) {
-            self.url = config.url
+            self.url = config.currentUrl!
             self.session = ConnectionSession(config: config)
             self.client = client
             self.requester = requester
             self.attestAke = AttestAke()
-            self.responderId = config.url.responderId
+            self.responderId = config.currentUrl!.responderId
             self.attestationVerifier = AttestationVerifier(attestation: config.attestation)
             self.rng = rng
             self.rngContext = rngContext
@@ -356,7 +356,7 @@ extension AttestedHttpConnection {
                 return .failure(.connectionError(
                                     .connectionFailure("url: \(url), status: \(callResult.status.code)")))
             }
-            
+
             if let metadata = callResult.metadata {
                 session.processResponse(headers: metadata.allHeaderFields)
             }
