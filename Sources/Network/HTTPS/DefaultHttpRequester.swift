@@ -18,8 +18,8 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
 
     static let defaultConfiguration : URLSessionConfiguration = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 30
-        config.timeoutIntervalForResource = 30
+        config.timeoutIntervalForRequest = 40
+        config.timeoutIntervalForResource = 40
         return config
     }()
     
@@ -75,6 +75,9 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
 }
 
 extension DefaultHttpRequester {
+    private typealias ChainOfTrustKeyMatch = (match: Bool, index: Int, key: SecKey)
+    private typealias ChainOfTrustKey = (index: Int, key: SecKey)
+    
     public typealias URLAuthenticationChallengeCompletion = (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
 
     func urlSession(didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping URLAuthenticationChallengeCompletion) {
@@ -89,21 +92,36 @@ extension DefaultHttpRequester {
             return
         }
 
-        /// Compare the public keys
-        let serverCertificateKey = SecTrustGetCertificateAtIndex(trust, 0)?.asPublicKey()
-        switch serverCertificateKey {
-        case .success(let key) where pinnedKeys.contains(key):
+        /// Compare pinned & server public keys
+        let matches : [ChainOfTrustKey]
+        matches = trust.publicKeyTrustChain.enumerated().map { chain -> ChainOfTrustKeyMatch in
+            let serverCertificateKey = chain.element
+            let match = pinnedKeys.contains(serverCertificateKey)
+            return (match: match, index: chain.offset, key: serverCertificateKey)
+        }.filter {
+            $0.match
+        }.map {
+            (index: $0.index, key: $0.key)
+        }
+        
+        switch matches.isNotEmpty {
+        case true:
+            let indexes = matches.map { "\($0.index)" }
+            let keys = matches.compactMap { $0.key.data }.map { "\($0.base64EncodedString() )" }
+            let message = "\nSuccess: pinned certificates matched with server's chain of trust at index(es): "
+                            + "[\(indexes.joined(separator: ", "))] "
+                            + "\nwith key(s): \(keys.joined(separator: ", \n"))"
+            logger.debug(message)
             completionHandler(.useCredential, URLCredential(trust: trust))
-        case .failure(let error):
+        case false:
             /// Failing here means that the public key of the server does not match the stored one. This can
             /// either indicate a MITM attack, or that the backend certificate and the private key changed,
             /// most likely due to expiration.
-            logger.error("Error: \(error)")
-            completionHandler(.cancelAuthenticationChallenge, nil)
-        default:
+            logger.error("Failure: no pinned certificate matched in the server's chain of trust")
             completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }
+    
 }
 
 extension DefaultHttpRequester: URLSessionDelegate {

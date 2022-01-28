@@ -130,8 +130,8 @@ struct NetworkConfig {
     
     private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
     private func validatedCertificates(_ trustRoots: [Data]) -> (grpc: PossibleCertificates, http:PossibleCertificates) {
-        let grpc = TransportProtocol.http.certificateValidator.validate(trustRoots)
-        let http = TransportProtocol.grpc.certificateValidator.validate(trustRoots)
+        let grpc = TransportProtocol.grpc.certificateValidator.validate(trustRoots)
+        let http = TransportProtocol.http.certificateValidator.validate(trustRoots)
         return (grpc, http)
     }
     

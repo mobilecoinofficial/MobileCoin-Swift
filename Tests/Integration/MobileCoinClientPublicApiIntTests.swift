@@ -441,7 +441,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
             let expect = expectation(description: "Submitting transaction")
             try consensusTrustRootWorks(transportProtocol: transportProtocol, expectation: expect)
-            waitForExpectations(timeout: 20)
+            waitForExpectations(timeout: 40)
             
             if index != (supportedProtocols.count - 1) {
                 sleep(10)
@@ -487,7 +487,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         try supportedProtocols.enumerated().forEach { (index, transportProtocol) in
             let expect = expectation(description: "Submitting transaction")
             try extraConsensusTrustRootWorks(transportProtocol: transportProtocol, expect: expect)
-            waitForExpectations(timeout: 20)
+            waitForExpectations(timeout: 40)
             
             if index != (supportedProtocols.count - 1) {
                 sleep(10)
