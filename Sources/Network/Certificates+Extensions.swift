@@ -5,11 +5,11 @@
 import Foundation
 
 extension Data {
-    public func asPinnedCertificate() -> Result<SecCertificate, InvalidInputError> {
-        Self.pinnedCertificate(for: self)
+    public func asSecCertificate() -> Result<SecCertificate, InvalidInputError> {
+        Self.secCertificate(for: self)
     }
     
-    public static func pinnedCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
+    public static func secCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
         let pinnedCertificateData = data as CFData
         if let pinnedCertificate = SecCertificateCreateWithData(nil, pinnedCertificateData) {
             return .success(pinnedCertificate)
@@ -24,7 +24,7 @@ extension Data {
     public static func pinnedCertificateKeys(for data: [Data]) -> Result<[SecKey], Error> {
         do {
             let keys = try data.map { bytes in
-                try bytes.asPinnedCertificate().get()
+                try bytes.asSecCertificate().get()
             }.compactMap { cert in
                 try SecCertificate.publicKey(for: cert).get()
             }
@@ -74,9 +74,9 @@ extension SecTrust {
     }
 
     public var certificateTrustChain : [SecCertificate] {
-        [Int](0..<certificateCount).compactMap({
+        [Int](0..<certificateCount).compactMap {
             SecTrustGetCertificateAtIndex(self, $0)
-        })
+        }
     }
     
     public var publicKeyTrustChain : [SecKey] {
