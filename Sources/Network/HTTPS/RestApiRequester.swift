@@ -46,7 +46,6 @@ extension RestApiRequester : Requester {
                 completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
             case .success(let httpResponse):
                 let statusCode = httpResponse.statusCode
-                let responseData = httpResponse.responseData
 
                 logger.info("Http Request url: \(url)")
                 logger.info("Status code: \(statusCode)")
