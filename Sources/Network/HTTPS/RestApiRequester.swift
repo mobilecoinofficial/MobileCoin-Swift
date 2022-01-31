@@ -36,7 +36,7 @@ extension RestApiRequester : Requester {
 
         do {
             request.httpBody = try call.requestPayload?.serializedData()
-        } catch let error {
+        } catch {
             completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
         }
 
@@ -45,10 +45,11 @@ extension RestApiRequester : Requester {
             case .failure(let error):
                 completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
             case .success(let httpResponse):
-                let response = httpResponse.httpUrlResponse
+                let statusCode = httpResponse.statusCode
+                let responseData = httpResponse.responseData
 
                 logger.info("Http Request url: \(url)")
-                logger.info("Status code: \(response.statusCode)")
+                logger.info("Status code: \(statusCode)")
                 
                 let responsePayload : T.ResponsePayload? = {
                     guard let data = httpResponse.responseData,
@@ -59,7 +60,7 @@ extension RestApiRequester : Requester {
                     return responsePayload
                 }()
 
-                let result = HttpCallResult(status: HTTPStatus(code: response.statusCode, message: ""), metadata: response, response: responsePayload)
+                let result = HttpCallResult(status: HTTPStatus(code: statusCode, message: ""), allHeaderFields: httpResponse.allHeaderFields, response: responsePayload)
                 completion(result)
             }
         }
