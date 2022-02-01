@@ -7,7 +7,7 @@ import Foundation
 
 public struct HttpCallResult<ResponsePayload> {
     let status: HTTPStatus
-    let metadata: HTTPURLResponse?
+    let allHeaderFields: [AnyHashable: Any]?
     let response: ResponsePayload?
 }
 
@@ -15,7 +15,7 @@ extension HttpCallResult {
     init(
         status: HTTPStatus
     ) {
-        self.init(status: status, metadata: nil, response: nil)
+        self.init(status: status, allHeaderFields: nil, response: nil)
     }
 }
 

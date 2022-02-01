@@ -69,8 +69,8 @@ extension ArbitraryHttpConnection {
                 return .failure(.connectionFailure(String(describing: callResult.status)))
             }
 
-            if let metadata = callResult.metadata {
-                session.processResponse(headers: metadata.allHeaderFields)
+            if let headerFields = callResult.allHeaderFields {
+                session.processResponse(headers: headerFields)
             }
 
             return .success(response)

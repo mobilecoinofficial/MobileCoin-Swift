@@ -343,46 +343,6 @@ extension NetworkPreset {
 
 }
 
-final class TestHttpRequester: HttpRequester {
-    let configuration : URLSessionConfiguration = {
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 30
-        config.timeoutIntervalForResource = 30
-        return config
-    }()
-    
-    func request(
-        url: URL,
-        method: HTTPMethod,
-        headers: [String: String]?,
-        body: Data?,
-        completion: @escaping (Result<HTTPResponse, Error>) -> Void
-    ) {
-        var request = URLRequest(url: url.absoluteURL)
-        request.httpMethod = method.rawValue
-        headers?.forEach({ key, value in
-            request.setValue(value, forHTTPHeaderField: key)
-        })
-
-        request.httpBody = body
-
-        let session = URLSession(configuration: configuration)
-        let task = session.dataTask(with: request) {data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            guard let response = response as? HTTPURLResponse else {
-                completion(.failure(ConnectionError.invalidServerResponse("No Response")))
-                return
-            }
-            let httpResponse = HTTPResponse(httpUrlResponse: response, responseData: data)
-            completion(.success(httpResponse))
-        }
-        task.resume()
-    }
-}
-
 extension NetworkPreset {
 
     func networkConfig(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> NetworkConfig {
@@ -392,7 +352,7 @@ extension NetworkPreset {
             fogUrl: fogUrl,
             attestation: attestationConfig,
             transportProtocol: transportProtocol).get()
-        networkConfig.httpRequester = TestHttpRequester()
+        networkConfig.httpRequester = DefaultHttpRequester()
         try networkConfig.setConsensusTrustRoots(Self.trustRootsBytes())
         try networkConfig.setFogTrustRoots(Self.trustRootsBytes())
         networkConfig.consensusAuthorization = consensusCredentials

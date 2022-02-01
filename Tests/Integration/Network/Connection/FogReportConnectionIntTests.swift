@@ -60,7 +60,7 @@ class FogReportConnectionIntTests: XCTestCase {
 extension FogReportConnectionIntTests {
     func createShortURLFogReportConnection(transportProtocol: TransportProtocol) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportShortUrl).get()
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: TestHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogReportConnection(
             httpFactory: httpFactory,
@@ -72,7 +72,7 @@ extension FogReportConnectionIntTests {
 
     func createFogReportConnection(transportProtocol: TransportProtocol) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: TestHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogReportConnection(
             httpFactory: httpFactory,

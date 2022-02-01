@@ -111,7 +111,7 @@ extension IntegrationTestFixtures {
         transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
         var mutableConfig = config
-        mutableConfig.httpRequester = TestHttpRequester()
+        mutableConfig.httpRequester = DefaultHttpRequester()
         let client = try MobileCoinClient.make(accountKey: accountKey, config: mutableConfig).get()
         if let consensusCredentials = network.consensusCredentials {
             client.setConsensusBasicAuthorization(
@@ -160,7 +160,7 @@ extension IntegrationTestFixtures {
 
     static func createServiceProvider(transportProtocol: TransportProtocol) throws -> ServiceProvider {
         let networkConfig = try createNetworkConfig(transportProtocol: transportProtocol)
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main, grpcConnectionFactory: grpcFactory, httpConnectionFactory: httpFactory)
     }
