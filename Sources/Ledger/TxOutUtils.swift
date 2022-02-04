@@ -101,6 +101,35 @@ enum TxOutUtils {
         }
     }
 
+    static func calculateCrc32(
+        from commitment: Data32
+    ) -> UInt32? {
+        return commitment.asMcBuffer { commitmentPtr in
+            var crc32: UInt32 = 0
+            // Safety: mc_tx_out_matches_any_subaddress is infallible when preconditions are
+            // upheld.
+            switch withMcError({ errorPtr in
+                mc_tx_out_commitment_crc32(
+                    commitmentPtr,
+                    &crc32,
+                    &errorPtr)
+            }) {
+            case .success:
+                return crc32
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_commitment_crc32 are supplied incorrectly.
+                    logger.fatalError("error: \(redacting: error)")
+                default:
+                    // Safety: mc_tx_out_get_value should not throw non-documented errors.
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+                }
+            }
+        }
+    }
+
     static func subaddressSpentPublicKey(
         targetKey: RistrettoPublic,
         publicKey: RistrettoPublic,
@@ -139,7 +168,7 @@ enum TxOutUtils {
             }
         }
     }
-
+    
     /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
     static func value(
