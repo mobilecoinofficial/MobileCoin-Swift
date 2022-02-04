@@ -65,8 +65,14 @@ extension ArbitraryHttpConnection {
         func processResponse<Response>(callResult: HttpCallResult<Response>)
             -> Result<Response, ConnectionError>
         {
-            guard callResult.status.isOk, let response = callResult.response else {
-                return .failure(.connectionFailure(String(describing: callResult.status)))
+            guard let status = callResult.status else {
+                return .failure(.connectionFailure(
+                    ["Invalid parameters, request not made.",
+                     callResult.error?.localizedDescription].compactMap({$0}).joined(separator: " ")))
+            }
+            
+            guard status.isOk, let response = callResult.response else {
+                return .failure(.connectionFailure(String(describing: status)))
             }
 
             if let headerFields = callResult.allHeaderFields {

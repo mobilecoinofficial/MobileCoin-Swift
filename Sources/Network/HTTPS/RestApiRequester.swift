@@ -26,7 +26,9 @@ extension RestApiRequester : Requester {
     
     public func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void) {
         guard let url = completeURL(path: call.path) else {
-            completion(HttpCallResult(status: HTTPStatus(code: 1, message: "could not construct URL")))
+            let message = "Could not construct URL"
+            logger.assertionFailure(message)
+            completion(HttpCallResult(error: InvalidInputError(message)))
             return
         }
 
@@ -37,16 +39,18 @@ extension RestApiRequester : Requester {
         do {
             request.httpBody = try call.requestPayload?.serializedData()
         } catch {
-            completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
+            logger.assertionFailure(error.localizedDescription)
+            completion(HttpCallResult(error: error))
+            return
         }
 
         requester.request(url: url, method: call.method, headers: request.allHTTPHeaderFields, body: request.httpBody) { result in
             switch result {
             case .failure(let error):
-                completion(HttpCallResult(status: HTTPStatus(code: 1, message: error.localizedDescription)))
+                logger.error(error.localizedDescription)
+                completion(HttpCallResult(error: error))
             case .success(let httpResponse):
                 let statusCode = httpResponse.statusCode
-
                 logger.info("Http Request url: \(url)")
                 logger.info("Status code: \(statusCode)")
                 
