@@ -67,8 +67,10 @@ extension ArbitraryHttpConnection {
         {
             guard let status = callResult.status else {
                 return .failure(.connectionFailure(
-                    ["Invalid parameters, request not made.",
-                     callResult.error?.localizedDescription].compactMap({$0}).joined(separator: " ")))
+                            ["Invalid parameters, request not made.",
+                             callResult.error?.localizedDescription,]
+                                .compactMap({$0})
+                                .joined(separator: " ")))
             }
             
             guard status.isOk, let response = callResult.response else {
