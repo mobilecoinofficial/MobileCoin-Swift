@@ -438,3 +438,36 @@ extension Transaction.Fixtures.Default {
     fileprivate static let tombstoneBlockIndex: UInt64 = 634
 
 }
+
+extension Transaction.Fixtures {
+    struct Commitment {
+        let txOutRecord: FogView_TxOutRecord
+        let viewKey: RistrettoPrivate
+        let crc32: UInt32
+
+        init() throws {
+            self.txOutRecord = try Transaction.Fixtures.Commitment.txOutRecord()
+            self.viewKey = try Transaction.Fixtures.Commitment.viewKey()
+            self.crc32 = Transaction.Fixtures.Commitment.crc32
+        }
+    }
+}
+
+extension Transaction.Fixtures.Commitment {
+    fileprivate static func txOutRecord() throws -> FogView_TxOutRecord {
+        try FogView_TxOutRecord.init(serializedData:
+                Data(base64Encoded: """
+                    CiC8HYxDXAB0BpSatEBt/RcAdja827WrGfSC98r440a3XREaIvW6wgVWCxogZibWmZBUztVVwmEVEoOH\
+                    wHc3ydGNf/SoJ1neF74DbzMiII4hgWxY3bCY62xi29I73rLWbWJiSIYM+1JzMAhDFud6KTlhBwAAAAAA\
+                    MYZ2AgAAAAAAOaEeH2EAAAAA
+                    """)!)
+    }
+    
+    fileprivate static func viewKey() throws -> RistrettoPrivate {
+        try RistrettoPrivate.init(
+                Data(base64Encoded: "gW54IsiCGiBKupPtPRQnoCZNqEz1jmS6IF2gazK50ws=")!)!
+    }
+    
+    fileprivate static var crc32: UInt32 = 2481745913
+    
+}

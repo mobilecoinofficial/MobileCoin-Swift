@@ -86,13 +86,11 @@ enum TxOutUtils {
                         // Safety: This condition indicates a programming error and can only
                         // happen if arguments to mc_tx_out_get_subaddress_spend_public_key are
                         // supplied incorrectly.
-                        // FIXME
                         logger.warning("error: \(redacting: error)")
                         return nil
                     default:
                         // Safety: mc_fog_resolver_add_report_response should not throw
                         // non-documented errors.
-                        // FIXME
                         logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                         return nil
                     }
@@ -106,7 +104,7 @@ enum TxOutUtils {
     ) -> UInt32? {
         return commitment.asMcBuffer { commitmentPtr in
             var crc32: UInt32 = 0
-            // Safety: mc_tx_out_matches_any_subaddress is infallible when preconditions are
+            // Safety: mc_tx_out_commitment_crc32 is infallible when preconditions are
             // upheld.
             switch withMcError({ errorPtr in
                 mc_tx_out_commitment_crc32(
@@ -123,7 +121,7 @@ enum TxOutUtils {
                     // happen if arguments to mc_tx_out_commitment_crc32 are supplied incorrectly.
                     logger.fatalError("error: \(redacting: error)")
                 default:
-                    // Safety: mc_tx_out_get_value should not throw non-documented errors.
+                    // Safety: mc_tx_out_commitment_crc32 should not throw non-documented errors.
                     logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
                 }
             }

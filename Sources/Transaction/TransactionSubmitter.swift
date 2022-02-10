@@ -52,7 +52,7 @@ struct TransactionSubmitter {
              .unsortedRingElements, .unequalRingSizes, .unsortedKeyImages,
              .duplicateKeyImages, .duplicateOutputPublicKey, .missingTxOutMembershipProof,
              .invalidTxOutMembershipProof, .invalidRistrettoPublicKey,
-             .tombstoneBlockExceeded, .invalidLedgerContext,
+             .tombstoneBlockExceeded, .invalidLedgerContext, .memosNotAllowed,
              .membershipProofValidationError, .keyError, .unsortedInputs:
             return .failure(.invalidTransaction())
         case .txFeeError:

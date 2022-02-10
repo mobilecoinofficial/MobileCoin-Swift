@@ -47,7 +47,7 @@ extension PartialTxOut {
                                                     maskedValue: txOutRecord.txOutAmountMaskedValue,
                                                     publicKey: publicKey,
                                                     viewPrivateKey: viewKey),
-              Self.isCrc32Matching(reconstructed: commitment, txOutRecord: txOutRecord)
+              Self.isCrc32Matching(commitment, txOutRecord: txOutRecord)
         else {
             return nil
         }
@@ -58,15 +58,15 @@ extension PartialTxOut {
             targetKey: targetKey,
             publicKey: publicKey)
     }
-    
-    private static func isCrc32Matching(reconstructed: Data32, txOutRecord: FogView_TxOutRecord) -> Bool {
+
+    static func isCrc32Matching(_ reconstructed: Data32, txOutRecord: FogView_TxOutRecord) -> Bool {
         let sentCommitment = txOutRecord.txOutAmountCommitmentData
         let sentCrc32 = txOutRecord.txOutAmountCommitmentDataCrc32
         let sentCommitmentCrc32: UInt32 = {
             guard let sentCommitment32 = Data32(sentCommitment) else { return nil }
             return TxOutUtils.calculateCrc32(from: sentCommitment32)
         }() ?? .emptyCrc32
-        
+
         let reconstructedCrc32 = TxOutUtils.calculateCrc32(from: reconstructed)
         
         return reconstructedCrc32 == sentCrc32 || reconstructedCrc32 == sentCommitmentCrc32
