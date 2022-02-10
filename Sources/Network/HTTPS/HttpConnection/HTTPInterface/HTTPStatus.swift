@@ -5,7 +5,7 @@
 import Foundation
 
 /// Encapsulates the result of a HTTP call.
-public struct HTTPStatus : Error {
+public struct HTTPStatus {
     
     /// The REST status code
     public var code: Int
@@ -28,15 +28,13 @@ public struct HTTPStatus : Error {
     public static let processingError: HTTPStatus = .init(code: 500, message: "Error")
 }
 
-extension HTTPStatus : CustomStringConvertible {
+extension HTTPStatus: CustomStringConvertible {
     public var description: String {
-        codeDescription + (message ?? "")
+        codeDescription + (["", message].compactMap({ $0 }).joined(separator: " "))
     }
     
     private var codeDescription: String {
         switch code {
-        case 1:
-            return "Unknown Error: "
         case 200:
             return "Success: "
         case 400:
@@ -52,7 +50,7 @@ extension HTTPStatus : CustomStringConvertible {
         case 503:
             return "Unavailable: "
         default:
-            return ""
+            return "Unknown Error: "
         }
     }
 }

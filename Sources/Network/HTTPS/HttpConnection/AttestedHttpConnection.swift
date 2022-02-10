@@ -342,19 +342,28 @@ extension AttestedHttpConnection {
         private func processResponse<Response>(callResult: HttpCallResult<Response>)
             -> Result<Response, AttestedHttpConnectionError>
         {
-            // Basic credential authorization failure
-            guard callResult.status.isOk else {
-                return .failure(.connectionError(.authorizationFailure("url: \(url)")))
+            guard let status = callResult.status else {
+                return .failure(.connectionError(
+                                    .connectionFailure(
+                                    ["Invalid parameters, request not made.",
+                                     callResult.error?.localizedDescription,]
+                                        .compactMap({$0})
+                                        .joined(separator: " "))))
             }
-
+            
             // Attestation failure, reattest
-            guard callResult.status.code != 403 else {
+            guard status.code != 403 else {
                 return .failure(.attestationFailure())
             }
 
-            guard callResult.status.code == 200, let response = callResult.response else {
+            // Basic credential authorization failure
+            guard status.isOk else {
+                return .failure(.connectionError(.authorizationFailure("url: \(url)")))
+            }
+
+            guard status.code == 200, let response = callResult.response else {
                 return .failure(.connectionError(
-                                    .connectionFailure("url: \(url), status: \(callResult.status.code)")))
+                                    .connectionFailure("url: \(url), status: \(status.code)")))
             }
             
             if let headerFields = callResult.allHeaderFields {
