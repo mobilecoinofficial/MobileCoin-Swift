@@ -77,19 +77,19 @@ enum TxOutUtils {
                 }) {
                 case .success(let bytes):
                     // Safety: It's safe to skip validation because
-                    // mc_tx_out_get_subaddress_spend_public_key should always return a valid
+                    // mc_tx_out_reconstruct_commitment should always return a valid
                     // RistrettoPublic on success.
                     return bytes as Data32
                 case .failure(let error):
                     switch error.errorCode {
                     case .invalidInput:
                         // Safety: This condition indicates a programming error and can only
-                        // happen if arguments to mc_tx_out_get_subaddress_spend_public_key are
+                        // happen if arguments to mc_tx_out_reconstruct_commitment are
                         // supplied incorrectly.
                         logger.warning("error: \(redacting: error)")
                         return nil
                     default:
-                        // Safety: mc_fog_resolver_add_report_response should not throw
+                        // Safety: mc_tx_out_reconstruct_commitment should not throw
                         // non-documented errors.
                         logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                         return nil
