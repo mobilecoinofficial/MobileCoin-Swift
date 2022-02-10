@@ -104,8 +104,6 @@ enum TxOutUtils {
     ) -> UInt32? {
         return commitment.asMcBuffer { commitmentPtr in
             var crc32: UInt32 = 0
-            // Safety: mc_tx_out_commitment_crc32 is infallible when preconditions are
-            // upheld.
             switch withMcError({ errorPtr in
                 mc_tx_out_commitment_crc32(
                     commitmentPtr,
