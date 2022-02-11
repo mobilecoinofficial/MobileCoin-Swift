@@ -7,20 +7,20 @@ import Foundation
 protocol ConnectionConfigProtocol {
     var currentUrl: MobileCoinUrlProtocol? { get }
     var transportProtocolOption: TransportProtocol.Option { get }
-    var trustRoots: PossibleNIOSSLCertificates? { get }
+    var trustRoots: [TransportProtocol:SSLCertificates] { get }
     var authorization: BasicCredentials? { get }
 }
 
 struct ConnectionConfig<Url: MobileCoinUrlProtocol>: ConnectionConfigProtocol {
     let urlLoadBalancer: RandomUrlLoadBalancer<Url>
     let transportProtocolOption: TransportProtocol.Option
-    let trustRoots: PossibleNIOSSLCertificates?
+    let trustRoots: [TransportProtocol:SSLCertificates]
     let authorization: BasicCredentials?
 
     init(
         urlLoadBalancer: RandomUrlLoadBalancer<Url>,
         transportProtocolOption: TransportProtocol.Option,
-        trustRoots: PossibleNIOSSLCertificates?,
+        trustRoots: [TransportProtocol:SSLCertificates],
         authorization: BasicCredentials?
     ) {
         self.urlLoadBalancer = urlLoadBalancer

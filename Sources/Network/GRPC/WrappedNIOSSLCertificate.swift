@@ -5,7 +5,7 @@
 import Foundation
 import NIOSSL
 
-struct WrappedNIOSSLCertificate : PossibleNIOSSLCertificates {
+struct WrappedNIOSSLCertificate : SSLCertificates {
     let trustRootsBytes: [Data]
     
     var trustRoots: [NIOSSLCertificate] = []

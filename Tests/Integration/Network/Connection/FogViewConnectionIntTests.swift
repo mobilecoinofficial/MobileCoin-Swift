@@ -295,7 +295,7 @@ extension FogViewConnectionIntTests {
     }
 
     func createFogViewConnection(networkConfig: NetworkConfig) -> FogViewConnection {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogViewConnection(
             httpFactory: httpFactory,

@@ -71,7 +71,7 @@ extension FogUntrustedTxOutConnectionIntTests {
     func createFogUntrustedTxOutConnection(networkConfig: NetworkConfig)
         -> FogUntrustedTxOutConnection
     {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogUntrustedTxOutConnection(
             httpFactory: httpFactory,

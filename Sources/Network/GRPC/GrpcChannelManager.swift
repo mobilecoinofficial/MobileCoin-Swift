@@ -12,7 +12,7 @@ final class GrpcChannelManager {
     private var addressToChannel: [GrpcChannelConfig: GRPCChannel] = [:]
 
     func channel(for config: ConnectionConfigProtocol) -> GRPCChannel {
-        let wrappedTrustRoots = config.trustRoots as? WrappedNIOSSLCertificate
+        let wrappedTrustRoots = config.trustRoots[.grpc] as? WrappedNIOSSLCertificate
         return channel(for: config.currentUrl!, trustRoots: wrappedTrustRoots?.trustRoots)
     }
 

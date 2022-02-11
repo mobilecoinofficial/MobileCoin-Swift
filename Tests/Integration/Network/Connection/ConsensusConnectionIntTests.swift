@@ -198,7 +198,7 @@ extension ConsensusConnectionIntTests {
     }
 
     func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? TestHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return ConsensusConnection(
             httpFactory: httpFactory,

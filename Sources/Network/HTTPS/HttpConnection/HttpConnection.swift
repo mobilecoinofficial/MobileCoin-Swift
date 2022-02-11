@@ -81,16 +81,23 @@ extension HttpConnection {
         func processResponse<Response>(callResult: HttpCallResult<Response>)
             -> Result<Response, ConnectionError>
         {
-            guard [403, 401].contains(callResult.status.code) == false else {
+            
+            guard let status = callResult.status else {
+                return .failure(.connectionFailure(
+                    ["Invalid parameters, request not made.",
+                     callResult.error?.localizedDescription].compactMap({$0}).joined(separator: " ")))
+            }
+            
+            guard [403, 401].contains(status.code) == false else {
                 return .failure(.authorizationFailure("url: \(url)"))
             }
 
-            guard callResult.status.isOk, let response = callResult.response else {
-                return .failure(.connectionFailure("url: \(url), status: \(callResult.status)"))
+            guard status.isOk, let response = callResult.response else {
+                return .failure(.connectionFailure("url: \(url), status: \(status)"))
             }
 
-            if let metadata = callResult.metadata {
-                session.processResponse(headers: metadata.allHeaderFields)
+            if let headerFields = callResult.allHeaderFields {
+                session.processResponse(headers: headerFields)
             }
 
             return .success(response)

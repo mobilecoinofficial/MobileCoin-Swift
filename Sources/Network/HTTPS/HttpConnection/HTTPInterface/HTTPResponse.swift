@@ -5,14 +5,24 @@
 import Foundation
 
 public struct HTTPResponse {
-    public let httpUrlResponse: HTTPURLResponse
-    public let responseData: Data?
-
-    public var statusCode: Int {
-        httpUrlResponse.statusCode
+    let statusCode: Int
+    let url: URL?
+    let allHeaderFields: [AnyHashable: Any]
+    let responseData: Data?
+    
+    public init(statusCode: Int, url: URL?, allHeaderFields: [AnyHashable: Any], responseData: Data?) {
+        self.statusCode = statusCode
+        self.url = url
+        self.allHeaderFields = allHeaderFields
+        self.responseData = responseData
     }
+}
 
-    public var allHeaderFields: [AnyHashable: Any] {
-        httpUrlResponse.allHeaderFields
+extension HTTPResponse {
+    public init(httpUrlResponse: HTTPURLResponse, responseData: Data?) {
+        self.statusCode = httpUrlResponse.statusCode
+        self.url = httpUrlResponse.url
+        self.allHeaderFields = httpUrlResponse.allHeaderFields
+        self.responseData = responseData
     }
 }

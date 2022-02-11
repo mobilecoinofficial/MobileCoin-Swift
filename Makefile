@@ -24,6 +24,18 @@ test:
 	@$(MAKE) --directory=Example test
 	@$(MAKE) --directory=ExampleHTTP test
 
+.PHONY: lock
+lock:
+	$(info making locks with setup & boostrap)
+	$(info Example setup)
+	@$(MAKE) --directory=Example setup
+	$(info ExampleHTTP setup)
+	@$(MAKE) --directory=ExampleHTTP setup
+	$(info Example bootstrap)
+	@$(MAKE) --directory=Example bootstrap
+	$(info ExampleHTTP bootstrap)
+	@$(MAKE) --directory=ExampleHTTP bootstrap
+
 .PHONY: clean
 clean: clean-docs
 	@$(MAKE) --directory=Example clean

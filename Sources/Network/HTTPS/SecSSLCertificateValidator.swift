@@ -4,8 +4,8 @@
 
 import Foundation
 
-class WrappedNIOSSLCertificateValidator : SSLCertificateValidator {
+class SecSSLCertificateValidator : SSLCertificateValidator {
     func validate(_ possibleCertificateData: [Data]) -> Result<SSLCertificates, InvalidInputError> {
-        return .failure(InvalidInputError("NIOSSLCertificates not supported with HTTP only target"))
+        SecSSLCertificates.make(trustRootBytes: possibleCertificateData)
     }
 }
