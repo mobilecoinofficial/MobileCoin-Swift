@@ -23,7 +23,7 @@ class RandomUrlLoadBalancer<Url: MobileCoinUrlProtocol> {
     }
     
     func nextUrl() -> Url? {
-        currentUrl =  try? urlsTyped.randomElement(using:&rng)
+        currentUrl =  urlsTyped.randomElement(using:&rng)
         return currentUrl
     }
 }
