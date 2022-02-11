@@ -332,30 +332,26 @@ extension MobileCoinClient {
             transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
 
-            guard !consensusUrls.isEmpty else {
-                return .failure(InvalidInputError("consensusUrls array cannot be empty"))
-            }
+            ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
+                RandomUrlLoadBalancer.make(urls: consensusUrls).map { consensusUrlLoadBalancer in
+                    FogUrl.make(strings: fogUrls).map { fogUrls in
+                        RandomUrlLoadBalancer.make(urls: fogUrls).map { fogUrlLoadBalancer in
 
-            guard !fogUrls.isEmpty else {
-                return .failure(InvalidInputError("fogUrls array cannot be empty"))
-            }
+                            let attestationConfig = NetworkConfig.AttestationConfig(
+                                consensus: consensusAttestation,
+                                fogView: fogViewAttestation,
+                                fogKeyImage: fogKeyImageAttestation,
+                                fogMerkleProof: fogMerkleProofAttestation,
+                                fogReport: fogReportAttestation)
 
-            return ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
-                FogUrl.make(strings: fogUrls).map { fogUrls in
-
-                    let attestationConfig = NetworkConfig.AttestationConfig(
-                        consensus: consensusAttestation,
-                        fogView: fogViewAttestation,
-                        fogKeyImage: fogKeyImageAttestation,
-                        fogMerkleProof: fogMerkleProofAttestation,
-                        fogReport: fogReportAttestation)
-
-                    let networkConfig = NetworkConfig(
-                        consensusUrls: consensusUrls,
-                        fogUrls: fogUrls,
-                        attestation: attestationConfig,
-                        transportProtocol: transportProtocol)
-                    return Config(networkConfig: networkConfig)
+                            let networkConfig = NetworkConfig(
+                                consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                                fogUrlLoadBalancer: fogUrlLoadBalancer,
+                                attestation: attestationConfig,
+                                transportProtocol: transportProtocol)
+                            return Config(networkConfig: networkConfig)
+                        }
+                    }
                 }
             }
         }

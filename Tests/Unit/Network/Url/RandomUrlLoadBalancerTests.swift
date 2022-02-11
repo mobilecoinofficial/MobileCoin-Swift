@@ -8,7 +8,7 @@ import XCTest
 class RandomUrlLoadBalancerTests: XCTestCase {
 
     func testSingleUrlReturnsThatUrl() {
-        let urlString = "http://www.mobilecoin.com"
+        let urlString = "mc://example.com"
 
         _ = ConsensusUrl.make(string: urlString).flatMap { consensusUrl in
             let loadBalancer = try? RandomUrlLoadBalancer(urls: [consensusUrl])
@@ -17,8 +17,8 @@ class RandomUrlLoadBalancerTests: XCTestCase {
     }
 
     func testMultipleUrlsReturnsDifferentUrlOnSecondCall() {
-        let urlA = "http://www.mobilecoin.com/A"
-        let urlB = "http://www.mobilecoin.com/B"
+        let urlA = "mc://example1.com"
+        let urlB = "mc://example2.com"
 
         _ = ConsensusUrl.make(strings: [urlA, urlB]).flatMap { consensusUrls in
             let loadBalancer = try? RandomUrlLoadBalancer(urls:consensusUrls)

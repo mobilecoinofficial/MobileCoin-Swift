@@ -1,29 +1,30 @@
 //
-//  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
+//  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-//protocol UrlLoadBalancer {
-//    associatedtype AnyScheme: Scheme
-//    func getNextUrl() -> MobileCoinUrl<AnyScheme>
-//}
 
+class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> {
 
-class RandomUrlLoadBalancer<Url: MobileCoinUrlProtocol> {
-    var rng = SystemRandomNumberGenerator()
-
-    let urlsTyped: [Url]
-    private(set) var currentUrl: Url?
-    
-    init(urls: [Url]) throws {
-        guard !urls.isEmpty else {
-            throw InvalidInputError("urls array must not be empty")
+    static func make(urls: [ServiceUrl]) -> Result<RandomUrlLoadBalancer, InvalidInputError> {
+        guard urls.isNotEmpty else {
+            return .failure(InvalidInputError("url list cannot be empty"))
         }
+        return .success(RandomUrlLoadBalancer.init(urls:urls))
+    }
+
+    var rng = SystemRandomNumberGenerator()
+    let urlsTyped: [ServiceUrl]
+
+    private init(urls: [ServiceUrl]) {
         self.urlsTyped = urls
-        _ = nextUrl()
     }
     
-    func nextUrl() -> Url? {
-        currentUrl =  urlsTyped.randomElement(using:&rng)
-        return currentUrl
+    func nextUrl() -> ServiceUrl {
+        guard let nextUrl = urlsTyped.randomElement(using:&rng) else {
+            // This condition should never happen
+            logger.fatalError(
+                "unable to get nextUrl() from RandomUrlLoadBalancer")
+        }
+        return nextUrl
     }
 }
