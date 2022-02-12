@@ -65,8 +65,8 @@ extension HttpConnection {
         private let session: ConnectionSession
 
         init(config: ConnectionConfigProtocol) {
-            self.url = config.currentUrl!
-            self.session = ConnectionSession(config: config)
+            self.url = config.nextUrl()
+            self.session = ConnectionSession(url: self.url, authorization: config.authorization)
         }
 
         func setAuthorization(credentials: BasicCredentials) {

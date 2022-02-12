@@ -28,6 +28,8 @@ struct AttestedConnectionConfig<Url: MobileCoinUrlProtocol>: AttestedConnectionC
         self.trustRoots = trustRoots
         self.authorization = authorization
     }
-
-    func nextUrl() { _ = self.urlLoadBalancer.nextUrl() }
+    
+    func nextUrl() -> MobileCoinUrlProtocol {
+        self.urlLoadBalancer.nextUrl()
+    }
 }

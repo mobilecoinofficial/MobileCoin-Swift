@@ -128,7 +128,7 @@ extension AttestedHttpConnection {
             rngContext: Any? = nil
         ) {
             self.url = config.nextUrl()
-            self.session = ConnectionSession(config: config)
+            self.session = ConnectionSession(url: self.url, authorization: config.authorization)
             self.client = client
             self.requester = requester
             self.attestAke = AttestAke()
