@@ -29,5 +29,5 @@ struct AttestedConnectionConfig<Url: MobileCoinUrlProtocol>: AttestedConnectionC
         self.authorization = authorization
     }
 
-    var currentUrl: MobileCoinUrlProtocol? { self.urlLoadBalancer.currentUrl }
-    func nextUrl() { _ = self.urlLoadBalancer.nextUrl() }}
+    func nextUrl() { _ = self.urlLoadBalancer.nextUrl() }
+}

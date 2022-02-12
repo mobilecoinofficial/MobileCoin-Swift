@@ -5,10 +5,10 @@
 import Foundation
 
 protocol ConnectionConfigProtocol {
-    var currentUrl: MobileCoinUrlProtocol? { get }
     var transportProtocolOption: TransportProtocol.Option { get }
     var trustRoots: [TransportProtocol:SSLCertificates] { get }
     var authorization: BasicCredentials? { get }
+    func nextUrl() -> MobileCoinUrlProtocol
 }
 
 struct ConnectionConfig<Url: MobileCoinUrlProtocol>: ConnectionConfigProtocol {
@@ -29,6 +29,7 @@ struct ConnectionConfig<Url: MobileCoinUrlProtocol>: ConnectionConfigProtocol {
         self.authorization = authorization
     }
 
-    var currentUrl: MobileCoinUrlProtocol? { self.urlLoadBalancer.currentUrl }
-    func nextUrl() { _ = self.urlLoadBalancer.nextUrl() }
+    func nextUrl() -> MobileCoinUrlProtocol {
+        self.urlLoadBalancer.nextUrl()
+    }
 }

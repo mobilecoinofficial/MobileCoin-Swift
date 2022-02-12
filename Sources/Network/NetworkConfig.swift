@@ -5,27 +5,15 @@
 import Foundation
 
 struct NetworkConfig {
-    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol)
+    static func make(consensusUrlLoadBalancer: consensusUrlLoadBalancer, fogUrlLoadBalancer: fogUrlLoadBalancer, attestation: AttestationConfig, transportProtocol: TransportProtocol)
         -> Result<NetworkConfig, InvalidInputError>
     {
-        ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
-            FogUrl.make(string: fogUrl).map { fogUrl in
-                NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation, transportProtocol: transportProtocol)
-            }
-        }
-    }
-
-    static func make(consensusUrls: [String], fogUrls: [String], attestation: AttestationConfig, transportProtocol: TransportProtocol)
-        -> Result<NetworkConfig, InvalidInputError>
-    {
-        ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
-            FogUrl.make(strings: fogUrls).map { fogUrls in
-                NetworkConfig(consensusUrls: consensusUrls, fogUrls: fogUrls, attestation: attestation, transportProtocol: transportProtocol)
-            }
-        }
+        NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation, transportProtocol: transportProtocol)
     }
 
     private let attestation: AttestationConfig
+    private let consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>
+    private let fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>
 
     var transportProtocol: TransportProtocol
 
@@ -42,19 +30,11 @@ struct NetworkConfig {
         }
     }
 
-    let fogUrls: [FogUrl]
-    let consensusUrls: [ConsensusUrl]
-
-    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
-        self.init(consensusUrls:[consensusUrl], fogUrls:[fogUrl], attestation: attestation, transportProtocol: transportProtocol)
-    }
-
-    init(consensusUrls: [ConsensusUrl], fogUrls: [FogUrl], attestation: AttestationConfig, transportProtocol: TransportProtocol) {
-
-        self.fogUrls = fogUrls
-        self.consensusUrls = consensusUrls
+    init(consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
+        self.consensusUrlLoadBalancer = consensusUrlLoadBalancer
+        self.fogUrlLoadBalancer = fogUrlLoadBalancer
     }
 
     var consensus: AttestedConnectionConfig<ConsensusUrl> {
