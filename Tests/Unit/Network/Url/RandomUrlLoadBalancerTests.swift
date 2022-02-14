@@ -11,8 +11,9 @@ class RandomUrlLoadBalancerTests: XCTestCase {
         let urlString = "mc://example.com"
 
         _ = ConsensusUrl.make(string: urlString).flatMap { consensusUrl in
-            let loadBalancer = try? RandomUrlLoadBalancer(urls: [consensusUrl])
-            XCTAssertEqual(loadBalancer?.nextUrl(), consensusUrl)
+            RandomUrlLoadBalancer.make(urls: [consensusUrl]).flatMap { loadBalancer in
+                XCTAssertEqual(loadBalancer.nextUrl(), consensusUrl)
+            }
         }
     }
 
@@ -21,10 +22,11 @@ class RandomUrlLoadBalancerTests: XCTestCase {
         let urlB = "mc://example2.com"
 
         _ = ConsensusUrl.make(strings: [urlA, urlB]).flatMap { consensusUrls in
-            let loadBalancer = try? RandomUrlLoadBalancer(urls:consensusUrls)
-            let nextA = loadBalancer?.nextUrl()
-            let nextB = loadBalancer?.nextUrl()
-            XCTAssertNotEqual(nextA, nextB)
+            RandomUrlLoadBalancer.make(urls: consensusUrls).flatMap { loadBalancer in
+                let nextA = loadBalancer.nextUrl()
+                let nextB = loadBalancer.nextUrl()
+                XCTAssertNotEqual(nextA, nextB)
+            }
         }
     }
 
