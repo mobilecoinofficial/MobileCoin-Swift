@@ -48,7 +48,7 @@ final class BlockchainFeeFetcher {
         blockchainService.getLastBlockInfo {
             switch $0 {
             case .success(let response):
-                let responseFee = response.mobMinimumFee
+                let responseFee = response.minimumFee
                 let minimumFee = responseFee != 0 ? responseFee : McConstants.DEFAULT_MINIMUM_FEE
                 self.cacheMinimumFee(minimumFee) {
                     completion(.success(minimumFee))

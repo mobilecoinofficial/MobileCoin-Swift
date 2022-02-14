@@ -8,6 +8,7 @@ protocol ConnectionConfigProtocol {
     var transportProtocolOption: TransportProtocol.Option { get }
     var trustRoots: [TransportProtocol:SSLCertificates] { get }
     var authorization: BasicCredentials? { get }
+    var currentUrl: MobileCoinUrlProtocol { get }
     func nextUrl() -> MobileCoinUrlProtocol
 }
 
@@ -31,5 +32,9 @@ struct ConnectionConfig<Url: MobileCoinUrlProtocol>: ConnectionConfigProtocol {
 
     func nextUrl() -> MobileCoinUrlProtocol {
         self.urlLoadBalancer.nextUrl()
+    }
+    
+    var currentUrl: MobileCoinUrlProtocol {
+        self.urlLoadBalancer.currentUrl
     }
 }

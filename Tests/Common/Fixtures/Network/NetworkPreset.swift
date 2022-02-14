@@ -346,17 +346,25 @@ extension NetworkPreset {
 extension NetworkPreset {
 
     func networkConfig(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> NetworkConfig {
+        let consensusUrls = try ConsensusUrl.make(strings: [consensusUrl]).get()
+        let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
+        let fogUrls = try FogUrl.make(strings: [fogUrl]).get()
+        let fogUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: fogUrls).get()
+
         let attestationConfig = try self.attestationConfig()
+
         var networkConfig = try NetworkConfig.make(
-            consensusUrl: consensusUrl,
-            fogUrl: fogUrl,
+            consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+            fogUrlLoadBalancer: fogUrlLoadBalancer,
             attestation: attestationConfig,
             transportProtocol: transportProtocol).get()
+
         networkConfig.httpRequester = DefaultHttpRequester()
         try networkConfig.setConsensusTrustRoots(Self.trustRootsBytes())
         try networkConfig.setFogTrustRoots(Self.trustRootsBytes())
         networkConfig.consensusAuthorization = consensusCredentials
         networkConfig.fogUserAuthorization = fogUserCredentials
+
         return networkConfig
     }
 

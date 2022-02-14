@@ -19,7 +19,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> ConsensusHttpConnection {
         ConsensusHttpConnection(
                         config: config,
-                        requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                        requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.nextUrl()),
                         targetQueue: targetQueue,
                         rng: rng,
                         rngContext: rngContext)
@@ -31,7 +31,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> BlockchainHttpConnection {
         BlockchainHttpConnection(
                         config: config,
-                        requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                        requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.currentUrl),
                         targetQueue: targetQueue)
     }
     
@@ -43,7 +43,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> FogViewHttpConnection {
         FogViewHttpConnection(
                 config: config,
-                requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.currentUrl),
                 targetQueue: targetQueue,
                 rng: rng,
                 rngContext: rngContext)
@@ -57,7 +57,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> FogMerkleProofHttpConnection {
         FogMerkleProofHttpConnection(
                         config: config,
-                        requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                        requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.currentUrl),
                         targetQueue: targetQueue,
                         rng: rng,
                         rngContext: rngContext)
@@ -71,7 +71,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> FogKeyImageHttpConnection {
         FogKeyImageHttpConnection(
                         config: config,
-                        requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                        requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.currentUrl),
                         targetQueue: targetQueue,
                         rng: rng,
                         rngContext: rngContext)
@@ -83,7 +83,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> FogBlockHttpConnection {
         FogBlockHttpConnection(
                         config: config,
-                        requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                        requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.currentUrl),
                         targetQueue: targetQueue)
     }
 
@@ -93,7 +93,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> FogUntrustedTxOutHttpConnection {
         FogUntrustedTxOutHttpConnection(
                         config: config,
-                        requester: RestApiRequester(requester: requester, baseUrl: config.currentUrl!),
+                        requester: RestApiRequester(requester: requester, baseUrl: config.urlLoadBalancer.currentUrl),
                         targetQueue: targetQueue)
     }
 

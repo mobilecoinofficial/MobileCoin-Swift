@@ -238,8 +238,8 @@ extension MobileCoinClient {
     private static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
         return """
-            Consensus urls: \(config.networkConfig.consensusUrls)
-            Fog urls: \(config.networkConfig.fogUrls)
+            Consensus urls: \(config.networkConfig.consensusUrlsDescription)
+            Fog urls: \(config.networkConfig.fogUrlsDescription)
             AccountKey PublicAddress: \
             \(redacting: Base58Coder.encode(accountKey.accountKey.publicAddress))
             AccountKey Fog Report url: \(fogInfo.reportUrl.url)
@@ -346,7 +346,7 @@ extension MobileCoinClient {
 
                             let networkConfig = NetworkConfig(
                                 consensusUrlLoadBalancer: consensusUrlLoadBalancer,
-                                fogUrlLoadBalancer: fogUrls,
+                                fogUrlLoadBalancer: fogUrlLoadBalancer,
                                 attestation: attestationConfig,
                                 transportProtocol: transportProtocol)
                             return Config(networkConfig: networkConfig)

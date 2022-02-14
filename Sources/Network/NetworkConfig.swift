@@ -5,15 +5,23 @@
 import Foundation
 
 struct NetworkConfig {
-    static func make(consensusUrlLoadBalancer: consensusUrlLoadBalancer, fogUrlLoadBalancer: fogUrlLoadBalancer, attestation: AttestationConfig, transportProtocol: TransportProtocol)
+    static func make(consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol)
         -> Result<NetworkConfig, InvalidInputError>
     {
-        NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation, transportProtocol: transportProtocol)
+        return .success(NetworkConfig(consensusUrlLoadBalancer: consensusUrlLoadBalancer, fogUrlLoadBalancer: fogUrlLoadBalancer, attestation: attestation, transportProtocol: transportProtocol))
     }
 
     private let attestation: AttestationConfig
     private let consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>
     private let fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>
+    
+    var fogUrlsDescription: String {
+        "\(fogUrlLoadBalancer.urlsDescription)"
+    }
+    
+    var consensusUrlsDescription: String {
+        "\(consensusUrlLoadBalancer.urlsDescription)"
+    }
 
     var transportProtocol: TransportProtocol
 
@@ -39,7 +47,7 @@ struct NetworkConfig {
 
     var consensus: AttestedConnectionConfig<ConsensusUrl> {
         AttestedConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:consensusUrls),
+            urlLoadBalancer: consensusUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.consensus,
             trustRoots: consensusTrustRoots,
@@ -48,7 +56,7 @@ struct NetworkConfig {
 
     var blockchain: ConnectionConfig<ConsensusUrl> {
         ConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:consensusUrls),
+            urlLoadBalancer: consensusUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             trustRoots: consensusTrustRoots,
             authorization: consensusAuthorization)
@@ -56,7 +64,7 @@ struct NetworkConfig {
 
     var fogView: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:fogUrls),
+            urlLoadBalancer: fogUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogView,
             trustRoots: fogTrustRoots,
@@ -65,7 +73,7 @@ struct NetworkConfig {
 
     var fogMerkleProof: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:fogUrls),
+            urlLoadBalancer: fogUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogMerkleProof,
             trustRoots: fogTrustRoots,
@@ -74,7 +82,7 @@ struct NetworkConfig {
 
     var fogKeyImage: AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:fogUrls),
+            urlLoadBalancer: fogUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogKeyImage,
             trustRoots: fogTrustRoots,
@@ -83,7 +91,7 @@ struct NetworkConfig {
 
     var fogBlock: ConnectionConfig<FogUrl> {
         ConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:fogUrls),
+            urlLoadBalancer: fogUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
@@ -91,7 +99,7 @@ struct NetworkConfig {
 
     var fogUntrustedTxOut: ConnectionConfig<FogUrl> {
         ConnectionConfig(
-            urlLoadBalancer: RandomUrlLoadBalancer(urls:fogUrls),
+            urlLoadBalancer: fogUrlLoadBalancer,
             transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
