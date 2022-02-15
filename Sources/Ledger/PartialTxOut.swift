@@ -60,7 +60,7 @@ extension PartialTxOut {
     }
 
     static func isCrc32Matching(_ reconstructed: Data32, txOutRecord: FogView_TxOutRecord) -> Bool {
-        let reconstructedCrc32 = reconstructed.txOutCommitmentCrc32
+        let reconstructedCrc32 = reconstructed.commitmentCrc32
         let txIsSentWithCrc32 = (txOutRecord.txOutAmountCommitmentDataCrc32 != .emptyCrc32)
 
         // Older code may not set the crc32 value for the tx record,
@@ -72,7 +72,7 @@ extension PartialTxOut {
         if txIsSentWithCrc32 {
             return reconstructedCrc32 == txOutRecord.txOutAmountCommitmentDataCrc32
         } else {
-            return reconstructedCrc32 == txOutRecord.txOutAmountCommitmentData.txOutCommitmentCrc32
+            return reconstructedCrc32 == txOutRecord.txOutAmountCommitmentData.commitmentCrc32
         }
     }
 }

@@ -99,6 +99,35 @@ enum TxOutUtils {
         }
     }
 
+    static func calculateCrc32(
+        from commitment: Data32
+    ) -> UInt32? {
+        return commitment.asMcBuffer { commitmentPtr in
+            var crc32: UInt32 = 0
+            switch withMcError({ errorPtr in
+                mc_tx_out_commitment_crc32(
+                    commitmentPtr,
+                    &crc32,
+                    &errorPtr)
+            }) {
+            case .success:
+                return crc32
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_commitment_crc32 are supplied incorrectly.
+                    logger.assertionFailure("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_commitment_crc32 should not throw nondocumented errors.
+                    logger.assertionFailure("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
+                }
+            }
+        }
+    }
+
     static func subaddressSpentPublicKey(
         targetKey: RistrettoPublic,
         publicKey: RistrettoPublic,
