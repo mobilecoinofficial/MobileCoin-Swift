@@ -60,19 +60,20 @@ extension PartialTxOut {
     }
 
     static func isCrc32Matching(_ reconstructed: Data32, txOutRecord: FogView_TxOutRecord) -> Bool {
-        let sentCommitment = txOutRecord.txOutAmountCommitmentData
-        let sentCrc32 = txOutRecord.txOutAmountCommitmentDataCrc32
-        let sentCommitmentCrc32: UInt32 = {
-            guard let sentCommitment32 = Data32(sentCommitment) else { return nil }
-            return TxOutUtils.calculateCrc32(from: sentCommitment32)
-        }() ?? .emptyCrc32
+        let reconstructedCrc32 = reconstructed.txOutCommitmentCrc32
+        let txIsSentWithCrc32 = (txOutRecord.txOutAmountCommitmentDataCrc32 != .emptyCrc32)
 
-        let reconstructedCrc32 = TxOutUtils.calculateCrc32(from: reconstructed)
-        
-        return reconstructedCrc32 == sentCrc32 || reconstructedCrc32 == sentCommitmentCrc32
+        // Older code may not set the crc32 value for the tx record,
+        // so it must be calculated off the data of the record itself
+        // until that code is deprecated.
+        //
+        // once it is required that crc32 be set, remove the 'else' below
+        // and add a guard check for the
+        if txIsSentWithCrc32 {
+            return reconstructedCrc32 == txOutRecord.txOutAmountCommitmentDataCrc32
+        } else {
+            return reconstructedCrc32 == txOutRecord.txOutAmountCommitmentData.txOutCommitmentCrc32
+        }
     }
 }
 
-extension UInt32 {
-    static var emptyCrc32: UInt32 = 0
-}

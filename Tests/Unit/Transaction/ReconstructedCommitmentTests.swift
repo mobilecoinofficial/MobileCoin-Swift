@@ -32,13 +32,7 @@ class ReconstructedCommitmentTests: XCTestCase {
     
     func testCrc32() throws {
         let fixture = try Transaction.Fixtures.Commitment()
-        let txOutRecord = fixture.txOutRecord
-        let commitment = txOutRecord.txOutAmountCommitmentData
-        let crc32: UInt32 = {
-            guard let data32 = Data32(commitment) else { return nil }
-            return TxOutUtils.calculateCrc32(from: data32)
-        }() ?? .emptyCrc32
-
+        let crc32 = fixture.txOutRecord.txOutAmountCommitmentData.txOutCommitmentCrc32
         XCTAssertEqual(crc32, fixture.crc32)
     }
 }
