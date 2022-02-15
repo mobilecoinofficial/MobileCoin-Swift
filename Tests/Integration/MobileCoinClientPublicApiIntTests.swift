@@ -33,7 +33,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func testAccountActivity() throws {
         let description = "Updating account balance"
-        try testSupportedProtocols(description: description, timeout: 60.0) {
+        try testSupportedProtocols(description: description) {
             try accountActivity(transportProtocol: $0, expectation: $1)
         }
     }
@@ -52,6 +52,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             print("blockCount: \(accountActivity.blockCount)")
             XCTAssertGreaterThan(accountActivity.blockCount, 0)
 
+            expect.fulfill()
         }
     }
 
