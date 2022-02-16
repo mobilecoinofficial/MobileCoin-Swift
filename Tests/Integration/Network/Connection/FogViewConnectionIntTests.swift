@@ -300,7 +300,7 @@ extension FogViewConnectionIntTests {
         return FogViewConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.fogView,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 }

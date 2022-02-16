@@ -76,7 +76,7 @@ extension FogUntrustedTxOutConnectionIntTests {
         return FogUntrustedTxOutConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.fogUntrustedTxOut,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 }
