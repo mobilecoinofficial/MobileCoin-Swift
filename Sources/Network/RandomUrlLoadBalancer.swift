@@ -8,12 +8,12 @@ class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> {
         guard urls.isNotEmpty else {
             return .failure(InvalidInputError("url list cannot be empty"))
         }
-        return .success(RandomUrlLoadBalancer.init(urls:urls))
+        return .success(RandomUrlLoadBalancer(urls:urls))
     }
 
-    var rng = SystemRandomNumberGenerator()
-    let urlsTyped: [ServiceUrl]
-    var currentUrl: ServiceUrl
+    private var rng = SystemRandomNumberGenerator()
+    private let urlsTyped: [ServiceUrl]
+    private(set) var currentUrl: ServiceUrl
 
     var urlsDescription: String {
         "\(urlsTyped)"
@@ -31,11 +31,21 @@ class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> {
     }
 
     func nextUrl() -> ServiceUrl {
-        guard let nextUrl = urlsTyped.randomElement(using: &rng) else {
-            // This condition should never happen
-            logger.fatalError(
-                "unable to get nextUrl() from RandomUrlLoadBalancer")
+        guard urlsTyped.count > 1 else {
+            return currentUrl
         }
+
+        var nextUrl: ServiceUrl
+        repeat {
+            guard let url = urlsTyped.randomElement(using: &rng) else {
+                // This condition should never happen
+                logger.fatalError(
+                    "unable to get nextUrl() from RandomUrlLoadBalancer")
+            }
+            nextUrl = url
+        }
+        while currentUrl.url == nextUrl.url
+
         currentUrl = nextUrl
         return currentUrl
     }

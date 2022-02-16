@@ -17,15 +17,21 @@ class RandomUrlLoadBalancerTests: XCTestCase {
         }
     }
 
-    func testMultipleUrlsReturnsDifferentUrlOnSecondCall() {
-        let urlA = "mc://example1.com"
-        let urlB = "mc://example2.com"
+    func testTenConsecutiveCallsNeverReturnSameUrlBackToBack() {
+        let urlA = "mc://exampleA.com"
+        let urlB = "mc://exampleB.com"
+        let urlC = "mc://exampleC.com"
 
-        _ = ConsensusUrl.make(strings: [urlA, urlB]).flatMap { consensusUrls in
+        _ = ConsensusUrl.make(strings: [urlA, urlB, urlC]).flatMap { consensusUrls in
             RandomUrlLoadBalancer.make(urls: consensusUrls).flatMap { loadBalancer in
-                let nextA = loadBalancer.nextUrl()
-                let nextB = loadBalancer.nextUrl()
-                XCTAssertNotEqual(nextA, nextB)
+                var currentUrl: MobileCoinUrl<ConsensusScheme>
+                var newUrl: MobileCoinUrl<ConsensusScheme> = loadBalancer.currentUrl
+                
+                for _ in 1...10 {
+                    currentUrl = newUrl
+                    newUrl = loadBalancer.nextUrl()
+                    XCTAssertNotEqual(currentUrl, newUrl)
+                }
             }
         }
     }
