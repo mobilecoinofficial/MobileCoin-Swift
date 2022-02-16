@@ -6,16 +6,20 @@ import Foundation
 
 
 public struct HttpCallResult<ResponsePayload> {
-    let status: HTTPStatus
+    let error: Error?
+    let status: HTTPStatus?
     let allHeaderFields: [AnyHashable: Any]?
     let response: ResponsePayload?
-}
-
-extension HttpCallResult {
+    
     init(
-        status: HTTPStatus
+        error: Error? = nil,
+        status: HTTPStatus? = nil,
+        allHeaderFields: [AnyHashable: Any]? = nil,
+        response: ResponsePayload? = nil
     ) {
-        self.init(status: status, allHeaderFields: nil, response: nil)
+        self.error = error
+        self.status = status
+        self.allHeaderFields = allHeaderFields
+        self.response = response
     }
 }
-
