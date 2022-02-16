@@ -10,7 +10,7 @@ final class FogViewConnection:
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
-    private let config: AttestedConnectionConfig<FogUrl>
+    private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
     private let rngContext: Any?
@@ -18,7 +18,7 @@ final class FogViewConnection:
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
-        config: AttestedConnectionConfig<FogUrl>,
+        config: NetworkConfig,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
@@ -31,12 +31,13 @@ final class FogViewConnection:
         self.rngContext = rngContext
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.fogView
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService:
                             grpcFactory.makeFogViewService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue,
                                 rng: rng,
                                 rngContext: rngContext))
@@ -44,13 +45,13 @@ final class FogViewConnection:
                     return .http(
                         httpService:
                             httpFactory.makeFogViewService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue,
                                 rng: rng,
                                 rngContext: rngContext))
                 }
             },
-            transportProtocolOption: config.transportProtocolOption,
+            transportProtocolOption: config.fogView.transportProtocolOption,
             targetQueue: targetQueue)
     }
 
