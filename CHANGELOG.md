@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0-pre9] - 2022-02-03
+
+### Added 
+
+- crc32 checksum comparison for reconstructed commitment data
+
+### Changed
+
+- Simplified Publicly Exposed Error's conformers.
+
 ## [1.2.0-pre8] - 2022-01-31
 
 ### Added
