@@ -6,6 +6,20 @@
 
 import Foundation
 
+public struct UnexpectedError: Error {
+    let reason: String
+
+    init(_ reason: String) {
+        self.reason = reason
+    }
+}
+
+extension UnexpectedError: CustomStringConvertible {
+    public var description: String {
+        "Unexpected error: \(reason)"
+    }
+}
+
 public struct InvalidInputError: Error {
     let reason: String
 

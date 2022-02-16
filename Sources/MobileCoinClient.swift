@@ -238,8 +238,8 @@ extension MobileCoinClient {
     private static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
         return """
-            Consensus url: \(config.networkConfig.consensusUrl.url)
-            Fog url: \(config.networkConfig.fogUrl.url)
+            Consensus urls: \(config.networkConfig.consensusUrlsDescription)
+            Fog urls: \(config.networkConfig.fogUrlsDescription)
             AccountKey PublicAddress: \
             \(redacting: Base58Coder.encode(accountKey.accountKey.publicAddress))
             AccountKey Fog Report url: \(fogInfo.reportUrl.url)
@@ -309,20 +309,49 @@ extension MobileCoinClient {
             fogReportAttestation: Attestation,
             transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
-            ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
-                FogUrl.make(string: fogUrl).map { fogUrl in
-                    let attestationConfig = NetworkConfig.AttestationConfig(
-                        consensus: consensusAttestation,
-                        fogView: fogViewAttestation,
-                        fogKeyImage: fogKeyImageAttestation,
-                        fogMerkleProof: fogMerkleProofAttestation,
-                        fogReport: fogReportAttestation)
-                    let networkConfig = NetworkConfig(
-                        consensusUrl: consensusUrl,
-                        fogUrl: fogUrl,
-                        attestation: attestationConfig,
-                        transportProtocol: transportProtocol)
-                    return Config(networkConfig: networkConfig)
+            Self.make(consensusUrls: [consensusUrl],
+                      consensusAttestation: consensusAttestation,
+                      fogUrls: [fogUrl],
+                      fogViewAttestation: fogViewAttestation,
+                      fogKeyImageAttestation: fogKeyImageAttestation,
+                      fogMerkleProofAttestation: fogMerkleProofAttestation,
+                      fogReportAttestation: fogReportAttestation,
+                      transportProtocol: transportProtocol)
+        }
+
+        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
+        ///     with the appropriate schemes.
+        public static func make(
+            consensusUrls: [String],
+            consensusAttestation: Attestation,
+            fogUrls: [String],
+            fogViewAttestation: Attestation,
+            fogKeyImageAttestation: Attestation,
+            fogMerkleProofAttestation: Attestation,
+            fogReportAttestation: Attestation,
+            transportProtocol: TransportProtocol
+        ) -> Result<Config, InvalidInputError> {
+
+            ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
+                RandomUrlLoadBalancer.make(urls: consensusUrls).flatMap { consensusUrlLoadBalancer in
+                    FogUrl.make(strings: fogUrls).flatMap { fogUrls in
+                        RandomUrlLoadBalancer.make(urls: fogUrls).map { fogUrlLoadBalancer in
+
+                            let attestationConfig = NetworkConfig.AttestationConfig(
+                                consensus: consensusAttestation,
+                                fogView: fogViewAttestation,
+                                fogKeyImage: fogKeyImageAttestation,
+                                fogMerkleProof: fogMerkleProofAttestation,
+                                fogReport: fogReportAttestation)
+
+                            let networkConfig = NetworkConfig(
+                                consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                                fogUrlLoadBalancer: fogUrlLoadBalancer,
+                                attestation: attestationConfig,
+                                transportProtocol: transportProtocol)
+                            return Config(networkConfig: networkConfig)
+                        }
+                    }
                 }
             }
         }

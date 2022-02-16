@@ -39,7 +39,7 @@ final class DefaultServiceProvider: ServiceProvider {
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.blockchain,
             targetQueue: targetQueue)
-            self.view = FogViewConnection(
+        self.view = FogViewConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig.fogView,

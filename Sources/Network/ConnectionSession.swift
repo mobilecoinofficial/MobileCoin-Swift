@@ -18,10 +18,6 @@ class ConnectionSession {
     let cookieStorage: HTTPCookieStorage
     var authorizationCredentials: BasicCredentials?
 
-    convenience init(config: ConnectionConfigProtocol) {
-        self.init(url: config.url, authorization: config.authorization)
-    }
-
     init(url: MobileCoinUrlProtocol, authorization: BasicCredentials? = nil) {
         self.url = url.httpBasedUrl
         self.cookieStorage = Self.ephemeralCookieStorage

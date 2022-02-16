@@ -67,8 +67,8 @@ extension GrpcConnection {
         private let session: ConnectionSession
 
         init(config: ConnectionConfigProtocol) {
-            self.url = config.url
-            self.session = ConnectionSession(config: config)
+            self.url = config.nextUrl()
+            self.session = ConnectionSession(url: self.url, authorization: config.authorization)
         }
 
         func setAuthorization(credentials: BasicCredentials) {
