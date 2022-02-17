@@ -10,7 +10,7 @@ final class FogKeyImageConnection:
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
-    private let config: AttestedConnectionConfig<FogUrl>
+    private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
     private let rngContext: Any?
@@ -18,7 +18,7 @@ final class FogKeyImageConnection:
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
-        config: AttestedConnectionConfig<FogUrl>,
+        config: NetworkConfig,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
@@ -32,25 +32,26 @@ final class FogKeyImageConnection:
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.fogKeyImage
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService:
                             grpcFactory.makeFogKeyImageService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue,
                                 rng: rng,
                                 rngContext: rngContext))
                 case .http:
                     return .http(httpService:
                             httpFactory.makeFogKeyImageService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue,
                                 rng: rng,
                                 rngContext: rngContext))
                 }
             },
-            transportProtocolOption: config.transportProtocolOption,
+            transportProtocolOption: config.fogKeyImage.transportProtocolOption,
             targetQueue: targetQueue)
     }
 

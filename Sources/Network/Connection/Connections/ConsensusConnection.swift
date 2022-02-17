@@ -10,7 +10,7 @@ final class ConsensusConnection:
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
-    private let config: AttestedConnectionConfig<ConsensusUrl>
+    private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
     private let rngContext: Any?
@@ -18,7 +18,7 @@ final class ConsensusConnection:
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
-        config: AttestedConnectionConfig<ConsensusUrl>,
+        config: NetworkConfig,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
@@ -32,23 +32,24 @@ final class ConsensusConnection:
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.consensus
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService: grpcFactory.makeConsensusService(
-                            config: config,
+                            config: rotatedConfig,
                             targetQueue: targetQueue,
                             rng: rng,
                             rngContext: rngContext))
                 case .http:
                     return .http(httpService: httpFactory.makeConsensusService(
-                            config: config,
+                            config: rotatedConfig,
                             targetQueue: targetQueue,
                             rng: rng,
                             rngContext: rngContext))
                 }
             },
-            transportProtocolOption: config.transportProtocolOption,
+            transportProtocolOption: config.consensus.transportProtocolOption,
             targetQueue: targetQueue)
     }
 

@@ -10,13 +10,13 @@ final class FogBlockConnection:
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
-    private let config: ConnectionConfig<FogUrl>
+    private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
-        config: ConnectionConfig<FogUrl>,
+        config: NetworkConfig,
         targetQueue: DispatchQueue?
     ) {
         self.httpFactory = httpFactory
@@ -26,21 +26,22 @@ final class FogBlockConnection:
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.fogBlock
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService:
                             grpcFactory.makeFogBlockService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue))
                 case .http:
                     return .http(httpService:
                             httpFactory.makeFogBlockService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue))
                 }
             },
-            transportProtocolOption: config.transportProtocolOption,
+            transportProtocolOption: config.fogBlock.transportProtocolOption,
             targetQueue: targetQueue)
     }
 
