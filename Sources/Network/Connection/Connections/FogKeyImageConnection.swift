@@ -30,9 +30,9 @@ final class FogKeyImageConnection:
         self.rng = rng
         self.rngContext = rngContext
 
-        let rotatedConfig = config.fogKeyImageConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.fogKeyImageConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -51,7 +51,7 @@ final class FogKeyImageConnection:
                                 rngContext: rngContext))
                 }
             },
-            transportProtocolOption: rotatedConfig.transportProtocolOption,
+            transportProtocolOption: config.fogKeyImageConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
 

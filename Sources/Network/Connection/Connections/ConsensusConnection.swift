@@ -30,9 +30,9 @@ final class ConsensusConnection:
         self.rng = rng
         self.rngContext = rngContext
 
-        let rotatedConfig = config.consensusConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.consensusConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -49,7 +49,7 @@ final class ConsensusConnection:
                             rngContext: rngContext))
                 }
             },
-            transportProtocolOption: rotatedConfig.transportProtocolOption,
+            transportProtocolOption: config.consensusConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
 

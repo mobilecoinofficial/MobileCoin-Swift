@@ -25,9 +25,9 @@ final class FogUntrustedTxOutConnection:
         self.config = config
         self.targetQueue = targetQueue
 
-        let rotatedConfig = config.fogUntrustedTxOutConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.fogUntrustedTxOutConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -42,7 +42,7 @@ final class FogUntrustedTxOutConnection:
                                 targetQueue: targetQueue))
                 }
             },
-            transportProtocolOption: rotatedConfig.transportProtocolOption,
+            transportProtocolOption: config.fogUntrustedTxOutConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
 

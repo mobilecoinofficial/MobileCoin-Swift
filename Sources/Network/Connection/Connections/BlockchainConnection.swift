@@ -25,9 +25,9 @@ final class BlockchainConnection:
         self.config = config
         self.targetQueue = targetQueue
         
-        let rotatedConfig = config.blockchainConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.blockchainConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -42,7 +42,7 @@ final class BlockchainConnection:
                                 targetQueue: targetQueue))
                 }
             },
-            transportProtocolOption: rotatedConfig.transportProtocolOption,
+            transportProtocolOption: config.blockchainConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
 
