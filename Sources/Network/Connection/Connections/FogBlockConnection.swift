@@ -24,9 +24,9 @@ final class FogBlockConnection:
         self.config = config
         self.targetQueue = targetQueue
 
+        let rotatedConfig = config.fogBlockConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.fogBlock
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -41,7 +41,7 @@ final class FogBlockConnection:
                                 targetQueue: targetQueue))
                 }
             },
-            transportProtocolOption: config.fogBlock.transportProtocolOption,
+            transportProtocolOption: rotatedConfig.transportProtocolOption,
             targetQueue: targetQueue)
     }
 

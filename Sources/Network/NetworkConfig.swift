@@ -45,7 +45,7 @@ struct NetworkConfig {
         self.fogUrlLoadBalancer = fogUrlLoadBalancer
     }
 
-    var consensus: AttestedConnectionConfig<ConsensusUrl> {
+    func consensusConfig() -> AttestedConnectionConfig<ConsensusUrl> {
         AttestedConnectionConfig(
             url: consensusUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -54,7 +54,7 @@ struct NetworkConfig {
             authorization: consensusAuthorization)
     }
 
-    var blockchain: ConnectionConfig<ConsensusUrl> {
+    func blockchainConfig() -> ConnectionConfig<ConsensusUrl> {
         ConnectionConfig(
             url: consensusUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -62,7 +62,7 @@ struct NetworkConfig {
             authorization: consensusAuthorization)
     }
 
-    var fogView: AttestedConnectionConfig<FogUrl> {
+    func fogViewConfig() -> AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -71,7 +71,7 @@ struct NetworkConfig {
             authorization: fogUserAuthorization)
     }
 
-    var fogMerkleProof: AttestedConnectionConfig<FogUrl> {
+    func fogMerkleProofConfig() -> AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -80,7 +80,7 @@ struct NetworkConfig {
             authorization: fogUserAuthorization)
     }
 
-    var fogKeyImage: AttestedConnectionConfig<FogUrl> {
+    func fogKeyImageConfig() -> AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
             url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -89,7 +89,7 @@ struct NetworkConfig {
             authorization: fogUserAuthorization)
     }
 
-    var fogBlock: ConnectionConfig<FogUrl> {
+    func fogBlockConfig() -> ConnectionConfig<FogUrl> {
         ConnectionConfig(
             url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -97,7 +97,7 @@ struct NetworkConfig {
             authorization: fogUserAuthorization)
     }
 
-    var fogUntrustedTxOut: ConnectionConfig<FogUrl> {
+    func fogUntrustedTxOutConfig() -> ConnectionConfig<FogUrl> {
         ConnectionConfig(
             url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,

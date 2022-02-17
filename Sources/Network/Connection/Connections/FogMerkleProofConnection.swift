@@ -30,9 +30,9 @@ final class FogMerkleProofConnection:
         self.rng = rng
         self.rngContext = rngContext
 
+        let rotatedConfig = config.fogMerkleProofConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.fogMerkleProof
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -51,7 +51,7 @@ final class FogMerkleProofConnection:
                                 rngContext: rngContext))
                 }
             },
-            transportProtocolOption: config.fogMerkleProof.transportProtocolOption,
+            transportProtocolOption: rotatedConfig.transportProtocolOption,
             targetQueue: targetQueue)
     }
 

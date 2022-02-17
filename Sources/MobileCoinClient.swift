@@ -245,10 +245,10 @@ extension MobileCoinClient {
             AccountKey Fog Report url: \(fogInfo.reportUrl.url)
             AccountKey Fog Report id: \(String(reflecting: fogInfo.reportId))
             AccountKey Fog Report authority sPKI: 0x\(fogInfo.authoritySpki.hexEncodedString())
-            Consensus attestation: \(config.networkConfig.consensus.attestation)
-            Fog View attestation: \(config.networkConfig.fogView.attestation)
-            Fog KeyImage attestation: \(config.networkConfig.fogKeyImage.attestation)
-            Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProof.attestation)
+            Consensus attestation: \(config.networkConfig.consensusConfig().attestation)
+            Fog View attestation: \(config.networkConfig.fogViewConfig().attestation)
+            Fog KeyImage attestation: \(config.networkConfig.fogKeyImageConfig().attestation)
+            Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProofConfig().attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
             """
     }

@@ -29,9 +29,10 @@ final class FogViewConnection:
         self.targetQueue = targetQueue
         self.rng = rng
         self.rngContext = rngContext
+        
+        let rotatedConfig = config.fogViewConfig()
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.fogView
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -51,7 +52,7 @@ final class FogViewConnection:
                                 rngContext: rngContext))
                 }
             },
-            transportProtocolOption: config.fogView.transportProtocolOption,
+            transportProtocolOption: rotatedConfig.transportProtocolOption,
             targetQueue: targetQueue)
     }
 
