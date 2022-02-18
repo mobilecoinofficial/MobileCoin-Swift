@@ -247,7 +247,7 @@ extension MobileCoinClient {
 
         return """
             Consensus urls: \(config.networkConfig.consensusUrls)
-            Fog urls: \(fogUrlsDescription)
+            Fog urls: \(config.networkConfig.fogUrls)
             AccountKey PublicAddress: \
             \(redacting: Base58Coder.encode(accountKey.accountKey.publicAddress))
             AccountKey Fog Report url: \(fogInfo.reportUrl.url)
