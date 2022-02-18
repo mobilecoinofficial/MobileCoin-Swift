@@ -15,14 +15,14 @@ struct NetworkConfig {
     private let consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>
     private let fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>
     
-    var fogUrlsDescription: String {
-        "\(fogUrlLoadBalancer.urlsDescription)"
+    var consensusUrls: [ConsensusUrl] {
+        consensusUrlLoadBalancer.urlsTyped
     }
     
-    var consensusUrlsDescription: String {
-        "\(consensusUrlLoadBalancer.urlsDescription)"
+    var fogUrls: [FogUrl] {
+        fogUrlLoadBalancer.urlsTyped
     }
-
+    
     var transportProtocol: TransportProtocol
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]

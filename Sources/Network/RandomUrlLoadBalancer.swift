@@ -11,13 +11,9 @@ class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> {
         return .success(RandomUrlLoadBalancer(urls:urls))
     }
 
+    let urlsTyped: [ServiceUrl]
     private var rng = SystemRandomNumberGenerator()
-    private let urlsTyped: [ServiceUrl]
     private(set) var currentUrl: ServiceUrl
-
-    var urlsDescription: String {
-        "\(urlsTyped)"
-    }
 
     private init(urls: [ServiceUrl]) {
         self.urlsTyped = urls
