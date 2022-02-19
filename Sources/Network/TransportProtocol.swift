@@ -21,6 +21,17 @@ extension TransportProtocol {
     }
 }
 
+extension TransportProtocol : CustomStringConvertible {
+    public var description: String {
+        switch option {
+        case .grpc:
+            return "GRPC"
+        case .http:
+            return "HTTP"
+        }
+    }
+}
+
 extension TransportProtocol : Equatable { }
 extension TransportProtocol : Hashable { }
 

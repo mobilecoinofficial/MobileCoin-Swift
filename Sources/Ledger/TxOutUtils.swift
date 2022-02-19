@@ -77,25 +77,52 @@ enum TxOutUtils {
                 }) {
                 case .success(let bytes):
                     // Safety: It's safe to skip validation because
-                    // mc_tx_out_get_subaddress_spend_public_key should always return a valid
+                    // mc_tx_out_reconstruct_commitment should always return a valid
                     // RistrettoPublic on success.
                     return bytes as Data32
                 case .failure(let error):
                     switch error.errorCode {
                     case .invalidInput:
                         // Safety: This condition indicates a programming error and can only
-                        // happen if arguments to mc_tx_out_get_subaddress_spend_public_key are
+                        // happen if arguments to mc_tx_out_reconstruct_commitment are
                         // supplied incorrectly.
-                        // FIXME
                         logger.warning("error: \(redacting: error)")
                         return nil
                     default:
-                        // Safety: mc_fog_resolver_add_report_response should not throw
+                        // Safety: mc_tx_out_reconstruct_commitment should not throw
                         // non-documented errors.
-                        // FIXME
                         logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                         return nil
                     }
+                }
+            }
+        }
+    }
+
+    static func calculateCrc32(
+        from commitment: Data32
+    ) -> UInt32? {
+        return commitment.asMcBuffer { commitmentPtr in
+            var crc32: UInt32 = 0
+            switch withMcError({ errorPtr in
+                mc_tx_out_commitment_crc32(
+                    commitmentPtr,
+                    &crc32,
+                    &errorPtr)
+            }) {
+            case .success:
+                return crc32
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_commitment_crc32 are supplied incorrectly.
+                    logger.assertionFailure("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_commitment_crc32 should not throw nondocumented errors.
+                    logger.assertionFailure("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
                 }
             }
         }
