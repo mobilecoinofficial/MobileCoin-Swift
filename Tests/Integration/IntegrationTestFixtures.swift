@@ -84,6 +84,41 @@ extension IntegrationTestFixtures {
             transportProtocol: transportProtocol).get()
     }
 
+    static func createMobileCoinClientConfigWithPartialValidConsensusUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient.Config {
+        try MobileCoinClient.Config.make(
+            consensusUrls: ["mc://invalid.mobilecoin.com", network.consensusUrl],
+            consensusAttestation: network.consensusAttestation(),
+            fogUrls: [network.fogUrl],
+            fogViewAttestation: network.fogViewAttestation(),
+            fogKeyImageAttestation: network.fogLedgerAttestation(),
+            fogMerkleProofAttestation: network.fogLedgerAttestation(),
+            fogReportAttestation: network.fogReportAttestation(),
+            transportProtocol: transportProtocol).get()
+    }
+    
+    static func createMobileCoinClientConfigWithPartialValidFogUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient.Config {
+        try MobileCoinClient.Config.make(
+            consensusUrls: [network.consensusUrl],
+            consensusAttestation: network.consensusAttestation(),
+            fogUrls: [network.fogUrl, "fog://invalid.mobilecoin.com"],
+//            fogUrls: ["fog://invalid.mobilecoin.com"],
+            fogViewAttestation: network.fogViewAttestation(),
+            fogKeyImageAttestation: network.fogLedgerAttestation(),
+            fogMerkleProofAttestation: network.fogLedgerAttestation(),
+            fogReportAttestation: network.fogReportAttestation(),
+            transportProtocol: transportProtocol).get()
+    }
+    
+    static func createMobileCoinClientWithPartialValidConsensusUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient {
+        let config = try createMobileCoinClientConfigWithPartialValidConsensusUrls(transportProtocol: transportProtocol)
+        return try createMobileCoinClient(config: config, transportProtocol: transportProtocol)
+    }
+
+    static func createMobileCoinClientWithPartialValidFogUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient {
+        let config = try createMobileCoinClientConfigWithPartialValidFogUrls(transportProtocol: transportProtocol)
+        return try createMobileCoinClient(config: config, transportProtocol: transportProtocol)
+    }
+
     static func createMobileCoinClient(
         accountIndex: Int = 0,
         transportProtocol: TransportProtocol

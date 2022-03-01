@@ -55,15 +55,33 @@ final class FogMerkleProofConnection:
             targetQueue: targetQueue)
     }
 
+    func completionResultIntercept(
+        _ result: Result<FogLedger_GetOutputsResponse, ConnectionError>,
+        completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
+    ) {
+        switch result {
+        case .success:
+            completion(result)
+        case .failure:
+            logger.debug("ForMerkleProofConnection - rotating config on error")
+            super.rotateConnection()
+            completion(result)
+        }
+    }
+    
     func getOutputs(
         request: FogLedger_GetOutputsRequest,
         completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getOutputs(request: request, completion: completion)
+            grpcConnection.getOutputs(request: request) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         case .http(let httpConnection):
-            httpConnection.getOutputs(request: request, completion: completion)
+            httpConnection.getOutputs(request: request) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         }
     }
 }

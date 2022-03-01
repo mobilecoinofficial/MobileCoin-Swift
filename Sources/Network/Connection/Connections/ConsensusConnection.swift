@@ -52,6 +52,20 @@ final class ConsensusConnection:
             transportProtocolOption: config.consensusConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
+    
+    func completionResultIntercept(
+        _ result: Result<ConsensusCommon_ProposeTxResponse, ConnectionError>,
+        completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void
+    ) {
+        switch result {
+        case .success:
+            completion(result)
+        case .failure:
+            logger.debug("ConsensusConnection - rotating config on error")
+            super.rotateConnection()
+            completion(result)
+        }
+    }
 
     func proposeTx(
         _ tx: External_Tx,
@@ -59,9 +73,13 @@ final class ConsensusConnection:
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.proposeTx(tx, completion: completion)
+            grpcConnection.proposeTx(tx) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         case .http(let httpConnection):
-            httpConnection.proposeTx(tx, completion: completion)
+            httpConnection.proposeTx(tx) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         }
     }
 }

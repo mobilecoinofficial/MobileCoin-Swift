@@ -45,15 +45,33 @@ final class FogBlockConnection:
             targetQueue: targetQueue)
     }
 
+    func completionResultIntercept(
+        _ result: Result<FogLedger_BlockResponse, ConnectionError>,
+        completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
+    ) {
+        switch result {
+        case .success:
+            completion(result)
+        case .failure:
+            logger.debug("FogBlockConnection - rotating config on error")
+            super.rotateConnection()
+            completion(result)
+        }
+    }
+    
     func getBlocks(
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getBlocks(request: request, completion: completion)
+            grpcConnection.getBlocks(request: request) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         case .http(let httpConnection):
-            httpConnection.getBlocks(request: request, completion: completion)
+            httpConnection.getBlocks(request: request) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         }
     }
 }

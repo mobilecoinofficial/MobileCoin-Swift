@@ -46,15 +46,33 @@ final class FogUntrustedTxOutConnection:
             targetQueue: targetQueue)
     }
 
+    func completionResultIntercept(
+        _ result: Result<FogLedger_TxOutResponse, ConnectionError>,
+        completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
+    ) {
+        switch result {
+        case .success:
+            completion(result)
+        case .failure:
+            logger.debug("FogUntrustedTxOutConnection - rotating config on error")
+            super.rotateConnection()
+            completion(result)
+        }
+    }
+    
     func getTxOuts(
         request: FogLedger_TxOutRequest,
         completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getTxOuts(request: request, completion: completion)
+            grpcConnection.getTxOuts(request: request) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         case .http(let httpConnection):
-            httpConnection.getTxOuts(request: request, completion: completion)
+            httpConnection.getTxOuts(request: request) { result in
+                self.completionResultIntercept(result, completion: completion)
+            }
         }
     }
 }
