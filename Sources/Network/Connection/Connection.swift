@@ -42,6 +42,22 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
     var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService> {
         inner.accessWithoutLocking.connectionOptionWrapper
     }
+    
+    func rotateURLOnError<T>(
+        _ completion: @escaping (Result<T, ConnectionError>) -> Void
+    ) -> (Result<T, ConnectionError>) -> Void {
+        { [weak self] result in
+            switch result {
+            case .success:
+                completion(result)
+            case .failure:
+                logger.debug("ConsensusConnection - rotating config on error")
+                self?.rotateConnection()
+                completion(result)
+            }
+        }
+    }
+
 }
 
 extension Connection {
