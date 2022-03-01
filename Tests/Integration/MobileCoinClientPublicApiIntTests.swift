@@ -504,6 +504,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testWrongConsensusTrustRootReturnsError() throws {
+        // Skipped because gRPC currently keeps retrying connection errors indefinitely.
+        try XCTSkipIf(true)
+
         let description = "Submitting transaction"
         try testSupportedProtocols(description: description) {
             try wrongConsensusTrustRootReturnsError(transportProtocol: $0, expectation: $1)
@@ -511,9 +514,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
     
     func wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        // Skipped because gRPC currently keeps retrying connection errors indefinitely.
-        try XCTSkipIf(true)
-
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots([
             try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
