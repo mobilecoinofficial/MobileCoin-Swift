@@ -9,6 +9,8 @@ import XCTest
 
 enum IntegrationTestFixtures {
     static let network: NetworkPreset = .testNet
+    static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
+    static let invalidFogUrl = "fog://invalid.mobilecoin.com"
 }
 
 extension IntegrationTestFixtures {
@@ -86,7 +88,7 @@ extension IntegrationTestFixtures {
 
     static func createMobileCoinClientConfigWithPartialValidConsensusUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
-            consensusUrls: ["mc://invalid.mobilecoin.com", network.consensusUrl],
+            consensusUrls: [invalidConsensusUrl, network.consensusUrl],
             consensusAttestation: network.consensusAttestation(),
             fogUrls: [network.fogUrl],
             fogViewAttestation: network.fogViewAttestation(),
@@ -100,8 +102,7 @@ extension IntegrationTestFixtures {
         try MobileCoinClient.Config.make(
             consensusUrls: [network.consensusUrl],
             consensusAttestation: network.consensusAttestation(),
-            fogUrls: [network.fogUrl, "fog://invalid.mobilecoin.com"],
-//            fogUrls: ["fog://invalid.mobilecoin.com"],
+            fogUrls: [invalidFogUrl, network.fogUrl],
             fogViewAttestation: network.fogViewAttestation(),
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
