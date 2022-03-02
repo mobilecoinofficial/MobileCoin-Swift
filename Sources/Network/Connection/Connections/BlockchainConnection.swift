@@ -46,33 +46,15 @@ final class BlockchainConnection:
             targetQueue: targetQueue)
     }
 
-    func completionResultIntercept(
-        _ result: Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>,
-        completion: @escaping (Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>) -> Void
-    ) {
-        switch result {
-        case .success:
-            completion(result)
-        case .failure:
-            logger.debug("BlockchainConnection - rotating config on error")
-            super.rotateConnection()
-            completion(result)
-        }
-    }
-
     func getLastBlockInfo(
         completion:
             @escaping (Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>) -> Void
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getLastBlockInfo() { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            grpcConnection.getLastBlockInfo(completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.getLastBlockInfo() { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            httpConnection.getLastBlockInfo(completion: rotateURLOnError(completion))
         }
     }
 }

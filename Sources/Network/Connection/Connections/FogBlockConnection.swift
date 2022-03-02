@@ -44,20 +44,6 @@ final class FogBlockConnection:
             transportProtocolOption: config.fogBlockConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
-
-    func completionResultIntercept(
-        _ result: Result<FogLedger_BlockResponse, ConnectionError>,
-        completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
-    ) {
-        switch result {
-        case .success:
-            completion(result)
-        case .failure:
-            logger.debug("FogBlockConnection - rotating config on error")
-            super.rotateConnection()
-            completion(result)
-        }
-    }
     
     func getBlocks(
         request: FogLedger_BlockRequest,
@@ -65,13 +51,9 @@ final class FogBlockConnection:
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getBlocks(request: request) { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            grpcConnection.getBlocks(request: request, completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.getBlocks(request: request) { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            httpConnection.getBlocks(request: request, completion: rotateURLOnError(completion))
         }
     }
 }

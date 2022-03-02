@@ -51,7 +51,7 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
             case .success:
                 completion(result)
             case .failure:
-                logger.debug("ConsensusConnection - rotating config on error")
+                logger.debug("rotating config on error")
                 self?.rotateConnection()
                 completion(result)
             }

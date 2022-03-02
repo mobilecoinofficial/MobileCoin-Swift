@@ -52,7 +52,7 @@ final class ConsensusConnection:
             transportProtocolOption: config.consensusConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
-    
+
     func proposeTx(
         _ tx: External_Tx,
         completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void

@@ -54,20 +54,6 @@ final class FogKeyImageConnection:
             transportProtocolOption: config.fogKeyImageConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
-
-    func completionResultIntercept(
-        _ result: Result<FogLedger_CheckKeyImagesResponse, ConnectionError>,
-        completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
-    ) {
-        switch result {
-        case .success:
-            completion(result)
-        case .failure:
-            logger.debug("FogKeyImageConnection - rotating config on error")
-            super.rotateConnection()
-            completion(result)
-        }
-    }
     
     func checkKeyImages(
         request: FogLedger_CheckKeyImagesRequest,
@@ -75,13 +61,9 @@ final class FogKeyImageConnection:
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.checkKeyImages(request: request) { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            grpcConnection.checkKeyImages(request: request, completion: rotateURLOnError(completion))
        case .http(let httpConnection):
-            httpConnection.checkKeyImages(request: request) { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            httpConnection.checkKeyImages(request: request, completion: rotateURLOnError(completion))
         }
     }
 }

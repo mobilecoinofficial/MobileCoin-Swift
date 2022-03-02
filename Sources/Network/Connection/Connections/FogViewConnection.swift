@@ -56,21 +56,6 @@ final class FogViewConnection:
             targetQueue: targetQueue)
     }
 
-
-    func completionResultIntercept(
-        _ result: Result<FogView_QueryResponse, ConnectionError>,
-        completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
-    ) {
-        switch result {
-        case .success:
-            completion(result)
-        case .failure:
-            logger.debug("FogViewConnection - rotating config on error")
-            super.rotateConnection()
-            completion(result)
-        }
-    }
-    
     func query(
         requestAad: FogView_QueryRequestAAD,
         request: FogView_QueryRequest,
@@ -78,13 +63,9 @@ final class FogViewConnection:
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.query(requestAad: requestAad, request: request) { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            grpcConnection.query(requestAad: requestAad, request: request, completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.query(requestAad: requestAad, request: request) { result in
-                self.completionResultIntercept(result, completion: completion)
-            }
+            httpConnection.query(requestAad: requestAad, request: request, completion: rotateURLOnError(completion))
         }
     }
 }

@@ -8,17 +8,25 @@ import XCTest
 
 class RandomUrlLoadBalancerIntTests: XCTestCase {
 
-    func testUrlRotates() throws {
-//        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-//            try verifyUrlRotates(transportProtocol: transportProtocol)
-//        }
+    func testUrlsRotatedWithHttpTransportProtocol() throws {
+        // manual testing - as failures are required for validation
+        try XCTSkipIf(true)
         try verifyUrlRotates(transportProtocol: .http)
+    }
+
+    func testUrlsRotatedWithGrpcTransportProtocol() throws {
+        // manual testing - as failures are required for validation
+        try XCTSkipIf(true)
+        try verifyUrlRotates(transportProtocol: .grpc)
     }
 
     func verifyUrlRotates(transportProtocol: TransportProtocol) throws {
         let client = try IntegrationTestFixtures.createMobileCoinClientWithPartialValidFogUrls(transportProtocol:TransportProtocol.http)
 
-        for _ in 0...3 {
+        // using 10 iterations to be sure to get past all the incremental
+        // failures from each of the individual services that may be used
+        // during the balance query
+        for _ in 0...10 {
             let expect = expectation(description: description)
             try balance(client: client, transportProtocol: TransportProtocol.http, expectation: expect)
             waitForExpectations(timeout: 100)
@@ -40,4 +48,3 @@ class RandomUrlLoadBalancerIntTests: XCTestCase {
     }
 
 }
-
