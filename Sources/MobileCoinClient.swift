@@ -334,9 +334,9 @@ extension MobileCoinClient {
         ) -> Result<Config, InvalidInputError> {
 
             ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
-                RandomUrlLoadBalancer.make(urls: consensusUrls).flatMap { consensusUrlLoadBalancer in
+                RandomUrlLoadBalancer<ConsensusUrl>.make(urls: consensusUrls).flatMap { consensusUrlLoadBalancer in
                     FogUrl.make(strings: fogUrls).flatMap { fogUrls in
-                        RandomUrlLoadBalancer.make(urls: fogUrls).map { fogUrlLoadBalancer in
+                        RandomUrlLoadBalancer<FogUrl>.make(urls: fogUrls).map { fogUrlLoadBalancer in
 
                             let attestationConfig = NetworkConfig.AttestationConfig(
                                 consensus: consensusAttestation,

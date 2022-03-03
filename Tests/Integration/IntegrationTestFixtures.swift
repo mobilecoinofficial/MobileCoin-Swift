@@ -66,7 +66,27 @@ extension IntegrationTestFixtures {
         networkConfig.setFogTrustRoots(trustRoots)
         return networkConfig
     }
+    
+    static func createNetworkConfig(transportProtocol: TransportProtocol,
+                                    consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
+                                    fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>) throws -> NetworkConfig {
+        let attestationConfig = try network.attestationConfig()
 
+        var networkConfig = try NetworkConfig.make(
+            consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+            fogUrlLoadBalancer: fogUrlLoadBalancer,
+            attestation: attestationConfig,
+            transportProtocol: transportProtocol).get()
+
+        networkConfig.httpRequester = DefaultHttpRequester()
+        try networkConfig.setConsensusTrustRoots(NetworkPreset.trustRootsBytes())
+        try networkConfig.setFogTrustRoots(NetworkPreset.trustRootsBytes())
+        networkConfig.consensusAuthorization = network.consensusCredentials
+        networkConfig.fogUserAuthorization = network.fogUserCredentials
+
+        return networkConfig
+    }
+    
     static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> NetworkConfig {
         var networkConfig = try network.networkConfig()
         networkConfig.consensusAuthorization = network.invalidCredentials
@@ -221,4 +241,22 @@ extension IntegrationTestFixtures {
             accountKey: accountKey,
             fogBlockService: serviceProvider.fogBlockService)
     }
+
+    static func createServiceProvider(transportProtocol: TransportProtocol,
+                                      consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
+                                      fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>) throws -> ServiceProvider {
+        let networkConfig = try createNetworkConfig(transportProtocol: transportProtocol,
+                                                    consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                                                    fogUrlLoadBalancer: fogUrlLoadBalancer)
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main, grpcConnectionFactory: grpcFactory, httpConnectionFactory: httpFactory)
+    }
+
+//    static func createFogViewForUrlLoadBalancingTests(transportProtocol: TransportProtocol) throws -> FogView {
+//        let serviceProvider = try createServiceProviderForUrlLoadBalancingTests(transportProtocol: transportProtocol)
+//        serviceProvider.fogViewService
+//        
+//        return FogReportManager(serviceProvider: serviceProvider, targetQueue: DispatchQueue.main)
+//    }
 }

@@ -5,15 +5,15 @@
 import Foundation
 
 struct NetworkConfig {
-    static func make(consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol)
+    static func make(consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol)
         -> Result<NetworkConfig, InvalidInputError>
     {
         return .success(NetworkConfig(consensusUrlLoadBalancer: consensusUrlLoadBalancer, fogUrlLoadBalancer: fogUrlLoadBalancer, attestation: attestation, transportProtocol: transportProtocol))
     }
 
     private let attestation: AttestationConfig
-    private let consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>
-    private let fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>
+    private let consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>
+    private let fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
     
     var consensusUrls: [ConsensusUrl] {
         consensusUrlLoadBalancer.urlsTyped
@@ -38,7 +38,7 @@ struct NetworkConfig {
         }
     }
 
-    init(consensusUrlLoadBalancer: RandomUrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: RandomUrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
+    init(consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
         self.consensusUrlLoadBalancer = consensusUrlLoadBalancer

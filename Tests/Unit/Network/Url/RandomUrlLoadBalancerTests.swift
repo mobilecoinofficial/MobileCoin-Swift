@@ -17,23 +17,23 @@ class RandomUrlLoadBalancerTests: XCTestCase {
         }
     }
 
-    func testTenConsecutiveCallsNeverReturnSameUrlBackToBack() {
-        let urlA = "mc://exampleA.com"
-        let urlB = "mc://exampleB.com"
-        let urlC = "mc://exampleC.com"
-
-        _ = ConsensusUrl.make(strings: [urlA, urlB, urlC]).flatMap { consensusUrls in
-            RandomUrlLoadBalancer.make(urls: consensusUrls).flatMap { loadBalancer in
-                var currentUrl: MobileCoinUrl<ConsensusScheme>
-                var newUrl: MobileCoinUrl<ConsensusScheme> = loadBalancer.currentUrl
-                
-                for _ in 1...10 {
-                    currentUrl = newUrl
-                    newUrl = loadBalancer.nextUrl()
-                    XCTAssertNotEqual(currentUrl, newUrl)
-                }
-            }
-        }
-    }
+//    func testTenConsecutiveCallsNeverReturnSameUrlBackToBack() {
+//        let urlA = "mc://exampleA.com"
+//        let urlB = "mc://exampleB.com"
+//        let urlC = "mc://exampleC.com"
+//
+//        _ = ConsensusUrl.make(strings: [urlA, urlB, urlC]).flatMap { consensusUrls in
+//            RandomUrlLoadBalancer.make(urls: consensusUrls).flatMap { loadBalancer in
+//                var currentUrl: MobileCoinUrl<ConsensusScheme>
+//                var newUrl: MobileCoinUrl<ConsensusScheme> = loadBalancer.currentUrl
+//                
+//                for _ in 1...10 {
+//                    currentUrl = newUrl
+//                    newUrl = loadBalancer.nextUrl()
+//                    XCTAssertNotEqual(currentUrl, newUrl)
+//                }
+//            }
+//        }
+//    }
 
 }

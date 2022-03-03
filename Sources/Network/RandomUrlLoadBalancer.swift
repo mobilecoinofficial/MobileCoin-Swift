@@ -2,31 +2,11 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> {
-
-    static func make(urls: [ServiceUrl]) -> Result<RandomUrlLoadBalancer, InvalidInputError> {
-        guard urls.isNotEmpty else {
-            return .failure(InvalidInputError("url list cannot be empty"))
-        }
-        return .success(RandomUrlLoadBalancer(urls:urls))
-    }
-
-    let urlsTyped: [ServiceUrl]
+class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> : UrlLoadBalancer<ServiceUrl> {
     private var rng = SystemRandomNumberGenerator()
     private(set) var currentUrl: ServiceUrl
-
-    private init(urls: [ServiceUrl]) {
-        self.urlsTyped = urls
-
-        guard let nextUrl = urlsTyped.randomElement(using: &rng) else {
-            // This condition should never happen
-            logger.fatalError(
-                "unable to get nextUrl() from RandomUrlLoadBalancer")
-        }
-        currentUrl = nextUrl
-    }
-
-    func nextUrl() -> ServiceUrl {
+    
+    override func nextUrl() -> ServiceUrl {
         guard urlsTyped.count > 1 else {
             return currentUrl
         }
@@ -44,6 +24,20 @@ class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> {
 
         currentUrl = nextUrl
         return currentUrl
+    }
+    
+    required init(urls: [ServiceUrl]) {
+        // this is to work around the 'Property not initialized at super.init call' compiler error
+        currentUrl = urls[0]
+
+        super.init(urls: urls)
+
+        guard let nextUrl = urlsTyped.randomElement(using: &rng) else {
+            // This condition should never happen
+            logger.fatalError(
+                "unable to get nextUrl() from RandomUrlLoadBalancer")
+        }
+        currentUrl = nextUrl
     }
 
 }
