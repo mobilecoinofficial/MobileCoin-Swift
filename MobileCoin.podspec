@@ -58,7 +58,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/Core", "1.2.0-pre8"
+    subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre9"
 
     subspec.dependency "gRPC-Swift"
     subspec.dependency "Logging", "~> 1.4"
@@ -90,7 +90,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "1.2.0-pre8"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 1.2.0-pre9"
 
     subspec.dependency "Logging", "~> 1.4"
 

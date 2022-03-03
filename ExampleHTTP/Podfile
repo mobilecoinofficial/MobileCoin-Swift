@@ -28,7 +28,8 @@ target 'Example' do
 
   # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin-ios-artifacts'
   # pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin-ios-artifacts'
-  pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin-ios-artifacts'
+  # pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin-ios-artifacts'
+  pod 'LibMobileCoin/CoreHTTP', path: '../../project'
   # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
   # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin-ios-artifacts.git'
 
