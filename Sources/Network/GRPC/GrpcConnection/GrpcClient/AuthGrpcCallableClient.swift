@@ -21,8 +21,8 @@ extension AuthGrpcCallableClient {
     func auth(
         _ request: Attest_AuthMessage,
         callOptions: CallOptions?,
-        completion: @escaping (UnaryCallResult<Attest_AuthMessage>) -> Void
+        completion: @escaping (Result<UnaryCallResult<Attest_AuthMessage>, Error>) -> Void
     ) {
-        auth(request, callOptions: callOptions).callResult.whenSuccess(completion)
+        auth(request, callOptions: callOptions).callResult.whenComplete(completion)
     }
 }

@@ -9,8 +9,8 @@ import XCTest
 class UrlLoadBalancerIntTests: XCTestCase {
     
     func testFogViewUrlRotates() throws {
-        try testFogViewRotatesAwayFromBadUrl(transportProtocol: .http)
-//        try testFogViewRotatesAwayFromBadUrl(transportProtocol: .grpc)
+//        try testFogViewRotatesAwayFromBadUrl(transportProtocol: .http)
+        try testFogViewRotatesAwayFromBadUrl(transportProtocol: .grpc)
     }
 
     func testFogViewRotatesAwayFromBadUrl(transportProtocol: TransportProtocol) throws {
@@ -48,7 +48,7 @@ class UrlLoadBalancerIntTests: XCTestCase {
             }
             expectFailure.fulfill()
         }
-        waitForExpectations(timeout: 1000)
+        waitForExpectations(timeout: 40)
 
         let expectSuccess = expectation(description: "Making FogView request that should succeed via url rotation after prior failure")
 
@@ -59,7 +59,7 @@ class UrlLoadBalancerIntTests: XCTestCase {
             guard nil != $0.successOrFulfill(expectation: expectSuccess) else { return }
             expectSuccess.fulfill()
         }
-        waitForExpectations(timeout: 100)
+        waitForExpectations(timeout: 40)
     }
 
 }

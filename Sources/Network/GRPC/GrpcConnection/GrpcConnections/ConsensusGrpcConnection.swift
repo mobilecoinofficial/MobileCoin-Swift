@@ -47,10 +47,10 @@ extension ConsensusGrpcConnection {
         func call(
             request: Attest_Message,
             callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<ConsensusCommon_ProposeTxResponse>) -> Void
+            completion: @escaping (Result<UnaryCallResult<ConsensusCommon_ProposeTxResponse>, Error>) -> Void
         ) {
             let unaryCall = client.clientTxPropose(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            unaryCall.callResult.whenComplete(completion)
         }
     }
 }

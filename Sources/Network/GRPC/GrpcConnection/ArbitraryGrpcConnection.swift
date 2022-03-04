@@ -18,7 +18,7 @@ class ArbitraryGrpcConnection {
         request: Call.Request,
         completion: @escaping (Result<Call.Response, ConnectionError>) -> Void
     ) {
-        func performCallCallback(callResult: UnaryCallResult<Call.Response>) {
+        func performCallCallback(callResult: Result<UnaryCallResult<Call.Response>, Error>) {
             inner.accessAsync {
                 let result = $0.processResponse(callResult: callResult)
                 switch result {
@@ -63,18 +63,23 @@ extension ArbitraryGrpcConnection {
             return callOptions
         }
 
-        func processResponse<Response>(callResult: UnaryCallResult<Response>)
+        func processResponse<Response>(callResult: Result<UnaryCallResult<Response>, Error>)
             -> Result<Response, ConnectionError>
         {
-            guard callResult.status.isOk, let response = callResult.response else {
-                return .failure(.connectionFailure(String(describing: callResult.status)))
-            }
+            switch callResult {
+            case .failure(let error):
+                return .failure(.connectionFailure(error.localizedDescription))
+            case .success(let callResponse):
+                guard callResponse.status.isOk, let response = callResponse.response else {
+                    return .failure(.connectionFailure(String(describing: callResponse.status)))
+                }
 
-            if let initialMetadata = callResult.initialMetadata {
-                session.processResponse(headers: initialMetadata)
-            }
+                if let initialMetadata = callResponse.initialMetadata {
+                    session.processResponse(headers: initialMetadata)
+                }
 
-            return .success(response)
+                return .success(response)
+            }
         }
     }
 }
