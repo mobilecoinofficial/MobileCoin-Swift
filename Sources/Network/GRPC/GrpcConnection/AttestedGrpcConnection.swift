@@ -8,6 +8,7 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+import NIOCore
 
 enum AttestedGrpcConnectionError: Error {
     case connectionError(ConnectionError)
@@ -87,6 +88,7 @@ class AttestedGrpcConnection: ConnectionProtocol {
         ) -> Void
     ) {
         inner.accessAsync(block: { inner, callback in
+
             inner.performAttestedCallWithAuth(
                 call,
                 requestAad: requestAad,
@@ -333,6 +335,7 @@ extension AttestedGrpcConnection {
         private func requestCallOptions() -> CallOptions {
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
+            callOptions.timeLimit = TimeLimit.timeout(TimeAmount.seconds(30))
             return callOptions
         }
 
