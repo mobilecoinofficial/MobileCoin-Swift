@@ -4,6 +4,7 @@
 
 import Foundation
 import GRPC
+import NIOCore
 
 class ArbitraryGrpcConnection {
     private let inner: SerialDispatchLock<Inner>
@@ -60,6 +61,7 @@ extension ArbitraryGrpcConnection {
         func requestCallOptions() -> CallOptions {
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
+            callOptions.timeLimit = TimeLimit.timeout(TimeAmount.seconds(30))
             return callOptions
         }
 

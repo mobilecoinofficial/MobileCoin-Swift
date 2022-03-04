@@ -88,7 +88,6 @@ class AttestedGrpcConnection: ConnectionProtocol {
         ) -> Void
     ) {
         inner.accessAsync(block: { inner, callback in
-
             inner.performAttestedCallWithAuth(
                 call,
                 requestAad: requestAad,
