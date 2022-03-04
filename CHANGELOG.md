@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0-pre10] - 2022-02-03
+
+### Changed
+
+- Use build-artifacts from CI/CD
+
 ## [1.2.0-pre9] - 2022-02-03
 
 ### Added 
