@@ -29,6 +29,12 @@ final class GrpcChannelManager {
     }
 }
 
+extension GrpcChannelManager {
+    enum Defaults {
+        static let callOptionsTimeLimit = TimeLimit.timeout(TimeAmount.seconds(30))
+    }
+}
+
 extension ClientConnection {
     fileprivate static func create(group: EventLoopGroup, config: GrpcChannelConfig) -> GRPCChannel
     {

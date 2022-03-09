@@ -9,6 +9,8 @@ import XCTest
 
 enum IntegrationTestFixtures {
     static let network: NetworkPreset = .testNet
+    static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
+    static let invalidFogUrl = "fog://invalid.mobilecoin.com"
 }
 
 extension IntegrationTestFixtures {
@@ -63,6 +65,14 @@ extension IntegrationTestFixtures {
         networkConfig.setConsensusTrustRoots(trustRoots)
         networkConfig.setFogTrustRoots(trustRoots)
         return networkConfig
+    }
+
+    static func createNetworkConfigWithInvalidUrls(transportProtocol: TransportProtocol) throws -> NetworkConfig {
+        try NetworkConfig.make(
+            consensusUrl: invalidConsensusUrl,
+            fogUrl: invalidFogUrl,
+            attestation: network.attestationConfig(),
+            transportProtocol: transportProtocol).get()
     }
 
     static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> NetworkConfig {
