@@ -14,11 +14,11 @@ protocol GrpcCallable {
     func call(
         request: Request,
         callOptions: CallOptions?,
-        completion: @escaping (UnaryCallResult<Response>) -> Void)
+        completion: @escaping (Result<UnaryCallResult<Response>, Error>) -> Void)
 }
 
 extension GrpcCallable {
-    func call(request: Request, completion: @escaping (UnaryCallResult<Response>) -> Void) {
+    func call(request: Request, completion: @escaping (Result<UnaryCallResult<Response>, Error>) -> Void) {
         call(request: request, callOptions: nil, completion: completion)
     }
 }

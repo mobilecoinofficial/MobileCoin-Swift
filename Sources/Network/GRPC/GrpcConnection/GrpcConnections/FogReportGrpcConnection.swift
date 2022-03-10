@@ -30,10 +30,10 @@ extension FogReportGrpcConnection {
         func call(
             request: Report_ReportRequest,
             callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<Report_ReportResponse>) -> Void
+            completion: @escaping (Result<UnaryCallResult<Report_ReportResponse>, Error>) -> Void
         ) {
             let unaryCall = client.getReports(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            unaryCall.callResult.whenComplete(completion)
         }
     }
 }

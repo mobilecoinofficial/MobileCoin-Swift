@@ -69,7 +69,7 @@ extension ConnectionIntTests {
         return ConsensusConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.consensus,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 
@@ -84,7 +84,7 @@ extension ConnectionIntTests {
         return FogBlockConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.fogBlock,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 

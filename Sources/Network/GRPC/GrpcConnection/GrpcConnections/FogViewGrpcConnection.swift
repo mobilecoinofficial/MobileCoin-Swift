@@ -50,10 +50,10 @@ extension FogViewGrpcConnection {
         func call(
             request: Attest_Message,
             callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<Attest_Message>) -> Void
+            completion: @escaping (Result<UnaryCallResult<Attest_Message>, Error>) -> Void
         ) {
             let unaryCall = client.query(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            unaryCall.callResult.whenComplete(completion)
         }
     }
 }
