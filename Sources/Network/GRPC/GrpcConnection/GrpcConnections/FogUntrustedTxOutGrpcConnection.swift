@@ -34,10 +34,10 @@ extension FogUntrustedTxOutGrpcConnection {
         func call(
             request: FogLedger_TxOutRequest,
             callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<FogLedger_TxOutResponse>) -> Void
+            completion: @escaping (Result<UnaryCallResult<FogLedger_TxOutResponse>, Error>) -> Void
         ) {
             let unaryCall = client.getTxOuts(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            unaryCall.callResult.whenComplete(completion)
         }
     }
 }

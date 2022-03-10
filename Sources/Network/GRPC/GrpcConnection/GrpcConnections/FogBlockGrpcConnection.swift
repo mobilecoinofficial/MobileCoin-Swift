@@ -34,10 +34,10 @@ extension FogBlockGrpcConnection {
         func call(
             request: FogLedger_BlockRequest,
             callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<FogLedger_BlockResponse>) -> Void
+            completion: @escaping (Result<UnaryCallResult<FogLedger_BlockResponse>, Error>) -> Void
         ) {
             let unaryCall = client.getBlocks(request, callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            unaryCall.callResult.whenComplete(completion)
         }
     }
 }

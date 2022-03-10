@@ -194,7 +194,7 @@ extension FogBlockConnectionIntTests {
         return FogBlockConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.fogBlock,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 }

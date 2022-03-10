@@ -203,7 +203,7 @@ extension ConsensusConnectionIntTests {
         return ConsensusConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.consensus,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 }

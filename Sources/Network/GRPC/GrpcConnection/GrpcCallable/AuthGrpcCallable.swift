@@ -12,7 +12,7 @@ protocol AuthGrpcCallable {
     func auth(
         _ request: Attest_AuthMessage,
         callOptions: CallOptions?,
-        completion: @escaping (UnaryCallResult<Attest_AuthMessage>) -> Void)
+        completion: @escaping (Result<UnaryCallResult<Attest_AuthMessage>, Error>) -> Void)
 }
 
 struct AuthGrpcCallableWrapper: GrpcCallable {
@@ -21,7 +21,7 @@ struct AuthGrpcCallableWrapper: GrpcCallable {
     func call(
         request: Attest_AuthMessage,
         callOptions: CallOptions?,
-        completion: @escaping (UnaryCallResult<Attest_AuthMessage>) -> Void
+        completion: @escaping (Result<UnaryCallResult<Attest_AuthMessage>, Error>) -> Void
     ) {
         authCallable.auth(request, callOptions: callOptions, completion: completion)
     }
