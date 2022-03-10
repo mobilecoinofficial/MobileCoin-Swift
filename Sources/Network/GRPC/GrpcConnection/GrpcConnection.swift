@@ -78,6 +78,7 @@ extension GrpcConnection {
         func requestCallOptions() -> CallOptions {
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
+            callOptions.timeLimit = GrpcChannelManager.Defaults.callOptionsTimeLimit
             return callOptions
         }
 
