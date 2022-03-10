@@ -11,49 +11,42 @@ class UrlLoadBalancerIntTests: XCTestCase {
     let expectationTimeout = 60.0
     
     func testBlockchainRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testBlockchainRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }
     }
 
     func testConsensusRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testConsensusRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }
     }
 
     func testFogBlockRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testFogBlockRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }
     }
 
     func testFogKeyImageRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testFogKeyImageRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }
     }
 
     func testFogMerkleProofRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testFogMerkleProofRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }
     }
 
     func testFogUntrustedTxOutRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testFogUntrustedTxOutRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }
     }
 
     func testFogViewRotatesAwayFromBadUrl() throws {
-        // try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try testFogViewRotatesAwayFromBadUrl(transportProtocol: transportProtocol)
         }

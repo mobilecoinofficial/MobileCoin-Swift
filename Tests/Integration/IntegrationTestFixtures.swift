@@ -271,10 +271,5 @@ extension IntegrationTestFixtures {
         return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main, grpcConnectionFactory: grpcFactory, httpConnectionFactory: httpFactory)
     }
 
-//    static func createFogViewForUrlLoadBalancingTests(transportProtocol: TransportProtocol) throws -> FogView {
-//        let serviceProvider = try createServiceProviderForUrlLoadBalancingTests(transportProtocol: transportProtocol)
-//        serviceProvider.fogViewService
-//        
-//        return FogReportManager(serviceProvider: serviceProvider, targetQueue: DispatchQueue.main)
-//    }
+
 }
