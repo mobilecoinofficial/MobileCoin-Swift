@@ -40,7 +40,7 @@ extension ClientConnection {
     {
         let builder: Builder
         if config.useTls {
-            let secureBuilder = ClientConnection.usingTLSBackedByNIOSSL(on: group)
+            let secureBuilder = ClientConnection.secure(group: group)
             if let trustRoots = config.trustRoots {
                 secureBuilder.withTLS(trustRoots: .certificates(trustRoots))
             }
