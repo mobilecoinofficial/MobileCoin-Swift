@@ -1,0 +1,17 @@
+### RTH Tasks
+
+- TxOutMemoBuilder
+- Add BlockVersion
+- Update one-time key generation
+- Add Change Output to all Tx's
+- AddressHash
+- EmptyMemo
+- DestinationMemo
+- SenderMemo
+- SenderMemoWithPaymentRequest
+- TxOutMemoType
+- TxOutMemoParser
+- Integrate into TxOut & OwnedTxOut
+- Update ReportResponse
+
+
