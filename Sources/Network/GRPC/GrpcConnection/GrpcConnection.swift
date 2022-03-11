@@ -4,7 +4,6 @@
 
 import Foundation
 import GRPC
-import NIOCore
 
 class GrpcConnection: ConnectionProtocol {
     private let inner: SerialDispatchLock<Inner>

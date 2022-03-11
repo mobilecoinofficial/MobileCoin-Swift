@@ -8,7 +8,6 @@
 import Foundation
 import GRPC
 import LibMobileCoin
-import NIOCore
 
 enum AttestedGrpcConnectionError: Error {
     case connectionError(ConnectionError)
