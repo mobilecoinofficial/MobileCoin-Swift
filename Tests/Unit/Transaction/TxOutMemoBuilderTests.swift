@@ -9,22 +9,23 @@ class TxOutMemoBuilderTests: XCTestCase {
     
     func testCreateWithSenderAndDestination() throws {
         let fixture = try AccountKey.Fixtures.Default()
-        XCTAssertSuccess(
-            TxOutMemoBuilder.createSenderAndDestinationRTHMemoBuilder(accountKey: fixture.accountKey))
+        XCTAssertNotNil(
+            TxOutMemoBuilder.createSenderAndDestinationMemoBuilder(accountKey: fixture.accountKey))
     }
     
     func testDefault() throws {
-        XCTAssertSuccess(
-            TxOutMemoBuilder.createDefaultRTHMemoBuilder())
+        XCTAssertNotNil(
+            TxOutMemoBuilder.createDefaultMemoBuilder())
     }
     
-    func testcreateSenderPaymentRequestAndDestinationRTHMemoBuilder() throws {
+    func testcreateSenderPaymentRequestAndDestinationMemoBuilder() throws {
         let fixture = try AccountKey.Fixtures.Default()
         let paymentRequestId : UInt64 = 1
-        XCTAssertSuccess(
-            TxOutMemoBuilder.createSenderPaymentRequestAndDestinationRTHMemoBuilder(
-                accountKey: fixture.accountKey,
-                paymentRequestId: paymentRequestId))
+        XCTAssertNotNil(
+            TxOutMemoBuilder.createSenderPaymentRequestAndDestinationMemoBuilder(
+                paymentRequestId: paymentRequestId,
+                accountKey: fixture.accountKey
+            ))
     }
     
 }
