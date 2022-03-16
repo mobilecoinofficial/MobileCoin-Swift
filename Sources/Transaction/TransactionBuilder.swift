@@ -75,6 +75,7 @@ final class TransactionBuilder {
                 build(
                     inputs: inputs,
                     accountKey: accountKey,
+                    changeAmount: nil,
                     outputs: [(recipient: recipient, amount: outputAmount)],
                     memoType: memoType,
                     fee: fee,
@@ -103,12 +104,12 @@ final class TransactionBuilder {
         outputsAddingChangeOutputIfNeeded(
             inputs: inputs,
             outputs: outputs,
-            changeAddress: changeAddress,
             fee: fee
-        ).flatMap { outputs in
+        ).flatMap { (outputs, changeAmount) in
             build(
                 inputs: inputs,
                 accountKey: accountKey,
+                changeAmount: changeAmount,
                 outputs: outputs,
                 memoType: memoType,
                 fee: fee,
@@ -122,6 +123,7 @@ final class TransactionBuilder {
     static func build(
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
+        changeAmount: PositiveUInt64?,
         outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
         memoType: MemoType,
         fee: UInt64,
@@ -132,7 +134,7 @@ final class TransactionBuilder {
     ) -> Result<(transaction: Transaction, receipts: [Receipt]), TransactionBuilderError> {
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.knownTxOut.value },
-                isEqualToSumOfValues: outputs.map { $0.amount.value } + [fee])
+                isEqualToSumOfValues: (outputs.map { $0.amount.value } + [fee] + [changeAmount?.value]).compactMap({$0}))
         else {
             return .failure(.invalidInput("Input values != output values + fee"))
         }
@@ -152,14 +154,25 @@ final class TransactionBuilder {
             }
         }
 
-        return outputs.map { recipient, amount in
+        var outputResults = outputs.map { recipient, amount in
             builder.addOutput(
                 publicAddress: recipient,
                 amount: amount.value,
                 rng: rng,
                 rngContext: rngContext
             ).map { $0.receipt }
-        }.collectResult().flatMap { receipts in
+        }
+        
+        if let changeAmount = changeAmount {
+            outputResults.append(builder.addChangeOutput(
+                accountKey: accountKey,
+                amount: changeAmount.value,
+                rng: rng,
+                rngContext: rngContext
+            ).map { $0.receipt })
+        }
+        
+        return outputResults.collectResult().flatMap { receipts in
             builder.build(rng: rng, rngContext: rngContext).map { transaction in
                 (transaction, receipts)
             }
@@ -206,19 +219,14 @@ final class TransactionBuilder {
     private static func outputsAddingChangeOutputIfNeeded(
         inputs: [PreparedTxInput],
         outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
-        changeAddress: PublicAddress,
         fee: UInt64
-    ) -> Result<[(recipient: PublicAddress, amount: PositiveUInt64)], TransactionBuilderError> {
+    ) -> Result<([(recipient: PublicAddress, amount: PositiveUInt64)], changeAmount: PositiveUInt64?), TransactionBuilderError> {
         remainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
             outputValues: outputs.map { $0.amount.value },
             fee: fee
         ).map { remainingAmount in
-            var outputArray = outputs
-            if remainingAmount > 0, let changeAmount = PositiveUInt64(remainingAmount) {
-                outputArray.append((changeAddress, changeAmount))
-            }
-            return outputArray
+            (outputs, PositiveUInt64(remainingAmount))
         }
     }
 
@@ -386,26 +394,24 @@ final class TransactionBuilder {
     }
 
     private func addChangeOutput(
-        publicAddress: PublicAddress,
         accountKey: AccountKey,
         amount: UInt64,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-
+        
         var confirmationNumberData = Data32()
-
+        
         return McAccountKey.withUnsafePointer(
             viewPrivateKey: accountKey.viewPrivateKey,
             spendPrivateKey: accountKey.spendPrivateKey,
-            reportUrl: publicAddress.fogReportUrl!.url.absoluteString,
-            reportId: publicAddress.fogReportId!,
+            reportUrl: accountKey.publicChangeAddress.fogReportUrl!.url.absoluteString,
+            reportId: accountKey.publicChangeAddress.fogReportId!,
             authoritySpki: accountKey.fogAuthoritySpki!
         ) { accountKeyPtr in
                 withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
                     confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
                         Data.make(withMcDataBytes: { errorPtr in
-//                            mc_transaction_builder_add_change_output(accountKeyPtr, ptr, amount, rngCallbackPtr, confirmationNumberPtr, &errorPtr)
                             mc_transaction_builder_add_change_output(
                                 accountKeyPtr,
                                 ptr,
