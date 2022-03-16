@@ -5,6 +5,31 @@
 import Foundation
 import LibMobileCoin
 
+public enum MemoType {
+    case unused
+    case recoverable(sender: AccountKey?)
+    case recoverablePaymentRequest(sender: AccountKey?, id: UInt64)
+    
+    func createMemoBuilder(accountKey: AccountKey) -> TxOutMemoBuilder {
+        switch self {
+        case .unused:
+            return TxOutMemoBuilder.createDefaultMemoBuilder()
+        case .recoverable(let sender):
+            return TxOutMemoBuilder.createRecoverableMemoBuilder(accountKey: sender ?? accountKey)
+        case .recoverablePaymentRequest(let sender, let id):
+            return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
+                paymentRequestId: id,
+                accountKey: sender ?? accountKey)
+        }
+    }
+}
+
+enum RTHMemoType {
+    case unused
+    case recoverable(sender: AccountKey)
+    case recoverablePaymentRequest(sender: AccountKey, id: UInt64)
+}
+
 class TxOutMemoBuilder {
     let ptr: OpaquePointer
 
@@ -12,22 +37,40 @@ class TxOutMemoBuilder {
         self.ptr = ptr
     }
     
-    static func createSenderAndDestinationMemoBuilder(accountKey: AccountKey) -> SenderAndDestinationMemoBuilder {
-        SenderAndDestinationMemoBuilder(accountKey: accountKey)
+    deinit {
+        mc_memo_builder_free(ptr)
+    }
+
+    static func createRecoverableMemoBuilder(accountKey: AccountKey) -> RecoverableMemoBuilder {
+        RecoverableMemoBuilder(accountKey: accountKey)
     }
     
     static func createDefaultMemoBuilder() -> DefaultMemoBuilder {
         DefaultMemoBuilder()
     }
     
-    static func createSenderPaymentRequestAndDestinationMemoBuilder(paymentRequestId: UInt64, accountKey: AccountKey) -> SenderPaymentRequestAndDestinationMemoBuilder {
-        SenderPaymentRequestAndDestinationMemoBuilder(paymentRequestId: paymentRequestId, accountKey: accountKey)
+    static func createRecoverablePaymentRequestMemoBuilder(paymentRequestId: UInt64, accountKey: AccountKey) -> RecoverablePaymentRequestMemoBuilder {
+        RecoverablePaymentRequestMemoBuilder(paymentRequestId: paymentRequestId, accountKey: accountKey)
     }
     
+    func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
+        try body(ptr)
+    }
+    
+    static func createMemoBuilder(type: RTHMemoType) -> TxOutMemoBuilder {
+        switch type {
+        case .unused:
+            return createDefaultMemoBuilder()
+        case .recoverable(let sender):
+            return createRecoverableMemoBuilder(accountKey: sender)
+        case .recoverablePaymentRequest(let sender, let id):
+            return createRecoverablePaymentRequestMemoBuilder(paymentRequestId: id, accountKey: sender)
+        }
+    }
 }
 
 
-final class SenderAndDestinationMemoBuilder : TxOutMemoBuilder {
+final class RecoverableMemoBuilder : TxOutMemoBuilder {
     init(
         accountKey: AccountKey
     ) {
@@ -51,7 +94,7 @@ final class DefaultMemoBuilder : TxOutMemoBuilder {
     }
 }
 
-final class SenderPaymentRequestAndDestinationMemoBuilder : TxOutMemoBuilder {
+final class RecoverablePaymentRequestMemoBuilder : TxOutMemoBuilder {
     init(
         paymentRequestId requestId: UInt64,
         accountKey: AccountKey

@@ -35,6 +35,7 @@ struct TransactionPreparer {
 
     func prepareSelfAddressedTransaction(
         inputs: [KnownTxOut],
+        memoType: MemoType,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
         completion: @escaping (
@@ -69,6 +70,7 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         sendingAllTo: self.selfPaymentAddress,
+                        memoType: memoType,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver
@@ -81,6 +83,7 @@ struct TransactionPreparer {
     func prepareTransaction(
         inputs: [KnownTxOut],
         recipient: PublicAddress,
+        memoType: MemoType,
         amount: UInt64,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
@@ -125,6 +128,7 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         to: recipient,
+                        memoType: memoType,
                         amount: amount,
                         changeAddress: self.selfPaymentAddress,
                         fee: fee,

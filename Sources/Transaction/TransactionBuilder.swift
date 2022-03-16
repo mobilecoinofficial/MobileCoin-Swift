@@ -27,10 +27,14 @@ extension TransactionBuilderError: CustomStringConvertible {
 }
 
 final class TransactionBuilder {
+    // TODO - Factor Out
+    static let rthBlockVersion = UInt32(2)
+    
     static func build(
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
         to recipient: PublicAddress,
+        memoType: MemoType,
         amount: PositiveUInt64,
         changeAddress: PublicAddress,
         fee: UInt64,
@@ -43,6 +47,7 @@ final class TransactionBuilder {
             inputs: inputs,
             accountKey: accountKey,
             outputs: [(recipient, amount)],
+            memoType: memoType,
             changeAddress: changeAddress,
             fee: fee,
             tombstoneBlockIndex: tombstoneBlockIndex,
@@ -58,6 +63,7 @@ final class TransactionBuilder {
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
         sendingAllTo recipient: PublicAddress,
+        memoType: MemoType,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
@@ -70,6 +76,7 @@ final class TransactionBuilder {
                     inputs: inputs,
                     accountKey: accountKey,
                     outputs: [(recipient: recipient, amount: outputAmount)],
+                    memoType: memoType,
                     fee: fee,
                     tombstoneBlockIndex: tombstoneBlockIndex,
                     fogResolver: fogResolver,
@@ -85,6 +92,7 @@ final class TransactionBuilder {
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
         outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
+        memoType: MemoType,
         changeAddress: PublicAddress,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
@@ -102,6 +110,7 @@ final class TransactionBuilder {
                 inputs: inputs,
                 accountKey: accountKey,
                 outputs: outputs,
+                memoType: memoType,
                 fee: fee,
                 tombstoneBlockIndex: tombstoneBlockIndex,
                 fogResolver: fogResolver,
@@ -114,6 +123,7 @@ final class TransactionBuilder {
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
         outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
+        memoType: MemoType,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
@@ -130,7 +140,9 @@ final class TransactionBuilder {
         let builder = TransactionBuilder(
             fee: fee,
             tombstoneBlockIndex: tombstoneBlockIndex,
-            fogResolver: fogResolver)
+            fogResolver: fogResolver,
+            memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
+            blockVersion: Self.rthBlockVersion)
 
         for input in inputs {
             if case .failure(let error) =
@@ -182,7 +194,8 @@ final class TransactionBuilder {
         let transactionBuilder = TransactionBuilder(
             fee: 0,
             tombstoneBlockIndex: tombstoneBlockIndex,
-            fogResolver: fogResolver)
+            fogResolver: fogResolver,
+            blockVersion: Self.rthBlockVersion)
         return transactionBuilder.addOutput(
             publicAddress: publicAddress,
             amount: amount,
@@ -249,21 +262,28 @@ final class TransactionBuilder {
 
         return .success(positiveRemainingAmount)
     }
-
+    
     private let tombstoneBlockIndex: UInt64
 
     private let ptr: OpaquePointer
+    
+    private let memoBuilder: TxOutMemoBuilder
 
     private init(
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
-        fogResolver: FogResolver = FogResolver()
+        fogResolver: FogResolver = FogResolver(),
+        memoBuilder: TxOutMemoBuilder = DefaultMemoBuilder(),
+        blockVersion: UInt32
     ) {
         self.tombstoneBlockIndex = tombstoneBlockIndex
-        self.ptr = fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
-            // Safety: mc_transaction_builder_create should never return nil.
-            withMcInfallible {
-                mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr)
+        self.memoBuilder = memoBuilder
+        self.ptr = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
+            fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
+                // Safety: mc_transaction_builder_create should never return nil.
+                withMcInfallible {
+                    mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr, memoBuilderPtr, blockVersion)
+                }
             }
         }
     }

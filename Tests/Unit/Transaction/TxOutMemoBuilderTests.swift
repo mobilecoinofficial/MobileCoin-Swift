@@ -10,7 +10,7 @@ class TxOutMemoBuilderTests: XCTestCase {
     func testCreateWithSenderAndDestination() throws {
         let fixture = try AccountKey.Fixtures.Default()
         XCTAssertNotNil(
-            TxOutMemoBuilder.createSenderAndDestinationMemoBuilder(accountKey: fixture.accountKey))
+            TxOutMemoBuilder.createRecoverableMemoBuilder(accountKey: fixture.accountKey))
     }
     
     func testDefault() throws {
@@ -27,5 +27,6 @@ class TxOutMemoBuilderTests: XCTestCase {
                 accountKey: fixture.accountKey
             ))
     }
+    
     
 }

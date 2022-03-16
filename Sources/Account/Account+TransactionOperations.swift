@@ -39,6 +39,7 @@ extension Account {
 
         func prepareTransaction(
             to recipient: PublicAddress,
+            memoType: MemoType,
             amount: UInt64,
             fee: UInt64,
             completion: @escaping (
@@ -81,6 +82,7 @@ extension Account {
                 transactionPreparer.prepareTransaction(
                     inputs: txOutsToSpend,
                     recipient: recipient,
+                    memoType: memoType,
                     amount: amount,
                     fee: fee,
                     tombstoneBlockIndex: tombstoneBlockIndex,
@@ -95,6 +97,7 @@ extension Account {
 
         func prepareTransaction(
             to recipient: PublicAddress,
+            memoType: MemoType,
             amount: UInt64,
             feeLevel: FeeLevel,
             completion: @escaping (
@@ -143,6 +146,7 @@ extension Account {
                         self.transactionPreparer.prepareTransaction(
                             inputs: inputs,
                             recipient: recipient,
+                            memoType: memoType,
                             amount: amount,
                             fee: fee,
                             tombstoneBlockIndex: tombstoneBlockIndex,
@@ -162,6 +166,7 @@ extension Account {
 
         func prepareDefragmentationStepTransactions(
             toSendAmount amountToSend: UInt64,
+            memoType: MemoType,
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
@@ -200,6 +205,7 @@ extension Account {
                         defragTxInputs.mapAsync({ defragInputs, callback in
                             self.transactionPreparer.prepareSelfAddressedTransaction(
                                 inputs: defragInputs.inputs,
+                                memoType: memoType,
                                 fee: defragInputs.fee,
                                 tombstoneBlockIndex: tombstoneBlockIndex,
                                 completion: callback)
