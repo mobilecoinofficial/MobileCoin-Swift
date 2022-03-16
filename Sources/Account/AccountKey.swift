@@ -36,6 +36,7 @@ public struct AccountKey {
     let changeSubaddressIndex: UInt64 = McConstants.DEFAULT_CHANGE_SUBADDRESS_INDEX
 
     public let publicAddress: PublicAddress
+    public let publicChangeAddress: PublicAddress
 
     init(
         viewPrivateKey: RistrettoPrivate,
@@ -52,6 +53,11 @@ public struct AccountKey {
             spendPrivateKey: spendPrivateKey,
             accountKeyFogInfo: fogInfo,
             subaddressIndex: subaddressIndex)
+        self.publicChangeAddress = PublicAddress(
+            viewPrivateKey: viewPrivateKey,
+            spendPrivateKey: spendPrivateKey,
+            accountKeyFogInfo: fogInfo,
+            subaddressIndex: changeSubaddressIndex)
     }
 
     /// - Returns: `nil` when the input is not deserializable.
