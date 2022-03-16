@@ -130,7 +130,6 @@ struct TransactionPreparer {
                         to: recipient,
                         memoType: memoType,
                         amount: amount,
-                        changeAddress: self.selfPaymentAddress,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver
