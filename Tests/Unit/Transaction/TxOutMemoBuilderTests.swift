@@ -22,7 +22,7 @@ class TxOutMemoBuilderTests: XCTestCase {
         let fixture = try AccountKey.Fixtures.Default()
         let paymentRequestId : UInt64 = 1
         XCTAssertNotNil(
-            TxOutMemoBuilder.createSenderPaymentRequestAndDestinationMemoBuilder(
+            TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: paymentRequestId,
                 accountKey: fixture.accountKey
             ))
