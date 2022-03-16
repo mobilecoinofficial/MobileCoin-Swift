@@ -13,6 +13,7 @@ class TransactionTests: XCTestCase {
             inputs: fixture.inputs,
             accountKey: fixture.accountKey,
             outputs: fixture.outputs,
+            memoType: .unused,
             fee: fixture.fee,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver))
