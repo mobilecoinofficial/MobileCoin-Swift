@@ -182,7 +182,7 @@ public final class MobileCoinClient {
 
     public func prepareDefragmentationStepTransactions(
         toSendAmount amount: UInt64,
-        memoType: MemoType = .unused,
+        recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
@@ -194,7 +194,7 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
-        ).prepareDefragmentationStepTransactions(toSendAmount: amount, memoType: memoType, feeLevel: feeLevel)
+        ).prepareDefragmentationStepTransactions(toSendAmount: amount, recoverableMemo: recoverableMemo, feeLevel: feeLevel)
         { result in
             self.callbackQueue.async {
                 completion(result)

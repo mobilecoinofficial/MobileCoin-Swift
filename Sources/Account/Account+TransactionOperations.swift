@@ -166,7 +166,7 @@ extension Account {
 
         func prepareDefragmentationStepTransactions(
             toSendAmount amountToSend: UInt64,
-            memoType: MemoType,
+            recoverableMemo: Bool,
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
@@ -205,7 +205,7 @@ extension Account {
                         defragTxInputs.mapAsync({ defragInputs, callback in
                             self.transactionPreparer.prepareSelfAddressedTransaction(
                                 inputs: defragInputs.inputs,
-                                memoType: memoType,
+                                recoverableMemo: recoverableMemo,
                                 fee: defragInputs.fee,
                                 tombstoneBlockIndex: tombstoneBlockIndex,
                                 completion: callback)

@@ -35,7 +35,7 @@ struct TransactionPreparer {
 
     func prepareSelfAddressedTransaction(
         inputs: [KnownTxOut],
-        memoType: MemoType,
+        recoverableMemo: Bool,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
         completion: @escaping (
@@ -70,7 +70,7 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         sendingAllTo: self.selfPaymentAddress,
-                        memoType: memoType,
+                        memoType: recoverableMemo ? .recoverable : .unused, 
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver

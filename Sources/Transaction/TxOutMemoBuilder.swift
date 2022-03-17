@@ -7,19 +7,27 @@ import LibMobileCoin
 
 public enum MemoType {
     case unused
-    case recoverable(sender: AccountKey?)
-    case recoverablePaymentRequest(sender: AccountKey?, id: UInt64)
+    case recoverable
+    case customRecoverable(sender: AccountKey)
+    case recoverablePaymentRequest(id: UInt64)
+    case customPaymentRequest(sender: AccountKey, id: UInt64)
     
     func createMemoBuilder(accountKey: AccountKey) -> TxOutMemoBuilder {
         switch self {
         case .unused:
             return TxOutMemoBuilder.createDefaultMemoBuilder()
-        case .recoverable(let sender):
-            return TxOutMemoBuilder.createRecoverableMemoBuilder(accountKey: sender ?? accountKey)
-        case .recoverablePaymentRequest(let sender, let id):
+        case .recoverable:
+            return TxOutMemoBuilder.createRecoverableMemoBuilder(accountKey: accountKey)
+        case .customRecoverable(let sender):
+            return TxOutMemoBuilder.createRecoverableMemoBuilder(accountKey: sender)
+        case .recoverablePaymentRequest(let id):
             return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: id,
-                accountKey: sender ?? accountKey)
+                accountKey: accountKey)
+        case .customPaymentRequest(let sender, let id):
+            return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
+                paymentRequestId: id,
+                accountKey: sender)
         }
     }
 }
