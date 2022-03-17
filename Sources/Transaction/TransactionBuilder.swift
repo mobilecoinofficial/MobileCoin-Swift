@@ -402,9 +402,7 @@ final class TransactionBuilder {
         return McAccountKey.withUnsafePointer(
             viewPrivateKey: accountKey.viewPrivateKey,
             spendPrivateKey: accountKey.spendPrivateKey,
-            reportUrl: accountKey.publicChangeAddress.fogReportUrl!.url.absoluteString,
-            reportId: accountKey.publicChangeAddress.fogReportId!,
-            authoritySpki: accountKey.fogAuthoritySpki!
+            fogInfo: accountKey.fogInfo
         ) { accountKeyPtr in
                 withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
                     confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in

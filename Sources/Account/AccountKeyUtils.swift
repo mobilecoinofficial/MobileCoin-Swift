@@ -97,6 +97,27 @@ extension McAccountKey {
     static func withUnsafePointer<T>(
         viewPrivateKey: RistrettoPrivate,
         spendPrivateKey: RistrettoPrivate,
+        fogInfo: AccountKey.FogInfo?,
+        body: (UnsafePointer<McAccountKey>) throws -> T
+    ) rethrows -> T {
+        guard let fogInfo = fogInfo else {
+            return try McAccountKey.withUnsafePointer(
+                viewPrivateKey: viewPrivateKey,
+                spendPrivateKey: spendPrivateKey,
+                body: body)
+        }
+        return try McAccountKey.withUnsafePointer(
+            viewPrivateKey: viewPrivateKey,
+            spendPrivateKey: spendPrivateKey,
+            reportUrl: fogInfo.reportUrlString,
+            reportId: fogInfo.reportId,
+            authoritySpki: fogInfo.authoritySpki,
+            body: body)
+    }
+
+    static func withUnsafePointer<T>(
+        viewPrivateKey: RistrettoPrivate,
+        spendPrivateKey: RistrettoPrivate,
         reportUrl: String,
         reportId: String,
         authoritySpki: Data,
