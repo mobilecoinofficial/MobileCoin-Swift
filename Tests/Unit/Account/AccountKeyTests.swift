@@ -88,4 +88,10 @@ class AccountKeyTests: XCTestCase {
         }
     }
 
+    func testPublicAddressHash() throws {
+        let fixture = try PublicAddress.Fixtures.Default()
+        let publicAddress = fixture.publicAddress
+        let addressHash = publicAddress.calculateAddressHash()
+        XCTAssertNotNil(addressHash)
+    }
 }
