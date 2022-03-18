@@ -5,12 +5,12 @@
 import Foundation
 import LibMobileCoin
 
-extension Data16 {
+extension Data64 {
     static func make(
         withMcMutableBuffer body:
             (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
-    ) -> Result<Data16, LibMobileCoinError> {
-        var bytes = Data16()
+    ) -> Result<Data64, LibMobileCoinError> {
+        var bytes = Data64()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcError { errorPtr in
                 body(bufferPtr, &errorPtr)
@@ -21,18 +21,18 @@ extension Data16 {
     static func make(
         withMcMutableBuffer body:
             (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
-    ) -> Result<Data16, LibMobileCoinError> {
-        var bytes = Data16()
+    ) -> Result<Data64, LibMobileCoinError> {
+        var bytes = Data64()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcErrorReturningArrayCount { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
         }.map { numBytesReturned in
-            guard numBytesReturned == 16 else {
+            guard numBytesReturned == 64 else {
                 // This condition indicates a programming error.
                 logger.fatalError(
                     "LibMobileCoin function returned unexpected byte count " +
-                        "(\(numBytesReturned)). Expected 16.")
+                        "(\(numBytesReturned)). Expected 64.")
             }
             return bytes
         }
@@ -57,12 +57,11 @@ extension Data16 {
             // This condition indicates a programming error.
             logger.fatalError("Infallible LibMobileCoin function failed.")
         }
-        guard numBytesReturned == 16 else {
+        guard numBytesReturned == 64 else {
             // This condition indicates a programming error.
             logger.fatalError(
                 "LibMobileCoin function returned unexpected byte count (\(numBytesReturned)). " +
-                    "Expected 16.")
+                    "Expected 64.")
         }
     }
 }
-
