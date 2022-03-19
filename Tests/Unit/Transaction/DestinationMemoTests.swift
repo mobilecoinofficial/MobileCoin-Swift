@@ -3,31 +3,150 @@
 //
 
 import XCTest
+@testable import MobileCoin
+@testable import LibMobileCoin
 
 class DestinationMemoTests: XCTestCase {
 
     func testAliceDestinationMemo() throws {
-        let alice_bytes_hex = SenderMemoData.Fixtures.alice_bytes
-        let bob_bytes_hex = SenderMemoData.Fixtures.bob_bytes
-        let tx_out_public_key_hex = SenderMemoData.Fixtures.tx_public_key_bytes
+        let alice_bytes_hex = DestinationMemoData.Fixtures.alice_bytes
+        // let tx_out_public_key_hex = DestinationMemoData.Fixtures.tx_public_key_bytes
         
         let alice_account_key = AccountKey(serializedData: Data(hexEncoded: alice_bytes_hex)!)
-        let bob_account_key = AccountKey(serializedData: Data(hexEncoded: bob_bytes_hex)!)
-        let tx_out_public_key = RistrettoPublic(Data(hexEncoded: tx_out_public_key_hex)!)
+        // let tx_out_public_key = RistrettoPublic(Data(hexEncoded: tx_out_public_key_hex)!)
         
-        let senderMemoData = SenderMemoData.create(senderAccountKey: alice_account_key!, receipientPublicAddress: bob_account_key!.publicAddress, txOutPublicKey: tx_out_public_key!)
-        XCTAssertNotNil(senderMemoData)
-        print("\(senderMemoData?.hexEncodedString())")
+        let destinationMemoData = DestinationMemoData.create(destinationAccountKey: alice_account_key!, numberOfRecipients: 1, fee: 3, totalOutlay: 100)
+        XCTAssertNotNil(destinationMemoData)
+        print("\(destinationMemoData?.hexEncodedString())")
+        // ccb5a98f0c0c42f68491e5e0c93624520000000000000000000000000000000000000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
         
-        let isValid = SenderMemoData.isValid(memoData: senderMemoData!, senderPublicAddress: alice_account_key!.publicAddress, receipientViewPrivateKey: bob_account_key!.subaddressViewPrivateKey, txOutPublicKey: tx_out_public_key!)
-        XCTAssertTrue(isValid)
-        
+//        let isValid = DestinationMemoData.isValid(memoData: destinationMemoData!, destinationPublicAddress: alice_account_key!.publicAddress, receipientViewPrivateKey: bob_account_key!.subaddressViewPrivateKey, txOutPublicKey: tx_out_public_key!)
+//        XCTAssertTrue(isValid)
+//
         let createdAddressHash = alice_account_key?.publicAddress.calculateAddressHash()
-        let addressHashFromMemoData = SenderMemoData.getAddressHash(memoData: senderMemoData!)
+        let addressHashFromMemoData = DestinationMemoData.getAddressHash(memoData: destinationMemoData!)
+        // ccb5a98f0c0c42f68491e5e0c9362452
         
         XCTAssertTrue(createdAddressHash! == addressHashFromMemoData!)
     }
 
+}
+
+struct DestinationMemoData {
+    enum Fixtures {}
+    
+//    static func isValid(
+//        memoData: Data64,
+//        senderPublicAddress: PublicAddress,
+//        receipientViewPrivateKey: RistrettoPrivate,
+//        txOutPublicKey: RistrettoPublic
+//    ) -> Bool {
+//        memoData.asMcBuffer { memoDataPtr in
+//            senderPublicAddress.withUnsafeCStructPointer { publicAddressPtr in
+//                receipientViewPrivateKey.asMcBuffer { receipientViewPrivateKeyPtr in
+//                    txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
+//                        var matches = true
+//                        // Safety: mc_tx_out_matches_any_subaddress is infallible when preconditions are
+//                        // upheld.
+//                        let result = withMcError { errorPtr in
+//                            mc_memo_sender_memo_is_valid(
+//                                memoDataPtr,
+//                                publicAddressPtr,
+//                                receipientViewPrivateKeyPtr,
+//                                txOutPublicKeyPtr,
+//                                &matches,
+//                                &errorPtr)
+//                        }
+//                        print(matches)
+//                        switch result {
+//                        case .success():
+//                            return true
+//                        case .failure(let error):
+//                            print("\(error)")
+//                            return false
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+    static func getAddressHash(
+        memoData: Data64
+    ) -> AddressHash? {
+        let bytes: Data16? = memoData.asMcBuffer { memoDataPtr in
+            switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+                mc_memo_destination_memo_get_address_hash(
+                    memoDataPtr,
+                    bufferPtr,
+                    &errorPtr)
+            }) {
+            case .success(let bytes):
+                // Safety: It's safe to skip validation because
+                // mc_tx_out_reconstruct_commitment should always return a valid
+                // RistrettoPublic on success.
+                return bytes as Data16
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // non-documented errors.
+                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
+                }
+            }
+        }
+        guard let bytes = bytes else { return nil }
+        print("address hash bytes \(bytes.data.hexEncodedString())")
+        return AddressHash(bytes)
+    }
+    
+    static func create(
+        senderAccountKey: AccountKey,
+        numberOfRecipients: UInt8,
+        fee: UInt64,
+        totalOutlay: UInt64
+    ) -> Data64? {
+        senderAccountKey.withUnsafeCStructPointer { senderAccountKeyPtr in
+            switch Data64.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+                mc_memo_sender_memo_create(
+                    senderAccountKeyPtr,
+                    numberOfRecipients,
+                    fee,
+                    totalOutlay,
+                    bufferPtr,
+                    &errorPtr)
+            }) {
+            case .success(let bytes):
+                // TODO - Update
+                
+                // Safety: It's safe to skip validation because
+                // mc_tx_out_reconstruct_commitment should always return a valid
+                // RistrettoPublic on success.
+                return bytes as Data64
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // non-documented errors.
+                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
+                }
+            }
+        }
+    }
 }
 
 extension DestinationMemoData.Fixtures {
