@@ -1,14 +1,25 @@
 ### RTH Tasks
 
-- TxOutMemoBuilder
+# - TxOutMemoBuilder
 - Add BlockVersion
 - Update one-time key generation
-- Add Change Output to all Tx's
-- AddressHash
-- EmptyMemo
+# - Add Change Output to all Tx's
+# - AddressHash
+# - FFIs
+#
+- Add TxOut tests to verify things get created correctly
+- Try to make more e2e tests
+# - Make the Memo abstraction types - SenderMemo, SenderMemo.data ? lazy var addressHash ? .data is optional, only init if valid ? 
+- Make PublicAddress pool, must be iterable, equatable, hashable. Create data structure that maps addresshash to PublicAddress using a Set. 
+- Annotate OwnedTxOut with resolved MemoData using pool. Keep track of un-resolved TxOuts that have RecoverableData, on pool change re-scan 
+- Pool & Scanner should be separate use DI to inject
+- Add demo to Signal.
+
+
 - DestinationMemo
 - SenderMemo
 - SenderMemoWithPaymentRequest
+- EmptyMemo
 - TxOutMemoType
 - TxOutMemoParser
 - Integrate into TxOut & OwnedTxOut

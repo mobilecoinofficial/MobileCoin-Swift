@@ -10,16 +10,21 @@ struct DestinationMemo {
     let numberOfRecipients: UInt8
     let fee: UInt64
     let totalOutlay: UInt64
+}
+
+struct RecoverableDestinationMemo {
+    let memoData: Data64
+    let addressHash: AddressHash
     
-    init?(_ memoData: Data64, addressHash: AddressHash, numberOfRecipients: UInt8, fee: UInt64, totalOutlay: UInt64) {
+    init?(_ memoData: Data64) {
+        guard let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData) else {
+            return nil
+        }
         self.memoData = memoData
         self.addressHash = addressHash
-        self.numberOfRecipients = numberOfRecipients
-        self.fee = fee
-        self.totalOutlay = totalOutlay
     }
-    
-    init?(_ memoData: Data64, txOut: TxOutProtocol, accountKey: AccountKey) {
+
+    func recover(txOut: TxOutProtocol, accountKey: AccountKey) -> DestinationMemo? {
         guard
             DestinationMemoUtils.isValid(txOut: txOut, accountKey: accountKey),
             let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData),
@@ -29,7 +34,10 @@ struct DestinationMemo {
         else {
             return nil
         }
+        return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
+    }
+    
+    init?(_ memoData: Data64, txOut: TxOutProtocol, accountKey: AccountKey) {
 
-        self.init(memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
     }
 }
