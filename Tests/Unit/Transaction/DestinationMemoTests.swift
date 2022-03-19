@@ -15,7 +15,11 @@ class DestinationMemoTests: XCTestCase {
         let alice_account_key = AccountKey(serializedData: Data(hexEncoded: alice_bytes_hex)!)
         // let tx_out_public_key = RistrettoPublic(Data(hexEncoded: tx_out_public_key_hex)!)
         
-        let destinationMemoData = DestinationMemoData.create(destinationAccountKey: alice_account_key!, numberOfRecipients: 1, fee: 3, totalOutlay: 100)
+        let fee: UInt64 = 3
+        let totalOutlay: UInt64 = 100
+        let numberOfRecipients: UInt8 = 1
+        
+        let destinationMemoData = DestinationMemoData.create(destinationPublicAddress: alice_account_key!.publicAddress, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
         XCTAssertNotNil(destinationMemoData)
         print("\(destinationMemoData?.hexEncodedString())")
         // ccb5a98f0c0c42f68491e5e0c93624520000000000000000000000000000000000000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
@@ -27,6 +31,15 @@ class DestinationMemoTests: XCTestCase {
         let addressHashFromMemoData = DestinationMemoData.getAddressHash(memoData: destinationMemoData!)
         // ccb5a98f0c0c42f68491e5e0c9362452
         
+        let memoDataFee = DestinationMemoData.getFee(memoData: destinationMemoData!)
+        XCTAssertEqual(memoDataFee, fee)
+
+        let memoDataTotalOutlay = DestinationMemoData.getTotalOutlay(memoData: destinationMemoData!)
+        XCTAssertEqual(memoDataTotalOutlay, totalOutlay)
+
+        let memoDataNumberOfRecipients = DestinationMemoData.getNumberOfRecipients(memoData: destinationMemoData!)
+        XCTAssertEqual(memoDataNumberOfRecipients, numberOfRecipients)
+
         XCTAssertTrue(createdAddressHash! == addressHashFromMemoData!)
     }
 
@@ -108,15 +121,15 @@ struct DestinationMemoData {
     }
     
     static func create(
-        senderAccountKey: AccountKey,
+        destinationPublicAddress: PublicAddress,
         numberOfRecipients: UInt8,
         fee: UInt64,
         totalOutlay: UInt64
     ) -> Data64? {
-        senderAccountKey.withUnsafeCStructPointer { senderAccountKeyPtr in
+        destinationPublicAddress.withUnsafeCStructPointer { destinationPublicAddressPtr in
             switch Data64.make(withMcMutableBuffer: { bufferPtr, errorPtr in
-                mc_memo_sender_memo_create(
-                    senderAccountKeyPtr,
+                mc_memo_destination_memo_create(
+                    destinationPublicAddressPtr,
                     numberOfRecipients,
                     fee,
                     totalOutlay,
@@ -147,6 +160,123 @@ struct DestinationMemoData {
             }
         }
     }
+    
+    static func getFee(
+        memoData: Data64
+    ) -> UInt64? {
+        memoData.asMcBuffer { memoDataPtr in
+            var out_fee: UInt64 = 0
+            let result = withMcError { errorPtr in
+                mc_memo_destination_memo_get_fee(
+                    memoDataPtr,
+                    &out_fee,
+                    &errorPtr)
+            }
+            switch (result, out_fee > 0) {
+            case (.success(), true):
+                // Safety: It's safe to skip validation because
+                // mc_tx_out_reconstruct_commitment should always return a valid
+                // RistrettoPublic on success.
+                return out_fee
+            case (.failure(let error), _):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // non-documented errors.
+                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
+                }
+            case (_, false):
+                logger.warning("fee must be greater than zero")
+                return nil
+            }
+        }
+    }
+    
+    static func getTotalOutlay(
+        memoData: Data64
+    ) -> UInt64? {
+        memoData.asMcBuffer { memoDataPtr in
+            var out_total_outlay: UInt64 = 0
+            let result = withMcError { errorPtr in
+                mc_memo_destination_memo_get_total_outlay(
+                    memoDataPtr,
+                    &out_total_outlay,
+                    &errorPtr)
+            }
+            switch (result, out_total_outlay > 0) {
+            case (.success(), true):
+                // Safety: It's safe to skip validation because
+                // mc_tx_out_reconstruct_commitment should always return a valid
+                // RistrettoPublic on success.
+                return out_total_outlay
+            case (.failure(let error), _):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // non-documented errors.
+                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
+                }
+            case (_, false):
+                logger.warning("total_outlay must be greater than zero")
+                return nil
+            }
+        }
+    }
+    
+    
+    static func getNumberOfRecipients(
+        memoData: Data64
+    ) -> UInt8? {
+        memoData.asMcBuffer { memoDataPtr in
+            var out_number_of_recipients: UInt8 = 0
+            let result = withMcError { errorPtr in
+                mc_memo_destination_memo_get_number_of_recipients(
+                    memoDataPtr,
+                    &out_number_of_recipients,
+                    &errorPtr)
+            }
+            switch (result, out_number_of_recipients > 0) {
+            case (.success(), true):
+                // Safety: It's safe to skip validation because
+                // mc_tx_out_reconstruct_commitment should always return a valid
+                // RistrettoPublic on success.
+                return out_number_of_recipients
+            case (.failure(let error), _):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return nil
+                default:
+                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // non-documented errors.
+                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return nil
+                }
+            case (_, false):
+                logger.warning("number_of_recipients must be greater than zero")
+                return nil
+            }
+        }
+    }
+    
+    
 }
 
 extension DestinationMemoData.Fixtures {
