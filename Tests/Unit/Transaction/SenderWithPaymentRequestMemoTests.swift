@@ -16,8 +16,9 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
         let bob_account_key = AccountKey(serializedData: Data(hexEncoded: bob_bytes_hex)!)
         let tx_out_public_key = RistrettoPublic(Data(hexEncoded: tx_out_public_key_hex)!)
         
-        let paymentRequestId = 17014
+        let paymentRequestId: UInt64 = 17014
         
+        //  ccb5a98f0c0c42f68491e5e0c9362452000000000000427600000000000000000000000000000000000000000000000007c61e75690f221bf0834b22e6833820
         let senderMemoData = SenderWithPaymentRequestMemoData.create(senderAccountKey: alice_account_key!, receipientPublicAddress: bob_account_key!.publicAddress, txOutPublicKey: tx_out_public_key!, paymentRequestId: paymentRequestId)
         XCTAssertNotNil(senderMemoData)
         print("\(senderMemoData?.hexEncodedString())")
@@ -25,18 +26,17 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
         let isValid = SenderWithPaymentRequestMemoData.isValid(memoData: senderMemoData!, senderPublicAddress: alice_account_key!.publicAddress, receipientViewPrivateKey: bob_account_key!.subaddressViewPrivateKey, txOutPublicKey: tx_out_public_key!)
         XCTAssertTrue(isValid)
         
+        // ccb5a98f0c0c42f68491e5e0c9362452
         let createdAddressHash = alice_account_key?.publicAddress.calculateAddressHash()
         let addressHashFromMemoData = SenderWithPaymentRequestMemoData.getAddressHash(memoData: senderMemoData!)
         
         XCTAssertTrue(createdAddressHash! == addressHashFromMemoData!)
         
-        let memoDataPaymentRequestId = SenderWithPaymentRequestMemoData.getPaymentRequestId(memoData: senderMemoData)
+        let memoDataPaymentRequestId = SenderWithPaymentRequestMemoData.getPaymentRequestId(memoData: senderMemoData!)
         XCTAssertEqual(memoDataPaymentRequestId, paymentRequestId)
     }
 }
 
-//  ccb5a98f0c0c42f68491e5e0c93624520000000000000000000000000000000000000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
-//  ccb5a98f0c0c42f68491e5e0c93624520000000000000000000000000000000000000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
 
 struct SenderWithPaymentRequestMemoData {
     enum Fixtures {}
