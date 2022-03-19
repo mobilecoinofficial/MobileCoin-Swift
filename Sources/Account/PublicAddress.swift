@@ -140,37 +140,7 @@ extension External_PublicAddress {
 
 extension PublicAddress {
     func calculateAddressHash() -> AddressHash? {
-        let bytes: Data16? = self.withUnsafeCStructPointer { publicAddressPtr in
-            switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
-                mc_account_key_get_short_address_hash(
-                    publicAddressPtr,
-                    bufferPtr,
-                    &errorPtr)
-            }) {
-            case .success(let bytes):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
-                return bytes as Data16
-            case .failure(let error):
-                switch error.errorCode {
-                case .invalidInput:
-                    // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
-                    // supplied incorrectly.
-                    logger.warning("error: \(redacting: error)")
-                    return nil
-                default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
-                    // non-documented errors.
-                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
-                    return nil
-                }
-            }
-        }
-        guard let bytes = bytes else { return nil }
-        print("address hash bytes \(bytes.data.hexEncodedString())")
-        return AddressHash(bytes)
+        try? AccountKeyUtils.publicAddressShortHash(publicAddress: self).get()
     }
 }
 

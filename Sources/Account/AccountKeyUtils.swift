@@ -91,6 +91,38 @@ enum AccountKeyUtils {
             }
         }
     }
+    
+    static func publicAddressShortHash(
+        publicAddress: PublicAddress
+    ) -> Result<AddressHash, InvalidInputError> {
+        publicAddress.withUnsafeCStructPointer { publicAddressPtr in
+            switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+                mc_account_key_get_short_address_hash(
+                    publicAddressPtr,
+                    bufferPtr,
+                    &errorPtr)
+            }) {
+            case .success(let bytes):
+                // Safety: It's safe to skip validation because
+                // mc_tx_out_reconstruct_commitment should always return a valid
+                // RistrettoPublic on success.
+                return .success(AddressHash(bytes))
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return .failure(InvalidInputError("TODO"))
+                default:
+                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // non-documented errors.
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+                }
+            }
+        }
+    }
 }
 
 extension McAccountKey {
