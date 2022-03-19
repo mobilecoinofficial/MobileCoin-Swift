@@ -4,10 +4,6 @@
 
 import Foundation
 
-protocol RecoverableMemo {
-    var memoData: Data64 { get }
-    var addressHash: AddressHash { get }
-}
 
 enum RecoveredMemo {
     case sender(SenderMemo)
@@ -17,15 +13,39 @@ enum RecoveredMemo {
 
 enum RecoverableMemo {
     case unused
-    case sender(RecoverableMemoData)
-    case destination(RecoverableMemoData)
-    case senderWithPaymentRequest(RecoverableMemoData)
+    case sender(RecoverableSenderMemo)
+    case destination(RecoverableDestinationMemo)
+    case senderWithPaymentRequest(RecoverableSenderWithPaymentRequestMemo)
     
-    init(_ data: Data66) {
+    init?(_ data: Data66, accountKey: AccountKey, txOut: TxOutProtocol) {
+        guard let memoData = Data64(data[2...]) else {
+            return nil
+        }
         let typeBytes = data[..<2]
+        
         switch typeBytes.hexEncodedString() {
         case Types.SENDER_WITH_PAYMENT_REQUEST:
-            self = .senderWithPaymentRequest(<#T##RecoverableMemoData#>)
+            let memo = RecoverableSenderWithPaymentRequestMemo(memoData, accountKey: accountKey, txOut: txOut)
+            guard let memo = memo else {
+                return nil
+            }
+            self = .senderWithPaymentRequest(memo)
+        case Types.SENDER:
+            let memo = RecoverableSenderMemo(memoData, accountKey: accountKey, txOut: txOut)
+            guard let memo = memo else {
+                return nil
+            }
+            self = .sender(memo)
+        case Types.DESTINATION:
+            let memo = RecoverableDestinationMemo(memoData, accountKey: accountKey, txOut: txOut)
+            guard let memo = memo else {
+                return nil
+            }
+            self = .destination(memo)
+        case Types.UNUSED:
+            self = .unused
+        default:
+            return nil
         }
     }
     

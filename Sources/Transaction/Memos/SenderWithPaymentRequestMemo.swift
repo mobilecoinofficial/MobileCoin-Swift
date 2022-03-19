@@ -9,14 +9,25 @@ struct SenderWithPaymentRequestMemo {
     let memoData: Data64
     let addressHash: AddressHash
     let paymentRequestId: UInt64
+}
 
-    init?(_ memoData: Data64, addressHash: AddressHash, paymentRequestId: UInt64) {
+struct RecoverableSenderWithPaymentRequestMemo {
+    let memoData: Data64
+    let addressHash: AddressHash
+    let accountKey: AccountKey
+    let txOut: TxOutProtocol
+
+    init?(_ memoData: Data64, accountKey: AccountKey, txOut: TxOutProtocol) {
+        guard let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData) else {
+            return nil
+        }
         self.memoData = memoData
         self.addressHash = addressHash
-        self.paymentRequestId = paymentRequestId
+        self.accountKey = accountKey
+        self.txOut = txOut
     }
 
-    init?(_ memoData: Data64, senderPublicAddress: PublicAddress, accountKey: AccountKey, txOut: TxOutProtocol) {
+    func recover(senderPublicAddress: PublicAddress) -> SenderWithPaymentRequestMemo? {
         guard
             let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData),
             SenderWithPaymentRequestMemoUtils.isValid(memoData: memoData,
@@ -27,6 +38,6 @@ struct SenderWithPaymentRequestMemo {
         else {
             return nil
         }
-        self.init(memoData, addressHash: addressHash, paymentRequestId: paymentRequestId)
+        return SenderWithPaymentRequestMemo(memoData: memoData, addressHash: addressHash, paymentRequestId: paymentRequestId)
     }
 }

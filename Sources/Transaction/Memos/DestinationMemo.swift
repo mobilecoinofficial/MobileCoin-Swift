@@ -15,13 +15,17 @@ struct DestinationMemo {
 struct RecoverableDestinationMemo {
     let memoData: Data64
     let addressHash: AddressHash
+    let accountKey: AccountKey
+    let txOut: TxOutProtocol
     
-    init?(_ memoData: Data64) {
+    init?(_ memoData: Data64, accountKey: AccountKey, txOut: TxOutProtocol) {
         guard let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData) else {
             return nil
         }
         self.memoData = memoData
         self.addressHash = addressHash
+        self.accountKey = accountKey
+        self.txOut = txOut
     }
 
     func recover(txOut: TxOutProtocol, accountKey: AccountKey) -> DestinationMemo? {
@@ -35,9 +39,5 @@ struct RecoverableDestinationMemo {
             return nil
         }
         return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
-    }
-    
-    init?(_ memoData: Data64, txOut: TxOutProtocol, accountKey: AccountKey) {
-
     }
 }
