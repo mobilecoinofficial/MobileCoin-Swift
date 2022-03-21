@@ -7,6 +7,10 @@ import LibMobileCoin
 
 struct AddressHash {
     let data16: Data16
+    
+    var hexBytes: String {
+        return data16.hexEncodedString()
+    }
 
     init(_ data: Data16) {
         self.data16 = data
@@ -24,4 +28,20 @@ extension AddressHash: DataConvertibleImpl {
     }
 
     var data: Data { data16.data }
+}
+
+extension AddressHash: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.hexBytes == rhs.hexBytes
+    }
+}
+
+//extension AddressHash: Hashable {
+//
+//}
+//
+extension AddressHash: CustomStringConvertible {
+    var description: String {
+        return hexBytes
+    }
 }

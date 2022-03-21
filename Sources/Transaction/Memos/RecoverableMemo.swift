@@ -12,14 +12,17 @@ enum RecoveredMemo {
 }
 
 enum RecoverableMemo {
+    case notset
     case unused
     case sender(RecoverableSenderMemo)
     case destination(RecoverableDestinationMemo)
     case senderWithPaymentRequest(RecoverableSenderWithPaymentRequestMemo)
     
-    init?(_ data: Data66, accountKey: AccountKey, txOut: TxOutProtocol) {
+    init(_ data: Data66, accountKey: AccountKey, txOut: TxOutProtocol) {
         guard let memoData = Data64(data[2...]) else {
-            return nil
+            logger.warning("Memo data type unavailable")
+            self = .notset
+            return
         }
         let typeBytes = data[..<2]
         
@@ -27,25 +30,28 @@ enum RecoverableMemo {
         case Types.SENDER_WITH_PAYMENT_REQUEST:
             let memo = RecoverableSenderWithPaymentRequestMemo(memoData, accountKey: accountKey, txOut: txOut)
             guard let memo = memo else {
-                return nil
+                // TODO see if we can remove the optional infection from the memo initializer
+                logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
             }
             self = .senderWithPaymentRequest(memo)
         case Types.SENDER:
             let memo = RecoverableSenderMemo(memoData, accountKey: accountKey, txOut: txOut)
             guard let memo = memo else {
-                return nil
+                // TODO see if we can remove the optional infection from the memo initializer
+                logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
             }
             self = .sender(memo)
         case Types.DESTINATION:
             let memo = RecoverableDestinationMemo(memoData, accountKey: accountKey, txOut: txOut)
             guard let memo = memo else {
-                return nil
+                // TODO see if we can remove the optional infection from the memo initializer
+                logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
             }
             self = .destination(memo)
         case Types.UNUSED:
             self = .unused
         default:
-            return nil
+            logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
         }
     }
     
@@ -57,3 +63,21 @@ enum RecoverableMemo {
     }
 }
 
+extension RecoverableMemo: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.notset, .notset):
+            return true
+        case (.unused, .unused):
+            return true
+        case (.sender(let lhsMemo), .sender(let rhsMemo)):
+            return lhsMemo == rhsMemo
+        case (.destination(let lhsMemo), .destination(let rhsMemo)):
+            return lhsMemo == rhsMemo
+        case (.senderWithPaymentRequest(let lhsMemo), .senderWithPaymentRequest(let rhsMemo)):
+            return lhsMemo == rhsMemo
+        default:
+            return false
+        }
+    }
+}

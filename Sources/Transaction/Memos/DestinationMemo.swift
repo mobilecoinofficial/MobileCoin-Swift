@@ -28,7 +28,7 @@ struct RecoverableDestinationMemo {
         self.txOut = txOut
     }
 
-    func recover(txOut: TxOutProtocol, accountKey: AccountKey) -> DestinationMemo? {
+    func recover() -> DestinationMemo? {
         guard
             DestinationMemoUtils.isValid(txOut: txOut, accountKey: accountKey),
             let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData),
@@ -39,5 +39,11 @@ struct RecoverableDestinationMemo {
             return nil
         }
         return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
+    }
+}
+
+extension RecoverableDestinationMemo: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.memoData.hexEncodedString() == rhs.memoData.hexEncodedString()
     }
 }
