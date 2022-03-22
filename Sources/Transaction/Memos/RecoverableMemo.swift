@@ -56,8 +56,8 @@ enum RecoverableMemo {
     }
     
     struct Types {
-        static let SENDER_WITH_PAYMENT_REQUEST = "0100"
-        static let SENDER = "0101"
+        static let SENDER = "0100"
+        static let SENDER_WITH_PAYMENT_REQUEST = "0101"
         static let DESTINATION = "0200"
         static let UNUSED = "0000"
     }

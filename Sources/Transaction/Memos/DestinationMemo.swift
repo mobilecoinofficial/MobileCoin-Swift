@@ -36,6 +36,7 @@ struct RecoverableDestinationMemo {
             let fee = DestinationMemoUtils.getFee(memoData: memoData),
             let totalOutlay = DestinationMemoUtils.getTotalOutlay(memoData: memoData)
         else {
+            logger.debug("Memo did not validate")
             return nil
         }
         return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
