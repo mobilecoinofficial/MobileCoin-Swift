@@ -99,6 +99,43 @@ enum TxOutUtils {
         }
     }
 
+    static func decryptEMemoPayload(
+        txOutPublicKey: RistrettoPublic,
+        accountKey: AccountKey
+    ) -> Data66? {
+        txOutPublicKey.asMcBuffer { publicKeyPtr in
+            accountKey.serializedData.asMcBuffer { accountKeyBytesPtr in
+                switch Data66.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+                    mc_memo_decrypt_e_memo_payload(
+                        publicKeyPtr,
+                        accountKeyBytesPtr,
+                        bufferPtr,
+                        &errorPtr)
+                }) {
+                case .success(let bytes):
+                    // Safety: It's safe to skip validation because
+                    // mc_tx_out_reconstruct_commitment should always return a valid
+                    // RistrettoPublic on success.
+                    return bytes as Data66
+                case .failure(let error):
+                    switch error.errorCode {
+                    case .invalidInput:
+                        // Safety: This condition indicates a programming error and can only
+                        // happen if arguments to mc_tx_out_reconstruct_commitment are
+                        // supplied incorrectly.
+                        logger.warning("error: \(redacting: error)")
+                        return nil
+                    default:
+                        // Safety: mc_tx_out_reconstruct_commitment should not throw
+                        // non-documented errors.
+                        logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                        return nil
+                    }
+                }
+            }
+        }
+    }
+
     static func calculateCrc32(
         from commitment: Data32
     ) -> UInt32? {

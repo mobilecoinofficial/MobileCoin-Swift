@@ -14,29 +14,31 @@ struct RecoverableSenderMemo {
     let memoData: Data64
     let addressHash: AddressHash
     let accountKey: AccountKey
-    let txOut: TxOutProtocol
+    let txOutPublicKey: RistrettoPublic
 
-    init?(_ memoData: Data64, accountKey: AccountKey, txOut: TxOutProtocol) {
+    init?(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
         guard let addressHash = SenderMemoUtils.getAddressHash(memoData: memoData) else {
             return nil
         }
         self.memoData = memoData
         self.addressHash = addressHash
         self.accountKey = accountKey
-        self.txOut = txOut
+        self.txOutPublicKey = txOutPublicKey
     }
 
     func recover(senderPublicAddress: PublicAddress) -> SenderMemo? {
         guard SenderMemoUtils.isValid(memoData: memoData,
                                    senderPublicAddress: senderPublicAddress,
                                    receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
-                                   txOutPublicKey: txOut.publicKey)
+                                   txOutPublicKey: txOutPublicKey)
         else {
             return nil
         }
         return SenderMemo(memoData: memoData, addressHash: addressHash)
     }
 }
+
+extension RecoverableSenderMemo: Hashable { }
 
 extension RecoverableSenderMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {

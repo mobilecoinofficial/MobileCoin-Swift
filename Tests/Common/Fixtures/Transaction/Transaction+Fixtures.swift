@@ -66,6 +66,7 @@ extension Transaction.Fixtures.BuildTx {
         let knownTxOut = try XCTUnwrap(KnownTxOut(
             LedgerTxOut(
                 PartialTxOut(
+                    encryptedMemo: Data66(),
                     commitment: Data32(base64Encoded:
                         "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
                     maskedValue: 2886556578342610519,

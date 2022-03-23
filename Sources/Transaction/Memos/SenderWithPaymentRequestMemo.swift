@@ -15,23 +15,23 @@ struct RecoverableSenderWithPaymentRequestMemo {
     let memoData: Data64
     let addressHash: AddressHash
     let accountKey: AccountKey
-    let txOut: TxOutProtocol
+    let txOutPublicKey: RistrettoPublic
 
-    init?(_ memoData: Data64, accountKey: AccountKey, txOut: TxOutProtocol) {
+    init?(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
         guard let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData) else {
             return nil
         }
         self.memoData = memoData
         self.addressHash = addressHash
         self.accountKey = accountKey
-        self.txOut = txOut
+        self.txOutPublicKey = txOutPublicKey
     }
 
     func recover(senderPublicAddress: PublicAddress) -> SenderWithPaymentRequestMemo? {
         guard SenderWithPaymentRequestMemoUtils.isValid(memoData: memoData,
                                        senderPublicAddress: senderPublicAddress,
                                        receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
-                                       txOutPublicKey: txOut.publicKey) else {
+                                       txOutPublicKey: txOutPublicKey) else {
             logger.debug("Memo did not validate")
             return nil
         }
@@ -49,6 +49,8 @@ struct RecoverableSenderWithPaymentRequestMemo {
         return SenderWithPaymentRequestMemo(memoData: memoData, addressHash: addressHash, paymentRequestId: paymentRequestId)
     }
 }
+
+extension RecoverableSenderWithPaymentRequestMemo: Hashable { }
 
 extension RecoverableSenderWithPaymentRequestMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {

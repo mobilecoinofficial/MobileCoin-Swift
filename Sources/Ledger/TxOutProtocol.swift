@@ -6,6 +6,7 @@ import Foundation
 import LibMobileCoin
 
 protocol TxOutProtocol {
+    var encryptedMemo: Data66 { get }
     var commitment: Data32 { get } 
     var maskedValue: UInt64 { get }
     var targetKey: RistrettoPublic { get }
@@ -67,6 +68,10 @@ extension TxOutProtocol {
             return nil
         }
         return (index: index, keyImage: keyImage)
+    }
+    
+    var keys: TxOut.Keys {
+        (publicKey: publicKey, targetKey: targetKey)
     }
 }
 

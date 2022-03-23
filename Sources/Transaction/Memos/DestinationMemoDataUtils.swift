@@ -8,12 +8,13 @@ import LibMobileCoin
 enum DestinationMemoUtils {
     
     static func isValid(
-        txOut: TxOutProtocol,
+        txOutPublicKey: RistrettoPublic,
+        txOutTargetKey: RistrettoPublic,
         accountKey: AccountKey
     ) -> Bool {
         TxOutUtils.matchesSubaddress(
-            targetKey: txOut.targetKey,
-            publicKey: txOut.publicKey,
+            targetKey: txOutTargetKey,
+            publicKey: txOutPublicKey,
             viewPrivateKey: accountKey.viewPrivateKey,
             subaddressSpendPrivateKey: accountKey.subaddressSpendPrivateKey)
     }

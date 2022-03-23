@@ -7,9 +7,9 @@ import Foundation
 enum TxOutMemoParser {
     static func parse(decryptedPayload: Data, accountKey: AccountKey, txOut: TxOutProtocol) -> RecoverableMemo {
         guard let recoverableMemoPayload = Data66(decryptedPayload) else {
-            logger.warning("Payload not the correct size for a recoverable payload")
+            logger.warning("Payload not the correct size for a recoverable memo")
             return .notset
         }
-        return RecoverableMemo(recoverableMemoPayload, accountKey: accountKey, txOut: txOut)
+        return RecoverableMemo(decryptedMemo: recoverableMemoPayload, accountKey: accountKey, txOutKeys: txOut.keys)
     }
 }

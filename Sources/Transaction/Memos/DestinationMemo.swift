@@ -16,21 +16,23 @@ struct RecoverableDestinationMemo {
     let memoData: Data64
     let addressHash: AddressHash
     let accountKey: AccountKey
-    let txOut: TxOutProtocol
+    let txOutPublicKey: RistrettoPublic
+    let txOutTargetKey: RistrettoPublic
     
-    init?(_ memoData: Data64, accountKey: AccountKey, txOut: TxOutProtocol) {
+    init?(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         guard let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData) else {
             return nil
         }
         self.memoData = memoData
         self.addressHash = addressHash
         self.accountKey = accountKey
-        self.txOut = txOut
+        self.txOutPublicKey = txOutKeys.publicKey
+        self.txOutTargetKey = txOutKeys.targetKey
     }
 
     func recover() -> DestinationMemo? {
         guard
-            DestinationMemoUtils.isValid(txOut: txOut, accountKey: accountKey),
+            DestinationMemoUtils.isValid(txOutPublicKey: txOutPublicKey, txOutTargetKey: txOutTargetKey, accountKey: accountKey),
             let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData),
             let numberOfRecipients = DestinationMemoUtils.getNumberOfRecipients(memoData: memoData),
             let fee = DestinationMemoUtils.getFee(memoData: memoData),
@@ -42,6 +44,8 @@ struct RecoverableDestinationMemo {
         return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
     }
 }
+
+extension RecoverableDestinationMemo: Hashable { }
 
 extension RecoverableDestinationMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {

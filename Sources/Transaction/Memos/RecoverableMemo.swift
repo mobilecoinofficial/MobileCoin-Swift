@@ -18,7 +18,7 @@ enum RecoverableMemo {
     case destination(RecoverableDestinationMemo)
     case senderWithPaymentRequest(RecoverableSenderWithPaymentRequestMemo)
     
-    init(_ data: Data66, accountKey: AccountKey, txOut: TxOutProtocol) {
+    init(decryptedMemo data: Data66, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         guard let memoData = Data64(data[2...]) else {
             logger.warning("Memo data type unavailable")
             self = .notset
@@ -28,21 +28,21 @@ enum RecoverableMemo {
         
         switch typeBytes.hexEncodedString() {
         case Types.SENDER_WITH_PAYMENT_REQUEST:
-            let memo = RecoverableSenderWithPaymentRequestMemo(memoData, accountKey: accountKey, txOut: txOut)
+            let memo = RecoverableSenderWithPaymentRequestMemo(memoData, accountKey: accountKey, txOutPublicKey: txOutKeys.publicKey)
             guard let memo = memo else {
                 // TODO see if we can remove the optional infection from the memo initializer
                 logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
             }
             self = .senderWithPaymentRequest(memo)
         case Types.SENDER:
-            let memo = RecoverableSenderMemo(memoData, accountKey: accountKey, txOut: txOut)
+            let memo = RecoverableSenderMemo(memoData, accountKey: accountKey, txOutPublicKey: txOutKeys.publicKey)
             guard let memo = memo else {
                 // TODO see if we can remove the optional infection from the memo initializer
                 logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
             }
             self = .sender(memo)
         case Types.DESTINATION:
-            let memo = RecoverableDestinationMemo(memoData, accountKey: accountKey, txOut: txOut)
+            let memo = RecoverableDestinationMemo(memoData, accountKey: accountKey, txOutKeys: txOutKeys)
             guard let memo = memo else {
                 // TODO see if we can remove the optional infection from the memo initializer
                 logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
@@ -62,6 +62,8 @@ enum RecoverableMemo {
         static let UNUSED = "0000"
     }
 }
+
+extension RecoverableMemo: Hashable { }
 
 extension RecoverableMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
