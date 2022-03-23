@@ -32,7 +32,11 @@ struct RecoverableDestinationMemo {
 
     func recover() -> DestinationMemo? {
         guard
-            DestinationMemoUtils.isValid(txOutPublicKey: txOutPublicKey, txOutTargetKey: txOutTargetKey, accountKey: accountKey),
+            DestinationMemoUtils.isValid(txOutPublicKey: txOutPublicKey, txOutTargetKey: txOutTargetKey, accountKey: accountKey) else {
+            logger.debug("invalid")
+            return nil
+        }
+        guard
             let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData),
             let numberOfRecipients = DestinationMemoUtils.getNumberOfRecipients(memoData: memoData),
             let fee = DestinationMemoUtils.getFee(memoData: memoData),

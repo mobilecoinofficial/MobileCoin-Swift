@@ -82,5 +82,6 @@ extension FogView_TxOutRecord {
         self.txOutAmountMaskedValue = txOut.maskedValue
         self.txOutTargetKeyData = txOut.targetKey.data
         self.txOutPublicKeyData = txOut.publicKey.data
+        self.txOutEMemoData = txOut.encryptedMemo.data
     }
 }
