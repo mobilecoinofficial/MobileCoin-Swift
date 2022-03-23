@@ -43,7 +43,10 @@ struct TxOut: TxOutProtocol {
     var maskedValue: UInt64 { proto.amount.maskedValue }
     var encryptedFogHint: Data { proto.eFogHint.data }
     var encryptedMemo: Data66 {
-        Data66(proto.eMemo.data) ?? Data66()
+        guard proto.hasEMemo else {
+            return Data66()
+        }
+        return Data66(proto.eMemo.data) ?? Data66()
     }
 }
 
