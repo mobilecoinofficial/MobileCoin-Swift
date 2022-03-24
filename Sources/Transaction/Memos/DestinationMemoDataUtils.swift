@@ -12,11 +12,17 @@ enum DestinationMemoUtils {
         txOutTargetKey: RistrettoPublic,
         accountKey: AccountKey
     ) -> Bool {
-        TxOutUtils.matchesSubaddress(
+        [TxOutUtils.matchesSubaddress(
             targetKey: txOutTargetKey,
             publicKey: txOutPublicKey,
             viewPrivateKey: accountKey.viewPrivateKey,
-            subaddressSpendPrivateKey: accountKey.subaddressSpendPrivateKey)
+            subaddressSpendPrivateKey: accountKey.subaddressSpendPrivateKey),
+         TxOutUtils.matchesSubaddress(
+             targetKey: txOutTargetKey,
+             publicKey: txOutPublicKey,
+             viewPrivateKey: accountKey.viewPrivateKey,
+             subaddressSpendPrivateKey: accountKey.changeSubaddressSpendPrivateKey)]
+        .contains(true)
     }
     
     static func getAddressHash(

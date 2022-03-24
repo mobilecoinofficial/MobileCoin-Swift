@@ -150,20 +150,6 @@ class KnownTxOutTests: XCTestCase {
         
     }
     
-//    @Test
-//    public void getTxOutMemo_senderWithPaymentRequestMemo_returnsCorrectSenderWithPaymentRequestMemoData() throws Exception {
-//      TxOutRecord txOutRecord =
-//          TxOutRecord.parseFrom(Hex.toByteArray(viewRecordWithSenderWithPaymentRequestMemoHexProtoBytes));
-//      OwnedTxOut ownedTxOut = new OwnedTxOut(txOutRecord, receiverAccountKey);
-//
-//      TxOutMemo txOutMemo = ownedTxOut.getTxOutMemo();
-//      SenderWithPaymentRequestMemoData senderWithPaymentRequestMemoData = ((SenderWithPaymentRequestMemo) txOutMemo)
-//          .getSenderWithPaymentRequestMemoData(senderAccountKey.getPublicAddress(), receiverAccountKey.getDefaultSubAddressViewKey());
-//
-//      AddressHash expectedAddressHash = senderAccountKey.getPublicAddress().calculateAddressHash();
-//      Assert.assertEquals(expectedAddressHash, senderWithPaymentRequestMemoData.getAddressHash());
-//      Assert.assertEquals(expectedPaymentRequestId,senderWithPaymentRequestMemoData.getPaymentRequestId());
-//    }
 }
 
 extension KnownTxOut {
@@ -360,26 +346,3 @@ extension KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo {
         try KnownTxOut.Fixtures.makeTxOut(hex: viewRecordWithSenderWithPaymentRequestMemoHex, viewKey: viewKey)
     }
 }
-
-/**
- @RunWith(JUnit4.class)
- public class OwnedTxOutTest {
-
-   @Test
-   public void testParcelable() throws InvalidUriException, AttestationException, InvalidFogResponse, NetworkException {
-     MobileCoinClient client = MobileCoinClientBuilder.newBuilder().build();
-     AccountActivity activity = client.getAccountActivity();
-     for(OwnedTxOut parcelInput : activity.getAllTxOuts()) {
-       Parcel parcel = Parcel.obtain();
-       parcelInput.writeToParcel(parcel, 0);
-       parcel.setDataPosition(0);
-       OwnedTxOut parcelOutput = OwnedTxOut.CREATOR.createFromParcel(parcel);
-       assertEquals(parcelInput, parcelOutput);
-       parcel.recycle();
-     }
-   }
-
- }
-
-
- **/
