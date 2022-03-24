@@ -9,6 +9,18 @@ import XCTest
 class TxOutMemoIntegrationTests: XCTestCase {
     
     func testPerformanceExample() throws {
+        let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
+        let txFixture = fixture.txFixture
+
+        XCTAssertSuccess(TransactionBuilder.build(
+            inputs: txFixture.inputs,
+            accountKey: txFixture.senderAccountKey,
+            to: txFixture.recipientAccountKey.publicAddress,
+            memoType: .recoverable,
+            amount: fixture.amount,
+            fee: txFixture.fee,
+            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
+            fogResolver: txFixture.fogResolver))
         
     }
 
@@ -19,24 +31,22 @@ extension TransactionBuilder {
 }
 
 extension TransactionBuilder.Fixtures {
-    struct Init {
+    struct SenderAndDestination {
         // The 'real index' corresponds to the index of the TxOut in a Ring's TxOUt list that actually
         // belongs ot the spender and is being used in the transaction.
         let realIndex = 3;
-
-//        let senderAccountKey: AccountKey
-//        let receiverAccountKey: AccountKey
-//
-        init() throws {
-//            self.senderAccountKey = try Self.makeAccountKey(hex: Self.senderAccountKeyHex)
-//            self.receiverAccountKey = try Self.makeAccountKey(hex: Self.receiverAccountKeyHex)
-            
-        }
-    }
-    
-    struct DefaultNotSet {
+        let memoBuilder: TxOutMemoBuilder
+        let senderAccountKey: AccountKey
+        let realTxOut: TxOut
+        let txFixture: Transaction.Fixtures.TxOutMemo
+        let amount = PositiveUInt64(1)!
 
         init() throws {
+            let fixture = try Transaction.Fixtures.TxOutMemo()
+            self.txFixture = fixture
+            self.senderAccountKey = fixture.senderAccountKey
+            self.memoBuilder = TxOutMemoBuilder.createRecoverableMemoBuilder(accountKey: fixture.senderAccountKey)
+            self.realTxOut = fixture.txOuts[realIndex]
         }
     }
 }

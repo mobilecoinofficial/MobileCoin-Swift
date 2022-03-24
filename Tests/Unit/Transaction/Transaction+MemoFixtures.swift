@@ -9,19 +9,25 @@ import XCTest
 
 extension Transaction.Fixtures {
     struct TxOutMemo {
-        let inputs: [PreparedTxInput]
         let senderAccountKey: AccountKey
         let recipientAccountKey: AccountKey
-        let outputs: [(recipient: PublicAddress, amount: PositiveUInt64)]
+        
+        let inputs: [PreparedTxInput]
+        let txOuts: [TxOut]
+        let membershipProofs: [TxOutMembershipProof]
         let fee = Self.fee
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
+        
+//        let outputs: [(recipient: PublicAddress, amount: PositiveUInt64)]
 
         init() throws {
             self.inputs = try Self.inputs()
+            self.txOuts = try Self.nativeTxOuts()
+            self.membershipProofs = try Self.txOutMembershipProofs()
             self.senderAccountKey = try Self.senderAccountKey()
             self.recipientAccountKey = try Self.recipientAccountKey()
-            self.outputs = try Self.outputs()
+//            self.outputs = try Self.outputs()
             self.fogResolver = try Self.fogResolver()
         }
     }
@@ -29,74 +35,112 @@ extension Transaction.Fixtures {
 
 extension Transaction.Fixtures.TxOutMemo {
 
-    fileprivate static func inputs() throws -> [PreparedTxInput] {
-        let knownTxOut = try XCTUnwrap(KnownTxOut(
-            LedgerTxOut(
-                PartialTxOut(
-                    encryptedMemo: Data66(),
-                    commitment: Data32(base64Encoded:
-                        "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
-                    maskedValue: 2886556578342610519,
-                    targetKey: RistrettoPublic(base64Encoded:
-                        "VECBlIdhtmTFaXtlWphlqELpDL04EKMbbPWu3CoJ2UE=")!,
-                    publicKey: RistrettoPublic(base64Encoded:
-                        "OHyDzGA0vvts1Rkgsb2sAYfgCTBQqnOQ4cz5iI7JSh4=")!),
-                globalIndex: 100011,
-                block: BlockMetadata(
-                    index: 2,
-                    timestampStatus: .known(
-                        timestamp: Date(timeIntervalSince1970: 1602883052.0)))),
-            accountKey: try XCTUnwrap(AccountKey(serializedData: Data(base64Encoded: """
-                CiIKIOehy72XOCsNdTLzG/RefRYoupEnA502UKNx5mdax7QNEiIKILuf18L68eT2bJeXd+3f153oGnliqOR\
-                aT9pefNlL0LAAGilmb2c6Ly9mb2ctaW5nZXN0Lm1vYmlsZWRldi5tb2JpbGVjb2luLmNvbSoUI+nfq9r3TG\
-                lCjsDfrBV4Tu3HRm4=
-                """)!))))
+    /**
+     
+       List<MobileCoinAPI.TxOut> outputsList = transaction.toProtoBufObject().getPrefix()
+           .getOutputsList();
+       TxOut txOut1 = TxOut.fromProtoBufObject(outputsList.get(0));
+       TxOut txOut2 = TxOut.fromProtoBufObject(outputsList.get(1));
 
+       TxOut sentTxOut;
+       try {
+         txOut1.getAmount().unmaskValue(recipientAccountKey.getViewKey(), txOut1.getPubKey());
+         sentTxOut = txOut1;
+       } catch(Exception e) {
+         sentTxOut = txOut2;
+       }
+
+       byte[] sentMemoPayload = sentTxOut.decryptMemoPayload(recipientAccountKey);
+
+       AddressHash senderAddressHash = senderAccountKey.getPublicAddress().calculateAddressHash();
+       SenderMemo senderMemo = (SenderMemo) TxOutMemoParser
+           .parseTxOutMemo(sentMemoPayload, recipientAccountKey, sentTxOut);
+       assertEquals(senderAddressHash, senderMemo.getUnvalidatedAddressHash());
+       SenderMemoData senderMemoData = senderMemo
+           .getSenderMemoData(senderAccountKey.getPublicAddress(), recipientAccountKey.getDefaultSubAddressViewKey());
+
+       assertEquals(senderAddressHash, senderMemoData.getAddressHash());
+     }
+
+
+     **/
+    
+    
+    static let realIndex = 3;
+    
+    static func realKnownTxOut() throws -> KnownTxOut {
+        let senderAccountKey = try senderAccountKey()
+        let txOuts = try nativeTxOuts()
+        let realTxOut = txOuts[realIndex]
+        let ledgerTxOut = LedgerTxOut(PartialTxOut(realTxOut), globalIndex: globalIndex, block: blockMetadata)
+        return try XCTUnwrap(KnownTxOut(ledgerTxOut, accountKey: senderAccountKey))
+    }
+    
+    static let globalIndex: UInt64 = 100011
+    static let blockMetadata: BlockMetadata = {
+        BlockMetadata(
+            index: 2,
+            timestampStatus: .known(
+                timestamp: Date(timeIntervalSince1970: 1602883052.0))
+        )
+    }()
+    
+    fileprivate static func inputs() throws -> [PreparedTxInput] {
+        let senderAccountKey = try senderAccountKey()
         let txOuts = try nativeTxOuts()
         let membershipProofs = try txOutMembershipProofs()
+        
+        let realTxOut = txOuts[realIndex]
+        let partialTxOut = PartialTxOut(realTxOut)
+        
+        let ledgerTxOut = LedgerTxOut(partialTxOut, globalIndex: globalIndex, block: blockMetadata)
+        let knownTxOut = try XCTUnwrap(KnownTxOut(
+                                            ledgerTxOut,
+                                            accountKey: senderAccountKey))
+
         let ring: [(TxOut, TxOutMembershipProof)] = Array(zip(txOuts, membershipProofs))
 
         return [try PreparedTxInput.make(knownTxOut: knownTxOut, ring: ring).get()]
     }
     
-    fileprivate static func outputs() throws
-        -> [(recipient: PublicAddress, amount: PositiveUInt64)]
-    {
-        [
-            (
-                recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(10))
-            ),
-            (
-                recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(2499979999999990))
-            ),
-        ]
-    }
+//    fileprivate static func outputs() throws
+//        -> [(recipient: PublicAddress, amount: PositiveUInt64)]
+//    {
+//        let inputKnownTxOut = try realKnownTxOut()
+//        let
+//        [
+//            (
+//                recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
+//                amount: try XCTUnwrap(PositiveUInt64(10))
+//            ),
+//            (
+//                recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
+//                amount: try XCTUnwrap(PositiveUInt64(2499979999999990))
+//            ),
+//        ]
+//    }
 
-    fileprivate static let fee: UInt64 = 10_000_000_000
-
-    fileprivate static let tombstoneBlockIndex: UInt64 = 610
-
-   
-    
-    
-
-    fileprivate static func inputKeyImages() throws -> Set<Data> {
-        [
-            try XCTUnwrap(Data(base64Encoded: "Mpi0OpU4JeTN3YGZyJDQakADLTe7SkrrzK3be3kn6xk==")),
-        ]
-    }
-
-    fileprivate static func outputPublicKeys() throws -> Set<Data> {
-        [
-            try XCTUnwrap(Data(base64Encoded: "OEDBnfDWxrm88MEFvilrE1Qtcc2yDjUiFX3psxK3BxQ=")),
-            try XCTUnwrap(Data(base64Encoded: "/HeqjlElnYDDMxtRA4LmmwbO9qKqZfAuRzm5jELJagE=")),
-        ]
-    }
+//    fileprivate static func inputKeyImages() throws -> Set<Data> {
+//        [
+//            try XCTUnwrap(Data(base64Encoded: "Mpi0OpU4JeTN3YGZyJDQakADLTe7SkrrzK3be3kn6xk==")),
+//        ]
+//    }
+//
+//    fileprivate static func outputPublicKeys() throws -> Set<Data> {
+//        [
+//            try XCTUnwrap(Data(base64Encoded: "OEDBnfDWxrm88MEFvilrE1Qtcc2yDjUiFX3psxK3BxQ=")),
+//            try XCTUnwrap(Data(base64Encoded: "/HeqjlElnYDDMxtRA4LmmwbO9qKqZfAuRzm5jELJagE=")),
+//        ]
+//    }
 
     
+    ///
+    /// Needed for test
+    ///
     
+    static let fee: UInt64 = 1
+    
+    static let tombstoneBlockIndex: UInt64 = 2000
     
     fileprivate static let fogAlphaUri = "fog://fog.alpha.mobilecoin.com/";
 

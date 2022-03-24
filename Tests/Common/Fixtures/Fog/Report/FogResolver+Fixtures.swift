@@ -207,10 +207,6 @@ extension FogResolver.Fixtures.TxOutMemo {
         try Attestation.Fixtures.Default().reportAttestation
     }
 
-    fileprivate static func fogResolver() throws -> FogResolver {
-        try fogResolver(reportUrl: self.reportUrl())
-    }
-
     fileprivate static func fogResolver(reportUrl: FogUrl) throws -> FogResolver {
         FogResolver(
             attestation: try self.attestation(),
