@@ -105,18 +105,6 @@ class KnownTxOutTests: XCTestCase {
         
     }
     
-//    @Test
-//    public void getTxOutMemo_senderWithPaymentRequestMemo_returnsSenderWithPaymentRequestMemo() throws Exception {
-//      TxOutRecord txOutRecord =
-//          TxOutRecord.parseFrom(Hex.toByteArray(viewRecordWithSenderWithPaymentRequestMemoHexProtoBytes));
-//      OwnedTxOut ownedTxOut = new OwnedTxOut(txOutRecord, receiverAccountKey);
-//
-//      TxOutMemo txOutMemo = ownedTxOut.getTxOutMemo();
-//
-//      Assert.assertEquals(TxOutMemoType.SENDER_WITH_PAYMENT_REQUEST, txOutMemo.getTxOutMemoType());
-//    }
-//
-    
     func testFogViewRecordSenderWithPaymentRequestMemoPayload() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo()
         let txOut = fixture.knownTxOut
