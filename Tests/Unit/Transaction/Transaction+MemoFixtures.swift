@@ -16,10 +16,17 @@ extension Transaction.Fixtures {
         let txOuts: [TxOut]
         let membershipProofs: [TxOutMembershipProof]
         let fee = Self.fee
+        let amount = PositiveUInt64(1)!
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
+        let globalIndex: UInt64
+        let blockMetadata: BlockMetadata
         
 //        let outputs: [(recipient: PublicAddress, amount: PositiveUInt64)]
+        var totalOutlay : UInt64 {
+            return fee + amount.value
+        }
+        
 
         init() throws {
             self.inputs = try Self.inputs()
@@ -29,6 +36,8 @@ extension Transaction.Fixtures {
             self.recipientAccountKey = try Self.recipientAccountKey()
 //            self.outputs = try Self.outputs()
             self.fogResolver = try Self.fogResolver()
+            self.globalIndex = Self.globalIndex
+            self.blockMetadata = Self.blockMetadata
         }
     }
 }
