@@ -27,6 +27,5 @@ class TxOutMemoBuilderTests: XCTestCase {
                 accountKey: fixture.accountKey
             ))
     }
-    
-    
+
 }

@@ -69,18 +69,6 @@ class TxOutMemoParserTest: XCTestCase {
         default:
             XCTAssert(false)
         }
-//
-//        guard case .destination(let memo) = txOutMemo,
-//              let recoveredMemo = memo.recover()
-//        else {
-//            XCTFail("Cannot unwrap RecoverableDestinationMemo")
-//            return
-//        }
-//
-//        XCTAssertEqual(recoveredMemo.addressHash, accountKey.publicAddress.calculateAddressHash())
-//        XCTAssertEqual(recoveredMemo.fee, 0)
-//        XCTAssertEqual(recoveredMemo.totalOutlay, 0)
-//        XCTAssertEqual(recoveredMemo.numberOfRecipients, 0)
     }
 }
 
@@ -256,46 +244,3 @@ extension TxOutMemoParser.Fixtures.DefaultSenderWithPaymentRequestMemo {
         try TxOutMemoParser.Fixtures.makePayloadData(hex: decryptedSenderWithPaymentRequestMemoPayload)
     }
 }
-
-
-/**
- public class TxOutMemoParserTest {
-
-   @Test
-   public void parseTxOutMemo_senderMemoDecryptedPayload_ReturnsSenderMemo() throws Exception {
-     TxOutMemo txOutMemo = TxOutMemoParser
-         .parseTxOutMemo(Hex.toByteArray(decryptedSenderMemoPayload), senderAccountKey, txOut);
-
-     Assert.assertEquals(TxOutMemoType.SENDER, txOutMemo.getTxOutMemoType());
-   }
-
-   @Test
-   public void parseTxOutMemo_senderWithPaymentRequestMemoDecryptedPayload_ReturnsSenderMemo() throws Exception {
-     String decryptedSenderWithPaymentRequestMemoPayload = "0101477458144e8cf4f6d54b6cc4ddf68bb200000000000001420000000000000000000000000000000000000000000000006fe3c566db189f475fac50c0025ac58a";
-     TxOut txOut = TxOut.fromBytes(Hex.toByteArray("0a2d0a220a2080d150b3957ff20758b9413a47044408731151fbf0140e7433e0d119bf658f4a11b89889a83748c3b712220a20ea28e0a73e2e579163d8710ef1d19bafc1bd04f681168a7eed50054c7c91b45d1a220a20f40936fb0af75ae89f632685e930a9a53abcac8665ae6a7cd59915e07f15d86e22560a540000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a440a4246587e555ff2700a08d66334a78b43f43c02a270bd580225a11d4f1bb4ca56017ab622dcdb26555c7340344a0a0499f6ee48ea1335e6a8c4ba4424cfe8ccc523dd1e"));
-     TxOutMemo txOutMemo = TxOutMemoParser
-         .parseTxOutMemo(Hex.toByteArray(decryptedSenderWithPaymentRequestMemoPayload), senderAccountKey, txOut);
-
-     Assert.assertEquals(TxOutMemoType.SENDER_WITH_PAYMENT_REQUEST, txOutMemo.getTxOutMemoType());
-   }
-
-   @Test
-   public void parseTxOutMemo_destinationMemoDecryptedPayload_ReturnsDestinationMemo() throws Exception {
-     String decryptedDestinationMemoPayload = "020040b3a58c408ddb104b2ef471e451588a010000000000001500000000000001d80000000000000000000000000000000000000000000000000000000000000000";
-     TxOut txOut = TxOut.fromBytes(Hex.toByteArray("0a2d0a220a209cd38dde0a41b026306ad55ea70f3ba0c0edcf93ead541e577a7d4729342fd2a11d320946556c6eadd12220a201e6c1a745fe1632885aedb8c2efbb3a7d0241d3ecd927f00b08c06ab0d65ec5a1a220a20c0c6a236ed89069f2c6ffe3cb8303c551b6102280cccd858e4da1a8c7610800922560a540000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a440a425b81d7d5b98d57f8684ee9344f567e7d30b22ad0881d3755564c144b861f71bdd7d9b5a5bcba0f52ed891f0c212f29003ddc9c7c824b4640258c901dbef2bb2e56b5"));
-     TxOutMemo txOutMemo = TxOutMemoParser
-         .parseTxOutMemo(Hex.toByteArray(decryptedDestinationMemoPayload), destinationAccountKey, txOut);
-
-     Assert.assertEquals(TxOutMemoType.DESTINATION, txOutMemo.getTxOutMemoType());
-   }
-
-   @Test
-   public void parseTxOutMemo_unusedMemoDecryptedPayload_ReturnsUnusedMemo() throws Exception {
-     String decryptedUnusedMemoPayload = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-     TxOutMemo txOutMemo = TxOutMemoParser
-         .parseTxOutMemo(Hex.toByteArray(decryptedUnusedMemoPayload), null, null);
-
-     Assert.assertEquals(TxOutMemoType.UNUSED, txOutMemo.getTxOutMemoType());
-   }
- }
- **/

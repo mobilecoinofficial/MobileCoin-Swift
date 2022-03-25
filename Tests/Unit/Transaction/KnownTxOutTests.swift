@@ -10,7 +10,6 @@ class KnownTxOutTests: XCTestCase {
 
     func testFogViewRecordMemoPayloadNotSet() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultNotSet()
-//        let accountKey = fixture.senderAccountKey
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
@@ -24,7 +23,6 @@ class KnownTxOutTests: XCTestCase {
 
     func testFogViewRecordMemoPayloadUnused() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultUnused()
-//        let accountKey = fixture.senderAccountKey
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
@@ -38,7 +36,6 @@ class KnownTxOutTests: XCTestCase {
     
     func testFogViewRecordSenderMemoPayload() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderMemo()
-//        let accountKey = fixture.senderAccountKey
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
@@ -52,13 +49,11 @@ class KnownTxOutTests: XCTestCase {
 
     func testFogViewRecordSenderMemoPayloadValues() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderMemo()
-//        let accountKey = fixture.senderAccountKey
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
         switch txOutMemo {
         case .sender(let recoverableSenderMemo):
-            // TODO compare address hash ?
             XCTAssertTrue(true)
             let recovered = recoverableSenderMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress)
             XCTAssertNotNil(recovered)
@@ -72,7 +67,6 @@ class KnownTxOutTests: XCTestCase {
     
     func testFogViewRecordDestinationMemoPayload() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultDestinationMemo()
-//        let accountKey = fixture.senderAccountKey
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
@@ -86,19 +80,17 @@ class KnownTxOutTests: XCTestCase {
 
     func testFogViewRecordDestinationMemoPayloadValues() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultDestinationMemo()
-//        let accountKey = fixture.senderAccountKey
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
         switch txOutMemo {
         case .destination(let recoverableDestinationMemo):
-            // TODO compare address hash ?
             XCTAssertTrue(true)
             let recovered = recoverableDestinationMemo.recover()
             XCTAssertNotNil(recovered)
             XCTAssertEqual(recovered?.fee, fixture.fee)
             XCTAssertEqual(recovered?.totalOutlay, fixture.totalOutlay)
-//            XCTAssertEqual(recovered?.numberOfRecipients, fixture.numberOfRecipients)
+            XCTAssertEqual(recovered?.numberOfRecipients, fixture.numberOfRecipients)
         default:
             XCTFail("TxOutMemo type mismatch")
         }
@@ -125,7 +117,6 @@ class KnownTxOutTests: XCTestCase {
         
         switch txOutMemo {
         case .senderWithPaymentRequest(let recoverableSenderWithPaymentRequestMemo):
-            // TODO compare address hash ?
             XCTAssertTrue(true)
             let recovered = recoverableSenderWithPaymentRequestMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress)
             XCTAssertNotNil(recovered)
@@ -316,7 +307,7 @@ extension KnownTxOut.Fixtures.DefaultDestinationMemo {
     static let viewRecordWithDestinationMemoHex = "11d320946556c6eadd1a201e6c1a745fe1632885aedb8c2efbb3a7d0241d3ecd927f00b08c06ab0d65ec5a2220c0c6a236ed89069f2c6ffe3cb8303c551b6102280cccd858e4da1a8c76108009296400000000000000310100000000000000390a000000000000004578fd2d5b4a425b81d7d5b98d57f8684ee9344f567e7d30b22ad0881d3755564c144b861f71bdd7d9b5a5bcba0f52ed891f0c212f29003ddc9c7c824b4640258c901dbef2bb2e56b5";
     
     static let expectedDestinationFee = UInt64(21)
-    static let expectedDestinationNumberOfRecipients = UInt(8)
+    static let expectedDestinationNumberOfRecipients = UInt8(8)
     static let expectedDestinationTotalOutlay = UInt64(472)
     
     static func getTxOut(viewKey: RistrettoPrivate) throws -> LedgerTxOut {
