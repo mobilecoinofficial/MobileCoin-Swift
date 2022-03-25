@@ -19,7 +19,8 @@ class TxOutMemoIntegrationTests: XCTestCase {
             amount: txFixture.amount,
             fee: txFixture.fee,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fogResolver: txFixture.fogResolver))
+            fogResolver: txFixture.fogResolver,
+            blockVersion: txFixture.blockVersion))
     }
 
     func testTransactionWithSenderMemo() throws {
@@ -73,7 +74,8 @@ class TxOutMemoIntegrationTests: XCTestCase {
             amount: txFixture.amount,
             fee: txFixture.fee,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fogResolver: txFixture.fogResolver))
+            fogResolver: txFixture.fogResolver,
+            blockVersion: txFixture.blockVersion))
     }
 
     func testTransactionWithSenderWithPaymentRequestMemo() throws {
@@ -115,6 +117,19 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.fee, txFixture.fee)
         XCTAssertEqual(recovered.totalOutlay, txFixture.totalOutlay)
+    }
+
+    func testBlockVersionOneUnusedMemo() throws {
+        let fixture = try TransactionBuilder.Fixtures.SenderAndDestinationBlockVersionOne()
+        let txFixture = fixture.txFixture
+        let recipientAccountKey = txFixture.recipientAccountKey
+        let recipientPublicAddress = recipientAccountKey.publicAddress
+        let sentTxOut = fixture.sentTxOut
+
+        XCTAssertTrue(
+            sentTxOut.recoverableMemo == .notset,
+            "Expecting a Recoverable Memo of type .notset"
+        )
     }
 
 }
@@ -164,7 +179,8 @@ extension TransactionBuilder.Fixtures {
                             amount: fixture.amount,
                             fee: fixture.fee,
                             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                            fogResolver: fixture.fogResolver)).transaction
+                            fogResolver: fixture.fogResolver,
+                            blockVersion: fixture.blockVersion)).transaction
                         
         }
         
@@ -214,10 +230,59 @@ extension TransactionBuilder.Fixtures {
                             amount: fixture.amount,
                             fee: fixture.fee,
                             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                            fogResolver: fixture.fogResolver)).transaction
+                            fogResolver: fixture.fogResolver,
+                            blockVersion: fixture.blockVersion)).transaction
         }
         
     }
+    
+    struct SenderAndDestinationBlockVersionOne {
+        let txFixture: Transaction.Fixtures.TxOutMemo
+        let receivedTxOut: KnownTxOut
+        let sentTxOut: KnownTxOut
+       
+        static let memoType: MemoType = .recoverable
+
+        init() throws {
+            self.receivedTxOut = try Self.getReceivedTxOut()
+            self.sentTxOut = try Self.getSentTxOut()
+            self.txFixture = try Transaction.Fixtures.TxOutMemo()
+        }
+        
+        static func getMemoType() -> MemoType {
+            .recoverable
+        }
+        
+        static func getReceivedTxOut() throws -> KnownTxOut {
+            try Transaction.Fixtures.getOwnedOutput(
+                accountKey: try Transaction.Fixtures.TxOutMemo().recipientAccountKey,
+                transaction: try Self.getTransaction())
+        }
+        
+        static func getSentTxOut() throws -> KnownTxOut {
+            try Transaction.Fixtures.getOwnedOutput(
+                accountKey: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
+                transaction: try Self.getTransaction())
+        }
+        
+        private static func getTransaction() throws -> Transaction {
+            let fixture = try Transaction.Fixtures.TxOutMemo()
+            let memoType = getMemoType()
+            return try XCTUnwrapSuccess(TransactionBuilder.build(
+                            inputs: fixture.inputs,
+                            accountKey: fixture.senderAccountKey,
+                            to: fixture.recipientAccountKey.publicAddress,
+                            memoType: memoType,
+                            amount: fixture.amount,
+                            fee: fixture.fee,
+                            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+                            fogResolver: fixture.fogResolver,
+                            blockVersion: BlockVersion.one)).transaction
+                        
+        }
+        
+    }
+    
 }
 
 extension Transaction.Fixtures {
@@ -238,60 +303,3 @@ extension Transaction.Fixtures {
                         ).first)
     }
 }
-/**
- @RunWith(AndroidJUnit4.class)
- public class TxOutMemoIntegrationTest {
- 
-   @Test
-   public void buildTransaction_senderAndDestinationMemoBuilder_txBuidlerRespectsBlockVersion() throws Exception {
-     TxOutMemoBuilder txOutMemoBuilder = TxOutMemoBuilder
-             .createSenderAndDestinationRTHMemoBuilder(senderAccountKey);
-     TxOut realTxOut = txOuts.get(realIndex);
-     transactionBuilder = new TransactionBuilder(fogResolver, txOutMemoBuilder, 1);
-
-     RistrettoPrivate onetimePrivateKey = Util.recoverOnetimePrivateKey(
-             realTxOut.getPubKey(),
-             realTxOut.getTargetKey(),
-             senderAccountKey
-     );
-     transactionBuilder
-             .addInput(txOuts, txOutMembershipProofs, realIndex, onetimePrivateKey,
-                     senderAccountKey.getViewKey());
-     long fee = 1L;
-     transactionBuilder.setFee(fee);
-     transactionBuilder.setTombstoneBlockIndex(UnsignedLong.valueOf(2000));
-     BigInteger sentTxOutValue = BigInteger.ONE;
-
-     transactionBuilder.addOutput(sentTxOutValue, recipientAccountKey.getPublicAddress(), null);
-     BigInteger realTxOutValue = realTxOut.getAmount()
-             .unmaskValue(senderAccountKey.getViewKey(), realTxOut.getPubKey());
-     BigInteger changeValue = realTxOutValue.subtract(BigInteger.valueOf(fee))
-             .subtract(sentTxOutValue);
-     transactionBuilder.addChangeOutput(changeValue, senderAccountKey, null);
-     Transaction transaction = transactionBuilder.build();
-
-     List<MobileCoinAPI.TxOut> outputsList = transaction.toProtoBufObject().getPrefix()
-             .getOutputsList();
-     TxOut txOut1 = TxOut.fromProtoBufObject(outputsList.get(0));
-     TxOut txOut2 = TxOut.fromProtoBufObject(outputsList.get(1));
-
-     TxOut sentTxOut;
-     try {
-       txOut1.getAmount().unmaskValue(recipientAccountKey.getViewKey(), txOut1.getPubKey());
-       sentTxOut = txOut1;
-     } catch(Exception e) {
-       sentTxOut = txOut2;
-     }
-
-     byte[] sentMemoPayload = sentTxOut.decryptMemoPayload(recipientAccountKey);
-
-     TxOutMemo unsetMemo = TxOutMemoParser
-             .parseTxOutMemo(sentMemoPayload, recipientAccountKey, sentTxOut);
-
-     assertEquals(TxOutMemoType.NOT_SET, unsetMemo.getTxOutMemoType());
-   }
-
- }
-
- return result
- **/

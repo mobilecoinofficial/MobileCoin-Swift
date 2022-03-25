@@ -34,7 +34,8 @@ extension Account {
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
-                targetQueue: targetQueue)
+                targetQueue: targetQueue,
+                blockVersion: MobileCoinClient.latestBlockVersion)
         }
 
         func prepareTransaction(
@@ -86,7 +87,8 @@ extension Account {
                     amount: amount,
                     fee: fee,
                     tombstoneBlockIndex: tombstoneBlockIndex,
-                    completion: completion)
+                    blockVersion: MobileCoinClient.latestBlockVersion,
+                    completion: completion) // - TODO
             case .failure(let error):
                 logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
@@ -150,6 +152,7 @@ extension Account {
                             amount: amount,
                             fee: fee,
                             tombstoneBlockIndex: tombstoneBlockIndex,
+                            blockVersion: MobileCoinClient.latestBlockVersion,
                             completion: completion)
                     case .failure(let error):
                         logger.info(
@@ -208,6 +211,7 @@ extension Account {
                                 recoverableMemo: recoverableMemo,
                                 fee: defragInputs.fee,
                                 tombstoneBlockIndex: tombstoneBlockIndex,
+                                blockVersion: MobileCoinClient.latestBlockVersion,
                                 completion: callback)
                         }, serialQueue: self.serialQueue, completion: completion)
                     case .failure(let error):

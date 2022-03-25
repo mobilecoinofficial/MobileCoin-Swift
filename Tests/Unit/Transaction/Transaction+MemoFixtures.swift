@@ -21,8 +21,8 @@ extension Transaction.Fixtures {
         let fogResolver: FogResolver
         let globalIndex: UInt64
         let blockMetadata: BlockMetadata
+        let blockVersion: BlockVersion
         
-//        let outputs: [(recipient: PublicAddress, amount: PositiveUInt64)]
         var totalOutlay : UInt64 {
             return fee + amount.value
         }
@@ -34,47 +34,19 @@ extension Transaction.Fixtures {
             self.membershipProofs = try Self.txOutMembershipProofs()
             self.senderAccountKey = try Self.senderAccountKey()
             self.recipientAccountKey = try Self.recipientAccountKey()
-//            self.outputs = try Self.outputs()
             self.fogResolver = try Self.fogResolver()
             self.globalIndex = Self.globalIndex
             self.blockMetadata = Self.blockMetadata
+            self.blockVersion = Self.blockVersion
         }
     }
 }
 
 extension Transaction.Fixtures.TxOutMemo {
 
-    /**
-     
-       List<MobileCoinAPI.TxOut> outputsList = transaction.toProtoBufObject().getPrefix()
-           .getOutputsList();
-       TxOut txOut1 = TxOut.fromProtoBufObject(outputsList.get(0));
-       TxOut txOut2 = TxOut.fromProtoBufObject(outputsList.get(1));
 
-       TxOut sentTxOut;
-       try {
-         txOut1.getAmount().unmaskValue(recipientAccountKey.getViewKey(), txOut1.getPubKey());
-         sentTxOut = txOut1;
-       } catch(Exception e) {
-         sentTxOut = txOut2;
-       }
+    fileprivate static let blockVersion = BlockVersion.minRTHEnabled
 
-       byte[] sentMemoPayload = sentTxOut.decryptMemoPayload(recipientAccountKey);
-
-       AddressHash senderAddressHash = senderAccountKey.getPublicAddress().calculateAddressHash();
-       SenderMemo senderMemo = (SenderMemo) TxOutMemoParser
-           .parseTxOutMemo(sentMemoPayload, recipientAccountKey, sentTxOut);
-       assertEquals(senderAddressHash, senderMemo.getUnvalidatedAddressHash());
-       SenderMemoData senderMemoData = senderMemo
-           .getSenderMemoData(senderAccountKey.getPublicAddress(), recipientAccountKey.getDefaultSubAddressViewKey());
-
-       assertEquals(senderAddressHash, senderMemoData.getAddressHash());
-     }
-
-
-     **/
-    
-    
     static let realIndex = 3;
     
     static func realKnownTxOut() throws -> KnownTxOut {
@@ -111,41 +83,6 @@ extension Transaction.Fixtures.TxOutMemo {
 
         return [try PreparedTxInput.make(knownTxOut: knownTxOut, ring: ring).get()]
     }
-    
-//    fileprivate static func outputs() throws
-//        -> [(recipient: PublicAddress, amount: PositiveUInt64)]
-//    {
-//        let inputKnownTxOut = try realKnownTxOut()
-//        let
-//        [
-//            (
-//                recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
-//                amount: try XCTUnwrap(PositiveUInt64(10))
-//            ),
-//            (
-//                recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
-//                amount: try XCTUnwrap(PositiveUInt64(2499979999999990))
-//            ),
-//        ]
-//    }
-
-//    fileprivate static func inputKeyImages() throws -> Set<Data> {
-//        [
-//            try XCTUnwrap(Data(base64Encoded: "Mpi0OpU4JeTN3YGZyJDQakADLTe7SkrrzK3be3kn6xk==")),
-//        ]
-//    }
-//
-//    fileprivate static func outputPublicKeys() throws -> Set<Data> {
-//        [
-//            try XCTUnwrap(Data(base64Encoded: "OEDBnfDWxrm88MEFvilrE1Qtcc2yDjUiFX3psxK3BxQ=")),
-//            try XCTUnwrap(Data(base64Encoded: "/HeqjlElnYDDMxtRA4LmmwbO9qKqZfAuRzm5jELJagE=")),
-//        ]
-//    }
-
-    
-    ///
-    /// Needed for test
-    ///
     
     static let fee: UInt64 = 1
     
@@ -731,12 +668,3 @@ extension Transaction.Fixtures.TxOutMemo {
             """
 
 }
-
-//extension Transaction.Fixtures.Serialization {
-//
-//    fileprivate static func serializedData() throws -> Data {
-//        try Data(contentsOf: Bundle.url("TransactionSerializedData", "bin"))
-//    }
-//
-//}
-

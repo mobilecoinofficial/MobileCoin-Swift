@@ -13,13 +13,15 @@ struct TransactionPreparer {
     private let fogResolverManager: FogResolverManager
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
+    private let blockVersion: BlockVersion
 
     init(
         accountKey: AccountKey,
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        blockVersion: BlockVersion
     ) {
         self.serialQueue = DispatchQueue(
             label: "com.mobilecoin.\(Account.self).\(Self.self)",
@@ -31,6 +33,7 @@ struct TransactionPreparer {
         self.fogMerkleProofFetcher = FogMerkleProofFetcher(
             fogMerkleProofService: fogMerkleProofService,
             targetQueue: targetQueue)
+        self.blockVersion = blockVersion
     }
 
     func prepareSelfAddressedTransaction(
@@ -38,6 +41,7 @@ struct TransactionPreparer {
         recoverableMemo: Bool,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
+        blockVersion: BlockVersion,
         completion: @escaping (
             Result<Transaction, DefragTransactionPreparationError>
         ) -> Void
@@ -73,7 +77,8 @@ struct TransactionPreparer {
                         memoType: recoverableMemo ? .recoverable : .unused, 
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver
+                        fogResolver: fogResolver,
+                        blockVersion: blockVersion
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
                 })
@@ -87,6 +92,7 @@ struct TransactionPreparer {
         amount: UInt64,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
+        blockVersion: BlockVersion,
         completion: @escaping (
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
@@ -132,7 +138,8 @@ struct TransactionPreparer {
                         amount: amount,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver
+                        fogResolver: fogResolver,
+                        blockVersion: blockVersion
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })
