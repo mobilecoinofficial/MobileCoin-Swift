@@ -13,11 +13,9 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .notset:
-            XCTAssertTrue(true)
-        default:
+        guard case .notset = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
     }
 
@@ -26,11 +24,9 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .unused:
-            XCTAssertTrue(true)
-        default:
+        guard case .unused = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
     }
     
@@ -39,11 +35,9 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .sender(_):
-            XCTAssertTrue(true)
-        default:
+        guard case .sender = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
     }
 
@@ -52,17 +46,15 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .sender(let recoverableSenderMemo):
-            XCTAssertTrue(true)
-            let recovered = recoverableSenderMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress)
-            XCTAssertNotNil(recovered)
-            let senderAddressHash = fixture.senderAccountKey.publicAddress.calculateAddressHash()
-            XCTAssertEqual(recovered?.addressHash, senderAddressHash)
-        default:
+        guard case let .sender(recoverableMemo) = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
-        
+        let recovered = try XCTUnwrap(
+            recoverableMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress))
+        XCTAssertEqual(
+            recovered.addressHash,
+            fixture.senderAccountKey.publicAddress.calculateAddressHash())
     }
     
     func testFogViewRecordDestinationMemoPayload() throws {
@@ -70,11 +62,9 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .destination(_):
-            XCTAssertTrue(true)
-        default:
+        guard case .destination = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
     }
 
@@ -83,18 +73,14 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .destination(let recoverableDestinationMemo):
-            XCTAssertTrue(true)
-            let recovered = recoverableDestinationMemo.recover()
-            XCTAssertNotNil(recovered)
-            XCTAssertEqual(recovered?.fee, fixture.fee)
-            XCTAssertEqual(recovered?.totalOutlay, fixture.totalOutlay)
-            XCTAssertEqual(recovered?.numberOfRecipients, fixture.numberOfRecipients)
-        default:
+        guard case let .destination(recoverableMemo) = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
-        
+        let recovered = try XCTUnwrap(recoverableMemo.recover())
+        XCTAssertEqual(recovered.fee, fixture.fee)
+        XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
     
     func testFogViewRecordSenderWithPaymentRequestMemoPayload() throws {
@@ -102,11 +88,9 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .senderWithPaymentRequest(_):
-            XCTAssertTrue(true)
-        default:
+        guard case .senderWithPaymentRequest = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
     }
 
@@ -115,18 +99,15 @@ class KnownTxOutTests: XCTestCase {
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
         
-        switch txOutMemo {
-        case .senderWithPaymentRequest(let recoverableSenderWithPaymentRequestMemo):
-            XCTAssertTrue(true)
-            let recovered = recoverableSenderWithPaymentRequestMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress)
-            XCTAssertNotNil(recovered)
-            let senderAddressHash = fixture.senderAccountKey.publicAddress.calculateAddressHash()
-            XCTAssertEqual(recovered?.addressHash, senderAddressHash)
-            XCTAssertEqual(recovered?.paymentRequestId, fixture.paymentRequestId)
-        default:
+        guard case let .senderWithPaymentRequest(recoverableMemo) = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
+            return
         }
-        
+        let recovered = try XCTUnwrap(
+            recoverableMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress))
+        let senderAddressHash = fixture.senderAccountKey.publicAddress.calculateAddressHash()
+        XCTAssertEqual(recovered.addressHash, senderAddressHash)
+        XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
     }
     
 }
