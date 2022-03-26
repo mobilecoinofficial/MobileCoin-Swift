@@ -9,6 +9,7 @@ import XCTest
 class DestinationMemoTests: XCTestCase {
     func testDestinationMemoCreate() throws {
         let fixture = try Transaction.Fixtures.DestinationMemo()
+        
         let destinationMemoData = try XCTUnwrap(
             DestinationMemoUtils.create(
                 destinationPublicAddress: fixture.accountKey.publicAddress,

@@ -10,21 +10,25 @@ class SenderMemoTests: XCTestCase {
     func testSenderMemoCreate() throws {
         let fixture = try Transaction.Fixtures.SenderMemo()
         
-        let senderMemoData = try XCTUnwrap(
+        let memoData = try XCTUnwrap(
             SenderMemoUtils.create(
                 senderAccountKey: fixture.senderAccountKey,
                 receipientPublicAddress: fixture.recieverAccountKey.publicAddress,
                 txOutPublicKey: fixture.txOutPublicKey))
         
+        XCTAssertEqual(
+            memoData.data.hexEncodedString(),
+            fixture.expectedSenderAddressHash.hexEncodedString())
+        
         XCTAssertTrue(
             SenderMemoUtils.isValid(
-                memoData: senderMemoData,
+                memoData: memoData,
                 senderPublicAddress: fixture.senderAccountKey.publicAddress,
                 receipientViewPrivateKey: fixture.recieverAccountKey.subaddressViewPrivateKey,
                 txOutPublicKey: fixture.txOutPublicKey))
 
         XCTAssertEqual(
             fixture.senderAccountKey.publicAddress.calculateAddressHash(),
-            SenderMemoUtils.getAddressHash(memoData: senderMemoData))
+            SenderMemoUtils.getAddressHash(memoData: memoData))
     }
 }

@@ -72,11 +72,15 @@ extension Transaction.Fixtures {
         let senderAccountKey: AccountKey
         let recieverAccountKey: AccountKey
         let txOutPublicKey: RistrettoPublic
+        let expectedMemoData: Data64
+        let expectedSenderAddressHash: Data16
 
         init() throws {
             self.senderAccountKey = try AccountKey.Fixtures.AliceAndBob().alice
             self.recieverAccountKey = try AccountKey.Fixtures.AliceAndBob().bob
             self.txOutPublicKey = try Self.getTxOutPublicKey()
+            self.expectedMemoData = try Self.getExpectedMemoData()
+            self.expectedSenderAddressHash = try Self.getExpectedSenderAddressHash()
         }
         
         static func getTxOutPublicKey() throws -> RistrettoPublic {
@@ -87,17 +91,74 @@ extension Transaction.Fixtures {
         
         static let txOutPublicKeyHex = "c235c13c4dedd808e95f428036716d52561fad7f51ce675f4d4c9c1fa1ea2165"
 
+        static func getExpectedMemoData() throws -> Data64 {
+            try XCTUnwrap(Data64(
+                            XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
+        }
+        
         static var validMemoDataHexBytes: String =
             """
             ccb5a98f0c0c42f68491e5e0c936245200000000000000000000000000000000\
             00000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
             """
         
+        static func getExpectedSenderAddressHash() throws -> Data16 {
+            try XCTUnwrap(Data16(
+                            XCTUnwrap(Data(hexEncoded: expectedAddressHashHex))))
+        }
+        
         static var expectedAddressHashHex: String =
             """
             ccb5a98f0c0c42f68491e5e0c9362452
             """
     }
+    
+    struct SenderWithPaymentRequestMemo {
+        let senderAccountKey: AccountKey
+        let recieverAccountKey: AccountKey
+        let txOutPublicKey: RistrettoPublic
+        let expectedMemoData: Data64
+        let expectedSenderAddressHash: Data16
+        let paymentRequestId: UInt64 = 17014
+
+        init() throws {
+            self.senderAccountKey = try AccountKey.Fixtures.AliceAndBob().alice
+            self.recieverAccountKey = try AccountKey.Fixtures.AliceAndBob().bob
+            self.txOutPublicKey = try Self.getTxOutPublicKey()
+            self.expectedMemoData = try Self.getExpectedMemoData()
+            self.expectedSenderAddressHash = try Self.getExpectedSenderAddressHash()
+        }
+        
+        static func getTxOutPublicKey() throws -> RistrettoPublic {
+            try XCTUnwrap(RistrettoPublic(
+                            try XCTUnwrap(Data(hexEncoded: txOutPublicKeyHex))))
+        }
+        
+        static let txOutPublicKeyHex = "c235c13c4dedd808e95f428036716d52561fad7f51ce675f4d4c9c1fa1ea2165"
+
+        static func getExpectedMemoData() throws -> Data64 {
+            try XCTUnwrap(Data64(
+                            XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
+        }
+        
+        static var validMemoDataHexBytes: String =
+            """
+            ccb5a98f0c0c42f68491e5e0c936245200000000000000000000000000000000\
+            00000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
+            """
+        
+        static func getExpectedSenderAddressHash() throws -> Data16 {
+            try XCTUnwrap(Data16(
+                            XCTUnwrap(Data(hexEncoded: expectedAddressHashHex))))
+        }
+        
+        static var expectedAddressHashHex: String =
+            """
+            ccb5a98f0c0c42f68491e5e0c9362452
+            """
+    }
+
+    static var validAddressHashHexBytes: String = "ccb5a98f0c0c42f68491e5e0c9362452"
 }
 
 extension Transaction.Fixtures.TxOutMemo {
