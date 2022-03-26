@@ -55,20 +55,48 @@ extension Transaction.Fixtures {
             self.numberOfRecipients = Self.numberOfRecipients
         }
         
-       
-        
-        
-        
-        
-        
-        
-        static var validMemoDataHexBytes: String = "ccb5a98f0c0c42f68491e5e0c9362452010000000000000400000000000000640000000000000000000000000000000000000000000000000000000000000000";
+        static var validMemoDataHexBytes: String =
+            """
+            ccb5a98f0c0c42f68491e5e0c936245201000000000000040000000000000064\
+            0000000000000000000000000000000000000000000000000000000000000000
+            """
         
         static var fee: UInt64 = 3
         
         static var totalOutlay: UInt64 = 100
         
         static var numberOfRecipients: UInt8 = 1
+    }
+    
+    struct SenderMemo {
+        let senderAccountKey: AccountKey
+        let recieverAccountKey: AccountKey
+        let txOutPublicKey: RistrettoPublic
+
+        init() throws {
+            self.senderAccountKey = try AccountKey.Fixtures.AliceAndBob().alice
+            self.recieverAccountKey = try AccountKey.Fixtures.AliceAndBob().bob
+            self.txOutPublicKey = try Self.getTxOutPublicKey()
+        }
+        
+        static func getTxOutPublicKey() throws -> RistrettoPublic {
+            try XCTUnwrap(
+                    RistrettoPublic(try XCTUnwrap(
+                                        Data(hexEncoded: txOutPublicKeyHex))))
+        }
+        
+        static let txOutPublicKeyHex = "c235c13c4dedd808e95f428036716d52561fad7f51ce675f4d4c9c1fa1ea2165"
+
+        static var validMemoDataHexBytes: String =
+            """
+            ccb5a98f0c0c42f68491e5e0c936245200000000000000000000000000000000\
+            00000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
+            """
+        
+        static var expectedAddressHashHex: String =
+            """
+            ccb5a98f0c0c42f68491e5e0c9362452
+            """
     }
 }
 
