@@ -52,9 +52,8 @@ class KnownTxOutTests: XCTestCase {
         }
         let recovered = try XCTUnwrap(
             recoverableMemo.recover(senderPublicAddress: fixture.senderAccountKey.publicAddress))
-        XCTAssertEqual(
-            recovered.addressHash,
-            fixture.senderAccountKey.publicAddress.calculateAddressHash())
+        let senderAddressHash = fixture.senderAccountKey.publicAddress.calculateAddressHash()
+        XCTAssertEqual(recovered.addressHash, senderAddressHash)
     }
     
     func testFogViewRecordDestinationMemoPayload() throws {
