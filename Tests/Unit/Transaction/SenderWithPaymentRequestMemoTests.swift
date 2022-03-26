@@ -8,7 +8,7 @@ import XCTest
 
 class SenderWithPaymentRequestMemoTests: XCTestCase {
     func testSenderWithPaymentRequestMemoCreate() throws {
-        let fixture = try Transaction.Fixtures.SenderWithPaymentRequestMemo()
+        let fixture = try MemoData.Fixtures.SenderWithPaymentRequestMemo()
         
         let memoData = try XCTUnwrap(
             SenderWithPaymentRequestMemoUtils.create(
@@ -19,8 +19,8 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
         
         XCTAssertEqual(
             memoData.data.hexEncodedString(),
-            fixture.expectedSenderAddressHash.hexEncodedString())
-        
+            fixture.expectedMemoData.hexEncodedString())
+
         XCTAssertTrue(
             SenderWithPaymentRequestMemoUtils.isValid(
                 memoData: memoData,
@@ -29,9 +29,9 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
                 txOutPublicKey: fixture.txOutPublicKey))
 
         XCTAssertEqual(
-            fixture.senderAccountKey.publicAddress.calculateAddressHash(),
-            SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData))
-        
+            SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData),
+            fixture.senderAccountKey.publicAddress.calculateAddressHash())
+
         XCTAssertEqual(
             SenderWithPaymentRequestMemoUtils.getPaymentRequestId(memoData: memoData),
             fixture.paymentRequestId)

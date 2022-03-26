@@ -24,8 +24,7 @@ class TxOutMemoBuilderTests: XCTestCase {
         XCTAssertNotNil(
             TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: paymentRequestId,
-                accountKey: fixture.accountKey
-            ))
+                accountKey: fixture.accountKey))
     }
 
 }

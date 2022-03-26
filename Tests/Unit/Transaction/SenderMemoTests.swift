@@ -8,7 +8,7 @@ import XCTest
 
 class SenderMemoTests: XCTestCase {
     func testSenderMemoCreate() throws {
-        let fixture = try Transaction.Fixtures.SenderMemo()
+        let fixture = try MemoData.Fixtures.SenderMemo()
         
         let memoData = try XCTUnwrap(
             SenderMemoUtils.create(
@@ -18,8 +18,8 @@ class SenderMemoTests: XCTestCase {
         
         XCTAssertEqual(
             memoData.data.hexEncodedString(),
-            fixture.expectedSenderAddressHash.hexEncodedString())
-        
+            fixture.expectedMemoData.hexEncodedString())
+
         XCTAssertTrue(
             SenderMemoUtils.isValid(
                 memoData: memoData,
@@ -28,7 +28,7 @@ class SenderMemoTests: XCTestCase {
                 txOutPublicKey: fixture.txOutPublicKey))
 
         XCTAssertEqual(
-            fixture.senderAccountKey.publicAddress.calculateAddressHash(),
-            SenderMemoUtils.getAddressHash(memoData: memoData))
+            SenderMemoUtils.getAddressHash(memoData: memoData),
+            fixture.senderAccountKey.publicAddress.calculateAddressHash())
     }
 }

@@ -8,7 +8,7 @@ import XCTest
 
 class DestinationMemoTests: XCTestCase {
     func testDestinationMemoCreate() throws {
-        let fixture = try Transaction.Fixtures.DestinationMemo()
+        let fixture = try MemoData.Fixtures.DestinationMemo()
         
         let destinationMemoData = try XCTUnwrap(
             DestinationMemoUtils.create(

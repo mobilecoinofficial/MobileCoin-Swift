@@ -87,6 +87,22 @@ extension AccountKey.Fixtures {
 }
 
 extension AccountKey.Fixtures {
+    struct KnownTxOut {
+        let senderAccountKey: AccountKey
+        let receiverAccountKey: AccountKey
+
+        init() throws {
+            self.senderAccountKey = try XCTUnwrap(
+                AccountKey(serializedData:XCTUnwrap(
+                            Data(hexEncoded: Self.senderAccountKeyHex))))
+            self.receiverAccountKey = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(
+                            Data(hexEncoded: Self.receiverAccountKeyHex))))
+        }
+    }
+}
+
+extension AccountKey.Fixtures {
     struct DefaultWithoutFog {
         let accountKey: AccountKey
 
@@ -206,3 +222,20 @@ extension AccountKey.Fixtures.AliceAndBob {
         a9e055395078d0b07286f9930203010001
         """
 }
+
+extension AccountKey.Fixtures.KnownTxOut {
+    static let senderAccountKeyHex =
+            """
+            0a220a20b1f765d30fbb85b605f04edd29bb9cbb83938f68600d4a618863e9664e7b960912220a20\
+            dae7da08e27ea4f17a233f15c234b58ce20d0d2727abb98e9bdcf04aeea540081a11666f673a2f2f\
+            6578616d706c652e636f6d
+            """
+
+    static let receiverAccountKeyHex =
+            """
+            0a220a20ff6b8ebfe4cda6a2bca7fa6061e73c752ecc3c01876a25b984f0230bcdab8b0712220a20\
+            197d2746aac53be4911b6dd01b3e67d5565fcf322c87c75add37959a608e4a021a11666f673a2f2f\
+            6578616d706c652e636f6d
+            """
+}
+
