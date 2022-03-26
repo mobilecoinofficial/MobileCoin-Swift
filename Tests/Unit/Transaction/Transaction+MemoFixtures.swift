@@ -26,7 +26,6 @@ extension Transaction.Fixtures {
         var totalOutlay : UInt64 {
             return fee + amount.value
         }
-        
 
         init() throws {
             self.inputs = try Self.inputs()
@@ -39,6 +38,37 @@ extension Transaction.Fixtures {
             self.blockMetadata = Self.blockMetadata
             self.blockVersion = Self.blockVersion
         }
+    }
+    
+    struct DestinationMemo {
+        let accountKey: AccountKey
+        let fee: UInt64
+        let totalOutlay: UInt64
+        let numberOfRecipients: UInt8
+        let validMemoDataHexBytes: String
+        
+        init() throws {
+            self.accountKey = try AccountKey.Fixtures.AliceAndBob().alice
+            self.validMemoDataHexBytes = Self.validMemoDataHexBytes
+            self.fee = Self.fee
+            self.totalOutlay = Self.totalOutlay
+            self.numberOfRecipients = Self.numberOfRecipients
+        }
+        
+       
+        
+        
+        
+        
+        
+        
+        static var validMemoDataHexBytes: String = "ccb5a98f0c0c42f68491e5e0c9362452010000000000000400000000000000640000000000000000000000000000000000000000000000000000000000000000";
+        
+        static var fee: UInt64 = 3
+        
+        static var totalOutlay: UInt64 = 100
+        
+        static var numberOfRecipients: UInt8 = 1
     }
 }
 
