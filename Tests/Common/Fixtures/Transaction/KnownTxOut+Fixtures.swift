@@ -136,7 +136,7 @@ extension KnownTxOut.Fixtures.DefaultDestinationMemo {
         """
 
     static let expectedDestinationFee = UInt64(21)
-    static let expectedDestinationNumberOfRecipients = UInt8(1)
+    static let expectedDestinationNumberOfRecipients = PositiveUInt8(1)!
     static let expectedDestinationTotalOutlay = UInt64(472)
     
     static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {

@@ -7,7 +7,7 @@ import Foundation
 struct DestinationMemo {
     let memoData: Data64
     let addressHash: AddressHash
-    let numberOfRecipients: UInt8
+    let numberOfRecipients: PositiveUInt8
     let fee: UInt64
     let totalOutlay: UInt64
 }
@@ -20,11 +20,8 @@ struct RecoverableDestinationMemo {
     let txOutTargetKey: RistrettoPublic
     
     init?(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
-        guard let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData) else {
-            return nil
-        }
         self.memoData = memoData
-        self.addressHash = addressHash
+        self.addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey
         self.txOutPublicKey = txOutKeys.publicKey
         self.txOutTargetKey = txOutKeys.targetKey
@@ -32,12 +29,7 @@ struct RecoverableDestinationMemo {
 
     func recover() -> DestinationMemo? {
         guard
-            DestinationMemoUtils.isValid(txOutPublicKey: txOutPublicKey, txOutTargetKey: txOutTargetKey, accountKey: accountKey) else {
-            logger.debug("invalid")
-            return nil
-        }
-        guard
-            let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData),
+            DestinationMemoUtils.isValid(txOutPublicKey: txOutPublicKey, txOutTargetKey: txOutTargetKey, accountKey: accountKey),
             let numberOfRecipients = DestinationMemoUtils.getNumberOfRecipients(memoData: memoData),
             let fee = DestinationMemoUtils.getFee(memoData: memoData),
             let totalOutlay = DestinationMemoUtils.getTotalOutlay(memoData: memoData)
@@ -45,6 +37,7 @@ struct RecoverableDestinationMemo {
             logger.debug("Memo did not validate")
             return nil
         }
+        let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
         return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
     }
 }

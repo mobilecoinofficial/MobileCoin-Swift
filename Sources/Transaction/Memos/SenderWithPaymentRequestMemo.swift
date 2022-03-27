@@ -18,11 +18,8 @@ struct RecoverableSenderWithPaymentRequestMemo {
     let txOutPublicKey: RistrettoPublic
 
     init?(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
-        guard let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData) else {
-            return nil
-        }
         self.memoData = memoData
-        self.addressHash = addressHash
+        self.addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey
         self.txOutPublicKey = txOutPublicKey
     }
@@ -41,11 +38,7 @@ struct RecoverableSenderWithPaymentRequestMemo {
             return nil
         }
         
-        guard let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData) else {
-            logger.debug("Unable to get address hash")
-            return nil
-        }
-        
+        let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
         return SenderWithPaymentRequestMemo(memoData: memoData, addressHash: addressHash, paymentRequestId: paymentRequestId)
     }
 }

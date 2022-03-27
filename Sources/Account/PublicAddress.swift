@@ -140,7 +140,7 @@ extension External_PublicAddress {
 
 extension PublicAddress {
     func calculateAddressHash() -> AddressHash? {
-        try? AccountKeyUtils.publicAddressShortHash(publicAddress: self).get()
+        AccountKeyUtils.publicAddressShortHash(publicAddress: self)
     }
 }
 
