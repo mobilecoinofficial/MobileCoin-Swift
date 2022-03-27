@@ -17,8 +17,6 @@ enum SenderMemoUtils {
                 receipientViewPrivateKey.asMcBuffer { receipientViewPrivateKeyPtr in
                     txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
                         var matches = true
-                        // Safety: mc_tx_out_matches_any_subaddress is infallible when preconditions are
-                        // upheld.
                         let result = withMcError { errorPtr in
                             mc_memo_sender_memo_is_valid(
                                 memoDataPtr,
@@ -29,11 +27,22 @@ enum SenderMemoUtils {
                                 &errorPtr)
                         }
                         switch result {
-                        case .success():
-                            return true
+                        case .success:
+                            return matches
                         case .failure(let error):
-                            logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
-                            return false
+                            switch error.errorCode {
+                            case .invalidInput:
+                                // Safety: This condition indicates a programming error and can only
+                                // happen if arguments to mc_memo_sender_memo_is_valid are
+                                // supplied incorrectly.
+                                logger.warning("error: \(redacting: error)")
+                                return false
+                            default:
+                                // Safety: mc_memo_sender_memo_is_valid should not throw
+                                // non-documented errors.
+                                logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                                return false
+                            }
                         }
                     }
                 }
@@ -43,8 +52,8 @@ enum SenderMemoUtils {
     
     static func getAddressHash(
         memoData: Data64
-    ) -> AddressHash? {
-        let bytes: Data16? = memoData.asMcBuffer { memoDataPtr in
+    ) -> AddressHash {
+        let bytes: Data16 = memoData.asMcBuffer { memoDataPtr in
             switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                 mc_memo_sender_memo_get_address_hash(
                     memoDataPtr,
@@ -52,27 +61,23 @@ enum SenderMemoUtils {
                     &errorPtr)
             }) {
             case .success(let bytes):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
                 return bytes as Data16
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // happen if arguments to mc_memo_sender_memo_get_address_hash are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
-                    return nil
+                    return Data16()
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_memo_sender_memo_get_address_hash should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
-                    return nil
+                    return Data16()
                 }
             }
         }
-        guard let bytes = bytes else { return nil }
         return AddressHash(bytes)
     }
     
@@ -93,22 +98,17 @@ enum SenderMemoUtils {
                             &errorPtr)
                     }) {
                     case .success(let bytes):
-                        // TODO - Update
-                        
-                        // Safety: It's safe to skip validation because
-                        // mc_tx_out_reconstruct_commitment should always return a valid
-                        // RistrettoPublic on success.
                         return bytes as Data64
                     case .failure(let error):
                         switch error.errorCode {
                         case .invalidInput:
                             // Safety: This condition indicates a programming error and can only
-                            // happen if arguments to mc_tx_out_reconstruct_commitment are
+                            // happen if arguments to mc_memo_sender_memo_create are
                             // supplied incorrectly.
                             logger.warning("error: \(redacting: error)")
                             return nil
                         default:
-                            // Safety: mc_tx_out_reconstruct_commitment should not throw
+                            // Safety: mc_memo_sender_memo_create should not throw
                             // non-documented errors.
                             logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                             return nil

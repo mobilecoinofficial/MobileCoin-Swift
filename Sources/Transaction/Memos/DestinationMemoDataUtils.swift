@@ -21,8 +21,8 @@ enum DestinationMemoUtils {
     
     static func getAddressHash(
         memoData: Data64
-    ) -> AddressHash? {
-        let bytes: Data16? = memoData.asMcBuffer { memoDataPtr in
+    ) -> AddressHash {
+        let bytes: Data16 = memoData.asMcBuffer { memoDataPtr in
             switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                 mc_memo_destination_memo_get_address_hash(
                     memoDataPtr,
@@ -30,33 +30,29 @@ enum DestinationMemoUtils {
                     &errorPtr)
             }) {
             case .success(let bytes):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
                 return bytes as Data16
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // happen if arguments to mc_memo_destination_memo_get_address_hash are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
-                    return nil
+                    return Data16()
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_memo_destination_memo_get_address_hash should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
-                    return nil
+                    return Data16()
                 }
             }
         }
-        guard let bytes = bytes else { return nil }
         return AddressHash(bytes)
     }
     
     static func create(
         destinationPublicAddress: PublicAddress,
-        numberOfRecipients: UInt8,
+        numberOfRecipients: PositiveUInt8,
         fee: UInt64,
         totalOutlay: UInt64
     ) -> Data64? {
@@ -64,29 +60,24 @@ enum DestinationMemoUtils {
             switch Data64.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                 mc_memo_destination_memo_create(
                     destinationPublicAddressPtr,
-                    numberOfRecipients,
+                    numberOfRecipients.value,
                     fee,
                     totalOutlay,
                     bufferPtr,
                     &errorPtr)
             }) {
             case .success(let bytes):
-                // TODO - Update
-                
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
                 return bytes as Data64
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // happen if arguments to mc_memo_destination_memo_create are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_memo_destination_memo_create should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
@@ -106,29 +97,23 @@ enum DestinationMemoUtils {
                     &out_fee,
                     &errorPtr)
             }
-            switch (result, out_fee > 0) {
-            case (.success(), true):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
+            switch result {
+            case .success:
                 return out_fee
-            case (.failure(let error), _):
+            case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // happen if arguments to mc_memo_destination_memo_get_fee are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_memo_destination_memo_get_fee should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }
-            case (_, false):
-                logger.warning("fee must be greater than zero")
-                return nil
             }
         }
     }
@@ -144,37 +129,30 @@ enum DestinationMemoUtils {
                     &out_total_outlay,
                     &errorPtr)
             }
-            switch (result, out_total_outlay > 0) {
-            case (.success(), true):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
+            switch result {
+            case .success:
                 return out_total_outlay
-            case (.failure(let error), _):
+            case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // happen if arguments to mc_memo_destination_memo_get_total_outlay are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_memo_destination_memo_get_total_outlay should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }
-            case (_, false):
-                logger.warning("total_outlay must be greater than zero")
-                return nil
             }
         }
     }
     
-    
     static func getNumberOfRecipients(
         memoData: Data64
-    ) -> UInt8? {
+    ) -> PositiveUInt8? {
         memoData.asMcBuffer { memoDataPtr in
             var out_number_of_recipients: UInt8 = 0
             let result = withMcError { errorPtr in
@@ -183,29 +161,24 @@ enum DestinationMemoUtils {
                     &out_number_of_recipients,
                     &errorPtr)
             }
-            switch (result, out_number_of_recipients > 0) {
-            case (.success(), true):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
-                return out_number_of_recipients
-            case (.failure(let error), _):
+            switch result {
+            case .success:
+                // Number of recipients must always be greater than 1
+                return PositiveUInt8(out_number_of_recipients)
+            case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
-                    // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // Safety: This condition indicates a programming error and can only happen
+                    // if arguments to  mc_memo_destination_memo_get_number_of_recipients are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_memo_destination_memo_get_number_of_recipients should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }
-            case (_, false):
-                logger.warning("number_of_recipients must be greater than zero")
-                return nil
             }
         }
     }

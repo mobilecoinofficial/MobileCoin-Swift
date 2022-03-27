@@ -94,7 +94,7 @@ enum AccountKeyUtils {
     
     static func publicAddressShortHash(
         publicAddress: PublicAddress
-    ) -> Result<AddressHash, InvalidInputError> {
+    ) -> AddressHash? {
         publicAddress.withUnsafeCStructPointer { publicAddressPtr in
             switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                 mc_account_key_get_short_address_hash(
@@ -103,20 +103,17 @@ enum AccountKeyUtils {
                     &errorPtr)
             }) {
             case .success(let bytes):
-                // Safety: It's safe to skip validation because
-                // mc_tx_out_reconstruct_commitment should always return a valid
-                // RistrettoPublic on success.
-                return .success(AddressHash(bytes))
+                return AddressHash(bytes)
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_tx_out_reconstruct_commitment are
+                    // happen if arguments mc_account_key_get_short_address_hash are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
-                    return .failure(InvalidInputError("TODO"))
+                    return nil
                 default:
-                    // Safety: mc_tx_out_reconstruct_commitment should not throw
+                    // Safety: mc_account_key_get_short_address_hash should not throw
                     // non-documented errors.
                     logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
                 }
