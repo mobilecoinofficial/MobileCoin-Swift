@@ -17,7 +17,7 @@ struct RecoverableSenderWithPaymentRequestMemo {
     let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
 
-    init?(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
+    init(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
         self.memoData = memoData
         self.addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey

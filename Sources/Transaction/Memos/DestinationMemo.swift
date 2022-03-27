@@ -19,7 +19,7 @@ struct RecoverableDestinationMemo {
     let txOutPublicKey: RistrettoPublic
     let txOutTargetKey: RistrettoPublic
     
-    init?(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
+    init(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         self.memoData = memoData
         self.addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey

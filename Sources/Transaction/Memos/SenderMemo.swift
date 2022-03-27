@@ -16,7 +16,7 @@ struct RecoverableSenderMemo {
     let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
 
-    init?(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
+    init(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
         self.memoData = memoData
         self.addressHash = SenderMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey

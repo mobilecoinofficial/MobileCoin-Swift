@@ -29,29 +29,18 @@ enum RecoverableMemo {
         switch typeBytes.hexEncodedString() {
         case Types.SENDER_WITH_PAYMENT_REQUEST:
             let memo = RecoverableSenderWithPaymentRequestMemo(memoData, accountKey: accountKey, txOutPublicKey: txOutKeys.publicKey)
-            guard let memo = memo else {
-                // TODO see if we can remove the optional infection from the memo initializer
-                logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
-            }
             self = .senderWithPaymentRequest(memo)
         case Types.SENDER:
             let memo = RecoverableSenderMemo(memoData, accountKey: accountKey, txOutPublicKey: txOutKeys.publicKey)
-            guard let memo = memo else {
-                // TODO see if we can remove the optional infection from the memo initializer
-                logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
-            }
             self = .sender(memo)
         case Types.DESTINATION:
             let memo = RecoverableDestinationMemo(memoData, accountKey: accountKey, txOutKeys: txOutKeys)
-            guard let memo = memo else {
-                // TODO see if we can remove the optional infection from the memo initializer
-                logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
-            }
             self = .destination(memo)
         case Types.UNUSED:
             self = .unused
         default:
-            logger.fatalError("Unexpected error when parsing TxOutMemoType. Shouldn't be reached.")
+            logger.warning("Memo data type unknown")
+            self = .notset
         }
     }
     
