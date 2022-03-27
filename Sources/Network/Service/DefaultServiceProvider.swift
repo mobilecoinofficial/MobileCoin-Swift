@@ -106,6 +106,19 @@ final class DefaultServiceProvider: ServiceProvider {
         block.setAuthorization(credentials: credentials)
         untrustedTxOut.setAuthorization(credentials: credentials)
     }
+    
+    static func defaultMake(
+        networkConfig: NetworkConfig,
+        targetQueue: DispatchQueue?
+    ) -> DefaultServiceProvider {
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester)
+        return DefaultServiceProvider(
+                        networkConfig: networkConfig,
+                        targetQueue: targetQueue,
+                        grpcConnectionFactory: grpcFactory,
+                        httpConnectionFactory: httpFactory)
+    }
 }
 
 extension DefaultServiceProvider {
