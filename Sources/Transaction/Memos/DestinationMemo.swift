@@ -46,6 +46,6 @@ extension RecoverableDestinationMemo: Hashable { }
 
 extension RecoverableDestinationMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.memoData.hexEncodedString() == rhs.memoData.hexEncodedString()
+        lhs.memoData == rhs.memoData
     }
 }

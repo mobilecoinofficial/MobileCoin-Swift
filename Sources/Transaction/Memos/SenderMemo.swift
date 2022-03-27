@@ -39,6 +39,6 @@ extension RecoverableSenderMemo: Hashable { }
 
 extension RecoverableSenderMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.memoData.hexEncodedString() == rhs.memoData.hexEncodedString()
+        return lhs.memoData == rhs.memoData
     }
 }
