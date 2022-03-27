@@ -21,7 +21,7 @@ extension KnownTxOut.Fixtures {
             let accountFixture = try AccountKey.Fixtures.KnownTxOut()
             self.senderAccountKey = accountFixture.senderAccountKey
             self.receiverAccountKey = accountFixture.receiverAccountKey
-            self.knownTxOut = try Self.getTxOut(accountKey: senderAccountKey)
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
         }
     }
     
@@ -34,7 +34,7 @@ extension KnownTxOut.Fixtures {
             let accountFixture = try AccountKey.Fixtures.KnownTxOut()
             self.senderAccountKey = accountFixture.senderAccountKey
             self.receiverAccountKey = accountFixture.receiverAccountKey
-            self.knownTxOut = try Self.getTxOut(accountKey: receiverAccountKey)
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
         }
     }
     
@@ -47,7 +47,7 @@ extension KnownTxOut.Fixtures {
             let accountFixture = try AccountKey.Fixtures.KnownTxOut()
             self.senderAccountKey = accountFixture.senderAccountKey
             self.receiverAccountKey = accountFixture.receiverAccountKey
-            self.knownTxOut = try Self.getTxOut(accountKey: receiverAccountKey)
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
         }
     }
     
@@ -63,7 +63,7 @@ extension KnownTxOut.Fixtures {
             let accountFixture = try AccountKey.Fixtures.KnownTxOut()
             self.senderAccountKey = accountFixture.senderAccountKey
             self.receiverAccountKey = accountFixture.receiverAccountKey
-            self.knownTxOut = try Self.getTxOut(accountKey: senderAccountKey)
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: senderAccountKey)
         }
     }
     
@@ -77,7 +77,7 @@ extension KnownTxOut.Fixtures {
             let accountFixture = try AccountKey.Fixtures.KnownTxOut()
             self.senderAccountKey = accountFixture.senderAccountKey
             self.receiverAccountKey = accountFixture.receiverAccountKey
-            self.knownTxOut = try Self.getTxOut(accountKey: receiverAccountKey)
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
         }
     }
 }
@@ -90,8 +90,8 @@ extension KnownTxOut.Fixtures.DefaultNotSet {
         000000000000310100000000000000390a0000000000000045dad4f606
         """
 
-    static func getTxOut(accountKey: AccountKey) throws -> KnownTxOut {
-        try KnownTxOut.Fixtures.getTxOut(hex: viewRecordHex, accountKey: accountKey)
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
     }
 }
 
@@ -105,8 +105,8 @@ extension KnownTxOut.Fixtures.DefaultUnused {
         a74dd2ffe3276e84e20c7d5f08508812e0
         """
 
-    static func getTxOut(accountKey: AccountKey) throws -> KnownTxOut {
-        try KnownTxOut.Fixtures.getTxOut(hex: viewRecordHex, accountKey: accountKey)
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
     }
 }
 
@@ -120,8 +120,8 @@ extension KnownTxOut.Fixtures.DefaultSenderMemo {
         48a77a1fe9525496cd87f70d154ca2a436
         """
 
-    static func getTxOut(accountKey: AccountKey) throws -> KnownTxOut {
-        try KnownTxOut.Fixtures.getTxOut(hex: viewRecordHex, accountKey: accountKey)
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
     }
 }
 
@@ -136,11 +136,11 @@ extension KnownTxOut.Fixtures.DefaultDestinationMemo {
         """
 
     static let expectedDestinationFee = UInt64(21)
-    static let expectedDestinationNumberOfRecipients = UInt8(8)
+    static let expectedDestinationNumberOfRecipients = UInt8(1)
     static let expectedDestinationTotalOutlay = UInt64(472)
     
-    static func getTxOut(accountKey: AccountKey) throws -> KnownTxOut {
-        try KnownTxOut.Fixtures.getTxOut(hex: viewRecordHex, accountKey: accountKey)
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
     }
 }
 
@@ -154,10 +154,10 @@ extension KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo {
         48ea1335e6a8c4ba4424cfe8ccc523dd1e
         """
 
-    static let expectedPaymentRequestId = UInt64(322);
+    static let expectedPaymentRequestId = UInt64(322)
     
-    static func getTxOut(accountKey: AccountKey) throws -> KnownTxOut {
-        try KnownTxOut.Fixtures.getTxOut(hex: viewRecordHex, accountKey: accountKey)
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
     }
 }
 
@@ -169,17 +169,16 @@ extension KnownTxOut.Fixtures {
                 viewKey: viewKey))
     }
     
-    static func getKnownTxOut(
+    static func makeKnownTxOut(
         ledgerTxOut: LedgerTxOut,
         accountKey: AccountKey
     ) throws -> KnownTxOut {
         try XCTUnwrap(KnownTxOut(ledgerTxOut, accountKey: accountKey))
     }
     
-    static func getTxOut(hex: String, accountKey: AccountKey) throws -> KnownTxOut {
-        try Self.getKnownTxOut(
+    static func getKnownTxOut(hex: String, accountKey: AccountKey) throws -> KnownTxOut {
+        try Self.makeKnownTxOut(
                 ledgerTxOut: try Self.makeLedgerTxOut(hex: hex, viewKey: accountKey.viewPrivateKey),
                 accountKey: accountKey)
     }
 }
-

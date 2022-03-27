@@ -9,7 +9,8 @@ import XCTest
 class TxOutMemoIntegrationTests: XCTestCase {
     
     func testBuildTransactionWithSenderAndDestinationMemo() throws {
-        let txFixture = try Transaction.Fixtures.TxOutMemo()
+        let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
+        let txFixture = fixture.txFixture
 
         XCTAssertSuccess(TransactionBuilder.build(
             inputs: txFixture.inputs,
@@ -25,9 +26,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
     func testTransactionWithSenderMemo() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
-        let txFixture = fixture.txFixture
-        let senderAccountKey = txFixture.senderAccountKey
-        let senderPublicAddress = senderAccountKey.publicAddress
+        let senderPublicAddress = fixture.senderPublicAddress
         let receivedTxOut = fixture.receivedTxOut
         
         guard
@@ -43,9 +42,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
     func testTransactionWithDestinationMemo() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
-        let txFixture = fixture.txFixture
-        let recipientAccountKey = txFixture.recipientAccountKey
-        let recipientPublicAddress = recipientAccountKey.publicAddress
+        let recipientPublicAddress = fixture.recipeintPublicAddress
         let sentTxOut = fixture.sentTxOut
 
         guard
@@ -57,20 +54,20 @@ class TxOutMemoIntegrationTests: XCTestCase {
         }
         
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
-        XCTAssertEqual(recovered.fee, txFixture.fee)
-        XCTAssertEqual(recovered.totalOutlay, txFixture.totalOutlay)
+        XCTAssertEqual(recovered.fee, fixture.fee)
+        XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
     }
 
     func testBuildTransactionWithSenderWithPaymentRequest() throws {
-        let txFixture = try Transaction.Fixtures.TxOutMemo()
-        let paymentRequestId =
-            TransactionBuilder.Fixtures.SenderWithPaymentRequestAndDestination.paymentRequestId
+        let fixture = try TransactionBuilder.Fixtures.SenderWithPaymentRequestAndDestination()
+        let txFixture = fixture.txFixture
+        let paymentRequestId = fixture.paymentRequestId
 
         XCTAssertSuccess(TransactionBuilder.build(
             inputs: txFixture.inputs,
             accountKey: txFixture.senderAccountKey,
             to: txFixture.recipientAccountKey.publicAddress,
-            memoType: .customPaymentRequest(sender: txFixture.senderAccountKey, id: paymentRequestId),
+            memoType: fixture.memoType,
             amount: txFixture.amount,
             fee: txFixture.fee,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
@@ -80,12 +77,8 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
     func testTransactionWithSenderWithPaymentRequestMemo() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderWithPaymentRequestAndDestination()
-        let txFixture = fixture.txFixture
-        let senderAccountKey = txFixture.senderAccountKey
-        let senderPublicAddress = senderAccountKey.publicAddress
+        let senderPublicAddress = fixture.senderPublicAddress
         let receivedTxOut = fixture.receivedTxOut
-        let paymentRequestId =
-            TransactionBuilder.Fixtures.SenderWithPaymentRequestAndDestination.paymentRequestId
 
         guard
             case let .senderWithPaymentRequest(recoverable) = receivedTxOut.recoverableMemo,
@@ -96,14 +89,12 @@ class TxOutMemoIntegrationTests: XCTestCase {
         }
         
         XCTAssertEqual(recovered.addressHash, senderPublicAddress.calculateAddressHash())
-        XCTAssertEqual(recovered.paymentRequestId, paymentRequestId)
+        XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
     }
 
     func testTransactionSenderWithPaymentRequestDestinationMemo() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderWithPaymentRequestAndDestination()
-        let txFixture = fixture.txFixture
-        let recipientAccountKey = txFixture.recipientAccountKey
-        let recipientPublicAddress = recipientAccountKey.publicAddress
+        let recipientPublicAddress = fixture.recipeintPublicAddress
         let sentTxOut = fixture.sentTxOut
 
         guard
@@ -115,15 +106,12 @@ class TxOutMemoIntegrationTests: XCTestCase {
         }
         
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
-        XCTAssertEqual(recovered.fee, txFixture.fee)
-        XCTAssertEqual(recovered.totalOutlay, txFixture.totalOutlay)
+        XCTAssertEqual(recovered.fee, fixture.fee)
+        XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
     }
 
     func testBlockVersionOneUnusedMemo() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestinationBlockVersionOne()
-        let txFixture = fixture.txFixture
-        let recipientAccountKey = txFixture.recipientAccountKey
-        let recipientPublicAddress = recipientAccountKey.publicAddress
         let sentTxOut = fixture.sentTxOut
 
         XCTAssertTrue(
@@ -132,174 +120,4 @@ class TxOutMemoIntegrationTests: XCTestCase {
         )
     }
 
-}
-
-extension TransactionBuilder {
-    enum Fixtures {}
-}
-
-extension TransactionBuilder.Fixtures {
-    struct SenderAndDestination {
-        let txFixture: Transaction.Fixtures.TxOutMemo
-        let receivedTxOut: KnownTxOut
-        let sentTxOut: KnownTxOut
-       
-        static let memoType: MemoType = .recoverable
-
-        init() throws {
-            self.receivedTxOut = try Self.getReceivedTxOut()
-            self.sentTxOut = try Self.getSentTxOut()
-            self.txFixture = try Transaction.Fixtures.TxOutMemo()
-        }
-        
-        static func getMemoType() -> MemoType {
-            .recoverable
-        }
-        
-        static func getReceivedTxOut() throws -> KnownTxOut {
-            try Transaction.Fixtures.getOwnedOutput(
-                accountKey: try Transaction.Fixtures.TxOutMemo().recipientAccountKey,
-                transaction: try Self.getTransaction())
-        }
-        
-        static func getSentTxOut() throws -> KnownTxOut {
-            try Transaction.Fixtures.getOwnedOutput(
-                accountKey: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
-                transaction: try Self.getTransaction())
-        }
-        
-        private static func getTransaction() throws -> Transaction {
-            let fixture = try Transaction.Fixtures.TxOutMemo()
-            let memoType = getMemoType()
-            return try XCTUnwrapSuccess(TransactionBuilder.build(
-                            inputs: fixture.inputs,
-                            accountKey: fixture.senderAccountKey,
-                            to: fixture.recipientAccountKey.publicAddress,
-                            memoType: memoType,
-                            amount: fixture.amount,
-                            fee: fixture.fee,
-                            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                            fogResolver: fixture.fogResolver,
-                            blockVersion: fixture.blockVersion)).transaction
-                        
-        }
-        
-    }
-    
-    struct SenderWithPaymentRequestAndDestination {
-        let paymentRequestId: UInt64
-        let txFixture: Transaction.Fixtures.TxOutMemo
-        let receivedTxOut: KnownTxOut
-        let sentTxOut: KnownTxOut
-
-        init() throws {
-            self.paymentRequestId = Self.paymentRequestId
-            self.receivedTxOut = try Self.getReceivedTxOut()
-            self.sentTxOut = try Self.getSentTxOut()
-            self.txFixture = try Transaction.Fixtures.TxOutMemo()
-        }
-        
-        static let paymentRequestId: UInt64 = 301
-        
-        static func getMemoType() throws -> MemoType {
-            try .customPaymentRequest(
-                    sender: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
-                    id: paymentRequestId)
-        }
-        
-        static func getReceivedTxOut() throws -> KnownTxOut {
-            try Transaction.Fixtures.getOwnedOutput(
-                accountKey: try Transaction.Fixtures.TxOutMemo().recipientAccountKey,
-                transaction: try Self.getTransaction())
-        }
-        
-        static func getSentTxOut() throws -> KnownTxOut {
-            try Transaction.Fixtures.getOwnedOutput(
-                accountKey: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
-                transaction: try Self.getTransaction())
-        }
-        
-        private static func getTransaction() throws -> Transaction {
-            let fixture = try Transaction.Fixtures.TxOutMemo()
-            let memoType = try getMemoType()
-            return try XCTUnwrapSuccess(TransactionBuilder.build(
-                            inputs: fixture.inputs,
-                            accountKey: fixture.senderAccountKey,
-                            to: fixture.recipientAccountKey.publicAddress,
-                            memoType: memoType,
-                            amount: fixture.amount,
-                            fee: fixture.fee,
-                            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                            fogResolver: fixture.fogResolver,
-                            blockVersion: fixture.blockVersion)).transaction
-        }
-        
-    }
-    
-    struct SenderAndDestinationBlockVersionOne {
-        let txFixture: Transaction.Fixtures.TxOutMemo
-        let receivedTxOut: KnownTxOut
-        let sentTxOut: KnownTxOut
-       
-        static let memoType: MemoType = .recoverable
-
-        init() throws {
-            self.receivedTxOut = try Self.getReceivedTxOut()
-            self.sentTxOut = try Self.getSentTxOut()
-            self.txFixture = try Transaction.Fixtures.TxOutMemo()
-        }
-        
-        static func getMemoType() -> MemoType {
-            .recoverable
-        }
-        
-        static func getReceivedTxOut() throws -> KnownTxOut {
-            try Transaction.Fixtures.getOwnedOutput(
-                accountKey: try Transaction.Fixtures.TxOutMemo().recipientAccountKey,
-                transaction: try Self.getTransaction())
-        }
-        
-        static func getSentTxOut() throws -> KnownTxOut {
-            try Transaction.Fixtures.getOwnedOutput(
-                accountKey: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
-                transaction: try Self.getTransaction())
-        }
-        
-        private static func getTransaction() throws -> Transaction {
-            let fixture = try Transaction.Fixtures.TxOutMemo()
-            let memoType = getMemoType()
-            return try XCTUnwrapSuccess(TransactionBuilder.build(
-                            inputs: fixture.inputs,
-                            accountKey: fixture.senderAccountKey,
-                            to: fixture.recipientAccountKey.publicAddress,
-                            memoType: memoType,
-                            amount: fixture.amount,
-                            fee: fixture.fee,
-                            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                            fogResolver: fixture.fogResolver,
-                            blockVersion: BlockVersion.one)).transaction
-                        
-        }
-        
-    }
-    
-}
-
-extension Transaction.Fixtures {
-    static func getOwnedOutput(
-        accountKey: AccountKey,
-        transaction: Transaction,
-        globalIndex: UInt64 = Transaction.Fixtures.TxOutMemo.globalIndex,
-        blockMetadata: BlockMetadata = Transaction.Fixtures.TxOutMemo.blockMetadata
-    ) throws -> KnownTxOut {
-        try XCTUnwrap(
-            transaction.outputs.compactMap({
-                            LedgerTxOut(
-                                PartialTxOut($0),
-                                globalIndex: globalIndex,
-                                block: blockMetadata)
-                                    .decrypt(accountKey: accountKey)
-                            }
-                        ).first)
-    }
 }
