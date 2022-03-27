@@ -5,17 +5,21 @@
 import Foundation
 
 enum BlockVersion : UInt32 {
+    case zero = 0
     case one = 1
-    case two = 2
 }
 
 extension BlockVersion {
     static func canEnableRecoverableMemos(version: BlockVersion) -> Bool {
-        version >= two
+        version >= one
+    }
+    
+    static var legacy: BlockVersion {
+        zero
     }
     
     static var minRTHEnabled: BlockVersion {
-        two
+        one
     }
 }
 

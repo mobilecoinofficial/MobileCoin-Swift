@@ -28,12 +28,11 @@ enum SenderMemoUtils {
                                 &matches,
                                 &errorPtr)
                         }
-                        print(matches)
                         switch result {
                         case .success():
                             return true
                         case .failure(let error):
-                            print("\(error)")
+                            logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                             return false
                         }
                     }
@@ -74,7 +73,6 @@ enum SenderMemoUtils {
             }
         }
         guard let bytes = bytes else { return nil }
-        print("address hash bytes \(bytes.data.hexEncodedString())")
         return AddressHash(bytes)
     }
     

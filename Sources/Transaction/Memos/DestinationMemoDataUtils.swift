@@ -51,7 +51,6 @@ enum DestinationMemoUtils {
             }
         }
         guard let bytes = bytes else { return nil }
-        print("address hash bytes \(bytes.data.hexEncodedString())")
         return AddressHash(bytes)
     }
     

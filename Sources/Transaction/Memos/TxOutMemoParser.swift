@@ -33,7 +33,7 @@ enum TxOutMemoParser {
         txOut: TxOutProtocol
     ) -> RecoverableMemo {
         guard let recoverableMemoPayload = Data66(decryptedPayload) else {
-            logger.warning("Payload not the correct size for a recoverable memo")
+            logger.warning("Incorrect payload size for a recoverable memo")
             return .notset
         }
         return RecoverableMemo(

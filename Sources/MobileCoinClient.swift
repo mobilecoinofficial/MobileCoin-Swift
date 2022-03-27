@@ -32,7 +32,7 @@ public final class MobileCoinClient {
     private let fogResolverManager: FogResolverManager
     private let feeFetcher: BlockchainFeeFetcher
     
-    static let latestBlockVersion = BlockVersion.one
+    static let latestBlockVersion = BlockVersion.legacy
 
     init(accountKey: AccountKeyWithFog, config: Config) {
         logger.info("""

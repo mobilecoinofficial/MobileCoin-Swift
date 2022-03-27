@@ -123,7 +123,6 @@ enum TxOutUtils {
                         // Safety: It's safe to skip validation because
                         // mc_tx_out_reconstruct_commitment should always return a valid
                         // RistrettoPublic on success.
-                        print("decryptedEMemoPayload \(bytes.hexEncodedString())")
                         return bytes as Data66
                     case .failure(let error):
                         switch error.errorCode {

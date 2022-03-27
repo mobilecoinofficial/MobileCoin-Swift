@@ -12,7 +12,6 @@ struct KnownTxOut: TxOutProtocol {
     let recoverableMemo: RecoverableMemo
 
     init?(_ ledgerTxOut: LedgerTxOut, accountKey: AccountKey) {
-        print("encrypted memo bytes \(ledgerTxOut.encryptedMemo.hexEncodedString())")
         guard let value = ledgerTxOut.value(accountKey: accountKey),
               let (subaddressIndex, keyImage) = ledgerTxOut.keyImage(accountKey: accountKey),
               let commitment = TxOutUtils.reconstructCommitment(
