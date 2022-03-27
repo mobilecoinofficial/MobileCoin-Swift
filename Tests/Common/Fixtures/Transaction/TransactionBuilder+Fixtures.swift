@@ -33,7 +33,7 @@ extension TransactionBuilder.Fixtures {
             self.receivedTxOut = try
                         Self.Fixtures.getOwnedOutput(
                             accountKey: txFixture.recipientAccountKey,
-                            transaction: try Self.Fixtures.getTransaction(memoType: memoType))
+                            transaction: try Self.Fixtures.getTransaction(memoType:memoType))
             self.sentTxOut = try
                         Self.Fixtures.getOwnedOutput(
                             accountKey: txFixture.senderAccountKey,
@@ -105,13 +105,13 @@ extension TransactionBuilder.Fixtures {
                             accountKey: txFixture.recipientAccountKey,
                             transaction: try Self.Fixtures.getTransaction(
                                                                 memoType: memoType,
-                                                                blockVersion: .one))
+                                                                blockVersion: .legacy))
             self.sentTxOut = try
                         Self.Fixtures.getOwnedOutput(
                             accountKey: txFixture.senderAccountKey,
                             transaction: try Self.Fixtures.getTransaction(
                                                                 memoType: memoType,
-                                                                blockVersion: .one))
+                                                                blockVersion: .legacy))
         }
         
         static func getMemoType() -> MemoType {
