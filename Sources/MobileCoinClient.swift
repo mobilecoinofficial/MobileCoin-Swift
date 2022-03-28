@@ -31,6 +31,8 @@ public final class MobileCoinClient {
     private let serviceProvider: ServiceProvider
     private let fogResolverManager: FogResolverManager
     private let feeFetcher: BlockchainFeeFetcher
+    
+    static let latestBlockVersion = BlockVersion.legacy
 
     init(accountKey: AccountKeyWithFog, config: Config) {
         logger.info("""
@@ -134,6 +136,7 @@ public final class MobileCoinClient {
 
     public func prepareTransaction(
         to recipient: PublicAddress,
+        memoType: MemoType = .unused,
         amount: UInt64,
         fee: UInt64,
         completion: @escaping (
@@ -148,7 +151,7 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
-        ).prepareTransaction(to: recipient, amount: amount, fee: fee) { result in
+        ).prepareTransaction(to: recipient, memoType: memoType, amount: amount, fee: fee) { result in
             self.callbackQueue.async {
                 completion(result)
             }
@@ -157,6 +160,7 @@ public final class MobileCoinClient {
 
     public func prepareTransaction(
         to recipient: PublicAddress,
+        memoType: MemoType = .unused,
         amount: UInt64,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (
@@ -171,7 +175,7 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
-        ).prepareTransaction(to: recipient, amount: amount, feeLevel: feeLevel) { result in
+        ).prepareTransaction(to: recipient, memoType: memoType, amount: amount, feeLevel: feeLevel) { result in
             self.callbackQueue.async {
                 completion(result)
             }
@@ -180,6 +184,7 @@ public final class MobileCoinClient {
 
     public func prepareDefragmentationStepTransactions(
         toSendAmount amount: UInt64,
+        recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
@@ -191,7 +196,7 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
-        ).prepareDefragmentationStepTransactions(toSendAmount: amount, feeLevel: feeLevel)
+        ).prepareDefragmentationStepTransactions(toSendAmount: amount, recoverableMemo: recoverableMemo, feeLevel: feeLevel)
         { result in
             self.callbackQueue.async {
                 completion(result)

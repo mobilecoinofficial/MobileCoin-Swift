@@ -34,11 +34,13 @@ extension Account {
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
-                targetQueue: targetQueue)
+                targetQueue: targetQueue,
+                blockVersion: MobileCoinClient.latestBlockVersion)
         }
 
         func prepareTransaction(
             to recipient: PublicAddress,
+            memoType: MemoType,
             amount: UInt64,
             fee: UInt64,
             completion: @escaping (
@@ -81,10 +83,12 @@ extension Account {
                 transactionPreparer.prepareTransaction(
                     inputs: txOutsToSpend,
                     recipient: recipient,
+                    memoType: memoType,
                     amount: amount,
                     fee: fee,
                     tombstoneBlockIndex: tombstoneBlockIndex,
-                    completion: completion)
+                    blockVersion: MobileCoinClient.latestBlockVersion,
+                    completion: completion) // - TODO
             case .failure(let error):
                 logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
@@ -95,6 +99,7 @@ extension Account {
 
         func prepareTransaction(
             to recipient: PublicAddress,
+            memoType: MemoType,
             amount: UInt64,
             feeLevel: FeeLevel,
             completion: @escaping (
@@ -143,9 +148,11 @@ extension Account {
                         self.transactionPreparer.prepareTransaction(
                             inputs: inputs,
                             recipient: recipient,
+                            memoType: memoType,
                             amount: amount,
                             fee: fee,
                             tombstoneBlockIndex: tombstoneBlockIndex,
+                            blockVersion: MobileCoinClient.latestBlockVersion,
                             completion: completion)
                     case .failure(let error):
                         logger.info(
@@ -162,6 +169,7 @@ extension Account {
 
         func prepareDefragmentationStepTransactions(
             toSendAmount amountToSend: UInt64,
+            recoverableMemo: Bool,
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
@@ -200,8 +208,10 @@ extension Account {
                         defragTxInputs.mapAsync({ defragInputs, callback in
                             self.transactionPreparer.prepareSelfAddressedTransaction(
                                 inputs: defragInputs.inputs,
+                                recoverableMemo: recoverableMemo,
                                 fee: defragInputs.fee,
                                 tombstoneBlockIndex: tombstoneBlockIndex,
+                                blockVersion: MobileCoinClient.latestBlockVersion,
                                 completion: callback)
                         }, serialQueue: self.serialQueue, completion: completion)
                     case .failure(let error):
