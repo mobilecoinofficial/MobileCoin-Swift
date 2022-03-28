@@ -261,9 +261,11 @@ final class TransactionBuilder {
     ) {
         self.tombstoneBlockIndex = tombstoneBlockIndex
         self.ptr = fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
-            // Safety: mc_transaction_builder_create should never return nil.
-            withMcInfallible {
-                mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr)
+            TxOutMemoBuilder.createDefaultMemoBuilder().withUnsafeOpaquePointer { txOutMemoBuildePtr in
+                // Safety: mc_transaction_builder_create should never return nil.
+                withMcInfallible {
+                    mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr, txOutMemoBuildePtr, BlockVersion.legacy.rawValue)
+                }
             }
         }
     }
