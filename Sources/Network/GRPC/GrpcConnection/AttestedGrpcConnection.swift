@@ -333,32 +333,39 @@ extension AttestedGrpcConnection {
         private func requestCallOptions() -> CallOptions {
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
+            callOptions.timeLimit = GrpcChannelManager.Defaults.callOptionsTimeLimit
             return callOptions
         }
 
-        private func processResponse<Response>(callResult: UnaryCallResult<Response>)
+        private func processResponse<Response>(callResult: Result<UnaryCallResult<Response>, Error>)
             -> Result<Response, AttestedGrpcConnectionError>
         {
-            // Basic credential authorization failure
-            guard callResult.status.code != .unauthenticated else {
-                return .failure(.connectionError(.authorizationFailure("url: \(url)")))
-            }
-
-            // Attestation failure, reattest
-            guard callResult.status.code != .permissionDenied else {
-                return .failure(.attestationFailure())
-            }
-
-            guard callResult.status.isOk, let response = callResult.response else {
+            switch callResult {
+            case .failure(let error):
                 return .failure(.connectionError(
-                    .connectionFailure("url: \(url), status: \(callResult.status)")))
-            }
+                                .connectionFailure("url: \(url), error: \(error.localizedDescription)")))
+            case .success(let callResponse):
+                // Basic credential authorization failure
+                guard callResponse.status.code != .unauthenticated else {
+                    return .failure(.connectionError(.authorizationFailure("url: \(url)")))
+                }
 
-            if let initialMetadata = callResult.initialMetadata {
-                session.processResponse(headers: initialMetadata)
-            }
+                // Attestation failure, reattest
+                guard callResponse.status.code != .permissionDenied else {
+                    return .failure(.attestationFailure())
+                }
 
-            return .success(response)
+                guard callResponse.status.isOk, let response = callResponse.response else {
+                    return .failure(.connectionError(
+                        .connectionFailure("url: \(url), status: \(callResponse.status)")))
+                }
+
+                if let initialMetadata = callResponse.initialMetadata {
+                    session.processResponse(headers: initialMetadata)
+                }
+
+                return .success(response)
+            }
         }
     }
 }

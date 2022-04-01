@@ -35,11 +35,11 @@ extension BlockchainGrpcConnection {
         func call(
             request: (),
             callOptions: CallOptions?,
-            completion: @escaping (UnaryCallResult<ConsensusCommon_LastBlockInfoResponse>) -> Void
+            completion: @escaping (Result<UnaryCallResult<ConsensusCommon_LastBlockInfoResponse>, Error>) -> Void
         ) {
             let unaryCall =
                 client.getLastBlockInfo(Google_Protobuf_Empty(), callOptions: callOptions)
-            unaryCall.callResult.whenSuccess(completion)
+            unaryCall.callResult.whenComplete(completion)
         }
     }
 }

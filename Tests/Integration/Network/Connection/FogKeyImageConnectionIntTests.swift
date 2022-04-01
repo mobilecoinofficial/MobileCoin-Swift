@@ -147,7 +147,7 @@ extension FogKeyImageConnectionIntTests {
         return FogKeyImageConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.fogKeyImage,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 }

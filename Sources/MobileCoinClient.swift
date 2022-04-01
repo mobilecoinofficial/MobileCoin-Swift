@@ -242,18 +242,19 @@ public final class MobileCoinClient {
 extension MobileCoinClient {
     private static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
+
         return """
-            Consensus url: \(config.networkConfig.consensusUrl.url)
-            Fog url: \(config.networkConfig.fogUrl.url)
+            Consensus urls: \(config.networkConfig.consensusUrls)
+            Fog urls: \(config.networkConfig.fogUrls)
             AccountKey PublicAddress: \
             \(redacting: Base58Coder.encode(accountKey.accountKey.publicAddress))
             AccountKey Fog Report url: \(fogInfo.reportUrl.url)
             AccountKey Fog Report id: \(String(reflecting: fogInfo.reportId))
             AccountKey Fog Report authority sPKI: 0x\(fogInfo.authoritySpki.hexEncodedString())
-            Consensus attestation: \(config.networkConfig.consensus.attestation)
-            Fog View attestation: \(config.networkConfig.fogView.attestation)
-            Fog KeyImage attestation: \(config.networkConfig.fogKeyImage.attestation)
-            Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProof.attestation)
+            Consensus attestation: \(config.networkConfig.consensusConfig().attestation)
+            Fog View attestation: \(config.networkConfig.fogViewConfig().attestation)
+            Fog KeyImage attestation: \(config.networkConfig.fogKeyImageConfig().attestation)
+            Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProofConfig().attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
             """
     }
@@ -314,20 +315,49 @@ extension MobileCoinClient {
             fogReportAttestation: Attestation,
             transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
-            ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
-                FogUrl.make(string: fogUrl).map { fogUrl in
-                    let attestationConfig = NetworkConfig.AttestationConfig(
-                        consensus: consensusAttestation,
-                        fogView: fogViewAttestation,
-                        fogKeyImage: fogKeyImageAttestation,
-                        fogMerkleProof: fogMerkleProofAttestation,
-                        fogReport: fogReportAttestation)
-                    let networkConfig = NetworkConfig(
-                        consensusUrl: consensusUrl,
-                        fogUrl: fogUrl,
-                        attestation: attestationConfig,
-                        transportProtocol: transportProtocol)
-                    return Config(networkConfig: networkConfig)
+            Self.make(consensusUrls: [consensusUrl],
+                      consensusAttestation: consensusAttestation,
+                      fogUrls: [fogUrl],
+                      fogViewAttestation: fogViewAttestation,
+                      fogKeyImageAttestation: fogKeyImageAttestation,
+                      fogMerkleProofAttestation: fogMerkleProofAttestation,
+                      fogReportAttestation: fogReportAttestation,
+                      transportProtocol: transportProtocol)
+        }
+
+        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
+        ///     with the appropriate schemes.
+        public static func make(
+            consensusUrls: [String],
+            consensusAttestation: Attestation,
+            fogUrls: [String],
+            fogViewAttestation: Attestation,
+            fogKeyImageAttestation: Attestation,
+            fogMerkleProofAttestation: Attestation,
+            fogReportAttestation: Attestation,
+            transportProtocol: TransportProtocol
+        ) -> Result<Config, InvalidInputError> {
+
+            ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
+                RandomUrlLoadBalancer<ConsensusUrl>.make(urls: consensusUrls).flatMap { consensusUrlLoadBalancer in
+                    FogUrl.make(strings: fogUrls).flatMap { fogUrls in
+                        RandomUrlLoadBalancer<FogUrl>.make(urls: fogUrls).map { fogUrlLoadBalancer in
+
+                            let attestationConfig = NetworkConfig.AttestationConfig(
+                                consensus: consensusAttestation,
+                                fogView: fogViewAttestation,
+                                fogKeyImage: fogKeyImageAttestation,
+                                fogMerkleProof: fogMerkleProofAttestation,
+                                fogReport: fogReportAttestation)
+
+                            let networkConfig = NetworkConfig(
+                                consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                                fogUrlLoadBalancer: fogUrlLoadBalancer,
+                                attestation: attestationConfig,
+                                transportProtocol: transportProtocol)
+                            return Config(networkConfig: networkConfig)
+                        }
+                    }
                 }
             }
         }
