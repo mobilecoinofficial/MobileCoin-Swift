@@ -91,7 +91,7 @@ class FogKeyImageConnectionIntTests: XCTestCase {
         var query = FogLedger_KeyImageQuery()
         query.keyImage = External_KeyImage(Data(repeating: 0, count: 33))
         request.queries = [query]
-        try createFogKeyImageConnection(transportProtocol:transportProtocol).checkKeyImages(request: request) {
+        try createFogKeyImageConnection(transportProtocol: transportProtocol).checkKeyImages(request: request) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
             print("error: \(error)")
 

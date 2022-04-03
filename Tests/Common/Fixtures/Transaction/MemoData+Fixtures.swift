@@ -4,7 +4,7 @@
 
 import Foundation
 @testable import MobileCoin
-t mimport XCTest
+import XCTest
 
 enum MemoData {
     struct Fixtures {}

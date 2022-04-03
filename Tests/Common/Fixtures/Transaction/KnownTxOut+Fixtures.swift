@@ -163,8 +163,8 @@ extension KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo {
 extension KnownTxOut.Fixtures {
     static func makeLedgerTxOut(hex: String, viewKey: RistrettoPrivate) throws -> LedgerTxOut {
         try XCTUnwrap(
-            LedgerTxOut(try XCTUnwrap(
-                FogView_TxOutRecord(contiguousBytes: try XCTUnwrap(Data(hexEncoded: hex)))),
+            LedgerTxOut(
+                try XCTUnwrap(Data(hexEncoded: hex)),
                 viewKey: viewKey))
     }
     

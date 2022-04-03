@@ -4,7 +4,7 @@
 
 import XCTest
 @testable import MobileCoin
-@testable import LibMobileCoin
+import LibMobileCoin
 
 
 extension TxOutMemoParser {

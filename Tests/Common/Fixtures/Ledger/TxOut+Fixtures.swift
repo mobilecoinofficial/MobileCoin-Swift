@@ -60,10 +60,11 @@ extension TxOut.Fixtures.Default {
     }
 
     fileprivate static let serializedData = Data(base64Encoded: """
-        Ci0KIgogBLssqSqN8jQARYHR96C0MgS9vSBxCY1x60FHi4el1GsRs+XfPwGwvG4SIgogmFwyP8+0UqrAoqiAsHY36oC\
-        mvj+b2eIbD+CKqydGWXAaIgogBF8KR3dl0gxGFdIa+LvY3ZwOO1zkDQu908KBMwFZfkkiVgpUbgYTxUjexTpVTynv91\
-        YtSvLT8XyPuxxfV05xwRTjjrGDm1TkuHkCmnzbw3a3ETt6RrNlwLKGfLfgBBkvsI4a8UMl/r21BigZytKZNbZJ52DSs\
-        gEA
+        Ci0KIgogBLssqSqN8jQARYHR96C0MgS9vSBxCY1x60FHi4el1GsRs+XfPwGwvG4SIgogmFwyP8+0UqrA\
+        oqiAsHY36oCmvj+b2eIbD+CKqydGWXAaIgogBF8KR3dl0gxGFdIa+LvY3ZwOO1zkDQu908KBMwFZfkki\
+        VgpUbgYTxUjexTpVTynv91YtSvLT8XyPuxxfV05xwRTjjrGDm1TkuHkCmnzbw3a3ETt6RrNlwLKGfLfg\
+        BBkvsI4a8UMl/r21BigZytKZNbZJ52DSsgEAKkQKQt9sSGH/eHqo8hywXe1D2XiXqjRTFQdG4qDRnHw4\
+        IcMR9Lv7UcTKZOIpNVa1rEJqI0yIPj9+6uw2yTyBJvuYbmNTaA==
         """)!
 
     fileprivate static let keyImageBase64Encoded = "6LmUstevIcLo0k6lcyXTBaRjdm9ktKqg/VnX2ivayA4="

@@ -18,7 +18,8 @@ class TransactionPerfTests: PerformanceTestCase {
                 memoType: .unused,
                 fee: fixture.fee,
                 tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                fogResolver: fixture.fogResolver))
+                fogResolver: fixture.fogResolver,
+                blockVersion: BlockVersion.one ))
         }
     }
 

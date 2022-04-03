@@ -42,3 +42,18 @@ extension LedgerTxOut {
         self.init(partialTxOut, globalIndex: globalIndex, block: block)
     }
 }
+
+extension LedgerTxOut {
+    init?(_ fogTxOutRecordBytes: Data, viewKey: RistrettoPrivate) {
+        guard
+            let txOutRecord = try? FogView_TxOutRecord(contiguousBytes: fogTxOutRecordBytes),
+            let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else {
+            return nil
+        }
+        let globalIndex = txOutRecord.txOutGlobalIndex
+        let block = BlockMetadata(
+            index: txOutRecord.blockIndex,
+            timestamp: txOutRecord.timestampDate)
+        self.init(partialTxOut, globalIndex: globalIndex, block: block)
+    }
+}

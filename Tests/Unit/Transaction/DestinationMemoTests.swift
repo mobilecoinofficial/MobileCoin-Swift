@@ -3,7 +3,6 @@
 //
 
 import XCTest
-@testable import LibMobileCoin
 @testable import MobileCoin
 
 class DestinationMemoTests: XCTestCase {
