@@ -52,10 +52,10 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
                 completion(result)
             case .failure:
                 logger.debug("rotating config on error")
-                self?.rotateConnection()
                 // schedule the completion on the queue so that the inner
                 // has a chance to process the scheduled connection update
-                self?.inner.serialExclusionQueue.async { completion(result) }
+                completion(result)
+                self?.rotateConnection()
             }
         }
     }
