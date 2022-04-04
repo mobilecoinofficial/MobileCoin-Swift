@@ -40,7 +40,7 @@ struct TxOut: TxOutProtocol {
         proto.serializedDataInfallible
     }
 
-    var maskedValue: UInt64 { proto.amount.maskedValue }
+    var maskedValue: UInt64 { proto.maskedAmount.maskedValue }
     var encryptedFogHint: Data { proto.eFogHint.data }
     var encryptedMemo: Data66 {
         guard proto.hasEMemo else {
@@ -55,7 +55,7 @@ extension TxOut: Hashable {}
 
 extension TxOut {
     static func make(_ proto: External_TxOut) -> Result<TxOut, InvalidInputError> {
-        guard let commitment = Data32(proto.amount.commitment.data) else {
+        guard let commitment = Data32(proto.maskedAmount.commitment.data) else {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid commitment format"))
         }

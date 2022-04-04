@@ -135,7 +135,7 @@ extension Receipt: Hashable {}
 extension Receipt {
     init?(_ proto: External_Receipt) {
         guard let txOutPublicKey = RistrettoPublic(proto.publicKey.data),
-              let commitment = Data32(proto.amount.commitment.data),
+              let commitment = Data32(proto.maskedAmount.commitment.data),
               let confirmationNumber = TxOutConfirmationNumber(proto.confirmation)
         else {
             logger.warning(
@@ -147,7 +147,7 @@ extension Receipt {
 
         self.txOutPublicKeyTyped = txOutPublicKey
         self.commitment = commitment
-        self.maskedValue = proto.amount.maskedValue
+        self.maskedValue = proto.maskedAmount.maskedValue
         self.confirmationNumber = confirmationNumber
         self.txTombstoneBlockIndex = proto.tombstoneBlock
     }
@@ -157,8 +157,8 @@ extension External_Receipt {
     init(_ receipt: Receipt) {
         self.init()
         self.publicKey = External_CompressedRistretto(receipt.txOutPublicKey)
-        self.amount.commitment = External_CompressedRistretto(receipt.commitment)
-        self.amount.maskedValue = receipt.maskedValue
+        self.maskedAmount.commitment = External_CompressedRistretto(receipt.commitment)
+        self.maskedAmount.maskedValue = receipt.maskedValue
         self.confirmation = External_TxOutConfirmationNumber(receipt.confirmationNumber)
         self.tombstoneBlock = receipt.txTombstoneBlockIndex
     }

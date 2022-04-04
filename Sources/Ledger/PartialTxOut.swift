@@ -29,7 +29,7 @@ extension PartialTxOut {
 
 extension PartialTxOut {
     init?(_ txOut: External_TxOut) {
-        guard let commitment = Data32(txOut.amount.commitment.data),
+        guard let commitment = Data32(txOut.maskedAmount.commitment.data),
               let targetKey = RistrettoPublic(txOut.targetKey.data),
               let publicKey = RistrettoPublic(txOut.publicKey.data)
         else {
@@ -38,7 +38,7 @@ extension PartialTxOut {
         self.init(
             encryptedMemo: txOut.encryptedMemo,
             commitment: commitment,
-            maskedValue: txOut.amount.maskedValue,
+            maskedValue: txOut.maskedAmount.maskedValue,
             targetKey: targetKey,
             publicKey: publicKey)
     }

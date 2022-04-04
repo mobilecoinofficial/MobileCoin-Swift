@@ -53,7 +53,8 @@ struct TransactionSubmitter {
              .duplicateKeyImages, .duplicateOutputPublicKey, .missingTxOutMembershipProof,
              .invalidTxOutMembershipProof, .invalidRistrettoPublicKey,
              .tombstoneBlockExceeded, .invalidLedgerContext, .memosNotAllowed,
-             .membershipProofValidationError, .keyError, .unsortedInputs:
+             .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
+             .unsortedOutputs, .membershipProofValidationError, .keyError, .unsortedInputs:
             return .failure(.invalidTransaction())
         case .txFeeError:
             return .failure(.feeError())
