@@ -15,7 +15,7 @@ struct DestinationMemo {
 struct RecoverableDestinationMemo {
     let memoData: Data64
     let addressHash: AddressHash
-    let accountKey: AccountKey
+    private let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
     let txOutTargetKey: RistrettoPublic
     
