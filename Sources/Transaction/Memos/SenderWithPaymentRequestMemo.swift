@@ -4,7 +4,6 @@
 
 import Foundation
 
-// TODO - Decide how to manage isValid for memo's where senderPublicAddress not nearby ?
 struct SenderWithPaymentRequestMemo {
     let memoData: Data64
     let addressHash: AddressHash

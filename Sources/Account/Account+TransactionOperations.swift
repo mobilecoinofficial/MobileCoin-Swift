@@ -88,7 +88,7 @@ extension Account {
                     fee: fee,
                     tombstoneBlockIndex: tombstoneBlockIndex,
                     blockVersion: MobileCoinClient.latestBlockVersion,
-                    completion: completion) // - TODO
+                    completion: completion)
             case .failure(let error):
                 logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
