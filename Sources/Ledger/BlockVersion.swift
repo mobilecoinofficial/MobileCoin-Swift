@@ -5,7 +5,6 @@
 import Foundation
 
 enum BlockVersion : UInt32 {
-    // TODO - Update static library with decremented code, then decrement raw values here
     case zero = 0
     case one = 1
 }

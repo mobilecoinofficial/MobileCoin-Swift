@@ -13,7 +13,7 @@ struct SenderMemo {
 struct RecoverableSenderMemo {
     let memoData: Data64
     let addressHash: AddressHash
-    let accountKey: AccountKey
+    private let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
 
     init(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {

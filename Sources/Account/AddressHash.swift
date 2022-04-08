@@ -8,7 +8,7 @@ import LibMobileCoin
 struct AddressHash {
     let data16: Data16
     
-    var hexBytes: String {
+    var hex: String {
         data16.hexEncodedString()
     }
 
@@ -36,6 +36,6 @@ extension AddressHash: Hashable { }
 
 extension AddressHash: CustomStringConvertible {
     var description: String {
-        return hexBytes
+        return hex
     }
 }

@@ -20,9 +20,7 @@ enum RecoverableMemo {
     
     init(decryptedMemo data: Data66, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         guard let memoData = Data64(data[2...]) else {
-            logger.warning("Memo data type unavailable")
-            self = .notset
-            return
+            logger.fatalError("Should never be reached because the input data > 2 bytes")
         }
         let typeBytes = data[..<2]
         

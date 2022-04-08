@@ -13,6 +13,7 @@ struct TxOut: TxOutProtocol {
     let commitment: Data32
     let targetKey: RistrettoPublic
     let publicKey: RistrettoPublic
+    let eMemo: Data66
 
     /// - Returns: `nil` when the input is not deserializable.
     init?(serializedData: Data) {
@@ -67,32 +68,37 @@ extension TxOut {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid public key format"))
         }
+        
+        var eMemo = Data66()
+        if proto.hasEMemo {
+            guard let memo = Data66(proto.eMemo.data) else {
+                return .failure(
+                    InvalidInputError("Failed parsing External_TxOut: invalid e_memo format"))
+            }
+            eMemo = memo
+        }
         return .success(
-            TxOut(proto: proto, commitment: commitment, targetKey: targetKey, publicKey: publicKey))
+            TxOut(
+                proto: proto,
+                commitment: commitment,
+                targetKey: targetKey,
+                publicKey: publicKey,
+                eMemo: eMemo))
     }
 
     private init(
         proto: External_TxOut,
         commitment: Data32,
         targetKey: RistrettoPublic,
-        publicKey: RistrettoPublic
+        publicKey: RistrettoPublic,
+        eMemo: Data66
     ) {
         self.proto = proto
         self.commitment = commitment
         self.targetKey = targetKey
         self.publicKey = publicKey
+        self.eMemo = eMemo
     }
-}
-
-extension TxOut {
-//    // TODO use result type or optional ?
-//    func decryptEMemoPayload(accountKey: AccountKey) -> Data66 {
-//        guard proto.hasEMemo else {
-//            return Data66()
-//        }
-//        // TxOutUtils.decryptMemoPayload(proto.eMemo,
-//        return Data66()
-//    }
 }
 
 extension External_TxOut {
