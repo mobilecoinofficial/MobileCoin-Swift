@@ -5,21 +5,24 @@
 import Foundation
 
 struct NetworkConfig {
-    static func make(consensusUrl: String, fogUrl: String, attestation: AttestationConfig, transportProtocol: TransportProtocol)
+    static func make(consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol)
         -> Result<NetworkConfig, InvalidInputError>
     {
-        ConsensusUrl.make(string: consensusUrl).flatMap { consensusUrl in
-            FogUrl.make(string: fogUrl).map { fogUrl in
-                NetworkConfig(consensusUrl: consensusUrl, fogUrl: fogUrl, attestation: attestation, transportProtocol: transportProtocol)
-            }
-        }
+        return .success(NetworkConfig(consensusUrlLoadBalancer: consensusUrlLoadBalancer, fogUrlLoadBalancer: fogUrlLoadBalancer, attestation: attestation, transportProtocol: transportProtocol))
     }
 
-    let consensusUrl: ConsensusUrl
-    let fogUrl: FogUrl
-
     private let attestation: AttestationConfig
-
+    private let consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>
+    private let fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
+    
+    var consensusUrls: [ConsensusUrl] {
+        consensusUrlLoadBalancer.urlsTyped
+    }
+    
+    var fogUrls: [FogUrl] {
+        fogUrlLoadBalancer.urlsTyped
+    }
+    
     var transportProtocol: TransportProtocol
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]
@@ -34,76 +37,76 @@ struct NetworkConfig {
             httpRequester?.setConsensusTrustRoots(consensusTrustRoots[.http] as? SecSSLCertificates)
         }
     }
-    
-    init(consensusUrl: ConsensusUrl, fogUrl: FogUrl, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
-        self.consensusUrl = consensusUrl
-        self.fogUrl = fogUrl
+
+    init(consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
+        self.consensusUrlLoadBalancer = consensusUrlLoadBalancer
+        self.fogUrlLoadBalancer = fogUrlLoadBalancer
     }
 
-    var consensus: AttestedConnectionConfig<ConsensusUrl> {
+    func consensusConfig() -> AttestedConnectionConfig<ConsensusUrl> {
         AttestedConnectionConfig(
-            url: consensusUrl,
+            url: consensusUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.consensus,
             trustRoots: consensusTrustRoots,
             authorization: consensusAuthorization)
     }
 
-    var blockchain: ConnectionConfig<ConsensusUrl> {
+    func blockchainConfig() -> ConnectionConfig<ConsensusUrl> {
         ConnectionConfig(
-            url: consensusUrl,
+            url: consensusUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             trustRoots: consensusTrustRoots,
             authorization: consensusAuthorization)
     }
 
-    var fogView: AttestedConnectionConfig<FogUrl> {
+    func fogViewConfig() -> AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
-            url: fogUrl,
+            url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogView,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
-    var fogMerkleProof: AttestedConnectionConfig<FogUrl> {
+    func fogMerkleProofConfig() -> AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
-            url: fogUrl,
+            url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogMerkleProof,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
-    var fogKeyImage: AttestedConnectionConfig<FogUrl> {
+    func fogKeyImageConfig() -> AttestedConnectionConfig<FogUrl> {
         AttestedConnectionConfig(
-            url: fogUrl,
+            url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             attestation: attestation.fogKeyImage,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
-    var fogBlock: ConnectionConfig<FogUrl> {
+    func fogBlockConfig() -> ConnectionConfig<FogUrl> {
         ConnectionConfig(
-            url: fogUrl,
+            url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
-    var fogUntrustedTxOut: ConnectionConfig<FogUrl> {
+    func fogUntrustedTxOutConfig() -> ConnectionConfig<FogUrl> {
         ConnectionConfig(
-            url: fogUrl,
+            url: fogUrlLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
     }
 
     var fogReportAttestation: Attestation { attestation.fogReport }
-    
+
     @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
@@ -115,7 +118,7 @@ struct NetworkConfig {
         
         return currentProtocolValidation(grpc: grpc, http: http)
     }
-    
+
     @discardableResult mutating public func setFogTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {

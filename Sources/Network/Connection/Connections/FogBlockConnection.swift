@@ -10,13 +10,13 @@ final class FogBlockConnection:
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
-    private let config: ConnectionConfig<FogUrl>
+    private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
-        config: ConnectionConfig<FogUrl>,
+        config: NetworkConfig,
         targetQueue: DispatchQueue?
     ) {
         self.httpFactory = httpFactory
@@ -26,33 +26,34 @@ final class FogBlockConnection:
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.fogBlockConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService:
                             grpcFactory.makeFogBlockService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue))
                 case .http:
                     return .http(httpService:
                             httpFactory.makeFogBlockService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue))
                 }
             },
-            transportProtocolOption: config.transportProtocolOption,
+            transportProtocolOption: config.fogBlockConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
-
+    
     func getBlocks(
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getBlocks(request: request, completion: completion)
+            grpcConnection.getBlocks(request: request, completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.getBlocks(request: request, completion: completion)
+            httpConnection.getBlocks(request: request, completion: rotateURLOnError(completion))
         }
     }
 }

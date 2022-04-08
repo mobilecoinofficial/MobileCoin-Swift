@@ -29,12 +29,18 @@ final class GrpcChannelManager {
     }
 }
 
+extension GrpcChannelManager {
+    enum Defaults {
+        static let callOptionsTimeLimit = TimeLimit.timeout(TimeAmount.seconds(30))
+    }
+}
+
 extension ClientConnection {
     fileprivate static func create(group: EventLoopGroup, config: GrpcChannelConfig) -> GRPCChannel
     {
         let builder: Builder
         if config.useTls {
-            let secureBuilder = ClientConnection.usingTLSBackedByNIOSSL(on: group)
+            let secureBuilder = ClientConnection.secure(group: group)
             if let trustRoots = config.trustRoots {
                 secureBuilder.withTLS(trustRoots: .certificates(trustRoots))
             }

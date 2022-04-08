@@ -198,7 +198,7 @@ extension FogMerkleProofConnectionIntTests {
         return FogMerkleProofConnection(
             httpFactory: httpFactory,
             grpcFactory: grpcFactory,
-            config: networkConfig.fogMerkleProof,
+            config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
 }

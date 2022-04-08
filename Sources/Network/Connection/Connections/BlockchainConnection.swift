@@ -11,37 +11,38 @@ final class BlockchainConnection:
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
-    private let config: ConnectionConfig<ConsensusUrl>
+    private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
-        config: ConnectionConfig<ConsensusUrl>,
+        config: NetworkConfig,
         targetQueue: DispatchQueue?
     ) {
         self.httpFactory = httpFactory
         self.grpcFactory = grpcFactory
         self.config = config
         self.targetQueue = targetQueue
-
+        
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
+                let rotatedConfig = config.blockchainConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService:
                             grpcFactory.makeBlockchainService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue))
                 case .http:
                     return .http(httpService:
                             httpFactory.makeBlockchainService(
-                                config: config,
+                                config: rotatedConfig,
                                 targetQueue: targetQueue))
                 }
             },
-            transportProtocolOption: config.transportProtocolOption,
+            transportProtocolOption: config.blockchainConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
 
@@ -51,9 +52,9 @@ final class BlockchainConnection:
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.getLastBlockInfo(completion: completion)
+            grpcConnection.getLastBlockInfo(completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.getLastBlockInfo(completion: completion)
+            httpConnection.getLastBlockInfo(completion: rotateURLOnError(completion))
         }
     }
 }
