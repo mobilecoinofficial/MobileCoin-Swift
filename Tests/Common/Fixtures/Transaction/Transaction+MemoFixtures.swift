@@ -47,12 +47,12 @@ extension Transaction.Fixtures.TxOutMemo {
 
     static let realIndex = 3
     static func realKnownTxOut() throws -> KnownTxOut {
-        let senderAccountKey = try senderAccountKey()
+        let senderKey = try senderAccountKey()
         let txOuts = try nativeTxOuts()
         let realTxOut = txOuts[realIndex]
         let ledgerTxOut = LedgerTxOut(
                             PartialTxOut(realTxOut), globalIndex: globalIndex, block: blockMetadata)
-        return try XCTUnwrap(KnownTxOut(ledgerTxOut, accountKey: senderAccountKey))
+        return try XCTUnwrap(KnownTxOut(ledgerTxOut, accountKey: senderKey))
     }
     
     static let globalIndex: UInt64 = 100011
@@ -65,7 +65,7 @@ extension Transaction.Fixtures.TxOutMemo {
     }()
     
     fileprivate static func inputs() throws -> [PreparedTxInput] {
-        let senderAccountKey = try senderAccountKey()
+        let senderKey = try senderAccountKey()
         let txOuts = try nativeTxOuts()
         let membershipProofs = try txOutMembershipProofs()
         
@@ -75,7 +75,7 @@ extension Transaction.Fixtures.TxOutMemo {
         let ledgerTxOut = LedgerTxOut(partialTxOut, globalIndex: globalIndex, block: blockMetadata)
         let knownTxOut = try XCTUnwrap(KnownTxOut(
                                             ledgerTxOut,
-                                            accountKey: senderAccountKey))
+                                            accountKey: senderKey))
 
         let ring: [(TxOut, TxOutMembershipProof)] = Array(zip(txOuts, membershipProofs))
 
