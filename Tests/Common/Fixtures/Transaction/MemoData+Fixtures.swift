@@ -4,7 +4,6 @@
 
 import Foundation
 @testable import MobileCoin
-@testable import LibMobileCoin
 import XCTest
 
 enum MemoData {
