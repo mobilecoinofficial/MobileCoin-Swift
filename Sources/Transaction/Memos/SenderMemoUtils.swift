@@ -16,7 +16,7 @@ enum SenderMemoUtils {
             senderPublicAddress.withUnsafeCStructPointer { publicAddressPtr in
                 receipientViewPrivateKey.asMcBuffer { receipientViewPrivateKeyPtr in
                     txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
-                        var matches = true
+                        var matches = false
                         let result = withMcError { errorPtr in
                             mc_memo_sender_memo_is_valid(
                                 memoDataPtr,
