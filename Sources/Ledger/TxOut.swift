@@ -6,11 +6,14 @@ import Foundation
 import LibMobileCoin
 
 struct TxOut: TxOutProtocol {
+    typealias Keys = (publicKey: RistrettoPublic, targetKey: RistrettoPublic)
+    
     fileprivate let proto: External_TxOut
 
     let commitment: Data32
     let targetKey: RistrettoPublic
     let publicKey: RistrettoPublic
+    let eMemo: Data66
 
     /// - Returns: `nil` when the input is not deserializable.
     init?(serializedData: Data) {
@@ -40,6 +43,12 @@ struct TxOut: TxOutProtocol {
 
     var maskedValue: UInt64 { proto.amount.maskedValue }
     var encryptedFogHint: Data { proto.eFogHint.data }
+    var encryptedMemo: Data66 {
+        guard proto.hasEMemo else {
+            return Data66()
+        }
+        return Data66(proto.eMemo.data) ?? Data66()
+    }
 }
 
 extension TxOut: Equatable {}
@@ -59,25 +68,53 @@ extension TxOut {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid public key format"))
         }
+        
+        var eMemo = Data66()
+        if proto.hasEMemo {
+            guard let memo = Data66(proto.eMemo.data) else {
+                return .failure(
+                    InvalidInputError("Failed parsing External_TxOut: invalid e_memo format"))
+            }
+            eMemo = memo
+        }
         return .success(
-            TxOut(proto: proto, commitment: commitment, targetKey: targetKey, publicKey: publicKey))
+            TxOut(
+                proto: proto,
+                commitment: commitment,
+                targetKey: targetKey,
+                publicKey: publicKey,
+                eMemo: eMemo))
     }
 
     private init(
         proto: External_TxOut,
         commitment: Data32,
         targetKey: RistrettoPublic,
-        publicKey: RistrettoPublic
+        publicKey: RistrettoPublic,
+        eMemo: Data66
     ) {
         self.proto = proto
         self.commitment = commitment
         self.targetKey = targetKey
         self.publicKey = publicKey
+        self.eMemo = eMemo
     }
 }
 
 extension External_TxOut {
     init(_ txOut: TxOut) {
         self = txOut.proto
+    }
+}
+
+extension External_TxOut {
+    var encryptedMemo: Data66 {
+        Data66(self.eMemo.data) ?? Data66()
+    }
+}
+
+extension FogView_TxOutRecord {
+    var encryptedMemo: Data66 {
+        Data66(self.txOutEMemoData.data) ?? Data66()
     }
 }

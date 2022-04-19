@@ -8,12 +8,13 @@
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let network: NetworkPreset = .testNet
-    static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
-    static let invalidFogUrl = "fog://invalid.mobilecoin.com"
+    static let network: NetworkPreset = .mobiledev
 }
 
 extension IntegrationTestFixtures {
+    static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
+    static let invalidFogUrl = "fog://invalid.mobilecoin.com"
+    
     static let fee = McConstants.DEFAULT_MINIMUM_FEE
 
     static func fogReportUrlTyped() throws -> FogUrl {

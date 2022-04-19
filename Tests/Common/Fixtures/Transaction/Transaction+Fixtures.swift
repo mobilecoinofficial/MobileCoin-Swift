@@ -18,6 +18,7 @@ extension Transaction.Fixtures {
         let fee = Self.fee
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
+        let blockVersion = Self.blockVersion
 
         init() throws {
             self.inputs = try Self.inputs()
@@ -61,11 +62,13 @@ extension Transaction.Fixtures {
 }
 
 extension Transaction.Fixtures.BuildTx {
+    fileprivate static var blockVersion = BlockVersion.one
 
     fileprivate static func inputs() throws -> [PreparedTxInput] {
         let knownTxOut = try XCTUnwrap(KnownTxOut(
             LedgerTxOut(
                 PartialTxOut(
+                    encryptedMemo: Data66(),
                     commitment: Data32(base64Encoded:
                         "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
                     maskedValue: 2886556578342610519,
