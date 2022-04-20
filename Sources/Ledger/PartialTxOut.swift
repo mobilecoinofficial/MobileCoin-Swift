@@ -6,6 +6,7 @@ import Foundation
 import LibMobileCoin
 
 struct PartialTxOut: TxOutProtocol {
+    let encryptedMemo: Data66
     let commitment: Data32
     let maskedValue: UInt64
     let targetKey: RistrettoPublic
@@ -18,6 +19,7 @@ extension PartialTxOut: Hashable {}
 extension PartialTxOut {
     init(_ txOut: TxOut) {
         self.init(
+            encryptedMemo: txOut.encryptedMemo,
             commitment: txOut.commitment,
             maskedValue: txOut.maskedValue,
             targetKey: txOut.targetKey,
@@ -34,6 +36,7 @@ extension PartialTxOut {
             return nil
         }
         self.init(
+            encryptedMemo: txOut.encryptedMemo,
             commitment: commitment,
             maskedValue: txOut.amount.maskedValue,
             targetKey: targetKey,
@@ -53,6 +56,7 @@ extension PartialTxOut {
         }
 
         self.init(
+            encryptedMemo: txOutRecord.encryptedMemo,
             commitment: commitment,
             maskedValue: txOutRecord.txOutAmountMaskedValue,
             targetKey: targetKey,
@@ -76,4 +80,3 @@ extension PartialTxOut {
         }
     }
 }
-
