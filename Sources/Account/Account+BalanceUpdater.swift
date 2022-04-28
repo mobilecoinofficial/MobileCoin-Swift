@@ -30,19 +30,21 @@ extension Account {
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogViewService: fogViewService,
                 fogQueryScalingStrategy: fogQueryScalingStrategy,
-                targetQueue: targetQueue)
+                targetQueue: targetQueue,
+                syncChecker: account.accessWithoutLocking.syncChecker)
             self.viewKeyScanner = FogViewKeyScanner(
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogBlockService: fogBlockService)
             self.fogKeyImageChecker = FogKeyImageChecker(
                 fogKeyImageService: fogKeyImageService,
-                targetQueue: targetQueue)
+                targetQueue: targetQueue,
+                syncChecker: account.accessWithoutLocking.syncChecker) //TODO - Grokk locking
         }
 
-        func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
+        func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
             logger.info("Updating balance...", logFunction: false)
             checkForNewTxOuts {
-                guard $0.successOr(completion: completion) != nil else {
+                guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
                     logger.warning(
                         "Failed to update balance: checkForNewTxOuts error: \($0)",
                         logFunction: false)
@@ -50,13 +52,21 @@ extension Account {
                 }
 
                 self.checkForSpentTxOuts {
-                    guard $0.successOr(completion: completion) != nil else {
+                    guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
                         logger.warning(
                             "Failed to update balance: checkForSpentTxOuts error: \($0)",
                             logFunction: false)
                         return
                     }
-
+                    
+                    let fogInSync = account.accessWithoutLocking.syncChecker.inSync()
+                    guard fogInSync.mapError({.fogSyncError($0)}).successOr(completion: completion) != nil else {
+                        logger.warning(
+                            "Failed to update balance: checkForSpentTxOuts error: \(fogInSync)",
+                            logFunction: false)
+                        return
+                    }
+                    
                     let balance = self.account.readSync { $0.cachedBalance }
 
                     logger.info(

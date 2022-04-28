@@ -15,8 +15,8 @@ PODS:
   - MobileCoin/IntegrationTests (1.2.0-pre11)
   - MobileCoin/PerformanceTests (1.2.0-pre11)
   - MobileCoin/Tests (1.2.0-pre11)
-  - SwiftLint (0.45.0)
-  - SwiftProtobuf (1.18.0)
+  - SwiftLint (0.47.1)
+  - SwiftProtobuf (1.19.0)
 
 DEPENDENCIES:
   - Keys (from `Pods/CocoaPodsKeys`)
@@ -48,9 +48,9 @@ SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
   LibMobileCoin: 49a5206a95b2efcb7f381ce6731cf12a76b3c9d0
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: 5f309be219cfc78117e4e0236bc49c43dfd7e393
-  SwiftLint: e5c7f1fba68eccfc51509d5b2ce1699f5502e0c7
-  SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
+  MobileCoin: 4b4c93443b2b62b08898afc6adc53d2721d0fc71
+  SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
+  SwiftProtobuf: 6ef3f0e422ef90d6605ca20b21a94f6c1324d6b3
 
 PODFILE CHECKSUM: fa3b77b062d292a978ffddf57c34bed7cf19d07e
 

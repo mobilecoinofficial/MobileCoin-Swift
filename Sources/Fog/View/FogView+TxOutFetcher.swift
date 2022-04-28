@@ -15,13 +15,15 @@ extension FogView {
         private let accountKey: AccountKey
         private let fogViewService: FogViewService
         private let fogQueryScalingStrategy: FogQueryScalingStrategy
+        private var syncChecker: FogSyncCheckable
 
         init(
             fogView: ReadWriteDispatchLock<FogView>,
             accountKey: AccountKey,
             fogViewService: FogViewService,
             fogQueryScalingStrategy: FogQueryScalingStrategy,
-            targetQueue: DispatchQueue?
+            targetQueue: DispatchQueue?,
+            syncChecker: FogSyncCheckable
         ) {
             self.serialQueue = DispatchQueue(
                 label: "com.mobilecoin.\(FogView.self).\(Self.self)",
@@ -30,6 +32,7 @@ extension FogView {
             self.accountKey = accountKey
             self.fogViewService = fogViewService
             self.fogQueryScalingStrategy = fogQueryScalingStrategy
+            self.syncChecker = syncChecker
         }
 
         private var allRngTxOutsFoundBlockCount: UInt64 {
@@ -61,6 +64,13 @@ extension FogView {
                 $0.queryRequest(targetBlockCount: targetBlockCount, numOutputs: numOutputs)
             }
             fogViewService.query(requestWrapper: requestWrapper) {
+                {
+                    guard let highestProcessedBlockCount = try? $0.get().highestProcessedBlockCount else {
+                        return
+                    }
+                    self.syncChecker.setViewsHighestKnownBlock(highestProcessedBlockCount)
+                }($0)
+                
                 let result = $0.flatMap { response in
                     self.fogView.writeSync {
                         $0.processQueryResponse(

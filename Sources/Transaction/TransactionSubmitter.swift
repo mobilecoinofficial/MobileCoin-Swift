@@ -8,10 +8,16 @@ import LibMobileCoin
 struct TransactionSubmitter {
     private let consensusService: ConsensusService
     private let feeFetcher: BlockchainFeeFetcher
+    private let syncChecker: FogSyncCheckable
 
-    init(consensusService: ConsensusService, feeFetcher: BlockchainFeeFetcher) {
+    init(
+        consensusService: ConsensusService,
+        feeFetcher: BlockchainFeeFetcher,
+        syncChecker: FogSyncCheckable
+    ) {
         self.consensusService = consensusService
         self.feeFetcher = feeFetcher
+        self.syncChecker = syncChecker
     }
 
     func submitTransaction(
@@ -25,6 +31,8 @@ struct TransactionSubmitter {
         consensusService.proposeTx(External_Tx(transaction)) {
             switch $0 {
             case .success(let response):
+                syncChecker.setConsensusHighestKnownBlock(response.blockCount - 1)
+                
                 let responseResult = self.processResponse(response)
                 if case .txFeeError = response.result {
                     self.feeFetcher.resetCache {
