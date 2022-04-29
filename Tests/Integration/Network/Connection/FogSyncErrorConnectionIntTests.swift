@@ -216,7 +216,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
 
         let client = try IntegrationTestFixtures.createMobileCoinClient(
             fogSyncChecker: mockSyncChecker,
-            transportProtocol:transportProtocol)
+            transportProtocol: transportProtocol)
 
         client.updateBalance {
             if shouldSucceed {
@@ -233,6 +233,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
             expect.fulfill()
         }
     }
+    
 /**
 
  public void testFogSyncDetection() throws Exception {
@@ -257,6 +258,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
 
      }
  **/
+}
 
 class MockFogSyncChecker: FogSyncCheckable {
     var viewsHighestKnownBlock: UInt64

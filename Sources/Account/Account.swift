@@ -9,14 +9,14 @@ final class Account {
 
     let fogView: FogView
     
-    let syncChecker: FogSyncCheckable
+    let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
     var allTxOutTrackers: [TxOutTracker] = []
 
     init(accountKey: AccountKeyWithFog, syncChecker: FogSyncCheckable) {
         self.accountKey = accountKey.accountKey
-        self.fogView = FogView(syncChecker: syncChecker)
-        self.syncChecker = syncChecker
+        self.syncCheckerLock = .init(syncChecker)
+        self.fogView = FogView(syncChecker: syncCheckerLock)
     }
 
     var publicAddress: PublicAddress {

@@ -10,12 +10,12 @@ import LibMobileCoin
 struct FogKeyImageChecker {
     private let serialQueue: DispatchQueue
     private let fogKeyImageService: FogKeyImageService
-    private let syncChecker: FogSyncCheckable
+    private let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
-    init(fogKeyImageService: FogKeyImageService, targetQueue: DispatchQueue?, syncChecker: FogSyncCheckable) {
+    init(fogKeyImageService: FogKeyImageService, targetQueue: DispatchQueue?, syncChecker: ReadWriteDispatchLock<FogSyncCheckable>) {
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)", target: targetQueue)
         self.fogKeyImageService = fogKeyImageService
-        self.syncChecker = syncChecker
+        self.syncCheckerLock = syncChecker
     }
 
     func checkKeyImage(
@@ -82,7 +82,9 @@ struct FogKeyImageChecker {
         }
         fogKeyImageService.checkKeyImages(request: request) { response in
             if let result = try? response.get() {
-                self.syncChecker.setLedgersHighestKnownBlock(result.numBlocks)
+                self.syncCheckerLock.writeSync({
+                    $0.setLedgersHighestKnownBlock(result.numBlocks)
+                })
             }
             completion(response.flatMap {
                 Self.parseResponse(keyImageQueries: keyImageQueries, response: $0)

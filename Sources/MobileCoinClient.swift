@@ -223,7 +223,7 @@ public final class MobileCoinClient {
         TransactionSubmitter(
             consensusService: serviceProvider.consensusService,
             feeFetcher: feeFetcher,
-            syncChecker: accountLock.accessWithoutLocking.syncChecker
+            syncChecker: accountLock.accessWithoutLocking.syncCheckerLock
         ).submitTransaction(transaction) { result in
             self.callbackQueue.async {
                 completion(result)

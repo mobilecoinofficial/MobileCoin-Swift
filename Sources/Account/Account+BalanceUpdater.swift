@@ -31,14 +31,14 @@ extension Account {
                 fogViewService: fogViewService,
                 fogQueryScalingStrategy: fogQueryScalingStrategy,
                 targetQueue: targetQueue,
-                syncChecker: account.accessWithoutLocking.syncChecker)
+                syncChecker: account.accessWithoutLocking.syncCheckerLock)
             self.viewKeyScanner = FogViewKeyScanner(
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogBlockService: fogBlockService)
             self.fogKeyImageChecker = FogKeyImageChecker(
                 fogKeyImageService: fogKeyImageService,
                 targetQueue: targetQueue,
-                syncChecker: account.accessWithoutLocking.syncChecker) //TODO - Grokk locking
+                syncChecker: account.accessWithoutLocking.syncCheckerLock) //TODO - Grokk locking
         }
 
         func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
@@ -59,7 +59,7 @@ extension Account {
                         return
                     }
                     
-                    let fogInSync = account.accessWithoutLocking.syncChecker.inSync()
+                    let fogInSync = account.accessWithoutLocking.syncCheckerLock.readSync({ $0.inSync() })
                     guard fogInSync.mapError({.fogSyncError($0)}).successOr(completion: completion) != nil else {
                         logger.warning(
                             "Failed to update balance: checkForSpentTxOuts error: \(fogInSync)",

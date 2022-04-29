@@ -61,7 +61,7 @@ class FogSyncChecker: FogSyncCheckable {
     func setLedgersHighestKnownBlock(_ value:UInt64) {
         ledgersHighestKnownBlock = value
     }
-    
+
     func setConsensusHighestKnownBlock(_ value:UInt64) {
         consensusHighestKnownBlock = value
     }
