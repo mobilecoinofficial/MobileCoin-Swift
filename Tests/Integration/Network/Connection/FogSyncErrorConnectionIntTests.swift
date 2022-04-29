@@ -234,30 +234,6 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         }
     }
     
-/**
-
- public void testFogSyncDetection() throws Exception {
-     @Test
-     public void testGetCurrentBlockIndex() {
-
-         AccountKey accountKey = mock(AccountKey.class);
-         TxOutStore txOutStore = new TxOutStore(accountKey);
-
-         txOutStore.setLedgerBlockIndex(UnsignedLong.ZERO);
-         txOutStore.setViewBlockIndex(UnsignedLong.ZERO);
-         assertEquals(txOutStore.getCurrentBlockIndex(), UnsignedLong.ZERO);
-
-         txOutStore.setLedgerBlockIndex(UnsignedLong.TEN);
-         assertEquals(txOutStore.getCurrentBlockIndex(), UnsignedLong.ZERO);
-
-         txOutStore.setViewBlockIndex(UnsignedLong.TEN);
-         assertEquals(txOutStore.getCurrentBlockIndex(), UnsignedLong.TEN);
-
-         txOutStore.setViewBlockIndex(UnsignedLong.TEN.add(UnsignedLong.TEN));
-         assertEquals(txOutStore.getCurrentBlockIndex(), UnsignedLong.TEN);
-
-     }
- **/
 }
 
 class MockFogSyncChecker: FogSyncCheckable {
