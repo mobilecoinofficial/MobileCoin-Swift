@@ -48,18 +48,9 @@ extension FogSyncCheckable {
 }
 
 class FogSyncChecker: FogSyncCheckable {
-    var viewsHighestKnownBlock: UInt64 = 0 {
-        willSet { print("Views Highest Known Block will from \(self.viewsHighestKnownBlock) to \(newValue)") }
-        didSet { print("Views Highest Known Block changed from \(oldValue) to \(self.viewsHighestKnownBlock)")}
-    }
-    var ledgersHighestKnownBlock: UInt64 = 0 {
-        willSet { print("Ledgers Highest Known Block will from \(self.ledgersHighestKnownBlock) to \(newValue)") }
-        didSet { print("Ledgers Highest Known Block changed from \(oldValue) to \(self.ledgersHighestKnownBlock)")}
-    }
-    var consensusHighestKnownBlock: UInt64 = 0 {
-        willSet { print("Consensus Highest Known Block will from \(self.consensusHighestKnownBlock) to \(newValue)") }
-        didSet { print("Consensus Highest Known Block changed from \(oldValue) to \(self.consensusHighestKnownBlock)")}
-    }
+    var viewsHighestKnownBlock: UInt64 = 0
+    var ledgersHighestKnownBlock: UInt64 = 0
+    var consensusHighestKnownBlock: UInt64 = 0
     
     let fogSyncThreshold: UInt64 = 10
     
