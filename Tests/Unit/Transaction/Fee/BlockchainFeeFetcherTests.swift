@@ -6,18 +6,21 @@ import LibMobileCoin
 @testable import MobileCoin
 import XCTest
 
-class BlockchainFeeFetcherTests: XCTestCase {
+class BlockchainMetaFetcherTests: XCTestCase {
 
     func testFetchMinimumFeeReturnsDefaultWithLegacyService() throws {
         let blockchainService = TestBlockchainService.makeWithSuccess()
-        let fetcher = BlockchainFeeFetcher(
+        let fetcher = BlockchainMetaFetcher(
             blockchainService: blockchainService,
-            minimumFeeCacheTTL: 60,
+            metaCacheTTL: 60,
             targetQueue: DispatchQueue.main)
 
         let expect = expectation(description: "fetching minimum fee")
-        fetcher.fetchMinimumFee {
-            XCTAssertSuccessEqual($0, 10_000_000_000)
+        fetcher.fetchMeta {
+            guard let metaCache = $0.successOrFulfill(expectation: expect)
+            else { return }
+            
+            XCTAssertEqual(metaCache.minimumFee, 10_000_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)
@@ -25,14 +28,17 @@ class BlockchainFeeFetcherTests: XCTestCase {
 
     func testFetchMinimumFeeWorksWithNewService() throws {
         let blockchainService = TestBlockchainService(successWithMinimumFee: 3_000_000_000)
-        let fetcher = BlockchainFeeFetcher(
+        let fetcher = BlockchainMetaFetcher(
             blockchainService: blockchainService,
-            minimumFeeCacheTTL: 60,
+            metaCacheTTL: 60,
             targetQueue: DispatchQueue.main)
 
         let expect = expectation(description: "fetching minimum fee")
-        fetcher.fetchMinimumFee {
-            XCTAssertSuccessEqual($0, 3_000_000_000)
+        fetcher.fetchMeta {
+            guard let metaCache = $0.successOrFulfill(expectation: expect)
+            else { return }
+            
+            XCTAssertEqual(metaCache.minimumFee, 3_000_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)

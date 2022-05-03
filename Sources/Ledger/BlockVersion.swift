@@ -4,27 +4,22 @@
 
 import Foundation
 
-enum BlockVersion : UInt32 {
-    case zero = 0
-    case one = 1
-}
+typealias BlockVersion = UInt32
 
 extension BlockVersion {
+    static let versionZero: BlockVersion = 0
+    static let versionOne: BlockVersion = 1
+    static let versionTwo: BlockVersion = 2
+    
     static func canEnableRecoverableMemos(version: BlockVersion) -> Bool {
-        version >= one
+        version >= versionOne
     }
     
     static var legacy: BlockVersion {
-        zero
+        Self.versionZero
     }
     
     static var minRTHEnabled: BlockVersion {
-        one
-    }
-}
-
-extension BlockVersion: Comparable {
-    static func < (lhs: BlockVersion, rhs: BlockVersion) -> Bool {
-        lhs.rawValue < rhs.rawValue
+        Self.versionOne
     }
 }

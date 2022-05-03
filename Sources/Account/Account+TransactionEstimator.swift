@@ -10,12 +10,12 @@ extension Account {
     struct TransactionEstimator {
         private let serialQueue: DispatchQueue
         private let account: ReadWriteDispatchLock<Account>
-        private let feeFetcher: BlockchainFeeFetcher
+        private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
 
         init(
             account: ReadWriteDispatchLock<Account>,
-            feeFetcher: BlockchainFeeFetcher,
+            metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             targetQueue: DispatchQueue?
         ) {
@@ -23,7 +23,7 @@ extension Account {
                 label: "com.mobilecoin.\(Account.self).\(Self.self))",
                 target: targetQueue)
             self.account = account
-            self.feeFetcher = feeFetcher
+            self.metaFetcher = metaFetcher
             self.txOutSelector = TxOutSelector(txOutSelectionStrategy: txOutSelectionStrategy)
         }
 
@@ -31,7 +31,7 @@ extension Account {
             feeLevel: FeeLevel,
             completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
         ) {
-            feeFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
                         let txOuts = self.account.readSync { $0.unspentTxOuts }
@@ -73,7 +73,7 @@ extension Account {
                 return
             }
 
-            feeFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
                         let txOuts = self.account.readSync { $0.unspentTxOuts }
@@ -115,7 +115,7 @@ extension Account {
                 return
             }
 
-            feeFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
                         let txOuts = self.account.readSync { $0.unspentTxOuts }

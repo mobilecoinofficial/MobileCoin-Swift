@@ -294,7 +294,7 @@ final class TransactionBuilder {
             fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
                 // Safety: mc_transaction_builder_create should never return nil.
                 withMcInfallible {
-                    mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr, memoBuilderPtr, blockVersion.rawValue)
+                    mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr, memoBuilderPtr, blockVersion)
                 }
             }
         }
