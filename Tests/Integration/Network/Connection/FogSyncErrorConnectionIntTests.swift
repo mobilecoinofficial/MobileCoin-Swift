@@ -60,7 +60,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         }
     }
     
-    func fogBehindConsensusWithinThresholdAheadConsensus(
+    func fogBehindConsensusButWithinThreshold(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
