@@ -63,15 +63,15 @@ class FogSyncErrorTests: XCTestCase {
     
     func testConsensusArithmeticOverflowMaxMinusMaxMinusThreshold() throws {
         let syncChecker = FogSyncChecker()
-        let threshold = syncChecker.maxAllowedBlockDelta
-        syncChecker.setLedgersHighestKnownBlock(UInt64.max - threshold.value)
-        syncChecker.setViewsHighestKnownBlock(UInt64.max - threshold.value)
+        let delta = syncChecker.maxAllowedBlockDelta
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max - delta.value - 1)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max - delta.value - 1)
         syncChecker.setConsensusHighestKnownBlock(UInt64.max)
         XCTAssertFailure(syncChecker.inSync())
         
         syncChecker.setLedgersHighestKnownBlock(UInt64.max)
         syncChecker.setViewsHighestKnownBlock(UInt64.max)
-        syncChecker.setConsensusHighestKnownBlock(UInt64.max - threshold.value)
+        syncChecker.setConsensusHighestKnownBlock(UInt64.max - delta.value - 1)
         XCTAssertSuccess(syncChecker.inSync())
     }
     
