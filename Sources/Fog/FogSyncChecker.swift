@@ -9,8 +9,8 @@ protocol FogSyncCheckable {
     var ledgersHighestKnownBlock: UInt64 { get }
     var consensusHighestKnownBlock: UInt64 { get }
     var currentBlockIndex: UInt64 { get }
-    var fogSyncThreshold: UInt64 { get }
-    
+    var maxAllowedBlockDelta: PositiveUInt64 { get }
+
     func inSync() -> Result<(), FogSyncError>
     func setLedgersHighestKnownBlock(_:UInt64)
     func setViewsHighestKnownBlock(_:UInt64)
@@ -27,23 +27,36 @@ extension FogSyncCheckable {
         }
         return .success(())
     }
-    
+
     var currentBlockIndex: UInt64 {
         min(ledgersHighestKnownBlock, viewsHighestKnownBlock)
     }
-    
+
     private var viewLedgerOutOfSync: Bool {
-        abs(
-            Int64(
-                max(viewsHighestKnownBlock, ledgersHighestKnownBlock)
-                &- min(viewsHighestKnownBlock, ledgersHighestKnownBlock)
-            )
-        ) >= fogSyncThreshold
+        // max(...) - min(...) ensures the result is always a positive integer that won't overflow
+        //
+        // Other possible constructions like:
+        //
+        // ```
+        //     abs(Int64(UInt64 - UInt64))  // or...
+        //     abs(UInt64 - UInt64) // where the first UInt64 is smaller than the second
+        // ```
+        //
+        // would cause arithmetic overflow exceptions at runtime.
+        //
+
+        UInt64(
+            max(ledgersHighestKnownBlock, viewsHighestKnownBlock) -
+            min(ledgersHighestKnownBlock, viewsHighestKnownBlock)
+        ) >= maxAllowedBlockDelta.value
     }
-    
+
     private var consensusOutOfSync: Bool {
+        // Consensus is only considered out of sync when its ahead of "fog's current block index" &&
+        // the delta is greater than the max allowed delta.
+        // The first boolean case short-circuits the second which avoids any chance of overflow.
         consensusHighestKnownBlock > currentBlockIndex &&
-            Int64(consensusHighestKnownBlock &- currentBlockIndex) >= fogSyncThreshold
+            UInt64(consensusHighestKnownBlock - currentBlockIndex) > maxAllowedBlockDelta.value
     }
 }
 
@@ -51,18 +64,25 @@ class FogSyncChecker: FogSyncCheckable {
     var viewsHighestKnownBlock: UInt64 = 0
     var ledgersHighestKnownBlock: UInt64 = 0
     var consensusHighestKnownBlock: UInt64 = 0
+
+    let maxAllowedBlockDelta: PositiveUInt64
     
-    let fogSyncThreshold: UInt64 = 10
-    
-    func setViewsHighestKnownBlock(_ value:UInt64) {
+    init() {
+        guard let maxAllowedBlockDelta = PositiveUInt64(10) else {
+            logger.fatalError("Should never be reached as 10 > 0")
+        }
+        self.maxAllowedBlockDelta = maxAllowedBlockDelta
+    }
+
+    func setViewsHighestKnownBlock(_ value: UInt64) {
         viewsHighestKnownBlock = value
     }
     
-    func setLedgersHighestKnownBlock(_ value:UInt64) {
+    func setLedgersHighestKnownBlock(_ value: UInt64) {
         ledgersHighestKnownBlock = value
     }
 
-    func setConsensusHighestKnownBlock(_ value:UInt64) {
+    func setConsensusHighestKnownBlock(_ value: UInt64) {
         consensusHighestKnownBlock = value
     }
 }
