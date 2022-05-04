@@ -18,13 +18,15 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
     ) throws {
         let fogIndex: UInt64 = 61
         let consensusIndex = fogIndex
+        let shouldSucceed = true
+        
         try attemptRefresh(
             fogViewBlockIndex: fogIndex,
             fogLedgerBlockIndex: fogIndex,
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: true
+            shouldSucceed: shouldSucceed
         )
     }
     
@@ -40,6 +42,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
     ) throws {
         let fogIndex: UInt64 = 321
         let consensusIndex = fogIndex - 2
+        let shouldSucceed = true
         
         // Fog ahead of Consensus should succeed (occurs when cached Consensus block info is used)
         try attemptRefresh(
@@ -48,74 +51,76 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: true
+            shouldSucceed: shouldSucceed
         )
     }
     
-    func testFogBehindConsensusWithinThreshold() throws {
+    func testFogBehindConsensusWithinDelta() throws {
         try testSupportedProtocols(description: description) {
-            try fogBehindConsensusWithinThresholdAheadConsensus(
+            try fogBehindConsensusWithinDeltaAheadConsensus(
                     transportProtocol: $0,
                     expectation: $1)
         }
     }
     
-    func fogBehindConsensusWithinThresholdAheadConsensus(
+    func fogBehindConsensusWithinDeltaAheadConsensus(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
         let fogIndex: UInt64 = 5234523462456
-        let consensusIndex = fogIndex + MockFogSyncChecker.threshold - 2
+        let consensusIndex = fogIndex + MockFogSyncChecker.delta - 2
+        let shouldSucceed = true
         
-        // Fog behind but within threshold should succeed
+        // Fog behind but within delta should succeed
         try attemptRefresh(
             fogViewBlockIndex: fogIndex,
             fogLedgerBlockIndex: fogIndex,
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: true
+            shouldSucceed: shouldSucceed
         )
     }
     
-    func testFogBehindConsensusAtThreshold() throws {
+    func testFogBehindConsensusAtDelta() throws {
         try testSupportedProtocols(description: description) {
-            try fogBehindConsensusAtThreshold(transportProtocol: $0, expectation: $1)
+            try fogBehindConsensusAtDelta(transportProtocol: $0, expectation: $1)
         }
     }
     
-    func fogBehindConsensusAtThreshold(
+    func fogBehindConsensusAtDelta(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
         let fogIndex: UInt64 = 60
-        let consensusIndex = fogIndex + MockFogSyncChecker.threshold - 1
+        let consensusIndex = fogIndex + MockFogSyncChecker.delta
+        let shouldSucceed = true
         
-        // Fog behind at threshold, should fail
+        // Fog behind at , should fail
         try attemptRefresh(
             fogViewBlockIndex: fogIndex,
             fogLedgerBlockIndex: fogIndex,
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: false
+            shouldSucceed: shouldSucceed
         )
     }
     
-    func testFogBehindConsensusOverThreshold() throws {
+    func testFogBehindConsensusOverDelta() throws {
         try testSupportedProtocols(description: description) {
-            try fogBehindConsensusOverThreshold(transportProtocol: $0, expectation: $1)
+            try fogBehindConsensusOverDelta(transportProtocol: $0, expectation: $1)
         }
     }
     
-    func fogBehindConsensusOverThreshold(
+    func fogBehindConsensusOverDelta(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
         let fogIndex: UInt64 = 410
-        let consensusIndex = fogIndex + MockFogSyncChecker.threshold
+        let consensusIndex = fogIndex + MockFogSyncChecker.delta + 1
         
-        // Fog behind over threshold, should fail
+        // Fog behind over delta, should fail
         try attemptRefresh(
             fogViewBlockIndex: fogIndex,
             fogLedgerBlockIndex: fogIndex,
@@ -126,21 +131,21 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         )
     }
     
-    func testViewLedgerAndConsensusWithinThreshold() throws {
+    func testViewLedgerAndConsensusWithinDelta() throws {
         try testSupportedProtocols(description: description) {
-            try viewLedgerAndConsensusWithinThreshold(transportProtocol: $0, expectation: $1)
+            try viewLedgerAndConsensusWithinDelta(transportProtocol: $0, expectation: $1)
         }
     }
     
-    func viewLedgerAndConsensusWithinThreshold(
+    func viewLedgerAndConsensusWithinDelta(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
         let viewIndex: UInt64 = 234234235675
-        let ledgerIndex = viewIndex - MockFogSyncChecker.threshold + 2
+        let ledgerIndex = viewIndex - MockFogSyncChecker.delta + 2
         let consensusIndex = viewIndex
         
-        // below threshold, should pass
+        // below delta, should pass
         try attemptRefresh(
             fogViewBlockIndex: viewIndex,
             fogLedgerBlockIndex: ledgerIndex,
@@ -151,21 +156,21 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         )
     }
     
-    func testViewLedgerAndConsensusAtThreshold() throws {
+    func testViewLedgerAndConsensusAtDelta() throws {
         try testSupportedProtocols(description: description) {
-            try viewLedgerAndConsensusAtThreshold(transportProtocol: $0, expectation: $1)
+            try viewLedgerAndConsensusAtDelta(transportProtocol: $0, expectation: $1)
         }
     }
     
-    func viewLedgerAndConsensusAtThreshold(
+    func viewLedgerAndConsensusAtDelta(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
         let viewIndex: UInt64 = 99
-        let ledgerIndex = viewIndex + MockFogSyncChecker.threshold + 1
-        let consensusIndex = viewIndex + MockFogSyncChecker.threshold / 2
+        let ledgerIndex = viewIndex + MockFogSyncChecker.delta + 1
+        let consensusIndex = viewIndex + MockFogSyncChecker.delta / 2
         
-        // at threshold, should fail
+        // at delta, should fail
         try attemptRefresh(
             fogViewBlockIndex: viewIndex,
             fogLedgerBlockIndex: ledgerIndex,
@@ -176,21 +181,21 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         )
     }
     
-    func testViewLedgerAndConsensusOverThreshold() throws {
+    func testViewLedgerAndConsensusOverDelta() throws {
         try testSupportedProtocols(description: description) {
-            try viewLedgerAndConsensusOverThreshold(transportProtocol: $0, expectation: $1)
+            try viewLedgerAndConsensusOverDelta(transportProtocol: $0, expectation: $1)
         }
     }
     
-    func viewLedgerAndConsensusOverThreshold(
+    func viewLedgerAndConsensusOverDelta(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
         let viewIndex: UInt64 = 170
-        let ledgerIndex = viewIndex - MockFogSyncChecker.threshold - 1
-        let consensusIndex = viewIndex - MockFogSyncChecker.threshold / 2
+        let ledgerIndex = viewIndex - MockFogSyncChecker.delta - 1
+        let consensusIndex = viewIndex - MockFogSyncChecker.delta / 2
         
-        // at threshold, should fail
+        // at delta, should fail
         try attemptRefresh(
             fogViewBlockIndex: viewIndex,
             fogLedgerBlockIndex: ledgerIndex,
@@ -241,15 +246,19 @@ class MockFogSyncChecker: FogSyncCheckable {
     var ledgersHighestKnownBlock: UInt64
     var consensusHighestKnownBlock: UInt64
 
-    let fogSyncThreshold: UInt64
+    let maxAllowedBlockDelta: PositiveUInt64
     
-    static let threshold: UInt64 = 10
+    static let delta: UInt64 = 10
     
     init(viewIndex: UInt64, ledgerIndex: UInt64, consensusIndex: UInt64) {
         viewsHighestKnownBlock = viewIndex
         ledgersHighestKnownBlock = ledgerIndex
         consensusHighestKnownBlock = consensusIndex
-        fogSyncThreshold = Self.threshold
+        
+        guard let positiveDelta = PositiveUInt64(Self.delta) else {
+            logger.fatalError("Should never be reached as 10 > 0")
+        }
+        maxAllowedBlockDelta = positiveDelta
     }
     
     func setViewsHighestKnownBlock(_: UInt64) {
