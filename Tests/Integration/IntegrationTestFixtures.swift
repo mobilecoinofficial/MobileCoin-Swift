@@ -8,7 +8,7 @@
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let network: NetworkPreset = .mobiledev
+    static let network: NetworkPreset = .alpha
 }
 
 extension IntegrationTestFixtures {
