@@ -96,7 +96,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         let consensusIndex = fogIndex + MockFogSyncChecker.delta
         let shouldSucceed = true
         
-        // Fog behind at , should fail
+        // Fog behind at delta, should succeed
         try attemptRefresh(
             fogViewBlockIndex: fogIndex,
             fogLedgerBlockIndex: fogIndex,
@@ -119,6 +119,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
     ) throws {
         let fogIndex: UInt64 = 410
         let consensusIndex = fogIndex + MockFogSyncChecker.delta + 1
+        let shouldSucceed = false
         
         // Fog behind over delta, should fail
         try attemptRefresh(
@@ -127,7 +128,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: false
+            shouldSucceed: shouldSucceed
         )
     }
     
@@ -144,6 +145,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         let viewIndex: UInt64 = 234234235675
         let ledgerIndex = viewIndex - MockFogSyncChecker.delta + 2
         let consensusIndex = viewIndex
+        let shouldSucceed = true
         
         // below delta, should pass
         try attemptRefresh(
@@ -152,7 +154,7 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: true
+            shouldSucceed: shouldSucceed
         )
     }
     
@@ -167,17 +169,18 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         expectation expect: XCTestExpectation
     ) throws {
         let viewIndex: UInt64 = 99
-        let ledgerIndex = viewIndex + MockFogSyncChecker.delta + 1
+        let ledgerIndex = viewIndex + MockFogSyncChecker.delta
         let consensusIndex = viewIndex + MockFogSyncChecker.delta / 2
+        let shouldSucceed = true
         
-        // at delta, should fail
+        // at delta, should succeed
         try attemptRefresh(
             fogViewBlockIndex: viewIndex,
             fogLedgerBlockIndex: ledgerIndex,
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: false
+            shouldSucceed: shouldSucceed
         )
     }
     
@@ -194,15 +197,16 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
         let viewIndex: UInt64 = 170
         let ledgerIndex = viewIndex - MockFogSyncChecker.delta - 1
         let consensusIndex = viewIndex - MockFogSyncChecker.delta / 2
+        let shouldSucceed = false
         
-        // at delta, should fail
+        // above delta, should fail
         try attemptRefresh(
             fogViewBlockIndex: viewIndex,
             fogLedgerBlockIndex: ledgerIndex,
             consensusBlockIndex: consensusIndex,
             transportProtocol: transportProtocol,
             expectation: expect,
-            shouldSucceed: false
+            shouldSucceed: shouldSucceed
         )
     }
     
