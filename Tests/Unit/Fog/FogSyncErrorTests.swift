@@ -35,4 +35,57 @@ class FogSyncErrorTests: XCTestCase {
         XCTAssertEqual(syncChecker.currentBlockIndex, 10)
     }
 
+    func testViewLedgerArithmeticOverflowMaxMinusMaxMinusOne() throws {
+        let syncChecker = FogSyncChecker()
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max - 1)
+        XCTAssertEqual(syncChecker.currentBlockIndex, (UInt64.max - 1))
+        XCTAssertSuccess(syncChecker.inSync())
+        
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max - 1)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max)
+        XCTAssertEqual(syncChecker.currentBlockIndex, (UInt64.max - 1))
+        XCTAssertSuccess(syncChecker.inSync())
+    }
+    
+    func testViewLedgerArithmeticOverflowMaxMinusOne() throws {
+        let syncChecker = FogSyncChecker()
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max)
+        syncChecker.setViewsHighestKnownBlock(1)
+        XCTAssertEqual(syncChecker.currentBlockIndex, 1)
+        XCTAssertFailure(syncChecker.inSync())
+
+        syncChecker.setLedgersHighestKnownBlock(1)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max)
+        XCTAssertEqual(syncChecker.currentBlockIndex, 1)
+        XCTAssertFailure(syncChecker.inSync())
+    }
+    
+    func testConsensusArithmeticOverflowMaxMinusMaxMinusThreshold() throws {
+        let syncChecker = FogSyncChecker()
+        let threshold = syncChecker.maxAllowedBlockDelta
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max - threshold.value)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max - threshold.value)
+        syncChecker.setConsensusHighestKnownBlock(UInt64.max)
+        XCTAssertFailure(syncChecker.inSync())
+        
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max)
+        syncChecker.setConsensusHighestKnownBlock(UInt64.max - threshold.value)
+        XCTAssertSuccess(syncChecker.inSync())
+    }
+    
+    func testConsensusArithmeticOverflowMaxMinusOne() throws {
+        let syncChecker = FogSyncChecker()
+        
+        syncChecker.setLedgersHighestKnownBlock(UInt64.max)
+        syncChecker.setViewsHighestKnownBlock(UInt64.max)
+        syncChecker.setConsensusHighestKnownBlock(1)
+        XCTAssertSuccess(syncChecker.inSync())
+        
+        syncChecker.setLedgersHighestKnownBlock(1)
+        syncChecker.setViewsHighestKnownBlock(1)
+        syncChecker.setConsensusHighestKnownBlock(UInt64.max)
+        XCTAssertFailure(syncChecker.inSync())
+    }
 }
