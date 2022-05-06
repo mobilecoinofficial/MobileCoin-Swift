@@ -119,6 +119,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             ) {
                 guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
                 else { return }
+                
+                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
 
                 client.submitTransaction(transaction) {
                     guard $0.successOrFulfill(expectation: expect) != nil else { return }

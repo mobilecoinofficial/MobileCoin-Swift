@@ -28,6 +28,27 @@ final class BlockchainMetaFetcher {
         }
     }
 
+    func getCachedBlockVersion(
+        completion: @escaping (BlockVersion?) -> Void
+    ) {
+        inner.accessAsync {
+            completion($0.metaCache?.blockVersion)
+        }
+    }
+    
+    func verifyBlockVersionOrReset(
+        blockVersion: BlockVersion,
+        completion: @escaping () -> Void
+    ) {
+        inner.accessAsync {
+            if $0.metaCache?.blockVersion != blockVersion {
+                self.resetCache {
+                    completion()
+                }
+            }
+        }
+    }
+    
     func cachedBlockVersion() -> BlockVersion? {
         inner.accessWithoutLocking.metaCache?.blockVersion
     }
