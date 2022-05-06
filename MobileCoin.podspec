@@ -60,11 +60,11 @@ Pod::Spec.new do |s|
 
     subspec.dependency "LibMobileCoin/Core", "~> 1.2.0-pre10"
 
-    subspec.dependency "gRPC-Swift", "~> 1.0.0"
+    subspec.dependency "gRPC-Swift", "1.0.0"
     subspec.dependency "Logging", "~> 1.4"
-    subspec.dependency "SwiftNIO", "~> 2.27.0"
+    subspec.dependency "SwiftNIO", "~> 2.32.0"
     subspec.dependency "SwiftNIOHPACK", "~> 1.16.3"
-    subspec.dependency "SwiftNIOHTTP1", "~> 2.27.0"
+    subspec.dependency "SwiftNIOHTTP1", "~> 2.32.0"
     subspec.dependency "SwiftProtobuf"
 
     subspec.test_spec 'ProtocolUnitTests' do |test_spec|
