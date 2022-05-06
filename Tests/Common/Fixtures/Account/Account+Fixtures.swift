@@ -12,6 +12,7 @@ extension Account {
 extension Account.Fixtures {
     struct Default {
         let account: Account
+        let syncChecker = FogSyncChecker()
 
         let accountKey: AccountKey
 
@@ -22,7 +23,7 @@ extension Account.Fixtures {
 
         init(accountKey: AccountKey) throws {
             self.accountKey = accountKey
-            self.account = try Account.make(accountKey: accountKey).get()
+            self.account = try Account.make(accountKey: accountKey, syncChecker: syncChecker).get()
         }
     }
 }

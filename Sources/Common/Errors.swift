@@ -20,6 +20,11 @@ extension InvalidInputError: CustomStringConvertible {
     }
 }
 
+public enum BalanceUpdateError: Error {
+    case connectionError(ConnectionError)
+    case fogSyncError(FogSyncError)
+}
+
 public enum ConnectionError: Error {
     case connectionFailure(String)
     case authorizationFailure(String)

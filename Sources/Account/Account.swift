@@ -7,12 +7,16 @@ import Foundation
 final class Account {
     let accountKey: AccountKey
 
-    let fogView = FogView()
+    let fogView: FogView
+    
+    let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
     var allTxOutTrackers: [TxOutTracker] = []
 
-    init(accountKey: AccountKeyWithFog) {
+    init(accountKey: AccountKeyWithFog, syncChecker: FogSyncCheckable) {
         self.accountKey = accountKey.accountKey
+        self.syncCheckerLock = .init(syncChecker)
+        self.fogView = FogView(syncChecker: syncCheckerLock)
     }
 
     var publicAddress: PublicAddress {
@@ -151,13 +155,13 @@ final class Account {
 
 extension Account {
     /// - Returns: `.failure` if `accountKey` doesn't use Fog.
-    static func make(accountKey: AccountKey) -> Result<Account, InvalidInputError> {
+    static func make(accountKey: AccountKey, syncChecker: FogSyncCheckable) -> Result<Account, InvalidInputError> {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
             let errorMessage = "Accounts without fog URLs are not currently supported."
             logger.error(errorMessage, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
-        return .success(Account(accountKey: accountKey))
+        return .success(Account(accountKey: accountKey, syncChecker: syncChecker))
     }
 }
 

@@ -175,6 +175,7 @@ class FogBlockConnectionIntTests: XCTestCase {
         }
         waitForExpectations(timeout: 20)
     }
+    
 }
 
 extension FogBlockConnectionIntTests {

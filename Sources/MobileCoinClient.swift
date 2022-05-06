@@ -32,6 +32,8 @@ public final class MobileCoinClient {
     private let fogResolverManager: FogResolverManager
     private let feeFetcher: BlockchainFeeFetcher
     
+    private let fogSyncChecker: FogSyncCheckable
+    
     static let latestBlockVersion = BlockVersion.legacy
 
     init(accountKey: AccountKeyWithFog, config: Config) {
@@ -42,13 +44,23 @@ public final class MobileCoinClient {
 
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)")
         self.callbackQueue = config.callbackQueue ?? DispatchQueue.main
-        self.accountLock = .init(Account(accountKey: accountKey))
+        self.fogSyncChecker = config.fogSyncCheckable
+        self.accountLock = .init(Account(accountKey: accountKey, syncChecker: fogSyncChecker))
         self.txOutSelectionStrategy = config.txOutSelectionStrategy
         self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
-        self.serviceProvider =
-        DefaultServiceProvider(networkConfig: config.networkConfig, targetQueue: serialQueue, grpcConnectionFactory: GrpcProtocolConnectionFactory(), httpConnectionFactory: HttpProtocolConnectionFactory(httpRequester: config.networkConfig.httpRequester))
+        
+        let grpcFactory = GrpcProtocolConnectionFactory()
+        let httpFactory = HttpProtocolConnectionFactory(
+            httpRequester: config.networkConfig.httpRequester)
+        
+        self.serviceProvider = DefaultServiceProvider(
+            networkConfig: config.networkConfig,
+            targetQueue: serialQueue,
+            grpcConnectionFactory: grpcFactory,
+            httpConnectionFactory: httpFactory)
+        
         self.fogResolverManager = FogResolverManager(
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
@@ -81,7 +93,7 @@ public final class MobileCoinClient {
         serviceProvider.setFogUserAuthorization(credentials: credentials)
     }
 
-    public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
+    public func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
         Account.BalanceUpdater(
             account: accountLock,
             fogViewService: serviceProvider.fogViewService,
@@ -210,7 +222,8 @@ public final class MobileCoinClient {
     ) {
         TransactionSubmitter(
             consensusService: serviceProvider.consensusService,
-            feeFetcher: feeFetcher
+            feeFetcher: feeFetcher,
+            syncChecker: accountLock.accessWithoutLocking.syncCheckerLock
         ).submitTransaction(transaction) { result in
             self.callbackQueue.async {
                 completion(result)
@@ -376,6 +389,7 @@ extension MobileCoinClient {
         var txOutSelectionStrategy: TxOutSelectionStrategy = DefaultTxOutSelectionStrategy()
         var mixinSelectionStrategy: MixinSelectionStrategy = DefaultMixinSelectionStrategy()
         var fogQueryScalingStrategy: FogQueryScalingStrategy = DefaultFogQueryScalingStrategy()
+        var fogSyncCheckable: FogSyncCheckable = FogSyncChecker()
 
         init(networkConfig: NetworkConfig) {
             self.networkConfig = networkConfig

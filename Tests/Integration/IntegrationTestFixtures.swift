@@ -53,8 +53,8 @@ extension IntegrationTestFixtures {
         try createAccountKey(accountIndex: accountIndex).publicAddress
     }
 
-    static func createAccount(accountIndex: Int = 0) throws -> Account {
-        try Account.make(accountKey: createAccountKey(accountIndex: accountIndex)).get()
+    static func createAccount(accountIndex: Int = 0, syncChecker: FogSyncCheckable = FogSyncChecker()) throws -> Account {
+        try Account.make(accountKey: createAccountKey(accountIndex: accountIndex), syncChecker: syncChecker).get()
     }
 
     static func createNetworkConfig(transportProtocol: TransportProtocol) throws -> NetworkConfig {
@@ -161,9 +161,10 @@ extension IntegrationTestFixtures {
 
     static func createMobileCoinClient(
         accountIndex: Int = 0,
+        fogSyncChecker: FogSyncCheckable = FogSyncChecker(),
         transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
-        try createMobileCoinClient(accountKey: createAccountKey(accountIndex: accountIndex), transportProtocol: transportProtocol)
+        try createMobileCoinClient(accountKey: createAccountKey(accountIndex: accountIndex), fogSyncChecker: fogSyncChecker, transportProtocol: transportProtocol)
     }
 
     static func createMobileCoinClient(
@@ -175,9 +176,14 @@ extension IntegrationTestFixtures {
         return try createMobileCoinClient(accountKey: accountKey, config: config, transportProtocol: transportProtocol)
     }
 
-    static func createMobileCoinClient(accountKey: AccountKey, transportProtocol: TransportProtocol) throws -> MobileCoinClient {
-        let config = try createMobileCoinClientConfig(transportProtocol: transportProtocol)
-        return try createMobileCoinClient(accountKey: accountKey, config: config, transportProtocol: transportProtocol)
+    static func createMobileCoinClient(
+        accountKey: AccountKey,
+        fogSyncChecker: FogSyncCheckable = FogSyncChecker(),
+        transportProtocol: TransportProtocol
+    ) throws -> MobileCoinClient {
+        var mutableConfig = try createMobileCoinClientConfig(transportProtocol: transportProtocol)
+        mutableConfig.fogSyncCheckable = fogSyncChecker
+        return try createMobileCoinClient(accountKey: accountKey, config: mutableConfig, transportProtocol: transportProtocol)
     }
 
     static func createMobileCoinClient(
