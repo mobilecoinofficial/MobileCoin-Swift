@@ -57,13 +57,13 @@ class FogSyncErrorConnectionIntTests: XCTestCase {
     
     func testFogBehindConsensusWithinDelta() throws {
         try testSupportedProtocols(description: description) {
-            try fogBehindConsensusWithinDeltaAheadConsensus(
+            try fogBehindConsensusWithinDelta(
                     transportProtocol: $0,
                     expectation: $1)
         }
     }
     
-    func fogBehindConsensusWithinDeltaAheadConsensus(
+    func fogBehindConsensusWithinDelta(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
