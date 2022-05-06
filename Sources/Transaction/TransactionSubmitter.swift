@@ -34,7 +34,7 @@ struct TransactionSubmitter {
                 syncCheckerLock.writeSync {
                     $0.setConsensusHighestKnownBlock(response.blockCount - 1)
                 }
-                
+
                 let responseResult = self.processResponse(response)
                 
                 if case .txFeeError = response.result {
