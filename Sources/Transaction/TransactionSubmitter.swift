@@ -7,16 +7,16 @@ import LibMobileCoin
 
 struct TransactionSubmitter {
     private let consensusService: ConsensusService
-    private let feeFetcher: BlockchainFeeFetcher
+    private let metaFetcher: BlockchainMetaFetcher
     private let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
     init(
         consensusService: ConsensusService,
-        feeFetcher: BlockchainFeeFetcher,
+        metaFetcher: BlockchainMetaFetcher,
         syncChecker: ReadWriteDispatchLock<FogSyncCheckable>
     ) {
         self.consensusService = consensusService
-        self.feeFetcher = feeFetcher
+        self.metaFetcher = metaFetcher
         self.syncCheckerLock = syncChecker
     }
 
@@ -28,14 +28,24 @@ struct TransactionSubmitter {
             "Submitting transaction... transaction: " +
             "\(redacting: transaction.serializedData.base64EncodedString())",
             logFunction: false)
+
         consensusService.proposeTx(External_Tx(transaction)) {
             switch $0 {
             case .success(let response):
-                syncCheckerLock.writeSync({ $0.setConsensusHighestKnownBlock(response.blockCount - 1) })
-                
+                syncCheckerLock.writeSync {
+                    // Consensus Block Index Cannot be less than 0
+                    $0.setConsensusHighestKnownBlock(
+                        response.blockCount > 0 ? response.blockCount - 1 : 0)
+                }
+
                 let responseResult = self.processResponse(response)
+
                 if case .txFeeError = response.result {
-                    self.feeFetcher.resetCache {
+                    self.metaFetcher.resetCache {
+                        completion(responseResult)
+                    }
+                } else if metaFetcher.cachedBlockVersion() ?? 0 != response.blockVersion {
+                    self.metaFetcher.resetCache {
                         completion(responseResult)
                     }
                 } else {

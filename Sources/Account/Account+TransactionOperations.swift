@@ -10,7 +10,7 @@ extension Account {
     struct TransactionOperations {
         private let serialQueue: DispatchQueue
         private let account: ReadWriteDispatchLock<Account>
-        private let feeFetcher: BlockchainFeeFetcher
+        private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
         private let transactionPreparer: TransactionPreparer
 
@@ -18,7 +18,7 @@ extension Account {
             account: ReadWriteDispatchLock<Account>,
             fogMerkleProofService: FogMerkleProofService,
             fogResolverManager: FogResolverManager,
-            feeFetcher: BlockchainFeeFetcher,
+            metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             mixinSelectionStrategy: MixinSelectionStrategy,
             targetQueue: DispatchQueue?
@@ -27,15 +27,14 @@ extension Account {
                 label: "com.mobilecoin.\(Account.self).\(Self.self))",
                 target: targetQueue)
             self.account = account
-            self.feeFetcher = feeFetcher
+            self.metaFetcher = metaFetcher
             self.txOutSelector = TxOutSelector(txOutSelectionStrategy: txOutSelectionStrategy)
             self.transactionPreparer = TransactionPreparer(
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
-                targetQueue: targetQueue,
-                blockVersion: MobileCoinClient.latestBlockVersion)
+                targetQueue: targetQueue)
         }
 
         func prepareTransaction(
@@ -75,20 +74,38 @@ extension Account {
                 })
             {
             case .success(let txOutsToSpend):
-                logger.info(
-                    "Transaction prepared with fee. txOutsToSpend: " +
-                        "0x\(redacting: txOutsToSpend.map { $0.publicKey.hexEncodedString() })",
-                    logFunction: false)
-                let tombstoneBlockIndex = ledgerBlockCount + 50
-                transactionPreparer.prepareTransaction(
-                    inputs: txOutsToSpend,
-                    recipient: recipient,
-                    memoType: memoType,
-                    amount: amount,
-                    fee: fee,
-                    tombstoneBlockIndex: tombstoneBlockIndex,
-                    blockVersion: MobileCoinClient.latestBlockVersion,
-                    completion: completion)
+                metaFetcher.blockVersion {
+                    switch $0 {
+                    case .success(let blockVersion):
+                        logger.info(
+                            "Transaction prepared with fee. txOutsToSpend: " +
+                                """
+                                    0x\(redacting: txOutsToSpend.map {
+                                        $0.publicKey.hexEncodedString()
+                                    })
+                                """,
+                            logFunction: false)
+                        let tombstoneBlockIndex = ledgerBlockCount + 50
+                        transactionPreparer.prepareTransaction(
+                            inputs: txOutsToSpend,
+                            recipient: recipient,
+                            memoType: memoType,
+                            amount: amount,
+                            fee: fee,
+                            tombstoneBlockIndex: tombstoneBlockIndex,
+                            blockVersion: blockVersion,
+                            completion: completion)
+                    case .failure(let error):
+                        logger.info(
+                            "prepareTransactionWithFee failure: \(error)",
+                            logFunction: false)
+                        
+                        serialQueue.async {
+                            completion(.failure(.connectionError(error)))
+                        }
+                    }
+                }
+                
             case .failure(let error):
                 logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
@@ -115,7 +132,7 @@ extension Account {
                 return
             }
 
-            feeFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel) {
                 switch $0 {
                 case .success(let feeStrategy):
                     let (unspentTxOuts, ledgerBlockCount) =
@@ -141,19 +158,32 @@ extension Account {
                         })
                     {
                     case .success(let (inputs: inputs, fee: fee)):
-                        logger.info(
-                            "Transaction prepared with fee level. fee: \(redacting: fee)",
-                            logFunction: false)
-                        let tombstoneBlockIndex = ledgerBlockCount + 50
-                        self.transactionPreparer.prepareTransaction(
-                            inputs: inputs,
-                            recipient: recipient,
-                            memoType: memoType,
-                            amount: amount,
-                            fee: fee,
-                            tombstoneBlockIndex: tombstoneBlockIndex,
-                            blockVersion: MobileCoinClient.latestBlockVersion,
-                            completion: completion)
+                        metaFetcher.blockVersion {
+                            switch $0 {
+                            case .success(let blockVersion):
+                                logger.info(
+                                    "Transaction prepared with fee level. fee: \(redacting: fee)",
+                                    logFunction: false)
+                                let tombstoneBlockIndex = ledgerBlockCount + 50
+                                self.transactionPreparer.prepareTransaction(
+                                    inputs: inputs,
+                                    recipient: recipient,
+                                    memoType: memoType,
+                                    amount: amount,
+                                    fee: fee,
+                                    tombstoneBlockIndex: tombstoneBlockIndex,
+                                    blockVersion: blockVersion,
+                                    completion: completion)
+                            case .failure(let error):
+                                logger.info(
+                                    "prepareTransactionWithFee failure: \(error)",
+                                    logFunction: false)
+                                
+                                serialQueue.async {
+                                    completion(.failure(.connectionError(error)))
+                                }
+                            }
+                        }
                     case .failure(let error):
                         logger.info(
                             "prepareTransactionWithFeeLevel failure: \(error)",
@@ -183,7 +213,7 @@ extension Account {
                 return
             }
 
-            feeFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel) {
                 switch $0 {
                 case .success(let feeStrategy):
                     let (unspentTxOuts, ledgerBlockCount) =
@@ -199,21 +229,34 @@ extension Account {
                         fromTxOuts: unspentTxOuts)
                     {
                     case .success(let defragTxInputs):
-                        if !defragTxInputs.isEmpty {
-                            logger.info(
-                                "Preparing \(defragTxInputs.count) defrag transactions",
-                                logFunction: false)
+                        metaFetcher.blockVersion {
+                            switch $0 {
+                            case .success(let blockVersion):
+                                if !defragTxInputs.isEmpty {
+                                    logger.info(
+                                        "Preparing \(defragTxInputs.count) defrag transactions",
+                                        logFunction: false)
+                                }
+                                let tombstoneBlockIndex = ledgerBlockCount + 50
+                                defragTxInputs.mapAsync({ defragInputs, callback in
+                                    self.transactionPreparer.prepareSelfAddressedTransaction(
+                                        inputs: defragInputs.inputs,
+                                        recoverableMemo: recoverableMemo,
+                                        fee: defragInputs.fee,
+                                        tombstoneBlockIndex: tombstoneBlockIndex,
+                                        blockVersion: blockVersion,
+                                        completion: callback)
+                                }, serialQueue: self.serialQueue, completion: completion)
+                            case .failure(let error):
+                                logger.info(
+                                    "prepareTransactionWithFee failure: \(error)",
+                                    logFunction: false)
+                                
+                                serialQueue.async {
+                                    completion(.failure(.connectionError(error)))
+                                }
+                            }
                         }
-                        let tombstoneBlockIndex = ledgerBlockCount + 50
-                        defragTxInputs.mapAsync({ defragInputs, callback in
-                            self.transactionPreparer.prepareSelfAddressedTransaction(
-                                inputs: defragInputs.inputs,
-                                recoverableMemo: recoverableMemo,
-                                fee: defragInputs.fee,
-                                tombstoneBlockIndex: tombstoneBlockIndex,
-                                blockVersion: MobileCoinClient.latestBlockVersion,
-                                completion: callback)
-                        }, serialQueue: self.serialQueue, completion: completion)
                     case .failure(let error):
                         logger.info(
                             "prepareDefragmentationStepTransactions failure: \(error)",

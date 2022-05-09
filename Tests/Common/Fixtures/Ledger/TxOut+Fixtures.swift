@@ -37,7 +37,7 @@ extension TxOut.Fixtures {
 }
 
 extension TxOut.Fixtures.Default {
-    fileprivate static let blockVersion = BlockVersion.one
+    fileprivate static let defaultBlockVersion = BlockVersion.minRTHEnabled
 
     fileprivate static func accountKey(accountIndex: UInt8) -> AccountKey {
         AccountKey.Fixtures.DefaultWithoutFog(accountIndex: accountIndex).accountKey
@@ -53,7 +53,7 @@ extension TxOut.Fixtures.Default {
             amount: value,
             fogResolver:
                 FogResolver.Fixtures.Default(reportUrl: accountKey.fogReportUrl).fogResolver,
-            blockVersion: blockVersion,
+            blockVersion: defaultBlockVersion,
             rng: testRngCallback,
             rngContext: TestRng()
         ).get()

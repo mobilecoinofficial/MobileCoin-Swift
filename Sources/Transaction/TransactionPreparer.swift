@@ -13,15 +13,13 @@ struct TransactionPreparer {
     private let fogResolverManager: FogResolverManager
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
-    private let blockVersion: BlockVersion
 
     init(
         accountKey: AccountKey,
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
-        targetQueue: DispatchQueue?,
-        blockVersion: BlockVersion
+        targetQueue: DispatchQueue?
     ) {
         self.serialQueue = DispatchQueue(
             label: "com.mobilecoin.\(Account.self).\(Self.self)",
@@ -33,7 +31,6 @@ struct TransactionPreparer {
         self.fogMerkleProofFetcher = FogMerkleProofFetcher(
             fogMerkleProofService: fogMerkleProofService,
             targetQueue: targetQueue)
-        self.blockVersion = blockVersion
     }
 
     func prepareSelfAddressedTransaction(

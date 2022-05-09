@@ -30,7 +30,7 @@ public final class MobileCoinClient {
 
     private let serviceProvider: ServiceProvider
     private let fogResolverManager: FogResolverManager
-    private let feeFetcher: BlockchainFeeFetcher
+    private let metaFetcher: BlockchainMetaFetcher
     
     private let fogSyncChecker: FogSyncCheckable
     
@@ -65,9 +65,9 @@ public final class MobileCoinClient {
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
             targetQueue: serialQueue)
-        self.feeFetcher = BlockchainFeeFetcher(
+        self.metaFetcher = BlockchainMetaFetcher(
             blockchainService: serviceProvider.blockchainService,
-            minimumFeeCacheTTL: config.minimumFeeCacheTTL,
+            metaCacheTTL: config.metaCacheTTL,
             targetQueue: serialQueue)
     }
 
@@ -114,7 +114,7 @@ public final class MobileCoinClient {
     ) {
         Account.TransactionEstimator(
             account: accountLock,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).amountTransferable(feeLevel: feeLevel, completion: completion)
@@ -127,7 +127,7 @@ public final class MobileCoinClient {
     ) {
         Account.TransactionEstimator(
             account: accountLock,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
@@ -140,7 +140,7 @@ public final class MobileCoinClient {
     ) {
         Account.TransactionEstimator(
             account: accountLock,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
@@ -159,7 +159,7 @@ public final class MobileCoinClient {
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
             fogResolverManager: fogResolverManager,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
@@ -183,7 +183,7 @@ public final class MobileCoinClient {
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
             fogResolverManager: fogResolverManager,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
@@ -204,7 +204,7 @@ public final class MobileCoinClient {
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
             fogResolverManager: fogResolverManager,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
@@ -222,7 +222,7 @@ public final class MobileCoinClient {
     ) {
         TransactionSubmitter(
             consensusService: serviceProvider.consensusService,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             syncChecker: accountLock.accessWithoutLocking.syncCheckerLock
         ).submitTransaction(transaction) { result in
             self.callbackQueue.async {
@@ -280,7 +280,7 @@ extension MobileCoinClient {
     {
         Account.TransactionEstimator(
             account: accountLock,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).amountTransferable(feeLevel: feeLevel)
@@ -294,7 +294,7 @@ extension MobileCoinClient {
     ) -> Result<UInt64, TransactionEstimationError> {
         Account.TransactionEstimator(
             account: accountLock,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
@@ -307,7 +307,7 @@ extension MobileCoinClient {
     {
         Account.TransactionEstimator(
             account: accountLock,
-            feeFetcher: feeFetcher,
+            metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
@@ -378,7 +378,7 @@ extension MobileCoinClient {
         fileprivate var networkConfig: NetworkConfig
 
         // default minimum fee cache TTL is 30 minutes
-        public var minimumFeeCacheTTL: TimeInterval = 30 * 60
+        public var metaCacheTTL: TimeInterval = 30 * 60
 
         public var cacheStorageAdapter: StorageAdapter?
 
