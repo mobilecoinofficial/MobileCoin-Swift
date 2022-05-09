@@ -48,7 +48,7 @@ extension FogSyncCheckable {
         UInt64(
             max(ledgersHighestKnownBlock, viewsHighestKnownBlock) -
             min(ledgersHighestKnownBlock, viewsHighestKnownBlock)
-        ) >= maxAllowedBlockDelta.value
+        ) > maxAllowedBlockDelta.value
     }
 
     private var consensusOutOfSync: Bool {
