@@ -74,7 +74,17 @@ extension McConstants {
     static let DEFAULT_SUBADDRESS_INDEX: UInt64 = 0
 
     /// An account's "default change address" is its first subaddress.
-    static let DEFAULT_CHANGE_SUBADDRESS_INDEX: UInt64 = 1
+    static let DEFAULT_CHANGE_SUBADDRESS_INDEX = UInt64.max - 1
+    
+    /// An account's "default change address" is its first subaddress.
+    static let FUTURE_SUBADDRESS_INDEX: UInt64 = 1
+    
+    /// TODO: Temp Array for testing TxOut's
+    static let POSSIBLE_SUBADDRESSES: [UInt64] = [
+        Self.DEFAULT_CHANGE_SUBADDRESS_INDEX,
+        Self.DEFAULT_SUBADDRESS_INDEX,
+        Self.FUTURE_SUBADDRESS_INDEX
+    ]
 }
 
 // MARK: - Keys

@@ -51,7 +51,8 @@ extension TxOutProtocol {
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
     func keyImage(accountKey: AccountKey) -> IndexedKeyImage? {
         [indexedKeyImage(index: accountKey.subaddressIndex, accountKey: accountKey),
-         indexedKeyImage(index: accountKey.changeSubaddressIndex, accountKey: accountKey)]
+         indexedKeyImage(index: accountKey.changeSubaddressIndex, accountKey: accountKey),
+         indexedKeyImage(index: accountKey.futureChangeSubaddressIndex, accountKey: accountKey)]
         .compactMap({$0})
         .first
     }

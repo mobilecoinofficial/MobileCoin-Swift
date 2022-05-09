@@ -34,9 +34,13 @@ public struct AccountKey {
     let fogInfo: FogInfo?
     let subaddressIndex: UInt64
     let changeSubaddressIndex: UInt64 = McConstants.DEFAULT_CHANGE_SUBADDRESS_INDEX
+    let futureChangeSubaddressIndex: UInt64 = McConstants.FUTURE_SUBADDRESS_INDEX
 
     public let publicAddress: PublicAddress
     public let publicChangeAddress: PublicAddress
+    
+    // TODO
+    public let publicFutureChangeAddress: PublicAddress
 
     init(
         viewPrivateKey: RistrettoPrivate,
@@ -58,6 +62,12 @@ public struct AccountKey {
             spendPrivateKey: spendPrivateKey,
             accountKeyFogInfo: fogInfo,
             subaddressIndex: changeSubaddressIndex)
+        // TODO
+        self.publicFutureChangeAddress = PublicAddress(
+            viewPrivateKey: viewPrivateKey,
+            spendPrivateKey: spendPrivateKey,
+            accountKeyFogInfo: fogInfo,
+            subaddressIndex: futureChangeSubaddressIndex)
     }
 
     /// - Returns: `nil` when the input is not deserializable.
@@ -97,6 +107,14 @@ public struct AccountKey {
         )
     }
     
+    private var futureChangeSubaddressPrivateKey : SubaddressPrivateKey {
+        AccountKeyUtils.subaddressPrivateKeys(
+            viewPrivateKey: viewPrivateKey,
+            spendPrivateKey: spendPrivateKey,
+            subaddressIndex: McConstants.FUTURE_SUBADDRESS_INDEX
+        )
+    }
+    
     var subaddressViewPrivateKey: RistrettoPrivate {
         subaddressPrivateKey.subaddressViewPrivateKey
     }
@@ -113,12 +131,22 @@ public struct AccountKey {
         changeSubaddressPrivateKey.subaddressSpendPrivateKey
     }
     
+    var futureChangeSubaddressViewPrivateKey: RistrettoPrivate {
+        futureChangeSubaddressPrivateKey.subaddressViewPrivateKey
+    }
+
+    var futureChangeSubaddressSpendPrivateKey: RistrettoPrivate {
+        futureChangeSubaddressPrivateKey.subaddressSpendPrivateKey
+    }
+    
     func subaddressSpendPrivateKey(index: UInt64) -> RistrettoPrivate? {
         switch index {
         case subaddressIndex:
             return subaddressSpendPrivateKey
         case changeSubaddressIndex:
             return changeSubaddressSpendPrivateKey
+        case futureChangeSubaddressIndex:
+            return futureChangeSubaddressSpendPrivateKey
         default:
             return nil
         }
@@ -130,6 +158,8 @@ public struct AccountKey {
             return subaddressViewPrivateKey
         case changeSubaddressIndex:
             return changeSubaddressViewPrivateKey
+        case futureChangeSubaddressIndex:
+            return futureChangeSubaddressViewPrivateKey
         default:
             return nil
         }

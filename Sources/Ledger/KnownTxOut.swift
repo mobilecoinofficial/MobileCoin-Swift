@@ -32,6 +32,8 @@ struct KnownTxOut: TxOutProtocol {
         self.value = value
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
+        
+        print("KnownTxOut \(keyImage.data.base64EncodedString()) | index = \(subaddressIndex) | value = \(value)")
     }
 
     var encryptedMemo: Data66 { ledgerTxOut.encryptedMemo }
