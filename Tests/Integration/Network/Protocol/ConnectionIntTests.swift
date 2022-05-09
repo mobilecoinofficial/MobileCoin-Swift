@@ -7,54 +7,54 @@ import LibMobileCoin
 import XCTest
 
 class ConnectionIntTests: XCTestCase {
-    func testCallTimeoutWithInvalidUrl() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try testCallTimeoutWithInvalidUrl(transportProtocol: transportProtocol)
-        }
-    }
-
-    func testCallTimeoutWithInvalidUrl(transportProtocol: TransportProtocol) throws {
-        let expect = expectation(description: "Making Fog View enclave request")
-
-        var request = FogLedger_BlockRequest()
-        request.rangeValues = [1..<2]
-        try createFogBlockConnectionWithInvalidUrls(transportProtocol: transportProtocol).getBlocks(request: request) {
-            guard let error = $0.failureOrFulfill(expectation: expect) else { return }
-
-            switch error {
-            case .connectionFailure:
-                break
-            default:
-                XCTFail("error of type \(type(of: error)), \(error)")
-            }
-            expect.fulfill()
-        }
-        waitForExpectations(timeout: 35)
-    }
-
-    func testAttestedCallTimeoutWithInvalidUrl() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try testAttestedCallTimeoutWithInvalidUrl(transportProtocol: transportProtocol)
-        }
-    }
-
-    func testAttestedCallTimeoutWithInvalidUrl(transportProtocol: TransportProtocol) throws {
-        let fixture = try Transaction.Fixtures.Default()
-
-        let expect = expectation(description: "Attested Call to invalid URL should timeout for protocol: \(transportProtocol.description)")
-        try createConsensusConnectionWithInvalidUrls(transportProtocol: transportProtocol).proposeTx(fixture.tx, completion: {
-            guard let error = $0.failureOrFulfill(expectation: expect) else { return }
-
-            switch error {
-            case .connectionFailure:
-                break
-            default:
-                XCTFail("error of type \(type(of: error)), \(error)")
-            }
-            expect.fulfill()
-        })
-        waitForExpectations(timeout: 35)
-    }
+//    func testCallTimeoutWithInvalidUrl() throws {
+//        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+//            try testCallTimeoutWithInvalidUrl(transportProtocol: transportProtocol)
+//        }
+//    }
+//
+//    func testCallTimeoutWithInvalidUrl(transportProtocol: TransportProtocol) throws {
+//        let expect = expectation(description: "Making Fog View enclave request")
+//
+//        var request = FogLedger_BlockRequest()
+//        request.rangeValues = [1..<2]
+//        try createFogBlockConnectionWithInvalidUrls(transportProtocol: transportProtocol).getBlocks(request: request) {
+//            guard let error = $0.failureOrFulfill(expectation: expect) else { return }
+//
+//            switch error {
+//            case .connectionFailure:
+//                break
+//            default:
+//                XCTFail("error of type \(type(of: error)), \(error)")
+//            }
+//            expect.fulfill()
+//        }
+//        waitForExpectations(timeout: 35)
+//    }
+//
+//    func testAttestedCallTimeoutWithInvalidUrl() throws {
+//        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+//            try testAttestedCallTimeoutWithInvalidUrl(transportProtocol: transportProtocol)
+//        }
+//    }
+//
+//    func testAttestedCallTimeoutWithInvalidUrl(transportProtocol: TransportProtocol) throws {
+//        let fixture = try Transaction.Fixtures.Default()
+//
+//        let expect = expectation(description: "Attested Call to invalid URL should timeout for protocol: \(transportProtocol.description)")
+//        try createConsensusConnectionWithInvalidUrls(transportProtocol: transportProtocol).proposeTx(fixture.tx, completion: {
+//            guard let error = $0.failureOrFulfill(expectation: expect) else { return }
+//
+//            switch error {
+//            case .connectionFailure:
+//                break
+//            default:
+//                XCTFail("error of type \(type(of: error)), \(error)")
+//            }
+//            expect.fulfill()
+//        })
+//        waitForExpectations(timeout: 35)
+//    }
 }
 
 extension ConnectionIntTests {
