@@ -28,15 +28,18 @@ struct TransactionSubmitter {
             "Submitting transaction... transaction: " +
             "\(redacting: transaction.serializedData.base64EncodedString())",
             logFunction: false)
+
         consensusService.proposeTx(External_Tx(transaction)) {
             switch $0 {
             case .success(let response):
                 syncCheckerLock.writeSync {
-                    $0.setConsensusHighestKnownBlock(response.blockCount - 1)
+                    // Consensus Block Index Cannot be less than 0
+                    $0.setConsensusHighestKnownBlock(
+                        response.blockCount > 0 ? response.blockCount - 1 : 0)
                 }
 
                 let responseResult = self.processResponse(response)
-                
+
                 if case .txFeeError = response.result {
                     self.metaFetcher.resetCache {
                         completion(responseResult)

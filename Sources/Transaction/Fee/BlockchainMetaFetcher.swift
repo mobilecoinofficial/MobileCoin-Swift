@@ -35,7 +35,7 @@ final class BlockchainMetaFetcher {
             completion($0.metaCache?.blockVersion)
         }
     }
-    
+
     func verifyBlockVersionOrReset(
         blockVersion: BlockVersion,
         completion: @escaping () -> Void
@@ -48,11 +48,11 @@ final class BlockchainMetaFetcher {
             }
         }
     }
-    
+
     func cachedBlockVersion() -> BlockVersion? {
         inner.accessWithoutLocking.metaCache?.blockVersion
     }
-    
+
     func feeStrategy(
         for feeLevel: FeeLevel,
         completion: @escaping (Result<FeeStrategy, ConnectionError>) -> Void
@@ -70,7 +70,7 @@ final class BlockchainMetaFetcher {
     func cachedFee() -> UInt64? {
         inner.accessWithoutLocking.metaCache?.minimumFee
     }
-    
+
     func getOrFetchMinimumFee(completion: @escaping (Result<UInt64, ConnectionError>) -> Void) {
         fetchCache {
             if let minimumFee = $0?.minimumFee {
@@ -82,6 +82,14 @@ final class BlockchainMetaFetcher {
                     })
                 }
             }
+        }
+    }
+
+    func getCachedMinimumFee(
+        completion: @escaping (UInt64?) -> Void
+    ) {
+        inner.accessAsync {
+            completion($0.metaCache?.minimumFee)
         }
     }
 
@@ -134,7 +142,7 @@ final class BlockchainMetaFetcher {
                 minimumFee: minimumFee,
                 blockVersion: blockVersion,
                 fetchTimestamp: Date())
-            
+
             $0.metaCache = newMeta
             completion(newMeta)
         }

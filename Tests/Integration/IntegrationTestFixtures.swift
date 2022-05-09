@@ -8,13 +8,13 @@
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let network: NetworkPreset = .mobiledev
+    static let network: NetworkPreset = .testNet
 }
 
 extension IntegrationTestFixtures {
     static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
     static let invalidFogUrl = "fog://invalid.mobilecoin.com"
-    
+
     static let fee = McConstants.DEFAULT_MINIMUM_FEE
 
     static func fogReportUrlTyped() throws -> FogUrl {
@@ -136,7 +136,7 @@ extension IntegrationTestFixtures {
             fogReportAttestation: network.fogReportAttestation(),
             transportProtocol: transportProtocol).get()
     }
-    
+
     static func createMobileCoinClientConfigWithPartialValidFogUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
             consensusUrls: [network.consensusUrl],
@@ -148,7 +148,7 @@ extension IntegrationTestFixtures {
             fogReportAttestation: network.fogReportAttestation(),
             transportProtocol: transportProtocol).get()
     }
-    
+
     static func createMobileCoinClientWithPartialValidConsensusUrls(transportProtocol: TransportProtocol) throws -> MobileCoinClient {
         let config = try createMobileCoinClientConfigWithPartialValidConsensusUrls(transportProtocol: transportProtocol)
         return try createMobileCoinClient(config: config, transportProtocol: transportProtocol)
@@ -277,6 +277,5 @@ extension IntegrationTestFixtures {
         let grpcFactory = GrpcProtocolConnectionFactory()
         return DefaultServiceProvider(networkConfig: networkConfig, targetQueue: DispatchQueue.main, grpcConnectionFactory: grpcFactory, httpConnectionFactory: httpFactory)
     }
-
 
 }
