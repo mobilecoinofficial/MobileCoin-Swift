@@ -543,7 +543,11 @@ extension NetworkPreset {
             return Self.testNetTestAccountMnemonicsCommaSeparated
                 .split(separator: ",").map { String($0) }
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .mobiledev:
+            return Self.mobileDevTestAccountMnemonicsCommaSeparated
+                .split(separator: ",").map { String($0) }
+
+        case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return []
         }
     }
@@ -553,6 +557,13 @@ extension NetworkPreset {
         MobileCoinKeys().testNetTestAccountMnemonicsCommaSeparated
 #else
     private static let testNetTestAccountMnemonicsCommaSeparated = ""
+#endif
+
+#if canImport(Keys)
+    private static let mobileDevTestAccountMnemonicsCommaSeparated =
+        MobileCoinKeys().mobileDevTestAccountMnemonicsCommaSeparated
+#else
+    private static let mobileDevTestAccountMnemonicsCommaSeparated = ""
 #endif
 
     var testAccountsPrivateKeys:
