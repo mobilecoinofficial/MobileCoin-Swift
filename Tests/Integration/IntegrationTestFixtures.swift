@@ -164,7 +164,9 @@ extension IntegrationTestFixtures {
         fogSyncChecker: FogSyncCheckable = FogSyncChecker(),
         transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
-        try createMobileCoinClient(accountKey: createAccountKey(accountIndex: accountIndex), fogSyncChecker: fogSyncChecker, transportProtocol: transportProtocol)
+        let accountKey = try createAccountKey(accountIndex: accountIndex)
+        print("accountindex \(accountIndex) \(Base58Coder.encode(accountKey.publicAddress))")
+        return try createMobileCoinClient(accountKey: accountKey, fogSyncChecker: fogSyncChecker, transportProtocol: transportProtocol)
     }
 
     static func createMobileCoinClient(
@@ -173,6 +175,7 @@ extension IntegrationTestFixtures {
         transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
         let accountKey = try createAccountKey(accountIndex: accountIndex)
+        print("accountindex \(index) \(accountKey.publicAddress)")
         return try createMobileCoinClient(accountKey: accountKey, config: config, transportProtocol: transportProtocol)
     }
 
