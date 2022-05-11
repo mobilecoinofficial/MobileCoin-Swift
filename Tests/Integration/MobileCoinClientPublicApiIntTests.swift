@@ -30,6 +30,32 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             expect.fulfill()
         }
     }
+//
+//    func testAllBalances() throws {
+//        let description = "Updating account balance"
+//        try testSupportedProtocols(description: description) {
+//            try allBalances(transportProtocol: $0, expectation: $1)
+//        }
+//    }
+
+    func testAllBalances() throws {
+        let indexes = Array(0...7)
+        let expect = expectation(description: description)
+        try indexes.forEach { index in
+            let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: index, transportProtocol: .grpc)
+
+            client.updateBalance {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
+                    print("accountindex \(index) balance: \(amountPicoMob)")
+                }
+
+//                if index == indexes.last! { expect.fulfill() }
+            }
+        }
+        waitForExpectations(timeout: 300)
+    }
 
     func testAccountActivity() throws {
         let description = "Updating account balance"
