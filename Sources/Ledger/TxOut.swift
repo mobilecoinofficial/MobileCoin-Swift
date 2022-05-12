@@ -41,7 +41,8 @@ struct TxOut: TxOutProtocol {
         proto.serializedDataInfallible
     }
 
-    var maskedValue: UInt64 { proto.amount.maskedValue }
+    var maskedValue: UInt64 { proto.maskedAmount.maskedValue }
+    var maskedTokenId: Data { proto.maskedAmount.maskedTokenID }
     var encryptedFogHint: Data { proto.eFogHint.data }
     var encryptedMemo: Data66 {
         guard proto.hasEMemo else {
@@ -56,7 +57,7 @@ extension TxOut: Hashable {}
 
 extension TxOut {
     static func make(_ proto: External_TxOut) -> Result<TxOut, InvalidInputError> {
-        guard let commitment = Data32(proto.amount.commitment.data) else {
+        guard let commitment = Data32(proto.maskedAmount.commitment.data) else {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid commitment format"))
         }
@@ -67,6 +68,12 @@ extension TxOut {
         guard let publicKey = RistrettoPublic(proto.publicKey.data) else {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid public key format"))
+        }
+        // TODO - Remove DEBUG statement
+        logger.info("Masked Token ID byte count \(proto.maskedAmount.maskedTokenID.count)")
+        guard [0,4,8].contains(proto.maskedAmount.maskedTokenID.count) else {
+            return .failure(
+                InvalidInputError("Masked Token ID should be 0, 4, or 8 bytes"))
         }
         
         var eMemo = Data66()

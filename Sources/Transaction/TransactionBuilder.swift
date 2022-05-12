@@ -354,72 +354,36 @@ final class TransactionBuilder {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-        var confirmationNumberData = Data32()
-        return publicAddress.withUnsafeCStructPointer { publicAddressPtr in
-            withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
-                confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
-                    Data.make(withMcDataBytes: { errorPtr in
-                        mc_transaction_builder_add_output(
-                            ptr,
-                            amount,
-                            publicAddressPtr,
-                            rngCallbackPtr,
-                            confirmationNumberPtr,
-                            &errorPtr)
-                    }).mapError {
-                        switch $0.errorCode {
-                        case .invalidInput:
-                            return .invalidInput("\(redacting: $0.description)")
-                        case .attestationVerificationFailed:
-                            return .attestationVerificationFailed("\(redacting: $0.description)")
-                        default:
-                            // Safety: mc_transaction_builder_add_output should not throw
-                            // non-documented errors.
-                            logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
-                        }
-                    }
-                }
+        addOutputWithContext(
+            publicAddress: publicAddress,
+            amount: amount,
+            rng: rng,
+            rngContext: rngContext).map {
+                let (txOut, receipt, _) = $0
+                return (txOut: txOut, receipt: receipt)
             }
-        }.map { txOutData in
-            guard let txOut = TxOut(serializedData: txOutData) else {
-                // Safety: mc_transaction_builder_add_output should always return valid data on
-                // success.
-                logger.fatalError("mc_transaction_builder_add_output returned invalid data: " +
-                    "\(redacting: txOutData.base64EncodedString())")
-            }
-
-            let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
-            let receipt = Receipt(
-                txOut: txOut,
-                confirmationNumber: confirmationNumber,
-                tombstoneBlockIndex: tombstoneBlockIndex)
-            return (txOut, receipt)
-        }
     }
 
-    private func addChangeOutput(
-        accountKey: AccountKey,
+    private func addOutputWithContext(
+        publicAddress: PublicAddress,
         amount: UInt64,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-        
+    ) -> Result<(txOut: TxOut, receipt: Receipt, sharedSecret: RistrettoPublic), TransactionBuilderError> {
         var confirmationNumberData = Data32()
-        
-        return McAccountKey.withUnsafePointer(
-            viewPrivateKey: accountKey.viewPrivateKey,
-            spendPrivateKey: accountKey.spendPrivateKey,
-            fogInfo: accountKey.fogInfo
-        ) { accountKeyPtr in
-                withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
-                    confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
+        var sharedSecretData = Data32()
+        return publicAddress.withUnsafeCStructPointer { publicAddressPtr in
+            withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+                confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
+                    sharedSecretData.asMcMutableBuffer { sharedSecretPtr in
                         Data.make(withMcDataBytes: { errorPtr in
-                            mc_transaction_builder_add_change_output(
-                                accountKeyPtr,
+                            mc_transaction_builder_add_output(
                                 ptr,
                                 amount,
+                                publicAddressPtr,
                                 rngCallbackPtr,
                                 confirmationNumberPtr,
+                                sharedSecretPtr,
                                 &errorPtr)
                         }).mapError {
                             switch $0.errorCode {
@@ -434,6 +398,83 @@ final class TransactionBuilder {
                             }
                         }
                     }
+                }
+            }
+        }.map { txOutData in
+            guard let txOut = TxOut(serializedData: txOutData) else {
+                // Safety: mc_transaction_builder_add_output should always return valid data on
+                // success.
+                logger.fatalError("mc_transaction_builder_add_output returned invalid data: " +
+                    "\(redacting: txOutData.base64EncodedString())")
+            }
+
+            let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
+            let sharedSecret = RistrettoPublic(skippingValidation: sharedSecretData) // TODO - safe to skip validation ?
+            let receipt = Receipt(
+                txOut: txOut,
+                confirmationNumber: confirmationNumber,
+                tombstoneBlockIndex: tombstoneBlockIndex)
+            return (txOut, receipt, sharedSecret)
+        }
+    }
+
+    private func addChangeOutput(
+        accountKey: AccountKey,
+        amount: UInt64,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
+    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
+        addChangeOutputWithContext(
+            accountKey: accountKey,
+            amount: amount,
+            rng: rng,
+            rngContext: rngContext).map {
+                let (txOut, receipt, _) = $0
+                return (txOut: txOut, receipt: receipt)
+            }
+    }
+
+    private func addChangeOutputWithContext(
+        accountKey: AccountKey,
+        amount: UInt64,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
+    ) -> Result<(txOut: TxOut, receipt: Receipt, sharedSecret: RistrettoPublic), TransactionBuilderError> {
+        
+        var confirmationNumberData = Data32()
+        var sharedSecretData = Data32()
+        
+        return McAccountKey.withUnsafePointer(
+            viewPrivateKey: accountKey.viewPrivateKey,
+            spendPrivateKey: accountKey.spendPrivateKey,
+            fogInfo: accountKey.fogInfo
+        ) { accountKeyPtr in
+                withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+                    confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
+                        sharedSecretData.asMcMutableBuffer { sharedSecretPtr in
+                            Data.make(withMcDataBytes: { errorPtr in
+                                mc_transaction_builder_add_change_output(
+                                    accountKeyPtr,
+                                    ptr,
+                                    amount,
+                                    rngCallbackPtr,
+                                    confirmationNumberPtr,
+                                    sharedSecretPtr,
+                                    &errorPtr)
+                            }).mapError {
+                                switch $0.errorCode {
+                                case .invalidInput:
+                                    return .invalidInput("\(redacting: $0.description)")
+                                case .attestationVerificationFailed:
+                                    return .attestationVerificationFailed("\(redacting: $0.description)")
+                                default:
+                                    // Safety: mc_transaction_builder_add_output should not throw
+                                    // non-documented errors.
+                                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+                                }
+                            }
+                        }
+                    }
                  }
         }.map { txOutData in
             guard let txOut = TxOut(serializedData: txOutData) else {
@@ -444,11 +485,12 @@ final class TransactionBuilder {
             }
 
             let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
+            let sharedSecret = RistrettoPublic(skippingValidation: sharedSecretData) // TODO - safe to skip validation ?
             let receipt = Receipt(
                 txOut: txOut,
                 confirmationNumber: confirmationNumber,
                 tombstoneBlockIndex: tombstoneBlockIndex)
-            return (txOut, receipt)
+            return (txOut, receipt, sharedSecret)
         }
     }
 

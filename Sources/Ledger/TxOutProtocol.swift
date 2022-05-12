@@ -9,6 +9,7 @@ protocol TxOutProtocol {
     var encryptedMemo: Data66 { get }
     var commitment: Data32 { get } 
     var maskedValue: UInt64 { get }
+    var maskedTokenId: Data { get }
     var targetKey: RistrettoPublic { get }
     var publicKey: RistrettoPublic { get }
 }
@@ -22,13 +23,6 @@ extension TxOutProtocol {
             subaddressSpendPrivateKey: accountKey.subaddressSpendPrivateKey)
     }
 
-    func matchesAnySubaddress(accountKey: AccountKey) -> Bool {
-        TxOutUtils.matchesAnySubaddress(
-            maskedValue: maskedValue,
-            publicKey: publicKey,
-            viewPrivateKey: accountKey.viewPrivateKey)
-    }
-
     func subaddressSpentPublicKey(viewPrivateKey: RistrettoPrivate) -> RistrettoPublic {
         TxOutUtils.subaddressSpentPublicKey(
             targetKey: targetKey,
@@ -39,8 +33,21 @@ extension TxOutProtocol {
     /// - Returns: `nil` when `accountKey` cannot unmask value, either because `accountKey` does not
     ///     own `TxOut` or because ` TxOut` values are incongruent.
     func value(accountKey: AccountKey) -> UInt64? {
-        TxOutUtils.value(
+        amount(accountKey: accountKey)?.value
+    }
+    
+    /// - Returns: `nil` when `accountKey` cannot unmask value, either because `accountKey` does not
+    ///     own `TxOut` or because ` TxOut` values are incongruent.
+    func tokenId(accountKey: AccountKey) -> UInt64? {
+        amount(accountKey: accountKey)?.tokenId
+    }
+    
+    /// - Returns: `nil` when `accountKey` cannot unmask the amoount, either because `accountKey`
+    ///     does not own `TxOut` or because ` TxOut` amounts are incongruent.
+    func amount(accountKey: AccountKey) -> Amount? {
+        TxOutUtils.amount(
             maskedValue: maskedValue,
+            maskedTokenId: maskedTokenId,
             publicKey: publicKey,
             viewPrivateKey: accountKey.viewPrivateKey)
     }
@@ -81,6 +88,7 @@ extension FogView_TxOutRecord {
         self.init()
         self.txOutAmountCommitmentData = txOut.commitment.data
         self.txOutAmountMaskedValue = txOut.maskedValue
+        self.txOutAmountMaskedTokenID = txOut.maskedTokenId
         self.txOutTargetKeyData = txOut.targetKey.data
         self.txOutPublicKeyData = txOut.publicKey.data
         self.txOutEMemoData = txOut.encryptedMemo.data

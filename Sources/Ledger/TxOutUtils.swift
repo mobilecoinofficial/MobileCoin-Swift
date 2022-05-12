@@ -8,29 +8,6 @@ import Foundation
 import LibMobileCoin
 
 enum TxOutUtils {
-    static func matchesAnySubaddress(
-        maskedValue: UInt64,
-        publicKey: RistrettoPublic,
-        viewPrivateKey: RistrettoPrivate
-    ) -> Bool {
-        var mcAmount = McTxOutAmount(masked_value: maskedValue)
-        return publicKey.asMcBuffer { publicKeyPtr in
-            viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
-                var matches = false
-                // Safety: mc_tx_out_matches_any_subaddress is infallible when preconditions are
-                // upheld.
-                withMcInfallible {
-                    mc_tx_out_matches_any_subaddress(
-                        &mcAmount,
-                        publicKeyPtr,
-                        viewPrivateKeyPtr,
-                        &matches)
-                }
-                return matches
-            }
-        }
-    }
-
     static func matchesSubaddress(
         targetKey: RistrettoPublic,
         publicKey: RistrettoPublic,
@@ -64,35 +41,50 @@ enum TxOutUtils {
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> Data32? {
-        var mcAmount = McTxOutAmount(masked_value: maskedValue)
-        return publicKey.asMcBuffer { publicKeyBufferPtr in
-            viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
-                switch Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
-                    mc_tx_out_reconstruct_commitment(
-                        &mcAmount,
-                        publicKeyBufferPtr,
-                        viewPrivateKeyPtr,
-                        bufferPtr,
-                        &errorPtr)
-                }) {
-                case .success(let bytes):
-                    // Safety: It's safe to skip validation because
-                    // mc_tx_out_reconstruct_commitment should always return a valid
-                    // RistrettoPublic on success.
-                    return bytes as Data32
-                case .failure(let error):
-                    switch error.errorCode {
-                    case .invalidInput:
-                        // Safety: This condition indicates a programming error and can only
-                        // happen if arguments to mc_tx_out_reconstruct_commitment are
-                        // supplied incorrectly.
-                        logger.warning("error: \(redacting: error)")
-                        return nil
-                    default:
-                        // Safety: mc_tx_out_reconstruct_commitment should not throw
-                        // non-documented errors.
-                        logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
-                        return nil
+        reconstructCommitment(maskedValue: maskedValue,
+                              maskedTokenId: Data(),
+                              publicKey: publicKey, viewPrivateKey: viewPrivateKey)
+    }
+
+    static func reconstructCommitment(
+        maskedValue: UInt64,
+        maskedTokenId: Data,
+        publicKey: RistrettoPublic,
+        viewPrivateKey: RistrettoPrivate
+    ) -> Data32? {
+        return maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
+            publicKey.asMcBuffer { publicKeyBufferPtr in
+                viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
+                    var mcAmount = McTxOutMaskedAmount(
+                        masked_value: maskedValue,
+                        masked_token_id: maskedTokenIdBufferPtr)
+                    switch Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+                        mc_tx_out_reconstruct_commitment(
+                            &mcAmount,
+                            publicKeyBufferPtr,
+                            viewPrivateKeyPtr,
+                            bufferPtr,
+                            &errorPtr)
+                    }) {
+                    case .success(let bytes):
+                        // Safety: It's safe to skip validation because
+                        // mc_tx_out_reconstruct_commitment should always return a valid
+                        // RistrettoPublic on success.
+                        return bytes as Data32
+                    case .failure(let error):
+                        switch error.errorCode {
+                        case .invalidInput:
+                            // Safety: This condition indicates a programming error and can only
+                            // happen if arguments to mc_tx_out_reconstruct_commitment are
+                            // supplied incorrectly.
+                            logger.warning("error: \(redacting: error)")
+                            return nil
+                        default:
+                            // Safety: mc_tx_out_reconstruct_commitment should not throw
+                            // non-documented errors.
+                            logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                            return nil
+                        }
                     }
                 }
             }
@@ -211,7 +203,7 @@ enum TxOutUtils {
             }
         }
     }
-
+    
     /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
     static func value(
@@ -219,35 +211,56 @@ enum TxOutUtils {
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> UInt64? {
-        var mcAmount = McTxOutAmount(masked_value: maskedValue)
-        return publicKey.asMcBuffer { publicKeyPtr in
-            viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
-                var valueOut: UInt64 = 0
-                switch withMcError({ errorPtr in
-                    mc_tx_out_get_value(
-                        &mcAmount,
-                        publicKeyPtr,
-                        viewKeyBufferPtr,
-                        &valueOut,
-                        &errorPtr)
-                }) {
-                case .success:
-                    return valueOut
-                case .failure(let error):
-                    switch error.errorCode {
-                    case .transactionCrypto:
-                        // Indicates either `commitment`/`maskedValue`/`publicKey` values are
-                        // incongruent or `viewPrivateKey` does not own `TxOut`. However, it's
-                        // not possible to determine which, only that the provided `commitment`
-                        // doesn't match the computed commitment.
-                        return nil
-                    case .invalidInput:
-                        // Safety: This condition indicates a programming error and can only
-                        // happen if arguments to mc_tx_out_get_value are supplied incorrectly.
-                        logger.fatalError("error: \(redacting: error)")
-                    default:
-                        // Safety: mc_tx_out_get_value should not throw non-documented errors.
-                        logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+        amount(maskedValue: maskedValue,
+               maskedTokenId: Data(),
+               publicKey: publicKey,
+               viewPrivateKey: viewPrivateKey)?.value
+    }
+
+
+    /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
+    ///     does not own `TxOut` or because `TxOut` values are incongruent.
+    static func amount(
+        maskedValue: UInt64,
+        maskedTokenId: Data,
+        publicKey: RistrettoPublic,
+        viewPrivateKey: RistrettoPrivate
+    ) -> Amount? {
+        return maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
+            publicKey.asMcBuffer { publicKeyPtr in
+                viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
+                    var mcAmount = McTxOutMaskedAmount(
+                        masked_value: maskedValue,
+                        masked_token_id: maskedTokenIdBufferPtr)
+                    var valueOut: UInt64 = 0
+                    var tokenIdOut: UInt64 = 0
+                    switch withMcError({ errorPtr in
+                        mc_tx_out_get_amount(
+                            &mcAmount,
+                            publicKeyPtr,
+                            viewKeyBufferPtr,
+                            &valueOut,
+                            &tokenIdOut,
+                            &errorPtr)
+                    }) {
+                    case .success:
+                        return Amount(value: valueOut, tokenId: tokenIdOut)
+                    case .failure(let error):
+                        switch error.errorCode {
+                        case .transactionCrypto:
+                            // Indicates either `commitment`/`maskedValue`/`publicKey` values are
+                            // incongruent or `viewPrivateKey` does not own `TxOut`. However, it's
+                            // not possible to determine which, only that the provided `commitment`
+                            // doesn't match the computed commitment.
+                            return nil
+                        case .invalidInput:
+                            // Safety: This condition indicates a programming error and can only
+                            // happen if arguments to mc_tx_out_get_value are supplied incorrectly.
+                            logger.fatalError("error: \(redacting: error)")
+                        default:
+                            // Safety: mc_tx_out_get_value should not throw non-documented errors.
+                            logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+                        }
                     }
                 }
             }

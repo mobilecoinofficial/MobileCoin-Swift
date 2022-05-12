@@ -7,12 +7,14 @@ import Foundation
 struct KnownTxOut: TxOutProtocol {
     private let ledgerTxOut: LedgerTxOut
     let value: UInt64
+    let tokenId: UInt64
     let keyImage: KeyImage
     let subaddressIndex: UInt64
     let recoverableMemo: RecoverableMemo
 
     init?(_ ledgerTxOut: LedgerTxOut, accountKey: AccountKey) {
-        guard let value = ledgerTxOut.value(accountKey: accountKey),
+        guard let amount = ledgerTxOut.amount(accountKey: accountKey),
+              let tokenId = ledgerTxOut.tokenId(accountKey: accountKey),
               let (subaddressIndex, keyImage) = ledgerTxOut.keyImage(accountKey: accountKey),
               let commitment = TxOutUtils.reconstructCommitment(
                                                     maskedValue: ledgerTxOut.maskedValue,
@@ -29,7 +31,8 @@ struct KnownTxOut: TxOutProtocol {
 
         self.commitment = commitment
         self.ledgerTxOut = ledgerTxOut
-        self.value = value
+        self.value = amount.value
+        self.tokenId = amount.tokenId
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
         
@@ -39,6 +42,7 @@ struct KnownTxOut: TxOutProtocol {
     var encryptedMemo: Data66 { ledgerTxOut.encryptedMemo }
     var commitment: Data32
     var maskedValue: UInt64 { ledgerTxOut.maskedValue }
+    var maskedTokenId: Data { ledgerTxOut.maskedTokenId }
     var targetKey: RistrettoPublic { ledgerTxOut.targetKey }
     var publicKey: RistrettoPublic { ledgerTxOut.publicKey }
     var block: BlockMetadata { ledgerTxOut.block }
