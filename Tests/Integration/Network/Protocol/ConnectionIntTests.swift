@@ -7,13 +7,28 @@ import LibMobileCoin
 import XCTest
 
 class ConnectionIntTests: XCTestCase {
-    func testCallTimeoutWithInvalidUrl() throws {
-        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try testCallTimeoutWithInvalidUrl(transportProtocol: transportProtocol)
+
+    func timeoutInSeconds(for transportProtocol: TransportProtocol) -> Double {
+        // pad timeout of test by 2 seconds over the protocol timeout
+        let padTime = 2.0
+
+        switch transportProtocol.option {
+        case .grpc:
+            // forced unwrap of timeout here in test is ok b/c we want fast failure if not set
+            return padTime + Double(GrpcChannelManager.Defaults.callOptionsTimeLimit.timeout!.nanoseconds) / 1.0e9
+        case .http:
+            return padTime + DefaultHttpRequester.defaultConfiguration.timeoutIntervalForRequest
         }
     }
 
-    func testCallTimeoutWithInvalidUrl(transportProtocol: TransportProtocol) throws {
+    func testInvalidUrlTimeout() throws {
+        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+            let timeToWait = timeoutInSeconds(for: transportProtocol)
+            try testInvalidUrlTimeout(using:transportProtocol, andWaitFor: timeToWait)
+        }
+    }
+
+    func testInvalidUrlTimeout(using transportProtocol: TransportProtocol, andWaitFor timeToWait: Double) throws {
         let expect = expectation(description: "Making Fog View enclave request")
 
         var request = FogLedger_BlockRequest()
@@ -29,16 +44,18 @@ class ConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         }
-        waitForExpectations(timeout: 35)
+        
+        waitForExpectations(timeout: timeToWait)
     }
 
-    func testAttestedCallTimeoutWithInvalidUrl() throws {
+    func testInvalidUrlAttestationTimeout() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try testAttestedCallTimeoutWithInvalidUrl(transportProtocol: transportProtocol)
+            let timeToWait = timeoutInSeconds(for: transportProtocol)
+            try testInvalidUrlAttestationTimeout(using: transportProtocol, andWaitFor: timeToWait)
         }
     }
 
-    func testAttestedCallTimeoutWithInvalidUrl(transportProtocol: TransportProtocol) throws {
+    func testInvalidUrlAttestationTimeout(using transportProtocol: TransportProtocol, andWaitFor timeToWait: Double) throws {
         let fixture = try Transaction.Fixtures.Default()
 
         let expect = expectation(description: "Attested Call to invalid URL should timeout for protocol: \(transportProtocol.description)")
@@ -53,7 +70,8 @@ class ConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         })
-        waitForExpectations(timeout: 35)
+
+        waitForExpectations(timeout: timeToWait)
     }
 }
 
