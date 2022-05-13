@@ -7,9 +7,10 @@ import Foundation
 public struct Balance {
     public let amountPicoMobLow: UInt64
     public let amountPicoMobHigh: UInt8
+    public let tokenId: TokenId
     let blockCount: UInt64
 
-    init(values: [UInt64], blockCount: UInt64) {
+    init(values: [UInt64], blockCount: UInt64, tokenId: TokenId) {
         var amountLow: UInt64 = 0
         var amountHigh: UInt8 = 0
         for value in values {
@@ -19,13 +20,18 @@ public struct Balance {
                 amountHigh += 1
             }
         }
-        self.init(amountLow: amountLow, amountHigh: amountHigh, blockCount: blockCount)
+        self.init(
+            amountLow: amountLow,
+            amountHigh: amountHigh,
+            blockCount: blockCount,
+            tokenId: tokenId)
     }
 
-    init(amountLow: UInt64, amountHigh: UInt8, blockCount: UInt64) {
+    init(amountLow: UInt64, amountHigh: UInt8, blockCount: UInt64, tokenId: TokenId) {
         self.amountPicoMobLow = amountLow
         self.amountPicoMobHigh = amountHigh
         self.blockCount = blockCount
+        self.tokenId = tokenId
     }
 
     /// - Returns: `nil` when the amount is too large to fit in a `UInt64`.

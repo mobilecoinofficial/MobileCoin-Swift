@@ -46,12 +46,23 @@ final class Account {
         return knowableBlockCount
     }
 
+    @available(*, deprecated, message: "Use cachedBalance(for:TokenId)")
     var cachedBalance: Balance {
+        cachedBalance(for: .MOB)
+    }
+
+    var cachedTxOutTokenIds: Set<TokenId> {
+        Set(allTxOutTrackers
+            .map { $0.knownTxOut.tokenId })
+    }
+
+    func cachedBalance(for tokenId: TokenId = .MOB) -> Balance {
         let blockCount = knowableBlockCount
         let txOutValues = allTxOutTrackers
             .filter { $0.receivedAndUnspent(asOfBlockCount: blockCount) }
+            .filter { $0.knownTxOut.tokenId == tokenId }
             .map { $0.knownTxOut.value }
-        return Balance(values: txOutValues, blockCount: blockCount)
+        return Balance(values: txOutValues, blockCount: blockCount, tokenId: tokenId)
     }
 
     var cachedAccountActivity: AccountActivity {

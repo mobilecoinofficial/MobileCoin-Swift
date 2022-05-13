@@ -5,7 +5,7 @@
 import Foundation
 
 /// TODO Document, add extra hooks ?
-typealias TokenId = UInt64
+public typealias TokenId = UInt64
 
 extension TokenId {
     static var MOB: UInt64 = 0
