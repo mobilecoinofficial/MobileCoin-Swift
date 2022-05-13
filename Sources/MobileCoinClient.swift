@@ -118,6 +118,14 @@ public final class MobileCoinClient {
         `updateBalance(completion:...)` returns the `Balance` struct for the default TokenId == .MOB
         """)
     public func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
+        updateBalances {
+            completion($0.map({
+                $0.mobBalance
+            }))
+        }
+    }
+
+    public func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void) {
         Account.BalanceUpdater(
             account: accountLock,
             fogViewService: serviceProvider.fogViewService,
@@ -125,7 +133,7 @@ public final class MobileCoinClient {
             fogBlockService: serviceProvider.fogBlockService,
             fogQueryScalingStrategy: fogQueryScalingStrategy,
             targetQueue: serialQueue
-        ).updateBalance { result in
+        ).updateBalances { result in
             self.callbackQueue.async {
                 completion(result)
             }
