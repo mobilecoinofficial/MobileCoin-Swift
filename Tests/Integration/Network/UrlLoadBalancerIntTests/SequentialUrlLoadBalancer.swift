@@ -4,7 +4,7 @@
 @testable import MobileCoin
 
 class SequentialUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol>: UrlLoadBalancer<ServiceUrl> {
-    private var curIdx = 0
+    private(set) var curIdx = 0
     var rotationEnabled = true
 
     override func nextUrl() -> ServiceUrl {
