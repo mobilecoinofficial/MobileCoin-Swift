@@ -8,5 +8,5 @@ import Foundation
 public typealias TokenId = UInt64
 
 extension TokenId {
-    static var MOB: UInt64 = 0
+    public static var MOB: UInt64 = 0
 }

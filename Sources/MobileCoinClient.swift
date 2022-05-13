@@ -71,12 +71,29 @@ public final class MobileCoinClient {
             targetQueue: serialQueue)
     }
 
+    @available(*, deprecated, message:
+        """
+        Deprecated in favor of `balance(for:TokenId)` which accepts a TokenId.
+        `balance` will assume the default TokenId == .MOB // UInt64(0)
+        
+        Get a set of all tokenIds that are in TxOuts owned by this account with:
+        
+        `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
+        """)
     public var balance: Balance {
-        accountLock.readSync { $0.cachedBalance }
+        balance(for: .MOB)
+    }
+
+    public var accountTokenIds: Set<TokenId> {
+        accountLock.readSync { $0.cachedTxOutTokenIds }
     }
 
     public var accountActivity: AccountActivity {
         accountLock.readSync { $0.cachedAccountActivity }
+    }
+
+    public func balance(for tokenId: TokenId = .MOB) -> Balance {
+        accountLock.readSync { $0.cachedBalance(for: tokenId) }
     }
 
     public func setTransportProtocol(_ transportProtocol: TransportProtocol) {
@@ -93,6 +110,13 @@ public final class MobileCoinClient {
         serviceProvider.setFogUserAuthorization(credentials: credentials)
     }
 
+    @available(*, deprecated, message:
+        """
+        Use `updateBalances(completion:@escaping (Result<Balances, BalanceUpdateError>) -> Void)`
+        which returns a `Balances` containing `Balance` structs for all known tokenIds.
+        
+        `updateBalance(completion:...)` returns the `Balance` struct for the default TokenId == .MOB
+        """)
     public func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
         Account.BalanceUpdater(
             account: accountLock,
