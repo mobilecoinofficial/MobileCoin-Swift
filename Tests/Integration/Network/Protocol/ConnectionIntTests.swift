@@ -6,6 +6,8 @@ import LibMobileCoin
 @testable import MobileCoin
 import XCTest
 
+// swiftlint:disable line_length
+
 class ConnectionIntTests: XCTestCase {
 
     func timeoutInSeconds(for transportProtocol: TransportProtocol) -> Double {
@@ -24,7 +26,8 @@ class ConnectionIntTests: XCTestCase {
     func testInvalidUrlTimeout() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             let timeToWait = timeoutInSeconds(for: transportProtocol)
-            try testInvalidUrlTimeout(using:transportProtocol, andWaitFor: timeToWait)
+            print("Testing \(transportProtocol.description) with timeout = \(timeToWait)")
+            try testInvalidUrlTimeout(using: transportProtocol, andWaitFor: timeToWait)
         }
     }
 
@@ -51,6 +54,7 @@ class ConnectionIntTests: XCTestCase {
     func testInvalidUrlAttestationTimeout() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             let timeToWait = timeoutInSeconds(for: transportProtocol)
+            print("Testing \(transportProtocol.description) with timeout = \(timeToWait)")
             try testInvalidUrlAttestationTimeout(using: transportProtocol, andWaitFor: timeToWait)
         }
     }
