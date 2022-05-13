@@ -140,6 +140,7 @@ final class TransactionBuilder {
             return .failure(.invalidInput("Input values != output values + fee"))
         }
 
+        logger.info("transaction builder blockVersion == \(blockVersion)")
         let builder = TransactionBuilder(
             fee: fee,
             tombstoneBlockIndex: tombstoneBlockIndex,
