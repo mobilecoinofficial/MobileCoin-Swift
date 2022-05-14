@@ -42,7 +42,7 @@ final class BlockchainMetaFetcher {
 
     func feeStrategy(
         for feeLevel: FeeLevel,
-        tokenId: TokenId = .MOB,
+        tokenId: TokenId,
         completion: @escaping (Result<FeeStrategy, ConnectionError>) -> Void
     ) {
         switch feeLevel {
@@ -61,7 +61,7 @@ final class BlockchainMetaFetcher {
     }
 
     func getOrFetchMinimumFee(
-        tokenId: TokenId = .MOB,
+        tokenId: TokenId,
         completion: @escaping (Result<UInt64, ConnectionError>) -> Void
     ) {
         fetchCache {
@@ -79,7 +79,7 @@ final class BlockchainMetaFetcher {
     }
 
     func getCachedMinimumFee(
-        tokenId: TokenId = .MOB,
+        tokenId: TokenId,
         completion: @escaping (UInt64?) -> Void
     ) {
         inner.accessAsync {
