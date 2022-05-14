@@ -37,10 +37,11 @@ extension Account {
                 targetQueue: targetQueue)
         }
 
+        // TODO
         func prepareTransaction(
             to recipient: PublicAddress,
             memoType: MemoType,
-            amount: UInt64,
+            amount: Amount,
             fee: UInt64,
             completion: @escaping (
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
@@ -117,7 +118,7 @@ extension Account {
         func prepareTransaction(
             to recipient: PublicAddress,
             memoType: MemoType,
-            amount: UInt64,
+            amount: Amount,
             feeLevel: FeeLevel,
             completion: @escaping (
                 Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
@@ -198,7 +199,7 @@ extension Account {
         }
 
         func prepareDefragmentationStepTransactions(
-            toSendAmount amountToSend: UInt64,
+            toSendAmount amountToSend: Amount,
             recoverableMemo: Bool,
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void

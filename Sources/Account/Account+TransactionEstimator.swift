@@ -28,20 +28,25 @@ extension Account {
         }
 
         func amountTransferable(
+            tokenId: TokenId,
             feeLevel: FeeLevel,
             completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
         ) {
-            metaFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: tokenId) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
-                        let txOuts = self.account.readSync { $0.unspentTxOuts }
+                        let txOuts = self.account.readSync { $0.unspentTxOuts(tokenId: tokenId) }
                         logger.info(
                             "Calculating amountTransferable. feeLevel: \(feeLevel), " +
+                                "tokenId: \(tokenId), " +
                                 "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
                             logFunction: false)
                         return self.txOutSelector
-                            .amountTransferable(feeStrategy: feeStrategy, txOuts: txOuts)
-                            .mapError {
+                            .amountTransferable(
+                                tokenId: tokenId,
+                                feeStrategy: feeStrategy,
+                                txOuts: txOuts
+                            ).mapError {
                                 switch $0 {
                                 case .feeExceedsBalance(let reason):
                                     return .feeExceedsBalance(reason)
@@ -60,11 +65,12 @@ extension Account {
         }
 
         func estimateTotalFee(
-            toSendAmount amount: UInt64,
+            toSendAmount amount: Amount,
             feeLevel: FeeLevel,
             completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
         ) {
-            guard amount > 0 else {
+            guard amount.value > 0 else {
+                // TODO fix, add name resolution for TokenId
                 let errorMessage = "estimateTotalFee failure: Cannot spend 0 MOB"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
@@ -73,13 +79,13 @@ extension Account {
                 return
             }
 
-            metaFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: amount.tokenId) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
-                        let txOuts = self.account.readSync { $0.unspentTxOuts }
+                        let txOuts = self.account.readSync { $0.unspentTxOuts(tokenId: amount.tokenId) }
                         logger.info(
-                            "Estimating total fee: amount: \(redacting: amount), feeLevel: " +
-                                "\(feeLevel), unspentTxOutValues: " +
+                            "Estimating total fee: amount: \(redacting: amount.value), feeLevel: " +
+                                "\(feeLevel), tokenId: \(amount.tokenId), unspentTxOutValues: " +
                                 "\(redacting: txOuts.map { $0.value })",
                             logFunction: false)
                         return self.txOutSelector
@@ -102,11 +108,12 @@ extension Account {
         }
 
         func requiresDefragmentation(
-            toSendAmount amount: UInt64,
+            toSendAmount amount: Amount,
             feeLevel: FeeLevel,
             completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
         ) {
-            guard amount > 0 else {
+            guard amount.value > 0 else {
+                // TODO fix, add name resolution for TokenId
                 let errorMessage = "requiresDefragmentation failure: Cannot spend 0 MOB"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
@@ -115,14 +122,14 @@ extension Account {
                 return
             }
 
-            metaFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: amount.tokenId) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
-                        let txOuts = self.account.readSync { $0.unspentTxOuts }
+                        let txOuts = self.account.readSync { $0.unspentTxOuts(tokenId: amount.tokenId) }
                         logger.info(
-                            "Calculation defragmentation required: amount: \(redacting: amount), " +
-                                "feeLevel: \(feeLevel), unspentTxOutValues: " +
-                                "\(redacting: txOuts.map { $0.value })",
+                            "Calculation defragmentation required: amount: \(redacting: amount.value), " +
+                                "feeLevel: \(feeLevel), tokenId: \(amount.tokenId), " +
+                                "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
                             logFunction: false)
                         return self.txOutSelector
                             .estimateTotalFee(
@@ -146,6 +153,7 @@ extension Account {
 }
 
 extension Account.TransactionEstimator {
+    // TODO update deprecation message, and or delete if not in use.
     @available(*, deprecated, message: "Use amountTransferable(feeLevel:completion:) instead")
     func amountTransferable(feeLevel: FeeLevel)
         -> Result<UInt64, BalanceTransferEstimationError>
@@ -156,8 +164,10 @@ extension Account.TransactionEstimator {
             "Calculating amountTransferable. feeLevel: \(feeLevel), unspentTxOutValues: " +
                 "\(redacting: txOuts.map { $0.value })",
             logFunction: false)
-        return txOutSelector.amountTransferable(feeStrategy: feeStrategy, txOuts: txOuts)
-            .mapError {
+        return txOutSelector.amountTransferable(
+            tokenId: .MOB,
+            feeStrategy: feeStrategy,
+            txOuts: txOuts).mapError {
                 switch $0 {
                 case .feeExceedsBalance(let reason):
                     return .feeExceedsBalance(reason)
@@ -171,6 +181,7 @@ extension Account.TransactionEstimator {
             }
     }
 
+    // TODO update deprecation message, and or delete if not in use.
     @available(*, deprecated, message:
         "Use estimateTotalFee(toSendAmount:feeLevel:completion:) instead")
     func estimateTotalFee(toSendAmount amount: UInt64, feeLevel: FeeLevel)
@@ -188,6 +199,8 @@ extension Account.TransactionEstimator {
             "Estimating total fee: amount: \(redacting: amount), feeLevel: \(feeLevel), " +
                 "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
             logFunction: false)
+        
+        let amount = Amount(value: amount, tokenId: .MOB)
         return txOutSelector
             .estimateTotalFee(toSendAmount: amount, feeStrategy: feeStrategy, txOuts: txOuts)
             .mapError { _ -> TransactionEstimationError in .insufficientBalance() }
@@ -200,6 +213,7 @@ extension Account.TransactionEstimator {
             }
     }
 
+    // TODO update deprecation message, and or delete if not in use.
     @available(*, deprecated, message:
         "Use requiresDefragmentation(toSendAmount:feeLevel:completion:) instead")
     func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel)
@@ -217,6 +231,8 @@ extension Account.TransactionEstimator {
             "Calculation defragmentation required: amount: \(redacting: amount), feeLevel: " +
                 "\(feeLevel), unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
             logFunction: false)
+        
+        let amount = Amount(value: amount, tokenId: .MOB)
         return txOutSelector
             .estimateTotalFee(toSendAmount: amount, feeStrategy: feeStrategy, txOuts: txOuts)
             .mapError { _ -> TransactionEstimationError in .insufficientBalance() }
