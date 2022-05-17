@@ -32,12 +32,13 @@ struct KnownTxOut: TxOutProtocol {
         self.amount = amount
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
-        
-        print("KnownTxOut \(keyImage.data.base64EncodedString()) | index = \(subaddressIndex) | value = \(value)")
+
+        print("KnownTxOut \(keyImage.data.base64EncodedString()) " +
+              "| index = \(subaddressIndex) | value = \(value)")
     }
 
     var value: UInt64 { amount.value }
-    var tokenId: TokenId { amount.tokenId } 
+    var tokenId: TokenId { amount.tokenId }
     var encryptedMemo: Data66 { ledgerTxOut.encryptedMemo }
     var commitment: Data32
     var maskedValue: UInt64 { ledgerTxOut.maskedValue }

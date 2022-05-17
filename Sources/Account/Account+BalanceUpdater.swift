@@ -38,7 +38,7 @@ extension Account {
             self.fogKeyImageChecker = FogKeyImageChecker(
                 fogKeyImageService: fogKeyImageService,
                 targetQueue: targetQueue,
-                syncChecker: account.accessWithoutLocking.syncCheckerLock) //TODO - Grokk locking
+                syncChecker: account.accessWithoutLocking.syncCheckerLock)
         }
 
         func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void) {

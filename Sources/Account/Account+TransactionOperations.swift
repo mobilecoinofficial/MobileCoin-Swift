@@ -47,7 +47,8 @@ extension Account {
             ) -> Void
         ) {
             guard amount.value > 0 else {
-                let errorMessage = "prepareTransactionWithFee failure: Cannot spend 0 \(amount.tokenId)"
+                let errorMessage = "prepareTransactionWithFee failure: " +
+                    "Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -99,13 +100,13 @@ extension Account {
                         logger.info(
                             "prepareTransactionWithFee failure: \(error)",
                             logFunction: false)
-                        
+
                         serialQueue.async {
                             completion(.failure(.connectionError(error)))
                         }
                     }
                 }
-                
+
             case .failure(let error):
                 logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
@@ -124,7 +125,8 @@ extension Account {
             ) -> Void
         ) {
             guard amount.value > 0 else {
-                let errorMessage = "prepareTransactionWithFeeLevel failure: Cannot spend 0 \(amount.tokenId)"
+                let errorMessage = "prepareTransactionWithFeeLevel failure: " +
+                    "Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -136,7 +138,9 @@ extension Account {
                 switch $0 {
                 case .success(let feeStrategy):
                     let (unspentTxOuts, ledgerBlockCount) =
-                        self.account.readSync { ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount) }
+                        self.account.readSync {
+                            ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount)
+                        }
                     logger.info(
                         "Preparing transaction with fee level... recipient: " +
                             "\(redacting: recipient), amount: \(redacting: amount), feeLevel: " +
@@ -178,7 +182,7 @@ extension Account {
                                 logger.info(
                                     "prepareTransactionWithFee failure: \(error)",
                                     logFunction: false)
-                                
+
                                 serialQueue.async {
                                     completion(.failure(.connectionError(error)))
                                 }
@@ -205,7 +209,8 @@ extension Account {
         ) {
             guard amountToSend.value > 0 else {
                 let errorMessage =
-                    "prepareDefragmentationStepTransactions failure: Cannot spend 0 \(amountToSend.tokenId)"
+                    "prepareDefragmentationStepTransactions failure: " +
+                    "Cannot spend 0 \(amountToSend.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -217,7 +222,9 @@ extension Account {
                 switch $0 {
                 case .success(let feeStrategy):
                     let (unspentTxOuts, ledgerBlockCount) =
-                        self.account.readSync { ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount) }
+                        self.account.readSync {
+                            ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount)
+                        }
                     logger.info(
                         "Preparing defragmentation step transactions... amountToSend: " +
                             "\(redacting: amountToSend), feeLevel: \(feeLevel), " +
@@ -251,7 +258,7 @@ extension Account {
                                 logger.info(
                                     "prepareTransactionWithFee failure: \(error)",
                                     logFunction: false)
-                                
+
                                 serialQueue.async {
                                     completion(.failure(.connectionError(error)))
                                 }

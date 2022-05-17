@@ -15,6 +15,10 @@ extension Amount {
         self.value = value
         self.tokenId = TokenId(tokenId)
     }
+    
+    init(mob: UInt64) {
+        self.init(value: mob, tokenId: .MOB)
+    }
 }
 
 extension Amount: CustomStringConvertible {

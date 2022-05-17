@@ -8,7 +8,7 @@ import XCTest
 class BalanceTests: XCTestCase {
 
     func testMaxBalance() {
-        let maxBalance = Balance(values: Self.maxBalanceTxoAmounts, blockCount: 1)
+        let maxBalance = Balance(values: Self.maxBalanceTxoAmounts, blockCount: 1, tokenId: .MOB)
         XCTAssertEqual(maxBalance.amountPicoMobHigh, 10)
         XCTAssertEqual(maxBalance.amountPicoMobLow, 15532559262904483840)
         XCTAssertEqual(maxBalance.amountMobParts.mobInt, 200_000_000)

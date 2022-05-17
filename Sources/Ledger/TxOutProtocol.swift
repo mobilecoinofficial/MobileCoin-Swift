@@ -7,7 +7,7 @@ import LibMobileCoin
 
 protocol TxOutProtocol {
     var encryptedMemo: Data66 { get }
-    var commitment: Data32 { get } 
+    var commitment: Data32 { get }
     var maskedValue: UInt64 { get }
     var maskedTokenId: Data { get }
     var targetKey: RistrettoPublic { get }
@@ -35,13 +35,13 @@ extension TxOutProtocol {
     func value(accountKey: AccountKey) -> UInt64? {
         amount(accountKey: accountKey)?.value
     }
-    
+
     /// - Returns: `nil` when `accountKey` cannot unmask value, either because `accountKey` does not
     ///     own `TxOut` or because ` TxOut` values are incongruent.
     func tokenId(accountKey: AccountKey) -> TokenId? {
         amount(accountKey: accountKey)?.tokenId
     }
-    
+
     /// - Returns: `nil` when `accountKey` cannot unmask the amoount, either because `accountKey`
     ///     does not own `TxOut` or because ` TxOut` amounts are incongruent.
     func amount(accountKey: AccountKey) -> Amount? {
@@ -53,17 +53,19 @@ extension TxOutProtocol {
     }
 
     typealias IndexedKeyImage = (index: UInt64, keyImage: KeyImage)
-    
+
     /// - Returns: `nil` when a valid `KeyImage` cannot be constructed, either because `accountKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
     func keyImage(accountKey: AccountKey) -> IndexedKeyImage? {
-        [indexedKeyImage(index: accountKey.subaddressIndex, accountKey: accountKey),
+        [
+         indexedKeyImage(index: accountKey.subaddressIndex, accountKey: accountKey),
          indexedKeyImage(index: accountKey.changeSubaddressIndex, accountKey: accountKey),
-         indexedKeyImage(index: accountKey.futureChangeSubaddressIndex, accountKey: accountKey)]
-        .compactMap({$0})
+         indexedKeyImage(index: accountKey.futureChangeSubaddressIndex, accountKey: accountKey),
+        ]
+        .compactMap({ $0 })
         .first
     }
-    
+
     private func indexedKeyImage(index: UInt64, accountKey: AccountKey) -> IndexedKeyImage? {
         guard
             let sspk = accountKey.subaddressSpendPrivateKey(index: index),
@@ -77,7 +79,7 @@ extension TxOutProtocol {
         }
         return (index: index, keyImage: keyImage)
     }
-    
+
     var keys: TxOut.Keys {
         (publicKey: publicKey, targetKey: targetKey)
     }

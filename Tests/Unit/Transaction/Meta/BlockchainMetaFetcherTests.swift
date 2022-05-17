@@ -250,7 +250,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
         let expect = expectation(
             description: "testing block version mismatch propose tx response")
 
-        metaFetcher.getCachedMinimumFee {
+        metaFetcher.getCachedMinimumFee(tokenId: .MOB) {
             XCTAssertNil($0)
 
             metaFetcher.fetchMeta {
@@ -264,7 +264,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
                     guard $0.failureOrFulfill(expectation: expect) != nil else { return }
                     print("Transaction submission failed, as expected")
 
-                    metaFetcher.getCachedMinimumFee {
+                    metaFetcher.getCachedMinimumFee(tokenId: .MOB) {
                         // Failure was .txFeeError, cache should be reset
                         XCTAssertNil($0)
 
@@ -286,7 +286,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
         let expect = expectation(
             description: "testing block version mismatch propose tx response")
 
-        metaFetcher.getCachedMinimumFee { nilFee in
+        metaFetcher.getCachedMinimumFee(tokenId: .MOB) { nilFee in
             metaFetcher.getCachedBlockVersion { nilBlockVersion in
                 XCTAssertNil(nilFee)
                 XCTAssertNil(nilBlockVersion)
@@ -302,7 +302,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
                         guard $0.successOrFulfill(expectation: expect) != nil else { return }
                         print("Transaction submission success")
 
-                        metaFetcher.getCachedMinimumFee { fee in
+                        metaFetcher.getCachedMinimumFee(tokenId: .MOB) { fee in
                             metaFetcher.getCachedBlockVersion { blockVersion in
                                 XCTAssertEqual(fee, fixtures.minimumFee)
                                 XCTAssertEqual(blockVersion, fixtures.initialBlockVersion)

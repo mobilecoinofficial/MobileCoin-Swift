@@ -56,7 +56,7 @@ final class Account {
             .map { $0.knownTxOut.tokenId })
     }
 
-    func cachedBalance(for tokenId: TokenId = .MOB) -> Balance {
+    func cachedBalance(for tokenId: TokenId) -> Balance {
         let blockCount = knowableBlockCount
         let txOutValues = allTxOutTrackers
             .filter { $0.receivedAndUnspent(asOfBlockCount: blockCount) }

@@ -46,7 +46,8 @@ extension Account {
                                 tokenId: tokenId,
                                 feeStrategy: feeStrategy,
                                 txOuts: txOuts
-                            ).mapError {
+                            )
+                            .mapError {
                                 switch $0 {
                                 case .feeExceedsBalance(let reason):
                                     return .feeExceedsBalance(reason)
@@ -81,7 +82,9 @@ extension Account {
             metaFetcher.feeStrategy(for: feeLevel, tokenId: amount.tokenId) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
-                        let txOuts = self.account.readSync { $0.unspentTxOuts(tokenId: amount.tokenId) }
+                        let txOuts = self.account.readSync {
+                            $0.unspentTxOuts(tokenId: amount.tokenId)
+                        }
                         logger.info(
                             "Estimating total fee: amount: \(redacting: amount.value), feeLevel: " +
                                 "\(feeLevel), tokenId: \(amount.tokenId), unspentTxOutValues: " +
@@ -112,7 +115,8 @@ extension Account {
             completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
         ) {
             guard amount.value > 0 else {
-                let errorMessage = "requiresDefragmentation failure: Cannot spend 0 \(amount.tokenId)"
+                let errorMessage = "requiresDefragmentation failure: " +
+                    "Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -123,9 +127,12 @@ extension Account {
             metaFetcher.feeStrategy(for: feeLevel, tokenId: amount.tokenId) {
                 completion($0.mapError { .connectionError($0) }
                     .flatMap { feeStrategy in
-                        let txOuts = self.account.readSync { $0.unspentTxOuts(tokenId: amount.tokenId) }
+                        let txOuts = self.account.readSync {
+                            $0.unspentTxOuts(tokenId: amount.tokenId)
+                        }
                         logger.info(
-                            "Calculation defragmentation required: amount: \(redacting: amount.value), " +
+                            "Calculation defragmentation required: amount: " +
+                                "\(redacting: amount.value), " +
                                 "feeLevel: \(feeLevel), tokenId: \(amount.tokenId), " +
                                 "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
                             logFunction: false)
@@ -165,7 +172,8 @@ extension Account.TransactionEstimator {
         return txOutSelector.amountTransferable(
             tokenId: .MOB,
             feeStrategy: feeStrategy,
-            txOuts: txOuts).mapError {
+            txOuts: txOuts)
+            .mapError {
                 switch $0 {
                 case .feeExceedsBalance(let reason):
                     return .feeExceedsBalance(reason)
@@ -197,7 +205,7 @@ extension Account.TransactionEstimator {
             "Estimating total fee: amount: \(redacting: amount), feeLevel: \(feeLevel), " +
                 "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
             logFunction: false)
-        
+
         let amount = Amount(value: amount, tokenId: .MOB)
         return txOutSelector
             .estimateTotalFee(toSendAmount: amount, feeStrategy: feeStrategy, txOuts: txOuts)
@@ -229,7 +237,7 @@ extension Account.TransactionEstimator {
             "Calculation defragmentation required: amount: \(redacting: amount), feeLevel: " +
                 "\(feeLevel), unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
             logFunction: false)
-        
+
         let amount = Amount(value: amount, tokenId: .MOB)
         return txOutSelector
             .estimateTotalFee(toSendAmount: amount, feeStrategy: feeStrategy, txOuts: txOuts)
