@@ -65,6 +65,11 @@ final class Account {
         return Balance(values: txOutValues, blockCount: blockCount, tokenId: tokenId)
     }
 
+    var cachedBalances: Balances {
+        let balances = cachedTxOutTokenIds.map { cachedBalance(for: $0) }
+        return Balances(balances: balances, blockCount: knowableBlockCount)
+    }
+
     var cachedAccountActivity: AccountActivity {
         let blockCount = knowableBlockCount
         let txOuts = allTxOutTrackers.compactMap { OwnedTxOut($0, atBlockCount: blockCount) }

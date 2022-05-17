@@ -69,15 +69,13 @@ extension Account {
                     
                     
                     let balances = self.account.readSync { account in
-                        account.cachedTxOutTokenIds.map { tokenId in
-                            account.cachedBalance(for: tokenId)
-                        }
+                        account.cachedBalances
                     }
                     
                     logger.info(
                         "Balance updates successful. balances: \(redacting: balances)",
                         logFunction: false)
-                    completion(.success(Balances(balances: balances)))
+                    completion(.success(balances))
                 }
             }
         }
