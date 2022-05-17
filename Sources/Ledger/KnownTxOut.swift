@@ -6,15 +6,13 @@ import Foundation
 
 struct KnownTxOut: TxOutProtocol {
     private let ledgerTxOut: LedgerTxOut
-    let value: UInt64
-    let tokenId: UInt64
+    let amount: Amount
     let keyImage: KeyImage
     let subaddressIndex: UInt64
     let recoverableMemo: RecoverableMemo
 
     init?(_ ledgerTxOut: LedgerTxOut, accountKey: AccountKey) {
         guard let amount = ledgerTxOut.amount(accountKey: accountKey),
-              let tokenId = ledgerTxOut.tokenId(accountKey: accountKey),
               let (subaddressIndex, keyImage) = ledgerTxOut.keyImage(accountKey: accountKey),
               let commitment = TxOutUtils.reconstructCommitment(
                                                     maskedValue: ledgerTxOut.maskedValue,
@@ -31,14 +29,15 @@ struct KnownTxOut: TxOutProtocol {
 
         self.commitment = commitment
         self.ledgerTxOut = ledgerTxOut
-        self.value = amount.value
-        self.tokenId = amount.tokenId
+        self.amount = amount
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
         
         print("KnownTxOut \(keyImage.data.base64EncodedString()) | index = \(subaddressIndex) | value = \(value)")
     }
 
+    var value: UInt64 { amount.value }
+    var tokenId: TokenId { amount.tokenId } 
     var encryptedMemo: Data66 { ledgerTxOut.encryptedMemo }
     var commitment: Data32
     var maskedValue: UInt64 { ledgerTxOut.maskedValue }

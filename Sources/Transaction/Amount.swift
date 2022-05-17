@@ -6,6 +6,21 @@ import Foundation
 
 /// TODO Document, add extra hooks as needed
 public struct Amount {
-    let value: UInt64
-    let tokenId: TokenId
+    public let value: UInt64
+    public let tokenId: TokenId
 }
+
+extension Amount {
+    public init(value: UInt64, tokenId: UInt64) {
+        self.value = value
+        self.tokenId = TokenId(tokenId)
+    }
+}
+
+extension Amount: CustomStringConvertible {
+    public var description: String {
+        "\(value) \(tokenId.description)"
+    }
+}
+
+extension Amount: Equatable, Hashable {}

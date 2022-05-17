@@ -20,7 +20,6 @@ struct SelectionTxOut {
 
 protocol TxOutSelectionStrategy {
     func amountTransferable(
-        tokenId: TokenId,
         feeStrategy: FeeStrategy,
         txOuts: [SelectionTxOut],
         maxInputsPerTransaction: Int
@@ -60,7 +59,6 @@ extension TxOutSelectionStrategy {
         -> Result<UInt64, AmountTransferableError>
     {
         amountTransferable(
-            tokenId: tokenId,
             feeStrategy: feeStrategy,
             txOuts: txOuts,
             maxInputsPerTransaction: McConstants.MAX_INPUTS)

@@ -86,7 +86,7 @@ struct TransactionPreparer {
         inputs: [KnownTxOut],
         recipient: PublicAddress,
         memoType: MemoType,
-        amount: UInt64,
+        amount: Amount,
         fee: UInt64,
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
@@ -94,8 +94,8 @@ struct TransactionPreparer {
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
         ) -> Void
     ) {
-        guard amount > 0, let amount = PositiveUInt64(amount) else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 MOB"
+        guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amount.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
                 completion(.failure(.invalidInput(errorMessage)))
@@ -104,7 +104,7 @@ struct TransactionPreparer {
         }
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanOrEqualToSumOfValues: [amount.value, fee])
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee])
         else {
             logger.warning(
                 "Insufficient balance to prepare transaction: sum of inputs: " +
@@ -132,7 +132,7 @@ struct TransactionPreparer {
                         accountKey: self.accountKey,
                         to: recipient,
                         memoType: memoType,
-                        amount: amount,
+                        amount: positiveValue, // TODO - make PositiveAmount struct ?
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,

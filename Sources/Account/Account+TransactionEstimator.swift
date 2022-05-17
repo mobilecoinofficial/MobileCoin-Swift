@@ -70,8 +70,7 @@ extension Account {
             completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
         ) {
             guard amount.value > 0 else {
-                // TODO fix, add name resolution for TokenId
-                let errorMessage = "estimateTotalFee failure: Cannot spend 0 MOB"
+                let errorMessage = "estimateTotalFee failure: Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -113,8 +112,7 @@ extension Account {
             completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
         ) {
             guard amount.value > 0 else {
-                // TODO fix, add name resolution for TokenId
-                let errorMessage = "requiresDefragmentation failure: Cannot spend 0 MOB"
+                let errorMessage = "requiresDefragmentation failure: Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))

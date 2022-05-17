@@ -111,7 +111,9 @@ final class BlockchainMetaFetcher {
                 let responseFee = response.mobMinimumFee
                 let minimumFee = responseFee != 0 ? responseFee : McConstants.DEFAULT_MINIMUM_FEE
                 let blockVersion = BlockVersion(response.networkBlockVersion)
-                let minimumFees = response.minimumFees
+                let minimumFees = response.minimumFees.reduce(into: [TokenId: UInt64](), { ongoing, keyValue in
+                    ongoing[TokenId(keyValue.key)] = keyValue.value
+                })
                 logger.info("blockVersion == \(blockVersion)") // TODO - delete
                 self.cacheMeta(
                     minimumFee: minimumFee,

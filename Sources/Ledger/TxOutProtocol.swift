@@ -38,7 +38,7 @@ extension TxOutProtocol {
     
     /// - Returns: `nil` when `accountKey` cannot unmask value, either because `accountKey` does not
     ///     own `TxOut` or because ` TxOut` values are incongruent.
-    func tokenId(accountKey: AccountKey) -> UInt64? {
+    func tokenId(accountKey: AccountKey) -> TokenId? {
         amount(accountKey: accountKey)?.tokenId
     }
     
