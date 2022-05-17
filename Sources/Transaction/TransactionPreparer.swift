@@ -71,7 +71,7 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         sendingAllTo: self.selfPaymentAddress,
-                        memoType: recoverableMemo ? .recoverable : .unused, 
+                        memoType: recoverableMemo ? .recoverable : .unused,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
