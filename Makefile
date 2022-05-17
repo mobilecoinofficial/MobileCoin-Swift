@@ -7,34 +7,34 @@ default: setup bootstrap build test
 setup:
 	bundle install
 	@$(MAKE) --directory=Example setup
-	@$(MAKE) --directory=ExampleHTTP setup
+#	@$(MAKE) --directory=ExampleHTTP setup
 
 .PHONY: bootstrap
 bootstrap:
 	@$(MAKE) --directory=Example bootstrap
-	@$(MAKE) --directory=ExampleHTTP bootstrap
+#	@$(MAKE) --directory=ExampleHTTP bootstrap
 
 .PHONY: build
 build:
 	@$(MAKE) --directory=Example build
-	@$(MAKE) --directory=ExampleHTTP build
+#	@$(MAKE) --directory=ExampleHTTP build
 
 .PHONY: test
 test:
 	@$(MAKE) --directory=Example test
-	@$(MAKE) --directory=ExampleHTTP test
+#	@$(MAKE) --directory=ExampleHTTP test
 
 .PHONY: lock
 lock:
 	$(info making locks with setup & boostrap)
 	$(info Example setup)
 	@$(MAKE) --directory=Example setup
-	$(info ExampleHTTP setup)
-	@$(MAKE) --directory=ExampleHTTP setup
+#	$(info ExampleHTTP setup)
+#	@$(MAKE) --directory=ExampleHTTP setup
 	$(info Example bootstrap)
 	@$(MAKE) --directory=Example bootstrap
-	$(info ExampleHTTP bootstrap)
-	@$(MAKE) --directory=ExampleHTTP bootstrap
+#	$(info ExampleHTTP bootstrap)
+#	@$(MAKE) --directory=ExampleHTTP bootstrap
 
 .PHONY: clean
 clean: clean-docs
