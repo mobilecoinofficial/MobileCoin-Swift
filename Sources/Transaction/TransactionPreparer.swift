@@ -91,7 +91,7 @@ struct TransactionPreparer {
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
-            Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
         guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {

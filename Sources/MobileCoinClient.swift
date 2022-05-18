@@ -285,8 +285,9 @@ public final class MobileCoinClient {
             to: recipient,
             memoType: memoType,
             amount: Amount(value: value, tokenId: .MOB),
-            fee: fee,
-            completion: completion)
+            fee: fee) {
+                completion($0.map({ ($0.transaction, $0.receipt) }))
+            }
         
     }
 
@@ -296,7 +297,7 @@ public final class MobileCoinClient {
         amount: Amount,
         fee: UInt64,
         completion: @escaping (
-            Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
         Account.TransactionOperations(
@@ -345,8 +346,11 @@ public final class MobileCoinClient {
             to: recipient,
             memoType: memoType,
             amount: Amount(value: value, tokenId: .MOB),
-            feeLevel: feeLevel,
-            completion: completion)
+            feeLevel: feeLevel) {
+                completion($0.map { pending in
+                    (pending.transaction, pending.receipt)
+                })
+            }
     }
 
     public func prepareTransaction(
@@ -355,7 +359,7 @@ public final class MobileCoinClient {
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (
-            Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
         Account.TransactionOperations(
@@ -415,8 +419,10 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
-        ).prepareDefragmentationStepTransactions(toSendAmount: amount, recoverableMemo: recoverableMemo, feeLevel: feeLevel)
-        { result in
+        ).prepareDefragmentationStepTransactions(
+            toSendAmount: amount,
+            recoverableMemo: recoverableMemo,
+            feeLevel: feeLevel) { result in
             self.callbackQueue.async {
                 completion(result)
             }

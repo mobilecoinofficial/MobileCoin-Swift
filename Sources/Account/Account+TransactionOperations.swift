@@ -43,7 +43,7 @@ extension Account {
             amount: Amount,
             fee: UInt64,
             completion: @escaping (
-                Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+                Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
         ) {
             guard amount.value > 0 else {
@@ -121,7 +121,7 @@ extension Account {
             amount: Amount,
             feeLevel: FeeLevel,
             completion: @escaping (
-                Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+                Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
         ) {
             guard amount.value > 0 else {

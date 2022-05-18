@@ -39,7 +39,7 @@ final class TransactionBuilder {
         blockVersion: BlockVersion,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipt: Receipt), TransactionBuilderError> {
+    ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
             inputs: inputs,
             accountKey: accountKey,
@@ -51,8 +51,8 @@ final class TransactionBuilder {
             blockVersion: blockVersion,
             rng: rng,
             rngContext: rngContext
-        ).map { transaction, transactionReceipts in
-            (transaction, transactionReceipts[0])
+        ).map { pendingTransaction in
+            pendingTransaction.singlePayload
         }
     }
 
@@ -67,7 +67,7 @@ final class TransactionBuilder {
         blockVersion: BlockVersion,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipt: Receipt), TransactionBuilderError> {
+    ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         positiveRemainingAmount(inputValues: inputs.map { $0.knownTxOut.value }, fee: fee)
             .flatMap { outputAmount in
                 build(
@@ -82,8 +82,8 @@ final class TransactionBuilder {
                     blockVersion: blockVersion,
                     rng: rng,
                     rngContext: rngContext
-                ).map { transaction, transactionReceipts in
-                    (transaction, transactionReceipts[0])
+                ).map { pendingTransaction in
+                    pendingTransaction.singlePayload
                 }
             }
     }
@@ -99,12 +99,12 @@ final class TransactionBuilder {
         blockVersion: BlockVersion,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipts: [Receipt]), TransactionBuilderError> {
+    ) -> Result<PendingTransaction, TransactionBuilderError> {
         outputsAddingChangeOutputIfNeeded(
             inputs: inputs,
             outputs: outputs,
             fee: fee
-        ).flatMap { (outputs, changeAmount) in
+        ).flatMap { outputs, changeAmount in
             build(
                 inputs: inputs,
                 accountKey: accountKey,
@@ -132,7 +132,7 @@ final class TransactionBuilder {
         blockVersion: BlockVersion,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipts: [Receipt]), TransactionBuilderError> {
+    ) -> Result<PendingTransaction, TransactionBuilderError> {
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.knownTxOut.value },
                 isEqualToSumOfValues: (outputs.map { $0.amount.value } + [fee] + [changeAmount?.value]).compactMap({$0}))
@@ -156,27 +156,32 @@ final class TransactionBuilder {
             }
         }
 
-        var outputResults = outputs.map { recipient, amount in
+        // Update to use PendingTransaction struct, and dynamic for BlockVersion number
+        let payloadContexts = outputs.map { recipient, amount in
             builder.addOutput(
                 publicAddress: recipient,
                 amount: amount.value,
                 rng: rng,
                 rngContext: rngContext
-            ).map { $0.receipt }
+            )
         }
         
-        if let changeAmount = changeAmount {
-            outputResults.append(builder.addChangeOutput(
-                accountKey: accountKey,
-                amount: changeAmount.value,
-                rng: rng,
-                rngContext: rngContext
-            ).map { $0.receipt })
-        }
-        
-        return outputResults.collectResult().flatMap { receipts in
-            builder.build(rng: rng, rngContext: rngContext).map { transaction in
-                (transaction, receipts)
+        // TODO, adjust for BlockVersion
+        let changeContext = builder.addChangeOutput(
+            accountKey: accountKey,
+            amount: changeAmount?.value ?? 0,
+            rng: rng,
+            rngContext: rngContext
+        )
+
+        return payloadContexts.collectResult().flatMap { payloadContexts in
+            changeContext.flatMap { changeContext in
+                builder.build(rng: rng, rngContext: rngContext).map { transaction in
+                    PendingTransaction(
+                        transaction: transaction,
+                        payloadTxOutContexts: payloadContexts,
+                        changeTxOutContext: changeContext)
+                }
             }
         }
     }
@@ -208,7 +213,7 @@ final class TransactionBuilder {
         blockVersion: BlockVersion,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
+    ) -> Result<TxOutContext, TransactionBuilderError> {
         let transactionBuilder = TransactionBuilder(
             fee: 0,
             tombstoneBlockIndex: tombstoneBlockIndex,
@@ -221,6 +226,7 @@ final class TransactionBuilder {
             rngContext: rngContext)
     }
 
+    // TODO messy, fix
     private static func outputsAddingChangeOutputIfNeeded(
         inputs: [PreparedTxInput],
         outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
@@ -354,23 +360,7 @@ final class TransactionBuilder {
         amount: UInt64,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-        addOutputWithContext(
-            publicAddress: publicAddress,
-            amount: amount,
-            rng: rng,
-            rngContext: rngContext).map {
-                let (txOut, receipt, _) = $0
-                return (txOut: txOut, receipt: receipt)
-            }
-    }
-
-    private func addOutputWithContext(
-        publicAddress: PublicAddress,
-        amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt, sharedSecret: RistrettoPublic), TransactionBuilderError> {
+    ) -> Result<TxOutContext, TransactionBuilderError> {
         var confirmationNumberData = Data32()
         var sharedSecretData = Data32()
         return publicAddress.withUnsafeCStructPointer { publicAddressPtr in
@@ -415,7 +405,7 @@ final class TransactionBuilder {
                 txOut: txOut,
                 confirmationNumber: confirmationNumber,
                 tombstoneBlockIndex: tombstoneBlockIndex)
-            return (txOut, receipt, sharedSecret)
+            return TxOutContext(txOut, receipt, sharedSecret)
         }
     }
 
@@ -424,23 +414,7 @@ final class TransactionBuilder {
         amount: UInt64,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-        addChangeOutputWithContext(
-            accountKey: accountKey,
-            amount: amount,
-            rng: rng,
-            rngContext: rngContext).map {
-                let (txOut, receipt, _) = $0
-                return (txOut: txOut, receipt: receipt)
-            }
-    }
-
-    private func addChangeOutputWithContext(
-        accountKey: AccountKey,
-        amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt, sharedSecret: RistrettoPublic), TransactionBuilderError> {
+    ) -> Result<TxOutContext, TransactionBuilderError> {
         
         var confirmationNumberData = Data32()
         var sharedSecretData = Data32()
@@ -491,7 +465,7 @@ final class TransactionBuilder {
                 txOut: txOut,
                 confirmationNumber: confirmationNumber,
                 tombstoneBlockIndex: tombstoneBlockIndex)
-            return (txOut, receipt, sharedSecret)
+            return TxOutContext(txOut, receipt, sharedSecret)
         }
     }
 
