@@ -52,31 +52,26 @@ class UrlLoadBalancerValidUrlIntTests: XCTestCase {
 
     func testBlockchainDoesNotRotateAwayFromGoodUrl(using transportProtocol: TransportProtocol)
     throws {
-        print("\n-----\nTesting Blockchain url rotation does not occur with good URL using: " +
-              "\(transportProtocol.description)")
+        print("Testing Blockchain url rotation does not occur with good URL using: " +
+              "\(transportProtocol.description)".readable)
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
-        let blockchain = try IntegrationTestFixtures.createBlockchainConnection(
-            for: transportProtocol,
-            using: consensusUrlLoadBalancer)
+        let fixtures = try UrlLoadBalancerFixtures.ValidBlockchain(with: transportProtocol)
+        let loadBalancer = fixtures.loadBalancer
+        let blockchain = fixtures.blockchainService
 
-        XCTAssertEqual(
-            0,
-            consensusUrlLoadBalancer.curIdx,
-            "Consensus URL load balancer should not have rotated and should be at index 0")
+        let rotateMessage = "Consensus URL load balancer should not have rotated and should be at index 0"
+        XCTAssertEqual(0, loadBalancer.curIdx, rotateMessage)
 
-        let expectSuccess = expectation(
+        let expect = expectation(
             description: "Making Blockchain request against valid URL should succeed")
+        
         blockchain.getLastBlockInfo {
-            guard nil != $0.successOrFulfill(expectation: expectSuccess) else { return }
-            expectSuccess.fulfill()
+            guard nil != $0.successOrFulfill(expectation: expect) else { return }
+            expect.fulfill()
         }
         waitForExpectations(timeout: transportProtocol.timeoutInSeconds)
 
-        XCTAssertEqual(
-            0,
-            consensusUrlLoadBalancer.curIdx,
-            "Consensus URL load balancer should not have rotated and should be at index 0")
+        XCTAssertEqual( 0, loadBalancer.curIdx, rotateMessage)
     }
 
     func testConsensusDoesNotRotateAwayFromGoodUrl(using transportProtocol: TransportProtocol)
@@ -276,4 +271,10 @@ class UrlLoadBalancerValidUrlIntTests: XCTestCase {
             "Fog URL load balancer should not have rotated and should be at index 0")
     }
 
+}
+
+extension String {
+    var readable: String {
+        "\n-----\n\(self)\n----\n"
+    }
 }

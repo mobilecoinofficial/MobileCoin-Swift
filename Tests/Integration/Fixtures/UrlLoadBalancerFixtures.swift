@@ -7,7 +7,7 @@ import XCTest
 
 // chose to avoid the extension on the Generic UrlLoadBalancer<> as the
 // use of the fixture would be obtrusive
-class UrlLoadBalancerFixtures {
+struct UrlLoadBalancerFixtures {
     let validUrlsConsensusUrlBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
     let validUrlsFogUrlBalancer: SequentialUrlLoadBalancer<FogUrl>
     let initialInvalidUrlFogUrlBalancer: SequentialUrlLoadBalancer<FogUrl>
@@ -19,6 +19,20 @@ class UrlLoadBalancerFixtures {
         initialInvalidUrlFogUrlBalancer = try Self.createFogUrlLoadBalancerWithInitialInvalidUrl()
         initialInvalidConsensusUrlBalancer =
             try Self.createConsensusUrlLoadBalancerWithInitialInvalidUrl()
+    }
+}
+
+extension UrlLoadBalancerFixtures {
+    struct ValidBlockchain {
+        let loadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
+        let blockchainService: BlockchainConnection
+       
+        init(with: TransportProtocol) throws {
+            self.loadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+            self.blockchainService = try IntegrationTestFixtures.createBlockchainConnection(
+                for: transportProtocol,
+                using: loadBalancer)
+        }
     }
 }
 
