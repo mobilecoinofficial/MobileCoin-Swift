@@ -17,10 +17,8 @@ class FogBlockConnectionIntTests: XCTestCase {
 
     func getBlocks(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetBlocks request")
-
-        var request = FogLedger_BlockRequest()
-        let range: Range<UInt64> = 1..<2
-        request.rangeValues = [range]
+        let fixtures = FogBlockConnection.Fixtures.Default()
+        let request = fixtures.request
         try createFogBlockConnection(transportProtocol:transportProtocol).getBlocks(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
@@ -29,7 +27,7 @@ class FogBlockConnectionIntTests: XCTestCase {
 
             XCTAssertEqual(response.blocks.count, request.ranges.count)
             if let block = response.blocks.first {
-                XCTAssertEqual(block.index, range.lowerBound)
+                XCTAssertEqual(block.index, fixtures.range.lowerBound)
                 XCTAssertGreaterThan(block.globalTxoCount, 0)
                 XCTAssertGreaterThan(block.outputs.count, 0)
             }
