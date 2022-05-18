@@ -56,7 +56,6 @@ class UrlLoadBalancerValidUrlIntTests: XCTestCase {
               "\(transportProtocol.description)")
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
-        
         let blockchain = try IntegrationTestFixtures.createBlockchainConnection(
             for: transportProtocol,
             using: consensusUrlLoadBalancer)
