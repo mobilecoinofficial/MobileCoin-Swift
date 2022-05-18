@@ -85,7 +85,7 @@ extension IntegrationTestFixtures {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
-        
+
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
