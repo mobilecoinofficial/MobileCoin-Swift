@@ -49,12 +49,10 @@ extension IntegrationTestFixtures {
         return SequentialUrlLoadBalancer(urls: fogUrls)
     }
 
-    static func createFogViewConnection
-    (
+    static func createFogViewConnection(
         for transportProtocol: TransportProtocol,
         using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
-    )
-    throws -> FogViewConnection {
+    ) throws -> FogViewConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer =
@@ -75,12 +73,10 @@ extension IntegrationTestFixtures {
         return fogView
     }
 
-    static func createFogUntrustedTxOutConnection
-    (
+    static func createFogUntrustedTxOutConnection(
         for transportProtocol: TransportProtocol,
         using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
-    )
-    throws -> FogUntrustedTxOutConnection {
+    ) throws -> FogUntrustedTxOutConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer =
@@ -101,12 +97,10 @@ extension IntegrationTestFixtures {
         return fogUntrustedTxOut
     }
 
-    static func createFogMerkleProofConnection
-    (
+    static func createFogMerkleProofConnection(
         for transportProtocol: TransportProtocol,
         using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
-    )
-    throws -> FogMerkleProofConnection {
+    ) throws -> FogMerkleProofConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer = try createValidConsensusUrlLoadBalancer()
@@ -126,12 +120,10 @@ extension IntegrationTestFixtures {
         return fogMerkleProof
     }
 
-    static func createFogKeyImageConnection
-    (
+    static func createFogKeyImageConnection(
         for transportProtocol: TransportProtocol,
         using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
-    )
-    throws -> FogKeyImageConnection {
+    ) throws -> FogKeyImageConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer = try createValidConsensusUrlLoadBalancer()
@@ -151,12 +143,10 @@ extension IntegrationTestFixtures {
         return fogKeyImage
     }
 
-    static func createFogBlockConnection
-    (
+    static func createFogBlockConnection(
         for transportProtocol: TransportProtocol,
         using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
-    )
-    throws -> FogBlockConnection {
+    ) throws -> FogBlockConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer =
@@ -177,12 +167,10 @@ extension IntegrationTestFixtures {
         return fogBlock
     }
 
-    static func createBlockchainConnection
-    (
+    static func createBlockchainConnection(
         for transportProtocol: TransportProtocol,
         using consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
-    )
-    throws -> BlockchainConnection {
+    ) throws -> BlockchainConnection {
         consensusUrlLoadBalancer.rotationEnabled = false
 
         let fogUrlLoadBalancer =
@@ -203,12 +191,10 @@ extension IntegrationTestFixtures {
         return blockchain
     }
 
-    static func createConsensusConnection
-    (
+    static func createConsensusConnection(
         for transportProtocol: TransportProtocol,
         using consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
-    )
-    throws -> ConsensusConnection {
+    ) throws -> ConsensusConnection {
         consensusUrlLoadBalancer.rotationEnabled = false
 
         let fogUrlLoadBalancer =

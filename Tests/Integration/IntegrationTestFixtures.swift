@@ -53,8 +53,7 @@ extension IntegrationTestFixtures {
         try createAccountKey(accountIndex: accountIndex).publicAddress
     }
 
-    static func createAccount
-    (
+    static func createAccount(
         accountIndex: Int = 0,
         syncChecker: FogSyncCheckable = FogSyncChecker()
     ) throws -> Account {
@@ -75,8 +74,7 @@ extension IntegrationTestFixtures {
         return networkConfig
     }
 
-    static func createNetworkConfig
-    (
+    static func createNetworkConfig(
         transportProtocol: TransportProtocol,
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
@@ -140,8 +138,7 @@ extension IntegrationTestFixtures {
             transportProtocol: transportProtocol).get()
     }
 
-    static func createMobileCoinClientConfigWithPartialValidConsensusUrls
-    (
+    static func createMobileCoinClientConfigWithPartialValidConsensusUrls(
         using transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
@@ -155,8 +152,7 @@ extension IntegrationTestFixtures {
             transportProtocol: transportProtocol).get()
     }
 
-    static func createMobileCoinClientConfigWithPartialValidFogUrls
-    (
+    static func createMobileCoinClientConfigWithPartialValidFogUrls(
         using transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
@@ -170,8 +166,7 @@ extension IntegrationTestFixtures {
             transportProtocol: transportProtocol).get()
     }
 
-    static func createMobileCoinClientWithPartialValidConsensusUrls
-    (
+    static func createMobileCoinClientWithPartialValidConsensusUrls(
         using transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
         let config = try createMobileCoinClientConfigWithPartialValidConsensusUrls(
@@ -306,8 +301,7 @@ extension IntegrationTestFixtures {
             targetQueue: DispatchQueue.main)
     }
 
-    static func createFogViewKeyScanner
-    (
+    static func createFogViewKeyScanner(
         transportProtocol: TransportProtocol,
         accountKey: AccountKey
     ) throws -> FogViewKeyScanner {
@@ -317,8 +311,7 @@ extension IntegrationTestFixtures {
             fogBlockService: serviceProvider.fogBlockService)
     }
 
-    static func createServiceProvider
-    (
+    static func createServiceProvider(
         transportProtocol: TransportProtocol,
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>

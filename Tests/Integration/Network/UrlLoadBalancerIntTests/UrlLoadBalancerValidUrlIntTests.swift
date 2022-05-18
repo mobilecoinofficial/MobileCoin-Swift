@@ -215,8 +215,7 @@ class UrlLoadBalancerValidUrlIntTests: XCTestCase {
             "Fog URL load balancer should not have rotated and should be at index 0")
     }
 
-    func testFogUntrustedTxOutDoesNotRotateAwayFromGoodUrl
-    (
+    func testFogUntrustedTxOutDoesNotRotateAwayFromGoodUrl(
         using transportProtocol: TransportProtocol
     ) throws {
 
