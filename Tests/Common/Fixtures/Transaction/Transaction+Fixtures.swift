@@ -377,11 +377,18 @@ extension Transaction.Fixtures.BuildTx {
     }
 
     fileprivate static func accountKey() throws -> AccountKey {
-        try XCTUnwrap(AccountKey(serializedData: Data(base64Encoded: """
+        let rootAccountKey = try XCTUnwrap(AccountKey(serializedData: Data(base64Encoded: """
             CiIKIOehy72XOCsNdTLzG/RefRYoupEnA502UKNx5mdax7QNEiIKILuf18L68eT2bJeXd+3f153oGnliqORaT9p\
             efNlL0LAAGilmb2c6Ly9mb2ctaW5nZXN0Lm1vYmlsZWRldi5tb2JpbGVjb2luLmNvbSoUI+nfq9r3TGlCjsDfrB\
             V4Tu3HRm4=
             """)!))
+        
+        return try AccountKey.make(
+            viewPrivateKey: rootAccountKey.viewPrivateKey,
+            spendPrivateKey: rootAccountKey.spendPrivateKey,
+            fogReportUrl: try AccountKey.Fixtures.Init().fogReportUrl,
+            fogReportId: try AccountKey.Fixtures.Init().fogReportId,
+            fogAuthoritySpki: try AccountKey.Fixtures.Init().fogAuthoritySpki).get()
     }
 
     fileprivate static func outputs() throws
