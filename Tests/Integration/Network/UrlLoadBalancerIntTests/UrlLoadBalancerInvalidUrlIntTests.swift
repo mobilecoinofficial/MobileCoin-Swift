@@ -55,7 +55,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
               "\(transportProtocol.description)")
 
         let consensusUrlLoadBalancer =
-            try IntegrationTestFixtures.createConsensusUrlLoadBalancerWithInitialInvalidUrl()
+            try UrlLoadBalancerFixtures().initialInvalidConsensusUrlBalancer
 
         let blockchain = try IntegrationTestFixtures.createBlockchainConnection(
             for: transportProtocol,
@@ -93,7 +93,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
               "\(transportProtocol.description)")
 
         let consensusUrlLoadBalancer =
-            try IntegrationTestFixtures.createConsensusUrlLoadBalancerWithInitialInvalidUrl()
+            try UrlLoadBalancerFixtures().initialInvalidConsensusUrlBalancer
 
         let consensus = try IntegrationTestFixtures.createConsensusConnection(
             for: transportProtocol,
@@ -131,9 +131,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
         print("\n-----\nTesting FogBlock url rotation away from invalid for protocol: " +
               "\(transportProtocol.description)")
 
-        let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createFogUrlLoadBalancerWithInitialInvalidUrl()
-
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().initialInvalidUrlFogUrlBalancer
         let fogBlock = try IntegrationTestFixtures.createFogBlockConnection(
             for: transportProtocol,
             using: fogUrlLoadBalancer)
@@ -169,9 +167,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
         print("\n-----\nTesting FogKeyImage url rotation away from invalid for protocol: " +
               "\(transportProtocol.description)")
 
-        let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createFogUrlLoadBalancerWithInitialInvalidUrl()
-
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().initialInvalidUrlFogUrlBalancer
         let fogKeyImage = try IntegrationTestFixtures.createFogKeyImageConnection(
             for: transportProtocol,
             using: fogUrlLoadBalancer)
@@ -209,9 +205,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
         print("\n-----\nTesting FogMerkleProof url rotation away from invalid for protocol: " +
               "\(transportProtocol.description)")
 
-        let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createFogUrlLoadBalancerWithInitialInvalidUrl()
-
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().initialInvalidUrlFogUrlBalancer
         let fogMerkleProof = try IntegrationTestFixtures.createFogMerkleProofConnection(
             for: transportProtocol,
             using: fogUrlLoadBalancer)
@@ -249,8 +243,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
         print("\n-----\nTesting FogUntrustedTxOut url rotation away from invalid for protocol: " +
               "\(transportProtocol.description)")
 
-        let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createFogUrlLoadBalancerWithInitialInvalidUrl()
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().initialInvalidUrlFogUrlBalancer
         let fogUntrustedTxOut =
             try IntegrationTestFixtures.createFogUntrustedTxOutConnection(
                 for: transportProtocol,
@@ -286,8 +279,7 @@ class UrlLoadBalancerInvalidUrlIntTests: XCTestCase {
         print("\n-----\nTesting FogView url rotation away from invalid using: " +
               "\(transportProtocol.description)")
 
-        let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createFogUrlLoadBalancerWithInitialInvalidUrl()
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().initialInvalidUrlFogUrlBalancer
         let fogView = try IntegrationTestFixtures.createFogViewConnection(
             for: transportProtocol,
             using: fogUrlLoadBalancer)

@@ -8,46 +8,6 @@ import Foundation
 import XCTest
 
 extension IntegrationTestFixtures {
-    static func createValidConsensusUrlLoadBalancer()
-    throws -> SequentialUrlLoadBalancer<ConsensusUrl> {
-        // same url purposefully doubled-up, as we use the current index to detect rotation
-        let urlStrings = [
-            IntegrationTestFixtures.network.consensusUrl,
-            IntegrationTestFixtures.network.consensusUrl,
-        ]
-        let consensusUrls = try ConsensusUrl.make(strings: urlStrings).get()
-        return SequentialUrlLoadBalancer(urls: consensusUrls)
-    }
-
-    static func createValidFogUrlLoadBalancer() throws -> SequentialUrlLoadBalancer<FogUrl> {
-        // same url purposefully doubled-up, as we use the current index to detect rotation
-        let urlStrings = [
-            IntegrationTestFixtures.network.fogUrl,
-            IntegrationTestFixtures.network.fogUrl,
-        ]
-        let fogUrls = try FogUrl.make(strings: urlStrings).get()
-        return SequentialUrlLoadBalancer(urls: fogUrls)
-    }
-
-    static func createConsensusUrlLoadBalancerWithInitialInvalidUrl()
-    throws -> SequentialUrlLoadBalancer<ConsensusUrl> {
-        let urlStrings = [
-            IntegrationTestFixtures.invalidConsensusUrl,
-            IntegrationTestFixtures.network.consensusUrl,
-        ]
-        let consensusUrls = try ConsensusUrl.make(strings: urlStrings).get()
-        return SequentialUrlLoadBalancer(urls: consensusUrls)
-    }
-
-    static func createFogUrlLoadBalancerWithInitialInvalidUrl()
-    throws -> SequentialUrlLoadBalancer<FogUrl> {
-        let urlStrings = [
-            IntegrationTestFixtures.invalidFogUrl,
-            IntegrationTestFixtures.network.fogUrl,
-        ]
-        let fogUrls = try FogUrl.make(strings: urlStrings).get()
-        return SequentialUrlLoadBalancer(urls: fogUrls)
-    }
 
     static func createFogViewConnection(
         for transportProtocol: TransportProtocol,
@@ -56,7 +16,7 @@ extension IntegrationTestFixtures {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer =
-            try IntegrationTestFixtures.createValidConsensusUrlLoadBalancer()
+            try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
@@ -80,7 +40,7 @@ extension IntegrationTestFixtures {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer =
-            try IntegrationTestFixtures.createValidConsensusUrlLoadBalancer()
+            try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
@@ -103,8 +63,9 @@ extension IntegrationTestFixtures {
     ) throws -> FogMerkleProofConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try createValidConsensusUrlLoadBalancer()
-
+        let consensusUrlLoadBalancer =
+            try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
@@ -126,8 +87,9 @@ extension IntegrationTestFixtures {
     ) throws -> FogKeyImageConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try createValidConsensusUrlLoadBalancer()
-
+        let consensusUrlLoadBalancer =
+            try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
@@ -150,7 +112,7 @@ extension IntegrationTestFixtures {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer =
-            try IntegrationTestFixtures.createValidConsensusUrlLoadBalancer()
+            try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
@@ -174,7 +136,7 @@ extension IntegrationTestFixtures {
         consensusUrlLoadBalancer.rotationEnabled = false
 
         let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createValidFogUrlLoadBalancer()
+            try UrlLoadBalancerFixtures().validUrlsFogUrlBalancer
 
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
@@ -198,7 +160,7 @@ extension IntegrationTestFixtures {
         consensusUrlLoadBalancer.rotationEnabled = false
 
         let fogUrlLoadBalancer =
-            try IntegrationTestFixtures.createValidFogUrlLoadBalancer()
+            try UrlLoadBalancerFixtures().validUrlsFogUrlBalancer
 
         let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
             transportProtocol: transportProtocol,
