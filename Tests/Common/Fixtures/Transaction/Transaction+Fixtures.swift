@@ -72,7 +72,7 @@ extension Transaction.Fixtures.BuildTx {
                     commitment: Data32(base64Encoded:
                         "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
                     maskedValue: 2886556578342610519,
-                    maskedTokenId: Data(), // TODO replace with MOB ? 
+                    maskedTokenId: Data(),
                     targetKey: RistrettoPublic(base64Encoded:
                         "VECBlIdhtmTFaXtlWphlqELpDL04EKMbbPWu3CoJ2UE=")!,
                     publicKey: RistrettoPublic(base64Encoded:
