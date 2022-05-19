@@ -25,3 +25,5 @@ extension BalanceTests {
     static let maxBalanceTxoAmounts =
         Array(repeating: maxBalanceTxoAmountPico, count: maxBalanceNumTxos)
 }
+
+// 18_446_744_073_709_551_615

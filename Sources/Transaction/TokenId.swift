@@ -6,6 +6,12 @@ import Foundation
 
 public struct TokenId {
     public let value: UInt64
+    public var name: String {
+        Self.names[self] ?? "TokenId \(self.value)"
+    }
+    public var significantDigits: UInt8 {
+        Self.significantDigits[self] ?? 12
+    }
 
     public init(_ value: UInt64) {
         self.value = value
@@ -14,15 +20,26 @@ public struct TokenId {
 
 extension TokenId {
     public static var MOB = TokenId(0)
+    public static var MOBUSD = TokenId(1)
 }
 
 extension TokenId: CustomStringConvertible {
     public var description: String {
-        Self.names[self] ?? "Token \(self.value)"
+        self.name
     }
 
-    public static var names: [TokenId: String] = {
-        [.MOB: "MOB"]
+    static var names: [TokenId: String] = {
+        [
+            .MOB: "MOB",
+            .MOBUSD: "MOBUSD"
+        ]
+    }()
+    
+    static var significantDigits: [TokenId: UInt8] = {
+        [
+            .MOB: 12,
+            .MOBUSD: 6
+        ]
     }()
 }
 

@@ -9,12 +9,19 @@ public struct Balance {
     public let amountPicoMobHigh: UInt8
     public let tokenId: TokenId
     let blockCount: UInt64
-
+    
     init(values: [UInt64], blockCount: UInt64, tokenId: TokenId) {
         var amountLow: UInt64 = 0
         var amountHigh: UInt8 = 0
-        for value in values {
+        // 18446744073709551615
+        // 1553255926290448384
+        
+        // 18446744073709551615
+        // 10000000000000000000
+        for (index, value) in values.enumerated() {
+            print("\(index < 10 ? "0" + String(index) : String(index)) \(value)")
             let (partialValue, overflow) = amountLow.addingReportingOverflow(value)
+            print("overflow: \(overflow ? "Y" : "N") \(partialValue)")
             amountLow = partialValue
             if overflow {
                 amountHigh += 1
@@ -59,6 +66,9 @@ public struct Balance {
     /// million MOB in circulation and assuming a base unit of 1 picoMOB as the smallest indivisible
     /// unit of MOB.
     public var amountMobParts: (mobInt: UInt32, picoFrac: UInt64) {
+        //
+        // > Example math with significant digits == 12
+        //
         // amount (picoMOB) = amountLow + amountHigh * 2^64
         //
         // amountLowMobDec = amountLow / 10^12
@@ -70,8 +80,14 @@ public struct Balance {
         // amountLowPicoFrac = amountLow % 10^12
 
         // amountHighMobInt = floor((amountHigh * 2^64) / 10^12)
+        //                  = floor((amountHigh * (2^52 * 2^12)) / (5^12 * 2^12)
+        //
+        //                  // factor out the (2^12), for now
         //                  = floor((amountHigh << 52) / 5^12)
+        //
         // amountHighPicoFrac = (amountHigh * 2^64) % 10^12
+        
+        //                  // re-apply the 2^12
         //                   = ((amountHigh << 52) % 5^12) << 12
         //
         // amountPicoFracCarry = floor((amountLowPicoFrac + amountHighPicoFrac) / 10^12)
@@ -79,22 +95,61 @@ public struct Balance {
         // amountMobInt = amountLowMobInt + amountHighMobInt + amountPicoFracCarry
         // amountPicoFrac = (amountLowPicoFrac + amountHighPicoFrac) % 10^12
 
+        
+        //
+        // > Example math with significant digits == 6
+        //
+        // amount (picoMOB) = amountLow + amountHigh * 2^64
+        //
+        // amountLowMobDec = amountLow / 10^6
+        // amountHighMobDec = amountHigh * 2^64 / 10^6
+        //
+        // amountMobDec = amountLowMobDec + amountHighMobDec
+        //
+        // amountLowMobInt = floor(amountLow / 10^6)
+        // amountLowPicoFrac = amountLow % 10^6
+
+        // amountHighMobInt = floor((amountHigh * 2^64) / 10^6)
+        //                  = floor((amountHigh * (2^52 * 2^6)) / (5^6 * 2^6)
+        //
+        //                  // factor out the (2^6), for now
+        //                  = floor((amountHigh << 58) / 5^6)
+        //
+        // amountHighPicoFrac = (amountHigh * 2^64) % 10^6
+        
+        //                  // re-apply the 2^6
+        //                   = ((amountHigh << 58) % 5^6) << 6
+        //
+        // amountPicoFracCarry = floor((amountLowPicoFrac + amountHighPicoFrac) / 10^6)
+        //
+        // amountMobInt = amountLowMobInt + amountHighMobInt + amountPicoFracCarry
+        // amountPicoFrac = (amountLowPicoFrac + amountHighPicoFrac) % 10^6
+
+        
+        // Significant Digits varies based on the the TokenId, examples:
+        // 10^12 = 1_000_000_000_000
+        // 10^6 = 1_000_000
+        let significantDigits = tokenId.significantDigits
+        
+        let divideBy = UInt64(pow(Double(10), Double(significantDigits)))
         let (amountLowMobInt, amountLowPicoFrac) = { () -> (UInt32, UInt64) in
             // 10^12 = 1_000_000_000_000
-            let mobParts = amountPicoMobLow.quotientAndRemainder(dividingBy: 1_000_000_000_000)
+            let mobParts = amountPicoMobLow.quotientAndRemainder(dividingBy: divideBy)
             return (UInt32(mobParts.quotient), mobParts.remainder)
         }()
 
         let (amountHighMobInt, amountHighPicoFrac) = { () -> (UInt32, UInt64) in
-            // Intermediary = base of 5^-12 MOB
-            let amountHighIntermediary = UInt64(amountPicoMobHigh) << 52
+            // Intermediary = base of 5^(64-12) MOB
+            let amountHighIntermediary = UInt64(amountPicoMobHigh) << (64 - significantDigits)
             // 5^12 = 244_140_625
-            let mobParts = amountHighIntermediary.quotientAndRemainder(dividingBy: 244_140_625)
-            return (UInt32(mobParts.quotient), mobParts.remainder << 12)
+            // 5^6 = 15_625
+            let factored = UInt64(pow(Double(5), Double(significantDigits)))
+            let mobParts = amountHighIntermediary.quotientAndRemainder(dividingBy: factored)
+            return (UInt32(mobParts.quotient), mobParts.remainder << significantDigits)
         }()
 
         let amountPicoFracParts = (amountLowPicoFrac + amountHighPicoFrac).quotientAndRemainder(
-            dividingBy: 1_000_000_000_000)
+            dividingBy: divideBy)
 
         let amountMobInt = amountLowMobInt + amountHighMobInt + UInt32(amountPicoFracParts.quotient)
         let amountPicoFrac = amountPicoFracParts.remainder
@@ -109,6 +164,6 @@ extension Balance: Hashable {}
 extension Balance: CustomStringConvertible {
     public var description: String {
         let amountMob = amountMobParts
-        return String(format: "%u.%012llu MOB", amountMob.mobInt, amountMob.picoFrac)
+        return String(format: "%u.%0\(tokenId.significantDigits)llu \(tokenId.name)", amountMob.mobInt, amountMob.picoFrac)
     }
 }

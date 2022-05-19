@@ -84,6 +84,10 @@ public final class MobileCoinClient {
         balance(for: .MOB)
     }
 
+    public var balances: Balances {
+        accountLock.readSync { $0.cachedBalances }
+    }
+
     public var accountTokenIds: Set<TokenId> {
         accountLock.readSync { $0.cachedTxOutTokenIds }
     }
