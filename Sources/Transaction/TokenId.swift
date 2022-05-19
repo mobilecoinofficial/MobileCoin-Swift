@@ -9,8 +9,13 @@ public struct TokenId {
     public var name: String {
         Self.names[self] ?? "TokenId \(self.value)"
     }
+    
     public var significantDigits: UInt8 {
         Self.significantDigits[self] ?? 12
+    }
+    
+    public var siPrefix: String? {
+        SIDecimalPrefix(rawValue: significantDigits)?.name
     }
 
     public init(_ value: UInt64) {
