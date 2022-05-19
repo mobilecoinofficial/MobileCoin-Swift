@@ -8,10 +8,10 @@ public struct Balance {
     public let amountLow: UInt64
     public let amountHigh: UInt64
     
-    @available(*, deprecated, message: "Use the new SI prefix & token agnostic amountLow")
+    @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amountLow`")
     public var amountPicoMobLow: UInt64 { amountLow }
     
-    @available(*, deprecated, message: "Use the new SI prefix & token agnostic amountHigh")
+    @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amountHigh`")
     public var amountPicoMobHigh: UInt64 { amountHigh }
     
     public let tokenId: TokenId
@@ -20,10 +20,8 @@ public struct Balance {
     init(values: [UInt64], blockCount: UInt64, tokenId: TokenId) {
         var amountLow: UInt64 = 0
         var amountHigh: UInt64 = 0
-        for (index, value) in values.enumerated() {
-            print("\(index < 10 ? "0" + String(index) : String(index)) \(value)")
+        for value in values {
             let (partialValue, overflow) = amountLow.addingReportingOverflow(value)
-            print("overflow: \(overflow ? "Y" : "N") \(partialValue)")
             amountLow = partialValue
             if overflow {
                 amountHigh += 1
@@ -51,7 +49,7 @@ public struct Balance {
         return amountLow
     }
 
-    @available(*, deprecated, message: "Use the new token agnostic amountParts")
+    @available(*, deprecated, message: "Use the new token agnostic `.amountParts`")
     public var amountMobParts: (mobInt: UInt64, picoFrac: UInt64) {
         (mobInt: amountParts.int, picoFrac: amountParts.frac)
     }
@@ -148,7 +146,7 @@ extension Balance: Hashable {}
 extension Balance: CustomStringConvertible {
     public var description: String {
         let amount = amountParts
-        return String(format: "%u.%0\(tokenId.significantDigits)llu \(tokenId.name)", amount.int, amount.frac)
+        return String(format: "%llu.%0\(tokenId.significantDigits)llu \(tokenId.name)", amount.int, amount.frac)
     }
 }
 

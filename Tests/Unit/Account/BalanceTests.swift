@@ -14,6 +14,7 @@ class BalanceTests: XCTestCase {
         XCTAssertEqual(maxBalance.amountPicoMobLow, 15532559262904483840)
         XCTAssertEqual(maxBalance.amountMobParts.mobInt, fixture.maxBalanceMob)
         XCTAssertEqual(maxBalance.amountMobParts.picoFrac, 0)
+        XCTAssertEqual(maxBalance.description, fixture.balanceDescription)
     }
 
     func testMaxBalanceMOBUSD() {
@@ -26,6 +27,7 @@ class BalanceTests: XCTestCase {
         XCTAssertEqual(maxBalance.amountLow, 15532559262904483840)
         XCTAssertEqual(maxBalance.amountParts.int, 200_000_000_000_000)
         XCTAssertEqual(maxBalance.amountParts.frac, 0)
+        XCTAssertEqual(maxBalance.description, fixture.balanceDescription)
     }
 
 }
@@ -40,7 +42,8 @@ extension BalanceTests.Fixtures {
         let maxBalanceMob: UInt64 = 200_000_000
         let maxBalanceTxoAmountPico: UInt64 = 10_000_000__000_000_000_000
         let maxBalanceNumTxos: Int
-        let maxBalanceTxoAmounts: Array<UInt64>
+        let maxBalanceTxoAmounts: [UInt64]
+        let balanceDescription: String = "200000000.000000000000 MOB"
 
         init() {
             self.maxBalanceNumTxos =
@@ -55,14 +58,14 @@ extension BalanceTests.Fixtures {
         let maxBalanceMobUSD: UInt64 = 200_000_000_000_000
         let txoAmountMicro: UInt64 = 10_000_000_000_000__000_000
         let maxBalanceNumTxos: Int
-        let maxBalanceTxoAmounts: Array<UInt64>
+        let maxBalanceTxoAmounts: [UInt64]
+        let balanceDescription: String = "200000000000000.000000 MOBUSD"
         
         init() {
             self.maxBalanceNumTxos =
                 Int(UInt64(maxBalanceMobUSD) / (txoAmountMicro / divideBy))
             self.maxBalanceTxoAmounts =
                 Array(repeating: txoAmountMicro, count: maxBalanceNumTxos)
-            
         }
     }
 }
