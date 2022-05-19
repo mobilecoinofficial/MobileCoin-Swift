@@ -156,7 +156,6 @@ final class TransactionBuilder {
             }
         }
 
-        // Update to use PendingTransaction struct, and dynamic for BlockVersion number
         let payloadContexts = outputs.map { recipient, amount in
             builder.addOutput(
                 publicAddress: recipient,
@@ -166,13 +165,23 @@ final class TransactionBuilder {
             )
         }
         
-        // TODO, adjust for BlockVersion
-        let changeContext = builder.addChangeOutput(
-            accountKey: accountKey,
-            amount: changeAmount?.value ?? 0,
-            rng: rng,
-            rngContext: rngContext
-        )
+        let changeContext: Result<TxOutContext, TransactionBuilderError>
+        switch blockVersion {
+        case .legacy:
+            // Clients built for BlockVersion == 0 (.legacy) will have trouble finding txOuts
+            // on the new change subaddress (max - 1), so we will emulate legacy behavior.
+            changeContext = builder.addOutput(
+                publicAddress: accountKey.publicAddress,
+                amount: changeAmount?.value ?? 0,
+                rng: rng,
+                rngContext: rngContext)
+        default:
+            changeContext = builder.addChangeOutput(
+                accountKey: accountKey,
+                amount: changeAmount?.value ?? 0,
+                rng: rng,
+                rngContext: rngContext)
+        }
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
             changeContext.flatMap { changeContext in
