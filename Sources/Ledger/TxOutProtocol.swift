@@ -66,7 +66,7 @@ extension TxOutProtocol {
         .first
     }
 
-    private func indexedKeyImage(index: UInt64, accountKey: AccountKey) -> IndexedKeyImage? {
+    func indexedKeyImage(index: UInt64, accountKey: AccountKey) -> IndexedKeyImage? {
         guard
             let sspk = accountKey.subaddressSpendPrivateKey(index: index),
             let keyImage = TxOutUtils.keyImage(

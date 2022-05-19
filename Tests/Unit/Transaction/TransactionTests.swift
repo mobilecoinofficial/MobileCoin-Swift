@@ -20,4 +20,52 @@ class TransactionTests: XCTestCase {
             blockVersion: fixture.blockVersion))
     }
 
+    func testLegacyBlockVersion() throws {
+        let fixture = try Transaction.Fixtures.BuildTx()
+        let txOutContext = try TransactionBuilder.build(
+            inputs: fixture.inputs,
+            accountKey: fixture.accountKey,
+            outputs: fixture.outputs,
+            memoType: .unused,
+            fee: fixture.fee,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fogResolver: fixture.fogResolver,
+            blockVersion: .legacy).get()
+        
+        let txOut = txOutContext.changeTxOutContext.txOut
+        let accountKey = fixture.accountKey
+        let indexedKeyImage = txOut.indexedKeyImage(
+            index: accountKey.subaddressIndex,
+            accountKey: accountKey)
+        guard let (index, _) = indexedKeyImage,
+              index == McConstants.DEFAULT_SUBADDRESS_INDEX else {
+                XCTFail("Invalid")
+                  return
+        }
+    }
+
+    func testRTHBlockVersion() throws {
+        let fixture = try Transaction.Fixtures.BuildTx()
+        let txOutContext = try TransactionBuilder.build(
+            inputs: fixture.inputs,
+            accountKey: fixture.accountKey,
+            outputs: fixture.outputs,
+            memoType: .unused,
+            fee: fixture.fee,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fogResolver: fixture.fogResolver,
+            blockVersion: .minRTHEnabled).get()
+        
+        let txOut = txOutContext.changeTxOutContext.txOut
+        let accountKey = fixture.accountKey
+        let indexedKeyImage = txOut.indexedKeyImage(
+            index: accountKey.changeSubaddressIndex,
+            accountKey: accountKey)
+        guard let (index, _) = indexedKeyImage,
+              index == McConstants.DEFAULT_CHANGE_SUBADDRESS_INDEX else {
+                XCTFail("Invalid")
+                  return
+        }
+    }
+
 }
