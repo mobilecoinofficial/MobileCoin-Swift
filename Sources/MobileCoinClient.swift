@@ -487,47 +487,6 @@ extension MobileCoinClient {
 }
 
 extension MobileCoinClient {
-    @available(*, deprecated, message: "Use amountTransferable(feeLevel:completion:) instead")
-    public func amountTransferable(feeLevel: FeeLevel = .minimum)
-        -> Result<UInt64, BalanceTransferEstimationError>
-    {
-        Account.TransactionEstimator(
-            account: accountLock,
-            metaFetcher: metaFetcher,
-            txOutSelectionStrategy: txOutSelectionStrategy,
-            targetQueue: serialQueue
-        ).amountTransferable(feeLevel: feeLevel)
-    }
-
-    @available(*, deprecated, message:
-        "Use estimateTotalFee(toSendAmount:feeLevel:completion:) instead")
-    public func estimateTotalFee(
-        toSendAmount amount: UInt64,
-        feeLevel: FeeLevel = .minimum
-    ) -> Result<UInt64, TransactionEstimationError> {
-        Account.TransactionEstimator(
-            account: accountLock,
-            metaFetcher: metaFetcher,
-            txOutSelectionStrategy: txOutSelectionStrategy,
-            targetQueue: serialQueue
-        ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
-    }
-
-    @available(*, deprecated, message:
-        "Use requiresDefragmentation(toSendAmount:feeLevel:completion:) instead")
-    public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
-        -> Result<Bool, TransactionEstimationError>
-    {
-        Account.TransactionEstimator(
-            account: accountLock,
-            metaFetcher: metaFetcher,
-            txOutSelectionStrategy: txOutSelectionStrategy,
-            targetQueue: serialQueue
-        ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
-    }
-}
-
-extension MobileCoinClient {
     public struct Config {
         /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
         ///     with the appropriate schemes.

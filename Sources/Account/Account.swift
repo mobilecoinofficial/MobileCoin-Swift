@@ -88,36 +88,8 @@ final class Account {
         return (txOuts: txOuts, blockCount: knowableBlockCount)
     }
 
-    // TODO - may not be necc. to deprecate, but could be useful in verifying all call-sites are good
-    @available(*, deprecated, message:
-        """
-        Use the new `unspentTxOuts(tokenId:TokenId)` that accepts a `TokenId` as an input parameter.
-        
-        `var unspentTxOuts: [KnownTxOut]` will return ALL `KnownTxOut`s for all tokenIds.
-        """)
-    var unspentTxOuts: [KnownTxOut] {
-        unspentTxOutsAndBlockCount.txOuts
-    }
-
     func unspentTxOuts(tokenId: TokenId) -> [KnownTxOut] {
         unspentTxOutsAndBlockCount(tokenId: tokenId).txOuts
-    }
-
-    // TODO - may not be necc. to deprecate, but could be useful in verifying all call-sites are good
-    @available(*, deprecated, message:
-        """
-        Use the new `unspentTxOutsAndBlockCount(tokenId:TokenId)` that accepts `TokenId` as an
-            input parameter.
-        
-        `var unspentTxOutsAndBlockCount: (txOuts: [KnownTxOut], blockCount: UInt64)` will return all
-            unfiltered.
-        """)
-    var unspentTxOutsAndBlockCount: (txOuts: [KnownTxOut], blockCount: UInt64) {
-        let knowableBlockCount = self.knowableBlockCount
-        let txOuts = allTxOutTrackers
-            .filter { $0.receivedAndUnspent(asOfBlockCount: knowableBlockCount) }
-            .map { $0.knownTxOut }
-        return (txOuts: txOuts, blockCount: knowableBlockCount)
     }
 
     func unspentTxOutsAndBlockCount(
