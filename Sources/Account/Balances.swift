@@ -30,3 +30,10 @@ public struct Balances {
         self.blockCount = blockCount
     }
 }
+
+extension Balances: CustomStringConvertible {
+    public var description: String {
+        "Balances: " + balances.values.map({ $0.description }).joined(separator: ", ")
+    }
+}
+

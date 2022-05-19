@@ -65,6 +65,7 @@ public final class MobileCoinClient {
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
             targetQueue: serialQueue)
+        
         self.metaFetcher = BlockchainMetaFetcher(
             blockchainService: serviceProvider.blockchainService,
             metaCacheTTL: config.metaCacheTTL,
@@ -602,4 +603,16 @@ extension MobileCoinClient {
             set { networkConfig.httpRequester = newValue }
         }
     }
+}
+
+extension MobileCoinClient {
+    
+    public func blockVersion(
+        _ completion: @escaping (Result<BlockVersion, ConnectionError>
+    ) -> Void) {
+        metaFetcher.blockVersion {
+            completion($0)
+        }
+    }
+    
 }

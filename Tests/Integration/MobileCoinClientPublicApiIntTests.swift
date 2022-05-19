@@ -39,17 +39,39 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func balances(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 0,
+            transportProtocol:transportProtocol)
 
-        client.updateBalance {
-            guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-            if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
-                print("balance: \(amountPicoMob)")
-                XCTAssertGreaterThan(amountPicoMob, 0)
+        client.blockVersion {
+            guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
+                XCTExpectFailure("Balances test only available on networks with BlockVersion >= 2")
+                return
             }
+            
+            client.updateBalances {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
-            expect.fulfill()
+                let balances = client.balances
+                print(balances)
+                
+                // Expect MOB & MOBUSD
+                XCTAssertGreaterThan(balances.balances.count, 1)
+                
+                print(client.accountActivity.describeUnspentTxOuts())
+
+                // Expect balances to be greater than zero
+                XCTAssertTrue(
+                    balances.balances[.MOB]!.amountParts.int > 0 ||
+                    balances.balances[.MOB]!.amountParts.frac > 0
+                )
+                XCTAssertTrue(
+                    balances.balances[.MOBUSD]!.amountParts.int > 0 ||
+                    balances.balances[.MOBUSD]!.amountParts.frac > 0
+                )
+
+                expect.fulfill()
+            }
         }
     }
 //
@@ -60,25 +82,25 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 //        }
 //    }
 
-//    func testAllBalances() throws {
-//        let indexes = Array(0...7)
-//        let expect = expectation(description: description)
-//        try indexes.forEach { index in
-//            let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: index, transportProtocol: .grpc)
-//
-//            client.updateBalances {
-//                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-//
-//                if let balances = try? XCTUnwrap(client.balances.balances),
-//                   let accountKey = try? IntegrationTestFixtures.createAccountKey(accountIndex: index) {
-//                    print("Account Index \(index), \(Base58Coder.encode(accountKey.publicAddress)), \(balances)")
-//                }
-//
-//            }
-//        }
-//        waitForExpectations(timeout: 300)
-//    }
-//
+    func testAllBalances() throws {
+        let indexes = Array(0...7)
+        let expect = expectation(description: description)
+        try indexes.forEach { index in
+            let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: index, transportProtocol: .grpc)
+
+            client.updateBalances {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                if let balances = try? XCTUnwrap(client.balances.balances),
+                   let accountKey = try? IntegrationTestFixtures.createAccountKey(accountIndex: index) {
+                    print("Account Index \(index), \(Base58Coder.encode(accountKey.publicAddress)), \(balances)")
+                }
+
+            }
+        }
+        waitForExpectations(timeout: 300)
+    }
+
     func testAccountActivity() throws {
         let description = "Updating account balance"
         try testSupportedProtocols(description: description) {
@@ -597,4 +619,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+}
+
+extension AccountActivity {
+    public func describeUnspentTxOuts() -> String {
+        [
+            self.txOuts.filter { $0.spentBlock == nil }.map {
+                "Unspent TxOut \($0.value) \($0.tokenId.name)"
+            }
+        ]
+        .flatMap({$0})
+        .joined(separator: ", \n")
+    }
 }

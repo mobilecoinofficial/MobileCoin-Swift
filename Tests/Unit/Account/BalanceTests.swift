@@ -68,4 +68,18 @@ extension BalanceTests.Fixtures {
                 Array(repeating: txoAmountMicro, count: maxBalanceNumTxos)
         }
     }
+    
+    static func describe(accountActivity: AccountActivity) -> String {
+        [
+            ["Account Activity:"],
+            accountActivity.txOuts.filter { $0.spentBlock != nil }.map {
+                "TxOut Spent in Block \($0.spentBlock!), \($0.value) \($0.tokenId.name)"
+            },
+            accountActivity.txOuts.filter { $0.spentBlock == nil }.map {
+                "Unspent TxOut \($0.value) \($0.tokenId.name)"
+            }
+        ]
+        .flatMap({$0})
+        .joined(separator: ", \n")
+    }
 }

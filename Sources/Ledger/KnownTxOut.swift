@@ -32,9 +32,6 @@ struct KnownTxOut: TxOutProtocol {
         self.amount = amount
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
-
-        print("KnownTxOut \(keyImage.data.base64EncodedString()) " +
-              "| index = \(subaddressIndex) | value = \(value)")
     }
 
     var value: UInt64 { amount.value }

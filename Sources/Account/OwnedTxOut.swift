@@ -10,6 +10,8 @@ public struct OwnedTxOut {
     public var publicKey: Data { publicKeyTyped.data }
 
     public let value: UInt64
+    
+    public let tokenId: TokenId
 
     let keyImageTyped: KeyImage
     /// - Returns: `TxOut` key  image
@@ -28,6 +30,7 @@ public struct OwnedTxOut {
     ) {
         self.publicKeyTyped = knownTxOut.publicKey
         self.value = knownTxOut.value
+        self.tokenId = knownTxOut.tokenId
         self.keyImageTyped = knownTxOut.keyImage
         self.receivedBlock = receivedBlock
         self.spentBlock = spentBlock
