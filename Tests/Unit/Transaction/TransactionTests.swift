@@ -20,6 +20,7 @@ class TransactionTests: XCTestCase {
             blockVersion: fixture.blockVersion))
     }
 
+    // TODO refactor to be less messy
     func testLegacyBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
         let txOutContext = try TransactionBuilder.build(
@@ -44,6 +45,7 @@ class TransactionTests: XCTestCase {
         }
     }
 
+    // TODO refactor to be less messy
     func testRTHBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
         let txOutContext = try TransactionBuilder.build(
