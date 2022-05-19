@@ -202,7 +202,10 @@ final class Account {
 
 extension Account {
     /// - Returns: `.failure` if `accountKey` doesn't use Fog.
-    static func make(accountKey: AccountKey, syncChecker: FogSyncCheckable) -> Result<Account, InvalidInputError> {
+    static func make(
+        accountKey: AccountKey,
+        syncChecker: FogSyncCheckable
+    ) -> Result<Account, InvalidInputError> {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
             let errorMessage = "Accounts without fog URLs are not currently supported."
             logger.error(errorMessage, logFunction: false)
