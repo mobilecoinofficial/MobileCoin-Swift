@@ -226,6 +226,7 @@ enum TxOutUtils {
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> Amount? {
+        var mcTxOutAmount = McTxOutAmount()
         return maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
             publicKey.asMcBuffer { publicKeyPtr in
                 viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
@@ -239,6 +240,7 @@ enum TxOutUtils {
                             &mcAmount,
                             publicKeyPtr,
                             viewKeyBufferPtr,
+                            &mcTxOutAmount,
                             &valueOut,
                             &tokenIdOut,
                             &errorPtr)
