@@ -143,6 +143,7 @@ final class TransactionBuilder {
         logger.info("transaction builder blockVersion == \(blockVersion)")
         let builder = TransactionBuilder(
             fee: fee,
+            tokenId: inputs.first!.knownTxOut.tokenId, // TODO - Fix, use tokenId from fee instead
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
             memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
@@ -225,6 +226,7 @@ final class TransactionBuilder {
     ) -> Result<TxOutContext, TransactionBuilderError> {
         let transactionBuilder = TransactionBuilder(
             fee: 0,
+            tokenId: .MOB,
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
             blockVersion: blockVersion)
@@ -299,6 +301,7 @@ final class TransactionBuilder {
 
     private init(
         fee: UInt64,
+        tokenId: TokenId,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
         memoBuilder: TxOutMemoBuilder = DefaultMemoBuilder(),
@@ -310,7 +313,7 @@ final class TransactionBuilder {
             fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
                 // Safety: mc_transaction_builder_create should never return nil.
                 withMcInfallible {
-                    mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr, memoBuilderPtr, blockVersion)
+                    mc_transaction_builder_create(fee, tokenId.value, tombstoneBlockIndex, fogResolverPtr, memoBuilderPtr, blockVersion)
                 }
             }
         }

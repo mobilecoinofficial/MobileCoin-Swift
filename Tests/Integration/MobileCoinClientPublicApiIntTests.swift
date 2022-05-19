@@ -55,21 +55,33 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 let balances = client.balances
                 print(balances)
                 
-                // Expect MOB & MOBUSD
                 XCTAssertGreaterThan(balances.balances.count, 1)
                 
                 print(client.accountActivity.describeUnspentTxOuts())
 
-                // Expect balances to be greater than zero
+                guard let mobBalance = balances.balances[.MOB] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+                
                 XCTAssertTrue(
-                    balances.balances[.MOB]!.amountParts.int > 0 ||
-                    balances.balances[.MOB]!.amountParts.frac > 0
+                    mobBalance.amountParts.int > 0 ||
+                    mobBalance.amountParts.frac > 0
                 )
+                
+                guard let mobUSDBalance = balances.balances[.MOB] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+                
                 XCTAssertTrue(
-                    balances.balances[.MOBUSD]!.amountParts.int > 0 ||
-                    balances.balances[.MOBUSD]!.amountParts.frac > 0
+                    mobUSDBalance.amountParts.int > 0 ||
+                    mobUSDBalance.amountParts.frac > 0
                 )
 
+                let unknownTokenId = TokenId(UInt64(17000))
+                XCTAssertNil(balances.balances[unknownTokenId])
+                
                 expect.fulfill()
             }
         }
@@ -197,6 +209,52 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
                     print("Transaction submission successful")
                     expect.fulfill()
+                }
+            }
+        }
+    }
+    
+    func testSubmitMobUSDTransaction() throws {
+        let description = "Submitting transaction"
+        try testSupportedProtocols(description: description) {
+            try submitMobUSDTransaction(transportProtocol: $0, expectation: $1)
+        }
+    }
+    
+    func submitMobUSDTransaction(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
+        let amount = Amount(value: 100, token: .MOBUSD)
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
+        { client in
+            client.blockVersion {
+                guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
+                    XCTExpectFailure("MOBUSD Transactions only available on networks with BlockVersion >= 2")
+                    return
+                }
+                
+                client.estimateTotalFee(toSendAmount: amount, feeLevel: .minimum) { estimatedFee in
+                    guard let fee = estimatedFee.successOrFulfill(expectation: expect)
+                    else { return }
+                            
+                    client.prepareTransaction(
+                        to: recipient,
+                        amount: amount,
+                        fee: fee
+                    ) {
+                        guard let pendingTransaction = $0.successOrFulfill(expectation: expect)
+                        else { return }
+        
+                        let transaction = pendingTransaction.transaction
+                        print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+                        client.submitTransaction(transaction) {
+                            guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                            print("Transaction submission successful")
+                            expect.fulfill()
+                        }
+                    }
                 }
             }
         }

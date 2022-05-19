@@ -37,8 +37,6 @@ extension PartialTxOut {
         else {
             return nil
         }
-        // TODO - Remove DEBUG statement
-        logger.info("Masked Token ID byte count \(txOut.maskedAmount.maskedTokenID.count)")
         guard [0,4,8].contains(txOut.maskedAmount.maskedTokenID.count) else {
             return nil
         }
@@ -64,8 +62,6 @@ extension PartialTxOut {
         else {
             return nil
         }
-        // TODO - Remove DEBUG statement
-        logger.info("Masked Token ID byte count \(txOutRecord.txOutAmountMaskedTokenID.count)")
         guard [0,4,8].contains(txOutRecord.txOutAmountMaskedTokenID.count) else {
             return nil
         }

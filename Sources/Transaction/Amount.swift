@@ -11,9 +11,15 @@ public struct Amount {
 }
 
 extension Amount {
+    // TODO - deprecate and switch naming
     public init(value: UInt64, tokenId: UInt64) {
         self.value = value
         self.tokenId = TokenId(tokenId)
+    }
+    
+    public init(value: UInt64, token: TokenId) {
+        self.value = value
+        self.tokenId = token
     }
     
     init(mob: UInt64) {
