@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.default_subspec = :none
 
   s.test_spec do |test_spec|
-    test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
+    test_spec.source_files = ["Tests/{Unit,Common}/**/*.swift"]
     test_spec.resources = [
       "Tests/Common/FixtureData/**/*",
       "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
@@ -37,6 +37,10 @@ Pod::Spec.new do |s|
 
   s.test_spec 'IntegrationTests' do |test_spec|
     test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+    test_spec.exclude_files = [
+      "Tests/Common/Utils/ProtocolSpecific/GRPCOnly/**",
+      "Tests/Common/Utils/ProtocolSpecific/HTTPOnly/**",
+    ]
     test_spec.resource = "Tests/Common/FixtureData/**/*"
   end
 
@@ -77,7 +81,14 @@ Pod::Spec.new do |s|
     end
   end
 
-
+  s.test_spec 'IntegrationTestsHTTP' do |test_spec|
+    test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+    test_spec.exclude_files = [
+      "Tests/Common/Utils/ProtocolSpecific/Combined/**",
+      "Tests/Common/Utils/ProtocolSpecific/GRPCOnly/**",
+    ]
+    test_spec.resource = "Tests/Common/FixtureData/**/*"
+  end
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [

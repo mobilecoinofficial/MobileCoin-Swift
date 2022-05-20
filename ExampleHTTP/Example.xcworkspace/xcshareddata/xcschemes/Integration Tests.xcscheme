@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
-               BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
-               BlueprintName = "MobileCoin-Unit-IntegrationTests"
+               BlueprintIdentifier = "5F8BB6A0F805533C453A563A036AD0E3"
+               BuildableName = "MobileCoin-Unit-IntegrationTestsHTTP.xctest"
+               BlueprintName = "MobileCoin-Unit-IntegrationTestsHTTP"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -51,15 +51,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
-            BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
-            BlueprintName = "MobileCoin-Unit-IntegrationTests"
-            ReferencedContainer = "container:Pods/Pods.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
