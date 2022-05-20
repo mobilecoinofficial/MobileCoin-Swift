@@ -36,7 +36,7 @@ struct TransactionPreparer {
     func prepareSelfAddressedTransaction(
         inputs: [KnownTxOut],
         recoverableMemo: Bool,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
@@ -45,7 +45,7 @@ struct TransactionPreparer {
     ) {
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanValue: fee)
+                isGreaterThanValue: fee.value)
         else {
             logger.warning(
                 "Insufficient balance for self-addressed transaction: sum of inputs: " +
@@ -87,7 +87,7 @@ struct TransactionPreparer {
         recipient: PublicAddress,
         memoType: MemoType,
         amount: Amount,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
@@ -104,7 +104,7 @@ struct TransactionPreparer {
         }
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee])
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee.value])
         else {
             logger.warning(
                 "Insufficient balance to prepare transaction: sum of inputs: " +

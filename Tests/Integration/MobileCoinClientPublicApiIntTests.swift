@@ -86,33 +86,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             }
         }
     }
-//
-//    func testAllBalances() throws {
-//        let description = "Updating account balance"
-//        try testSupportedProtocols(description: description) {
-//            try allBalances(transportProtocol: $0, expectation: $1)
-//        }
-//    }
-
-    func testAllBalances() throws {
-        let indexes = Array(0...7)
-        let expect = expectation(description: description)
-        try indexes.forEach { index in
-            let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: index, transportProtocol: .grpc)
-
-            client.updateBalances {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                if let balances = try? XCTUnwrap(client.balances.balances),
-                   let accountKey = try? IntegrationTestFixtures.createAccountKey(accountIndex: index) {
-                    print("Account Index \(index), \(Base58Coder.encode(accountKey.publicAddress)), \(balances)")
-                }
-
-            }
-        }
-        waitForExpectations(timeout: 300)
-    }
-
+    
     func testAccountActivity() throws {
         let description = "Updating account balance"
         try testSupportedProtocols(description: description) {

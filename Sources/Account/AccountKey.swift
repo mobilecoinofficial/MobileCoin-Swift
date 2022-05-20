@@ -139,6 +139,10 @@ public struct AccountKey {
         futureChangeSubaddressPrivateKey.subaddressSpendPrivateKey
     }
     
+    func subaddressSpendPrivateKey(_ index: UInt64) -> RistrettoPrivate? {
+        subaddressSpendPrivateKey(index: index)
+    }
+    
     func subaddressSpendPrivateKey(index: UInt64) -> RistrettoPrivate? {
         switch index {
         case subaddressIndex:

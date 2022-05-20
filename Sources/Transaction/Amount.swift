@@ -17,6 +17,11 @@ extension Amount {
         self.tokenId = TokenId(tokenId)
     }
     
+    public init(_ value: UInt64, _ token: TokenId) {
+        self.value = value
+        self.tokenId = token
+    }
+    
     public init(value: UInt64, token: TokenId) {
         self.value = value
         self.tokenId = token

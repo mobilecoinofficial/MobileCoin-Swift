@@ -33,7 +33,7 @@ final class TransactionBuilder {
         to recipient: PublicAddress,
         memoType: MemoType,
         amount: PositiveUInt64,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
@@ -43,7 +43,7 @@ final class TransactionBuilder {
         build(
             inputs: inputs,
             accountKey: accountKey,
-            outputs: [(recipient, amount)],
+            outputs: [TransactionOutput(recipient, amount)],
             memoType: memoType,
             fee: fee,
             tombstoneBlockIndex: tombstoneBlockIndex,
@@ -61,7 +61,7 @@ final class TransactionBuilder {
         accountKey: AccountKey,
         sendingAllTo recipient: PublicAddress,
         memoType: MemoType,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
@@ -69,12 +69,14 @@ final class TransactionBuilder {
         rngContext: Any? = nil
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         positiveRemainingAmount(inputValues: inputs.map { $0.knownTxOut.value }, fee: fee)
-            .flatMap { outputAmount in
+            .map { outputAmount in
+                PossibleTransaction([TransactionOutput(recipient, outputAmount)], nil)
+            }
+            .flatMap { possibleTransaction in
                 build(
                     inputs: inputs,
                     accountKey: accountKey,
-                    changeAmount: nil,
-                    outputs: [(recipient: recipient, amount: outputAmount)],
+                    possibleTransaction: possibleTransaction,
                     memoType: memoType,
                     fee: fee,
                     tombstoneBlockIndex: tombstoneBlockIndex,
@@ -91,9 +93,9 @@ final class TransactionBuilder {
     static func build(
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
-        outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
+        outputs: [TransactionOutput],
         memoType: MemoType,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
@@ -104,12 +106,11 @@ final class TransactionBuilder {
             inputs: inputs,
             outputs: outputs,
             fee: fee
-        ).flatMap { outputs, changeAmount in
+        ).flatMap { buildingTransaction in
             build(
                 inputs: inputs,
                 accountKey: accountKey,
-                changeAmount: changeAmount,
-                outputs: outputs,
+                possibleTransaction: buildingTransaction,
                 memoType: memoType,
                 fee: fee,
                 tombstoneBlockIndex: tombstoneBlockIndex,
@@ -123,27 +124,28 @@ final class TransactionBuilder {
     static func build(
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
-        changeAmount: PositiveUInt64?,
-        outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
+        possibleTransaction: PossibleTransaction,
         memoType: MemoType,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
+        let outputs = possibleTransaction.outputs
+        let changeAmount = possibleTransaction.changeAmount
+        let allValues = (outputs.map { $0.amount.value } + [fee.value, changeAmount?.value ?? 0])
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.knownTxOut.value },
-                isEqualToSumOfValues: (outputs.map { $0.amount.value } + [fee] + [changeAmount?.value]).compactMap({$0}))
+                isEqualToSumOfValues: allValues)
         else {
             return .failure(.invalidInput("Input values != output values + fee"))
         }
 
-        logger.info("transaction builder blockVersion == \(blockVersion)")
         let builder = TransactionBuilder(
             fee: fee,
-            tokenId: inputs.first!.knownTxOut.tokenId, // TODO - Fix, use tokenId from fee instead
+            tokenId: fee.tokenId,
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
             memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
@@ -157,10 +159,10 @@ final class TransactionBuilder {
             }
         }
 
-        let payloadContexts = outputs.map { recipient, amount in
+        let payloadContexts = outputs.map { output in
             builder.addOutput(
-                publicAddress: recipient,
-                amount: amount.value,
+                publicAddress: output.recipient,
+                amount: output.amount.value,
                 rng: rng,
                 rngContext: rngContext
             )
@@ -225,7 +227,7 @@ final class TransactionBuilder {
         rngContext: Any?
     ) -> Result<TxOutContext, TransactionBuilderError> {
         let transactionBuilder = TransactionBuilder(
-            fee: 0,
+            fee: Amount(value: 0, tokenId: .MOB),
             tokenId: .MOB,
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
@@ -237,34 +239,33 @@ final class TransactionBuilder {
             rngContext: rngContext)
     }
 
-    // TODO messy, fix
     private static func outputsAddingChangeOutputIfNeeded(
         inputs: [PreparedTxInput],
-        outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
-        fee: UInt64
-    ) -> Result<([(recipient: PublicAddress, amount: PositiveUInt64)], changeAmount: PositiveUInt64?), TransactionBuilderError> {
+        outputs: [TransactionOutput],
+        fee: Amount
+    ) -> Result<PossibleTransaction, TransactionBuilderError> {
         remainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
             outputValues: outputs.map { $0.amount.value },
             fee: fee
         ).map { remainingAmount in
-            (outputs, PositiveUInt64(remainingAmount))
+            PossibleTransaction(outputs, PositiveUInt64(remainingAmount))
         }
     }
 
-    private static func remainingAmount(inputValues: [UInt64], outputValues: [UInt64], fee: UInt64)
+    private static func remainingAmount(inputValues: [UInt64], outputValues: [UInt64], fee: Amount)
         -> Result<UInt64, TransactionBuilderError>
     {
         guard UInt64.safeCompare(
                 sumOfValues: inputValues,
-                isGreaterThanOrEqualToSumOfValues: outputValues + [fee])
+                isGreaterThanOrEqualToSumOfValues: outputValues + [fee.value])
         else {
             return .failure(.invalidInput("Total input amount < total output amount + fee"))
         }
 
         guard let remainingAmount = UInt64.safeSubtract(
                 sumOfValues: inputValues,
-                minusSumOfValues: outputValues + [fee])
+                minusSumOfValues: outputValues + [fee.value])
         else {
             return .failure(.invalidInput("Change amount overflows UInt64"))
         }
@@ -272,14 +273,16 @@ final class TransactionBuilder {
         return .success(remainingAmount)
     }
 
-    private static func positiveRemainingAmount(inputValues: [UInt64], fee: UInt64)
+    private static func positiveRemainingAmount(inputValues: [UInt64], fee: Amount)
         -> Result<PositiveUInt64, TransactionBuilderError>
     {
-        guard UInt64.safeCompare(sumOfValues: inputValues, isGreaterThanValue: fee) else {
+        guard UInt64.safeCompare(sumOfValues: inputValues, isGreaterThanValue: fee.value) else {
             return .failure(.invalidInput("Total input amount <= fee"))
         }
 
-        guard let remainingAmount = UInt64.safeSubtract(sumOfValues: inputValues, minusValue: fee)
+        guard let remainingAmount = UInt64.safeSubtract(
+                sumOfValues: inputValues,
+                minusValue: fee.value)
         else {
             return .failure(.invalidInput("Change amount overflows UInt64"))
         }
@@ -300,7 +303,7 @@ final class TransactionBuilder {
     private let memoBuilder: TxOutMemoBuilder
 
     private init(
-        fee: UInt64,
+        fee: Amount,
         tokenId: TokenId,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
@@ -313,7 +316,13 @@ final class TransactionBuilder {
             fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
                 // Safety: mc_transaction_builder_create should never return nil.
                 withMcInfallible {
-                    mc_transaction_builder_create(fee, tokenId.value, tombstoneBlockIndex, fogResolverPtr, memoBuilderPtr, blockVersion)
+                    mc_transaction_builder_create(
+                            fee.value, 
+                            tokenId.value, 
+                            tombstoneBlockIndex, 
+                            fogResolverPtr, 
+                            memoBuilderPtr, 
+                            blockVersion)
                 }
             }
         }
@@ -326,13 +335,14 @@ final class TransactionBuilder {
     private func addInput(preparedTxInput: PreparedTxInput, accountKey: AccountKey)
         -> Result<(), TransactionBuilderError>
     {
-        guard let subaddressSpendPrivateKey = accountKey.subaddressSpendPrivateKey(index: preparedTxInput.subaddressIndex) else {
-            return .failure(TransactionBuilderError.invalidInput("Tx subaddress index out of bounds"))
+        let subaddressIndex = preparedTxInput.subaddressIndex
+        guard let spendPrivateKey = accountKey.subaddressSpendPrivateKey(subaddressIndex) else {
+            return .failure(.invalidInput("Tx subaddress index out of bounds"))
         }
         return addInput(
                 preparedTxInput: preparedTxInput,
                 viewPrivateKey: accountKey.viewPrivateKey,
-                subaddressSpendPrivateKey: subaddressSpendPrivateKey)
+                subaddressSpendPrivateKey: spendPrivateKey)
     }
 
     private func addInput(

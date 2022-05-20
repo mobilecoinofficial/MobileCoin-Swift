@@ -53,7 +53,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         }
         
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
-        XCTAssertEqual(recovered.fee, fixture.fee)
+        XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
     }
 
@@ -105,7 +105,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         }
         
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
-        XCTAssertEqual(recovered.fee, fixture.fee)
+        XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
     }
 

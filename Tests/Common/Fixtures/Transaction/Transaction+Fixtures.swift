@@ -14,7 +14,7 @@ extension Transaction.Fixtures {
     struct BuildTx {
         let inputs: [PreparedTxInput]
         let accountKey: AccountKey
-        let outputs: [(recipient: PublicAddress, amount: PositiveUInt64)]
+        let outputs: [TransactionOutput]
         let fee = Self.fee
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
@@ -392,21 +392,21 @@ extension Transaction.Fixtures.BuildTx {
     }
 
     fileprivate static func outputs() throws
-        -> [(recipient: PublicAddress, amount: PositiveUInt64)]
+        -> [TransactionOutput]
     {
         [
-            (
+            TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
                 amount: try XCTUnwrap(PositiveUInt64(10))
             ),
-            (
+            TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
                 amount: try XCTUnwrap(PositiveUInt64(2499979999999990))
             ),
         ]
     }
 
-    fileprivate static let fee: UInt64 = 10_000_000_000
+    fileprivate static let fee: Amount = Amount(10_000_000_000, .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 610
 
@@ -444,7 +444,7 @@ extension Transaction.Fixtures.Default {
         ]
     }
 
-    fileprivate static let fee: UInt64 = 10_000_000_000
+    fileprivate static let fee: Amount = Amount(10_000_000_000, .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 634
 

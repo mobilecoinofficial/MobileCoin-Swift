@@ -17,7 +17,7 @@ extension TransactionBuilder.Fixtures {
         let receivedTxOut: KnownTxOut
         let sentTxOut: KnownTxOut
         let memoType: MemoType
-        let fee: UInt64
+        let fee: Amount
         let totalOutlay: UInt64
 
         static let Fixtures = TransactionBuilder.Fixtures.self
@@ -52,7 +52,7 @@ extension TransactionBuilder.Fixtures {
         let receivedTxOut: KnownTxOut
         let sentTxOut: KnownTxOut
         let memoType: MemoType
-        let fee: UInt64
+        let fee: Amount
         let totalOutlay: UInt64
 
         static let Fixtures = TransactionBuilder.Fixtures.self

@@ -42,4 +42,4 @@ struct PositiveUInt64 {
     }
 }
 
-extension PositiveUInt64: Equatable { }
+extension PositiveUInt64: Equatable, Hashable { }
