@@ -218,6 +218,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     ) {
                         guard let pendingTransaction = $0.successOrFulfill(expectation: expect)
                         else { return }
+                        
+                        let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+                        XCTAssertNotNil(publicKey)
+        
+                        let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+                        XCTAssertNotNil(sharedSecret)
         
                         let transaction = pendingTransaction.transaction
                         print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
