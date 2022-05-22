@@ -70,4 +70,21 @@ class TransactionTests: XCTestCase {
         }
     }
 
+    func testExactChangeCreatesChangeOutput() throws {
+        let fixture = try Transaction.Fixtures.ExactChange()
+
+        // TODO - Do we need to test on both blockversions ?
+        let txOutContext = try TransactionBuilder.build(
+            inputs: fixture.inputs,
+            accountKey: fixture.accountKey,
+            outputs: fixture.outputs,
+            memoType: .unused,
+            fee: fixture.fee,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fogResolver: fixture.fogResolver,
+            blockVersion: .minRTHEnabled).get()
+        
+        XCTAssertNotNil(txOutContext.changeTxOutContext)
+    }
+
 }

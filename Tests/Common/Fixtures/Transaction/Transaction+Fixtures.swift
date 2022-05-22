@@ -27,6 +27,27 @@ extension Transaction.Fixtures {
             self.fogResolver = try Self.fogResolver()
         }
     }
+    
+    struct ExactChange {
+        let inputs: [PreparedTxInput]
+        let accountKey: AccountKey
+        let outputs: [TransactionOutput]
+        let fee: Amount
+        let tombstoneBlockIndex: UInt64
+        let fogResolver: FogResolver
+        let blockVersion = BlockVersion.minRTHEnabled
+
+        init() throws {
+            let buildTxFixture = try Transaction.Fixtures.BuildTx()
+            self.fee = buildTxFixture.fee
+            self.tombstoneBlockIndex = buildTxFixture.tombstoneBlockIndex
+            self.inputs = buildTxFixture.inputs
+            self.accountKey = buildTxFixture.accountKey
+            self.outputs = try Self.outputs()
+            self.fogResolver = buildTxFixture.fogResolver
+            /*self.blockVersion = buildTxFixture.blockVersion*/
+        }
+    }
 }
 
 extension Transaction.Fixtures {
@@ -397,7 +418,7 @@ extension Transaction.Fixtures.BuildTx {
         [
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(10))
+                amount: try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
             ),
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
@@ -417,6 +438,20 @@ extension Transaction.Fixtures.BuildTx {
     fileprivate static func fogResolver() throws -> FogResolver {
         let fogReportUrl = try self.fogReportUrl()
         return try FogResolver.Fixtures.Default(reportUrl: fogReportUrl).fogResolver
+    }
+
+}
+
+extension Transaction.Fixtures.ExactChange {
+    fileprivate static func outputs() throws
+        -> [TransactionOutput]
+    {
+        [
+            TransactionOutput(
+                recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
+                amount: try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
+            ),
+        ]
     }
 
 }

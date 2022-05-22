@@ -239,6 +239,7 @@ final class TransactionBuilder {
             rngContext: rngContext)
     }
 
+    // TODO - Should we always add change output for BlockVersion == 0 ?
     private static func outputsAddingChangeOutputIfNeeded(
         inputs: [PreparedTxInput],
         outputs: [TransactionOutput],
