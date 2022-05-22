@@ -199,11 +199,15 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let amount = Amount(value: 100, token: .MOBUSD)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
-        { client in
+        func checkBlockVersionAndFee(
+                _ client: MobileCoinClient,
+                _ expect: XCTestExpectation,
+                _ completion: @escaping (UInt64) -> ()) {
+
             client.blockVersion {
                 guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
-                    XCTExpectFailure("MOBUSD Transactions only available on networks with BlockVersion >= 2")
+                    XCTExpectFailure("MOBUSD Transactions only available " + 
+                                     "on networks with BlockVersion >= 2")
                     return
                 }
                 
@@ -211,29 +215,133 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     guard let fee = estimatedFee.successOrFulfill(expectation: expect)
                     else { return }
                             
-                    client.prepareTransaction(
-                        to: recipient,
-                        amount: amount,
-                        fee: fee
-                    ) {
-                        guard let pendingTransaction = $0.successOrFulfill(expectation: expect)
-                        else { return }
+                    completion(fee)
+                }
+            }
+        }
+
+        func prepareAndSubmit(
+                _ client: MobileCoinClient,
+                _ expect: XCTestExpectation,
+                _ fee: UInt64,
+                _ completion: @escaping () -> ()) {
+
+            client.prepareTransaction(
+                to: recipient,
+                amount: amount,
+                fee: fee
+            ) {
+                guard let pendingTransaction = $0.successOrFulfill(expectation: expect)
+                else { return }
+                
+                let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+                XCTAssertNotNil(publicKey)
+
+                let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+                XCTAssertNotNil(sharedSecret)
+
+                let transaction = pendingTransaction.transaction
+                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+                client.submitTransaction(transaction) {
+                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                    print("Transaction submission successful")
+
+                    completion()
+                }
+            }
+        }
+
+        func checkBalances(
+                _ client: MobileCoinClient,
+                _ expect: XCTestExpectation,
+                _ completion: @escaping (Balances) -> ()) {
+ 
+            client.updateBalances {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                let balances = client.balances
+                print(balances)
+                
+                XCTAssertGreaterThan(balances.balances.count, 1)
+                
+                print(client.accountActivity.describeUnspentTxOuts())
+
+                guard let mobBalance = balances.balances[.MOB] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+                
+                XCTAssertTrue(
+                    mobBalance.amountParts.int > 0 ||
+                    mobBalance.amountParts.frac > 0
+                )
+                
+                guard let mobUSDBalance = balances.balances[.MOBUSD] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+                
+                XCTAssertTrue(
+                    mobUSDBalance.amountParts.int > 0 ||
+                    mobUSDBalance.amountParts.frac > 0
+                )
+
+                let unknownTokenId = TokenId(UInt64(17000))
+                XCTAssertNil(balances.balances[unknownTokenId])
+                
+                completion(balances)
+            }
+        }
+
+        func verifyBalanceChange(
+                _ client: MobileCoinClient,
+                _ balancesBefore: Balances,
+                _ expect: XCTestExpectation
+                ) {
+
+            var numChecksRemaining = 5
+            func checkBalanceChange() {
+                numChecksRemaining -= 1
+                print("Updating balance...")
+                client.updateBalances {
+                    guard let balances = $0.successOrFulfill(expectation: expect) else { return }
+                    print("Balances: \(balances)")
+
+                    do {
+                        let balancesMap = balances.balances
+                        let balancesBeforeMap = balancesBefore.balances
+                        let mobUSD = try XCTUnwrap(balancesMap[.MOBUSD]?.amount())
+                        let initialMobUSD = try XCTUnwrap(balancesBeforeMap[.MOBUSD]?.amount())
                         
-                        let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
-                        XCTAssertNotNil(publicKey)
-        
-                        let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
-                        XCTAssertNotNil(sharedSecret)
-        
-                        let transaction = pendingTransaction.transaction
-                        print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+                        guard mobUSD != initialMobUSD else {
+                            guard numChecksRemaining > 0 else {
+                                XCTFail("Failed to receive a changed balance. initial balance: " +
+                                    "\(initialMobUSD), current balance: " +
+                                    "\(mobUSD) microMOBUSD")
+                                expect.fulfill()
+                                return
+                            }
 
-                        client.submitTransaction(transaction) {
-                            guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                            print("Transaction submission successful")
-                            expect.fulfill()
+                            Thread.sleep(forTimeInterval: 2)
+                            checkBalanceChange()
+                            return
                         }
+                    } catch {}
+                    expect.fulfill()
+                }
+            }
+            checkBalanceChange()
+        }
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol) { client in
+            checkBlockVersionAndFee(client, expect) { fee in 
+                checkBalances(client, expect) { balancesBefore in
+                    prepareAndSubmit(client, expect, fee) {
+                        verifyBalanceChange(client, balancesBefore, expect) 
                     }
                 }
             }

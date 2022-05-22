@@ -42,7 +42,15 @@ public struct Balance {
     }
 
     /// - Returns: `nil` when the amount is too large to fit in a `UInt64`.
+    @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amount()`")
     public func amountPicoMob() -> UInt64? {
+        guard amountHigh == 0 else {
+            return nil
+        }
+        return amountLow
+    }
+
+    public func amount() -> UInt64? {
         guard amountHigh == 0 else {
             return nil
         }
