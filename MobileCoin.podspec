@@ -90,7 +90,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 1.2.0-pre12"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "1.2.0-pre12"
 
     subspec.dependency "Logging", "~> 1.4"
 
