@@ -18,8 +18,7 @@ ENV['MC_ENABLE_SWIFTLINT_SCRIPT'] = '1'
 ENV['MC_ENABLE_WARN_LONG_COMPILE_TIMES'] = '1'
 
 target 'Example' do
-  #pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
-  pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationTestsHTTP', 'PerformanceTests']
+  pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
   # pod 'MobileCoin/Core', path: '..', testspecs: ['ProtocolUnitTests']
   pod 'MobileCoin/CoreHTTP', path: '..', testspecs: ['HttpProtocolUnitTests']
   # pod 'MobileCoin', podspec: '../MobileCoin.podspec'

@@ -12,7 +12,7 @@ PODS:
     - LibMobileCoin/CoreHTTP (~> 1.2.0-pre12)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/IntegrationTestsHTTP (1.2.0-pre11)
+  - MobileCoin/IntegrationTests (1.2.0-pre11)
   - MobileCoin/PerformanceTests (1.2.0-pre11)
   - MobileCoin/Tests (1.2.0-pre11)
   - SwiftLint (0.47.1)
@@ -24,7 +24,7 @@ DEPENDENCIES:
   - MobileCoin (from `..`)
   - MobileCoin/CoreHTTP (from `..`)
   - MobileCoin/CoreHTTP/HttpProtocolUnitTests (from `..`)
-  - MobileCoin/IntegrationTestsHTTP (from `..`)
+  - MobileCoin/IntegrationTests (from `..`)
   - MobileCoin/PerformanceTests (from `..`)
   - MobileCoin/Tests (from `..`)
   - SwiftLint
@@ -48,10 +48,10 @@ SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
   LibMobileCoin: 49a5206a95b2efcb7f381ce6731cf12a76b3c9d0
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: e3a4ee1d22701474be32378440f12b4bd3d96a3e
+  MobileCoin: 4b4c93443b2b62b08898afc6adc53d2721d0fc71
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftProtobuf: 6ef3f0e422ef90d6605ca20b21a94f6c1324d6b3
 
-PODFILE CHECKSUM: dd4229d6fae139aade46b8211f721a089b9b5daa
+PODFILE CHECKSUM: fa3b77b062d292a978ffddf57c34bed7cf19d07e
 
 COCOAPODS: 1.11.2
