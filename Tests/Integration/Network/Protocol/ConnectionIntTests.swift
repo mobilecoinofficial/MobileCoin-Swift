@@ -11,7 +11,7 @@ class ConnectionIntTests: XCTestCase {
     func testInvalidUrlTimeout() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             print("Testing \(transportProtocol.description) with timeout = " +
-                  "\(transportProtocol.timeoutInSeconds)")
+                  "\(transportProtocol.testTimeoutInSeconds)")
             try testInvalidUrlTimeout(using: transportProtocol)
         }
     }
@@ -36,13 +36,13 @@ class ConnectionIntTests: XCTestCase {
                 expect.fulfill()
             }
 
-        waitForExpectations(timeout: transportProtocol.timeoutInSeconds)
+        waitForExpectations(timeout: transportProtocol.testTimeoutInSeconds)
     }
 
     func testInvalidUrlAttestationTimeout() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             print("Testing \(transportProtocol.description) with timeout = " +
-                  "\(transportProtocol.timeoutInSeconds)")
+                  "\(transportProtocol.testTimeoutInSeconds)")
             try testInvalidUrlAttestationTimeout(using: transportProtocol)
         }
     }
@@ -67,6 +67,6 @@ class ConnectionIntTests: XCTestCase {
                 expect.fulfill()
             })
 
-        waitForExpectations(timeout: transportProtocol.timeoutInSeconds)
+        waitForExpectations(timeout: transportProtocol.testTimeoutInSeconds)
     }
 }

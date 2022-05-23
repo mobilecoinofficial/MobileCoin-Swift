@@ -151,10 +151,9 @@ class UrlLoadBalancerIntTests: XCTestCase {
 
         let expect = expectation(description: expectMessage)
         try fixture.callService(expect: expect)
-        waitForExpectations(timeout: transProto.timeoutInSeconds)
+        waitForExpectations(timeout: transProto.testTimeoutInSeconds)
 
         let shouldRotate  = !fixture.useValidUrls
         XCTAssertEqual(shouldRotate, loadBalancer.didRotate, assertMessage)
     }
 }
-
