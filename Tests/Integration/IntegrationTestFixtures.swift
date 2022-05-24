@@ -197,6 +197,7 @@ extension IntegrationTestFixtures {
         config: MobileCoinClient.Config,
         transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
+        let accountKey = try createAccountKey(accountIndex: accountIndex)
         return try createMobileCoinClient(
             accountKey: accountKey,
             config: config,
