@@ -3,13 +3,13 @@ source 'https://cdn.cocoapods.org/'
 platform :ios, '10.0'
 
 plugin 'cocoapods-repo-update'
-keep_source_code_for_prebuilt_frameworks!
 plugin 'cocoapods-keys', {
   :project => "MobileCoin",
   :keys => [
     "devNetworkAuthUsername",
     "devNetworkAuthPassword",
     "testNetTestAccountMnemonicsCommaSeparated",
+    "mobileDevTestAccountMnemonicsCommaSeparated",
   ]}
 
 use_frameworks!

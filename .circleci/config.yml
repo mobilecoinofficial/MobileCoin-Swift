@@ -9,6 +9,7 @@ defaults:
     devNetworkAuthUsername:
     devNetworkAuthPassword:
     testNetTestAccountMnemonicsCommaSeparated:
+    mobileDevTestAccountMnemonicsCommaSeparated:
 
 commands:
   init-artifacts-submodule:
