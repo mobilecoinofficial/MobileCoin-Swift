@@ -20,7 +20,6 @@ class TransactionTests: XCTestCase {
             blockVersion: fixture.blockVersion))
     }
 
-    // TODO refactor to be less messy
     func testLegacyBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
         let txOutContext = try TransactionBuilder.build(
@@ -32,10 +31,10 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .legacy).get()
-        
+
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
-        let indexedKeyImage = txOut.indexedKeyImage(
+        let indexedKeyImage = txOut.constructKeyImage(
             index: accountKey.subaddressIndex,
             accountKey: accountKey)
         guard let (index, _) = indexedKeyImage,
@@ -45,7 +44,6 @@ class TransactionTests: XCTestCase {
         }
     }
 
-    // TODO refactor to be less messy
     func testRTHBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
         let txOutContext = try TransactionBuilder.build(
@@ -57,10 +55,10 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .minRTHEnabled).get()
-        
+
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
-        let indexedKeyImage = txOut.indexedKeyImage(
+        let indexedKeyImage = txOut.constructKeyImage(
             index: accountKey.changeSubaddressIndex,
             accountKey: accountKey)
         guard let (index, _) = indexedKeyImage,
@@ -83,7 +81,7 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .minRTHEnabled).get()
-        
+
         XCTAssertNotNil(txOutContext.changeTxOutContext)
     }
 

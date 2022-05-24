@@ -167,7 +167,7 @@ final class TransactionBuilder {
                 rngContext: rngContext
             )
         }
-        
+
         let changeContext: Result<TxOutContext, TransactionBuilderError>
         switch blockVersion {
         case .legacy:
@@ -296,11 +296,11 @@ final class TransactionBuilder {
 
         return .success(positiveRemainingAmount)
     }
-    
+
     private let tombstoneBlockIndex: UInt64
 
     private let ptr: OpaquePointer
-    
+
     private let memoBuilder: TxOutMemoBuilder
 
     private init(
@@ -318,11 +318,11 @@ final class TransactionBuilder {
                 // Safety: mc_transaction_builder_create should never return nil.
                 withMcInfallible {
                     mc_transaction_builder_create(
-                            fee.value, 
-                            tokenId.value, 
-                            tombstoneBlockIndex, 
-                            fogResolverPtr, 
-                            memoBuilderPtr, 
+                            fee.value,
+                            tokenId.value,
+                            tombstoneBlockIndex,
+                            fogResolverPtr,
+                            memoBuilderPtr,
                             blockVersion)
                 }
             }
@@ -337,7 +337,7 @@ final class TransactionBuilder {
         -> Result<(), TransactionBuilderError>
     {
         let subaddressIndex = preparedTxInput.subaddressIndex
-        guard let spendPrivateKey = accountKey.subaddressSpendPrivateKey(subaddressIndex) else {
+        guard let spendPrivateKey = accountKey.privateKeys(for: subaddressIndex)?.spendKey else {
             return .failure(.invalidInput("Tx subaddress index out of bounds"))
         }
         return addInput(
@@ -438,10 +438,10 @@ final class TransactionBuilder {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> Result<TxOutContext, TransactionBuilderError> {
-        
+
         var confirmationNumberData = Data32()
         var sharedSecretData = Data32()
-        
+
         return McAccountKey.withUnsafePointer(
             viewPrivateKey: accountKey.viewPrivateKey,
             spendPrivateKey: accountKey.spendPrivateKey,
@@ -473,7 +473,7 @@ final class TransactionBuilder {
                             }
                         }
                     }
-                 }
+                }
         }.map { txOutData in
             guard let txOut = TxOut(serializedData: txOutData) else {
                 // Safety: mc_transaction_builder_add_output should always return valid data on

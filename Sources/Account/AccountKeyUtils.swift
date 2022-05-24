@@ -12,7 +12,7 @@ enum AccountKeyUtils {
         viewPrivateKey: RistrettoPrivate,
         spendPrivateKey: RistrettoPrivate,
         subaddressIndex: UInt64
-    ) -> (subaddressViewPrivateKey: RistrettoPrivate, subaddressSpendPrivateKey: RistrettoPrivate) {
+    ) -> (viewKey: RistrettoPrivate, spendKey: RistrettoPrivate) {
         var subaddressViewPrivateKeyOut = Data32()
         var subaddressSpendPrivateKeyOut = Data32()
         viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
@@ -91,7 +91,7 @@ enum AccountKeyUtils {
             }
         }
     }
-    
+
     static func publicAddressShortHash(
         publicAddress: PublicAddress
     ) -> AddressHash? {
