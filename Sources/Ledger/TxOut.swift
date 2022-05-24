@@ -7,7 +7,7 @@ import LibMobileCoin
 
 struct TxOut: TxOutProtocol {
     typealias Keys = (publicKey: RistrettoPublic, targetKey: RistrettoPublic)
-    
+
     fileprivate let proto: External_TxOut
 
     let commitment: Data32
@@ -69,13 +69,11 @@ extension TxOut {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid public key format"))
         }
-        // TODO - Remove DEBUG statement
-        logger.info("Masked Token ID byte count \(proto.maskedAmount.maskedTokenID.count)")
-        guard [0,4,8].contains(proto.maskedAmount.maskedTokenID.count) else {
+        guard [0, 4, 8].contains(proto.maskedAmount.maskedTokenID.count) else {
             return .failure(
                 InvalidInputError("Masked Token ID should be 0, 4, or 8 bytes"))
         }
-        
+
         var eMemo = Data66()
         if proto.hasEMemo {
             guard let memo = Data66(proto.eMemo.data) else {

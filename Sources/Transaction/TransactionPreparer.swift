@@ -132,7 +132,7 @@ struct TransactionPreparer {
                         accountKey: self.accountKey,
                         to: recipient,
                         memoType: memoType,
-                        amount: positiveValue, // TODO - make PositiveAmount struct ?
+                        amount: positiveValue,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,

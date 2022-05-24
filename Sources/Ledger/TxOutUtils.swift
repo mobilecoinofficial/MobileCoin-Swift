@@ -52,7 +52,7 @@ enum TxOutUtils {
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> Data32? {
-        return maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
+        maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
             publicKey.asMcBuffer { publicKeyBufferPtr in
                 viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
                     var mcAmount = McTxOutMaskedAmount(
@@ -96,7 +96,7 @@ enum TxOutUtils {
         txOutPublicKey: RistrettoPublic,
         accountKey: AccountKey
     ) -> Data66? {
-        return McAccountKey.withUnsafePointer(
+        McAccountKey.withUnsafePointer(
             viewPrivateKey: accountKey.viewPrivateKey,
             spendPrivateKey: accountKey.spendPrivateKey,
             fogInfo: accountKey.fogInfo
@@ -139,7 +139,7 @@ enum TxOutUtils {
     static func calculateCrc32(
         from commitment: Data32
     ) -> UInt32? {
-        return commitment.asMcBuffer { commitmentPtr in
+        commitment.asMcBuffer { commitmentPtr in
             var crc32: UInt32 = 0
             switch withMcError({ errorPtr in
                 mc_tx_out_commitment_crc32(
@@ -203,7 +203,7 @@ enum TxOutUtils {
             }
         }
     }
-    
+
     /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
     static func value(
@@ -216,7 +216,6 @@ enum TxOutUtils {
                publicKey: publicKey,
                viewPrivateKey: viewPrivateKey)?.value
     }
-
 
     /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
@@ -246,7 +245,7 @@ enum TxOutUtils {
                             &errorPtr)
                     }) {
                     case .success:
-                        return Amount(value: valueOut, tokenId: tokenIdOut)
+                        return Amount(value: valueOut, tokenId: TokenId(tokenIdOut))
                     case .failure(let error):
                         switch error.errorCode {
                         case .transactionCrypto:

@@ -114,7 +114,6 @@ final class BlockchainMetaFetcher {
                 let minimumFees = response.minimumFees.reduce(into: [TokenId: UInt64](), {
                     $0[TokenId($1.key)] = $1.value
                 })
-                logger.info("blockVersion == \(blockVersion)") // TODO - delete
                 self.cacheMeta(
                     minimumFee: minimumFee,
                     minimumFees: minimumFees,

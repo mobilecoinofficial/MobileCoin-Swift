@@ -423,7 +423,7 @@ final class TransactionBuilder {
             }
 
             let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
-            let sharedSecret = RistrettoPublic(skippingValidation: sharedSecretData) // TODO - safe to skip validation ?
+            let sharedSecret = RistrettoPublic(skippingValidation: sharedSecretData)
             let receipt = Receipt(
                 txOut: txOut,
                 confirmationNumber: confirmationNumber,
@@ -483,7 +483,7 @@ final class TransactionBuilder {
             }
 
             let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
-            let sharedSecret = RistrettoPublic(skippingValidation: sharedSecretData) // TODO - safe to skip validation ?
+            let sharedSecret = RistrettoPublic(skippingValidation: sharedSecretData)
             let receipt = Receipt(
                 txOut: txOut,
                 confirmationNumber: confirmationNumber,
