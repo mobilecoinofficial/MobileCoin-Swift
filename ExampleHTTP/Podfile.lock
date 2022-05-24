@@ -1,20 +1,20 @@
 PODS:
   - Keys (1.0.1)
-  - LibMobileCoin/CoreHTTP (1.2.0-pre13):
+  - LibMobileCoin/CoreHTTP (1.2.0-pre14):
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (1.2.0-pre14)
-  - MobileCoin/CoreHTTP (1.2.0-pre14):
-    - LibMobileCoin/CoreHTTP (= 1.2.0-pre13)
+  - MobileCoin (1.2.0-pre15)
+  - MobileCoin/CoreHTTP (1.2.0-pre15):
+    - LibMobileCoin/CoreHTTP (= 1.2.0-pre14)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (1.2.0-pre14):
-    - LibMobileCoin/CoreHTTP (= 1.2.0-pre13)
+  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (1.2.0-pre15):
+    - LibMobileCoin/CoreHTTP (= 1.2.0-pre14)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/IntegrationTests (1.2.0-pre14)
-  - MobileCoin/PerformanceTests (1.2.0-pre14)
-  - MobileCoin/Tests (1.2.0-pre14)
+  - MobileCoin/IntegrationTests (1.2.0-pre15)
+  - MobileCoin/PerformanceTests (1.2.0-pre15)
+  - MobileCoin/Tests (1.2.0-pre15)
   - SwiftLint (0.47.1)
   - SwiftProtobuf (1.19.0)
 
@@ -46,9 +46,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 4d29f5c048653f3ccf7c6d8eb3da2b12b12e76a7
+  LibMobileCoin: a44c1b3f8e9b5d79fbf23d48b2dba8420daaf9e8
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: 81f40bbac83e39249c0f4516bdd9572775042151
+  MobileCoin: e6e57c9ed99748570d8fe4a3b5c78ce11ba842f6
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftProtobuf: 6ef3f0e422ef90d6605ca20b21a94f6c1324d6b3
 

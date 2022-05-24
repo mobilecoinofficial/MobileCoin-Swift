@@ -1,0 +1,12 @@
+- Token ID & Amount Changes
+    - Swift - In-Progress:
+    - Next
+        - Update rust nightly commit for the toolchain
+        - Refactor changeAmount stuff in the transaction builder to be cleaner/simpler
+        - Refactor changeSubaddress stuff in the AccountKey file, seems confusing
+        - Go through TODO
+        - Remove extra change subaddress
+        - Fix Linting
+    - Future
+        - Port over the new GRPC clients that got generated to HTTP
+

@@ -418,7 +418,7 @@ extension Transaction.Fixtures.BuildTx {
         [
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
+                amount: try XCTUnwrap(PositiveUInt64(10))
             ),
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
