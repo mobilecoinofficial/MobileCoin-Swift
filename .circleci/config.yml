@@ -1,7 +1,7 @@
 version: 2.1
 
 defaults:
-  default-xcode-version: &default-xcode-version "12.2.0"
+  default-xcode-version: &default-xcode-version "12.5.1"
   default-ruby-version: &default-ruby-version "2.7"
 
   default-environment: &default-environment
