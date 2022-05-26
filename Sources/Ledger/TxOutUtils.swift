@@ -229,23 +229,19 @@ enum TxOutUtils {
         return maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
             publicKey.asMcBuffer { publicKeyPtr in
                 viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
-                    var mcAmount = McTxOutMaskedAmount(
+                    var mcMaskedAmount = McTxOutMaskedAmount(
                         masked_value: maskedValue,
                         masked_token_id: maskedTokenIdBufferPtr)
-                    var valueOut: UInt64 = 0
-                    var tokenIdOut: UInt64 = 0
                     switch withMcError({ errorPtr in
                         mc_tx_out_get_amount(
-                            &mcAmount,
+                            &mcMaskedAmount,
                             publicKeyPtr,
                             viewKeyBufferPtr,
                             &mcTxOutAmount,
-                            &valueOut,
-                            &tokenIdOut,
                             &errorPtr)
                     }) {
                     case .success:
-                        return Amount(value: valueOut, tokenId: TokenId(tokenIdOut))
+                        return Amount(mcTxOutAmount)
                     case .failure(let error):
                         switch error.errorCode {
                         case .transactionCrypto:

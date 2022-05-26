@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import LibMobileCoin
 
 public struct Amount {
     public let value: UInt64
@@ -32,3 +33,10 @@ extension Amount: CustomStringConvertible {
 }
 
 extension Amount: Equatable, Hashable {}
+
+extension Amount {
+    init(_ amount: McTxOutAmount) {
+        self.value = amount.value
+        self.tokenId = TokenId(amount.token_id)
+    }
+}

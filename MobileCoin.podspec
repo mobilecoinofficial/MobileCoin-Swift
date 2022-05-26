@@ -114,7 +114,6 @@ Pod::Spec.new do |s|
   # on the framework target and any testspec targets for this pod.
   pod_target_xcconfig = {
     "GCC_OPTIMIZATION_LEVEL" => "z",
-    "LLVM_LTO" => "YES",
     "ENABLE_BITCODE" => "YES",
     "SUPPORTS_MACCATALYST" => "YES",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit
