@@ -10,10 +10,14 @@ struct KnownTxOut: TxOutProtocol {
     let keyImage: KeyImage
     let subaddressIndex: UInt64
     let recoverableMemo: RecoverableMemo
+    let sharedSecret: RistrettoPrivate
 
     init?(_ ledgerTxOut: LedgerTxOut, accountKey: AccountKey) {
         guard let amount = ledgerTxOut.amount(accountKey: accountKey),
               let (subaddressIndex, keyImage) = ledgerTxOut.keyImage(accountKey: accountKey),
+              let sharedSecret = TxOutUtils.sharedSecret(
+                                                viewPrivateKey: accountKey.viewPrivateKey,
+                                                publicKey: ledgerTxOut.publicKey),
               let commitment = TxOutUtils.reconstructCommitment(
                                                     maskedValue: ledgerTxOut.maskedValue,
                                                     publicKey: ledgerTxOut.publicKey,
@@ -32,6 +36,7 @@ struct KnownTxOut: TxOutProtocol {
         self.amount = amount
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
+        self.sharedSecret = sharedSecret
     }
 
     var value: UInt64 { amount.value }
