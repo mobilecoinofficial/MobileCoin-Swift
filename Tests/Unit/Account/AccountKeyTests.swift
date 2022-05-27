@@ -21,6 +21,24 @@ class AccountKeyTests: XCTestCase {
             fogAuthoritySpki: fixture.fogAuthoritySpki))
     }
 
+    func testAlphaFog() throws {
+        let fixture = try AccountKey.Fixtures.AlphaFog()
+        XCTAssertSuccess(AccountKey.make(
+            entropy: fixture.rootEntropy,
+            fogReportUrl: fixture.fogReportUrl,
+            fogReportId: fixture.fogReportId,
+            fogAuthoritySpki: fixture.fogAuthoritySpki))
+//        XCTAssertEqual(fixture.accountKey.publicAddress.serializedData.hexEncodedString(), fixture.publicAddress.serializedData.hexEncodedString())
+//        XCTAssertEqual(fixture.manualAccountKey.publicAddress.serializedData.hexEncodedString(), fixture.publicAddress.serializedData.hexEncodedString())
+//        XCTAssertEqual(fixture.manualAccountKey.viewPrivateKey.data.hexEncodedString(), fixture.accountKey.viewPrivateKey.data.hexEncodedString())
+        XCTAssertEqual(fixture.manualAccountKey.viewPrivateKey.data.hexEncodedString(), fixture.viewPrivateKey.data.hexEncodedString())
+        XCTAssertEqual(fixture.manualAccountKey.spendPrivateKey.data.hexEncodedString(), fixture.spendPrivateKey.data.hexEncodedString())
+        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.reportUrlString, fixture.fogReportUrl)
+        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.reportId, fixture.fogReportId)
+        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.authoritySpki.hexEncodedString(), fixture.fogAuthoritySpki.hexEncodedString())
+        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.reportUrl.description, fixture.fogReportUrl)
+    }
+
     func testFromMnemonic() throws {
         let fixture = try AccountKey.Fixtures.Init()
         let accountKey = AccountKey(mnemonic: fixture.mnemonic)
