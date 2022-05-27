@@ -45,7 +45,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
         client.blockVersion {
             guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
-                XCTExpectFailure("Balances test only available on networks with BlockVersion >= 2")
+                print("Test cannot run on blockversion < 2 ... " +
+                      "fulfilling the expectation as a success")
+                expect.fulfill()
                 return
             }
             
@@ -206,8 +208,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
             client.blockVersion {
                 guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
-                    XCTExpectFailure("MOBUSD Transactions only available " + 
-                                     "on networks with BlockVersion >= 2")
+                    print("Test cannot run on blockversion < 2 ... " +
+                          "fulfilling the expectation as a success")
+                    expect.fulfill()
                     return
                 }
                 
