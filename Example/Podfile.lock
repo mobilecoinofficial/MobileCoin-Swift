@@ -19,32 +19,32 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.6.0)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin/Core (1.2.0-pre14):
+  - LibMobileCoin/Core (1.2.0-pre15):
     - gRPC-Swift
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (1.2.0-pre15)
-  - MobileCoin/Core (1.2.0-pre15):
+  - MobileCoin (1.2.0-pre16)
+  - MobileCoin/Core (1.2.0-pre16):
     - gRPC-Swift (= 1.0.0)
-    - LibMobileCoin/Core (= 1.2.0-pre14)
+    - LibMobileCoin/Core (= 1.2.0-pre15)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.32.0)
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.32.0)
     - SwiftProtobuf
-  - MobileCoin/Core/ProtocolUnitTests (1.2.0-pre15):
+  - MobileCoin/Core/ProtocolUnitTests (1.2.0-pre16):
     - gRPC-Swift (= 1.0.0)
-    - LibMobileCoin/Core (= 1.2.0-pre14)
+    - LibMobileCoin/Core (= 1.2.0-pre15)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.32.0)
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.32.0)
     - SwiftProtobuf
-  - MobileCoin/IntegrationTests (1.2.0-pre15)
-  - MobileCoin/PerformanceTests (1.2.0-pre15)
-  - MobileCoin/Tests (1.2.0-pre15)
+  - MobileCoin/IntegrationTests (1.2.0-pre16)
+  - MobileCoin/PerformanceTests (1.2.0-pre16)
+  - MobileCoin/Tests (1.2.0-pre16)
   - SwiftLint (0.47.1)
   - SwiftNIO (2.32.3):
     - SwiftNIOCore (= 2.32.3)
@@ -164,9 +164,9 @@ SPEC CHECKSUMS:
   CNIOWindows: f5aa9dfb401b440a7b4c9cd911e53e981a787193
   gRPC-Swift: 77154009a019e97f8c4bd8f2bb75fe9726801157
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: a44c1b3f8e9b5d79fbf23d48b2dba8420daaf9e8
+  LibMobileCoin: 042d7f27c76a32546e3537c004add9482a5d8631
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: b5b2a3d7f7c00beae374f687132f2ffd346fe0e2
+  MobileCoin: fa2eb34d4cf070730bb1d409a7548193849d7203
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftNIO: bb336ceef32850e9671d3fa0e0cc2b9add3b5948
   SwiftNIOConcurrencyHelpers: ca2594e10749655f42baf5468212be83d2f94fe3
