@@ -126,25 +126,25 @@ public struct Balance {
         let significantDigits = tokenId.significantDigits
         
         let divideBy = UInt64(pow(Double(10), Double(significantDigits)))
-        let (amountLowMobInt, amountLowFrac) = { () -> (UInt64, UInt64) in
-            let mobParts = amountLow.quotientAndRemainder(dividingBy: divideBy)
-            return (UInt64(mobParts.quotient), mobParts.remainder)
+        let (amountLowInt, amountLowFrac) = { () -> (UInt64, UInt64) in
+            let parts = amountLow.quotientAndRemainder(dividingBy: divideBy)
+            return (UInt64(parts.quotient), parts.remainder)
         }()
 
-        let (amountHighMobInt, amountHighFrac) = { () -> (UInt64, UInt64) in
+        let (amountHighInt, amountHighFrac) = { () -> (UInt64, UInt64) in
             let amountHighIntermediary = UInt64(amountHigh) << (64 - significantDigits)
             let factored = UInt64(pow(Double(5), Double(significantDigits)))
-            let mobParts = amountHighIntermediary.quotientAndRemainder(dividingBy: factored)
-            return (UInt64(mobParts.quotient), mobParts.remainder << significantDigits)
+            let parts = amountHighIntermediary.quotientAndRemainder(dividingBy: factored)
+            return (UInt64(parts.quotient), parts.remainder << significantDigits)
         }()
 
         let amountFracParts = (amountLowFrac + amountHighFrac).quotientAndRemainder(
             dividingBy: divideBy)
 
-        let amountMobInt = amountLowMobInt + amountHighMobInt + UInt64(amountFracParts.quotient)
+        let amountInt = amountLowInt + amountHighInt + UInt64(amountFracParts.quotient)
         let amountFrac = amountFracParts.remainder
 
-        return (amountMobInt, amountFrac)
+        return (amountInt, amountFrac)
     }
 }
 
@@ -154,10 +154,10 @@ extension Balance: Hashable {}
 extension Balance: CustomStringConvertible {
     public var description: String {
         let amount = amountParts
-        return String(format: "%llu.%0\(tokenId.significantDigits)llu \(tokenId.name)", amount.int, amount.frac)
+        return String(format: "%llu.%0\(tokenId.significantDigits)llu \(tokenId.name)",
+                      amount.int, amount.frac)
     }
 }
-
 
 enum SIDecimalPrefix: UInt8 {
     case deci = 1
