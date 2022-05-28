@@ -79,7 +79,7 @@ enum TxOutUtils {
         viewPrivateKey: RistrettoPrivate
     ) -> Data32? {
         reconstructCommitment(maskedValue: maskedValue,
-                              maskedTokenId: Data(),
+                              maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
                               publicKey: publicKey, viewPrivateKey: viewPrivateKey)
     }
 
@@ -249,7 +249,7 @@ enum TxOutUtils {
         viewPrivateKey: RistrettoPrivate
     ) -> UInt64? {
         amount(maskedValue: maskedValue,
-               maskedTokenId: Data(),
+               maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
                publicKey: publicKey,
                viewPrivateKey: viewPrivateKey)?.value
     }

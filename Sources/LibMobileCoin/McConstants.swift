@@ -210,3 +210,12 @@ extension McConstants {
     static let FOG_KEY_IMAGE_MAX_REQUEST_SIZE = 2000
 
 }
+
+// MARK: - TxOut
+
+extension McConstants {
+
+    /// Maximum number of Key Images that may be checked in a single request.
+    static let LEGACY_MOB_MASKED_TOKEN_ID = Data()
+
+}
