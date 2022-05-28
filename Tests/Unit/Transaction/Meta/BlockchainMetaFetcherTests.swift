@@ -20,7 +20,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
             guard let metaCache = $0.successOrFulfill(expectation: expect)
             else { return }
 
-            XCTAssertEqual(metaCache.minimumFee, 10_000_000_000)
+            XCTAssertEqual(metaCache.minimumFees[.MOB], 10_000_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)
@@ -38,7 +38,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
             guard let metaCache = $0.successOrFulfill(expectation: expect)
             else { return }
 
-            XCTAssertEqual(metaCache.minimumFee, 3_000_000_000)
+            XCTAssertEqual(metaCache.minimumFees[.MOB], 3_000_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)
@@ -257,7 +257,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
                 guard let metaCache = $0.successOrFulfill(expectation: expect)
                 else { return }
 
-                XCTAssertEqual(metaCache.minimumFee, fixtures.minimumFee)
+                XCTAssertEqual(metaCache.minimumFees[.MOB], fixtures.minimumFee)
                 XCTAssertEqual(metaCache.blockVersion, fixtures.initialBlockVersion)
 
                 transactionSubmitter.submitTransaction(transaction) {
@@ -295,7 +295,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
                     guard let metaCache = $0.successOrFulfill(expectation: expect)
                     else { return }
 
-                    XCTAssertEqual(metaCache.minimumFee, fixtures.minimumFee)
+                    XCTAssertEqual(metaCache.minimumFees[.MOB], fixtures.minimumFee)
                     XCTAssertEqual(metaCache.blockVersion, fixtures.initialBlockVersion)
 
                     transactionSubmitter.submitTransaction(transaction) {
