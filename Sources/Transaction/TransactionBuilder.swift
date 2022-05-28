@@ -145,7 +145,6 @@ final class TransactionBuilder {
 
         let builder = TransactionBuilder(
             fee: fee,
-            tokenId: fee.tokenId,
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
             memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
@@ -228,7 +227,6 @@ final class TransactionBuilder {
     ) -> Result<TxOutContext, TransactionBuilderError> {
         let transactionBuilder = TransactionBuilder(
             fee: Amount(value: 0, tokenId: .MOB),
-            tokenId: .MOB,
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
             blockVersion: blockVersion)
@@ -305,7 +303,6 @@ final class TransactionBuilder {
 
     private init(
         fee: Amount,
-        tokenId: TokenId,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
         memoBuilder: TxOutMemoBuilder = DefaultMemoBuilder(),
@@ -319,7 +316,7 @@ final class TransactionBuilder {
                 withMcInfallible {
                     mc_transaction_builder_create(
                             fee.value,
-                            tokenId.value,
+                            fee.tokenId.value,
                             tombstoneBlockIndex,
                             fogResolverPtr,
                             memoBuilderPtr,
