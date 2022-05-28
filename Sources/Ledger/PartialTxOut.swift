@@ -33,14 +33,12 @@ extension PartialTxOut {
     init?(_ txOut: External_TxOut) {
         guard let commitment = Data32(txOut.maskedAmount.commitment.data),
               let targetKey = RistrettoPublic(txOut.targetKey.data),
-              let publicKey = RistrettoPublic(txOut.publicKey.data)
+              let publicKey = RistrettoPublic(txOut.publicKey.data),
+              [0,4,8].contains(txOut.maskedAmount.maskedTokenID.count)
         else {
             return nil
         }
-        guard [0,4,8].contains(txOut.maskedAmount.maskedTokenID.count) else {
-            return nil
-        }
-        
+
         self.init(
             encryptedMemo: txOut.encryptedMemo,
             commitment: commitment,
@@ -53,6 +51,7 @@ extension PartialTxOut {
     init?(_ txOutRecord: FogView_TxOutRecord, viewKey: RistrettoPrivate) {
         guard let targetKey = RistrettoPublic(txOutRecord.txOutTargetKeyData),
               let publicKey = RistrettoPublic(txOutRecord.txOutPublicKeyData),
+              [0,4,8].contains(txOutRecord.txOutAmountMaskedTokenID.count),
               let commitment = TxOutUtils.reconstructCommitment(
                                                     maskedValue: txOutRecord.txOutAmountMaskedValue,
                                                     maskedTokenId: txOutRecord.txOutAmountMaskedTokenID,
@@ -62,10 +61,7 @@ extension PartialTxOut {
         else {
             return nil
         }
-        guard [0,4,8].contains(txOutRecord.txOutAmountMaskedTokenID.count) else {
-            return nil
-        }
-        
+
         self.init(
             encryptedMemo: txOutRecord.encryptedMemo,
             commitment: commitment,
