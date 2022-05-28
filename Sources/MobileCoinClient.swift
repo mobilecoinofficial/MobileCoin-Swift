@@ -126,10 +126,17 @@ public final class MobileCoinClient {
         
         this function will return the `Balance` struct for the default TokenId == .MOB
         """)
-    public func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
+    public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
         updateBalances {
             completion($0.map({
                 $0.mobBalance
+            }).mapError({
+                switch $0 {
+                case .connectionError(let error):
+                    return error
+                case .fogSyncError(let error):
+                    return ConnectionError.invalidServerResponse(error.description)
+                }
             }))
         }
     }
@@ -298,7 +305,7 @@ public final class MobileCoinClient {
 
     public func prepareTransaction(
         to recipient: PublicAddress,
-        memoType: MemoType = .unused,
+        memoType: MemoType = .recoverable,
         amount: Amount,
         fee: UInt64,
         completion: @escaping (
@@ -360,7 +367,7 @@ public final class MobileCoinClient {
 
     public func prepareTransaction(
         to recipient: PublicAddress,
-        memoType: MemoType = .unused,
+        memoType: MemoType = .recoverable,
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (

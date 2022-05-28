@@ -626,16 +626,16 @@ extension NetworkPreset {
         switch self {
         case .dynamic:
             return [
-                "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21",
-                "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f",
-                "8ecaa57fcbec4397ca7fd270695ec2dd6d6bffccde24c0ca4f115a5cae1e896d",
-                "54a602d432c601887af7921c248b984f8510cb016580e156e0a647735acaf2bc",
                 "b01579aab48859b4e9f3ca8ec5e9904d8584bb8da30ae712d4e65426c76daab7",
                 "06edaf5b30852bc5e2033a6a5e4d25f2681b2e27d3499560185cecff4cff205f",
                 "dcd7feec764e02041ed7b835a6fad7bd30bc911207d7a05c772d687d1e3137e6",
                 "d82ed8fedcaae021efce0e6c32460fac32ff8f2918eb157557f7a9c20751af62",
                 "3864150d417afc1ddea49848c5f672c602da152c350473a6947f0f29a3a65825",
                 "43c8272b3e9f5da19761e88204d250b010672ca8a2f540af6bd25c67c3b0c200",
+                "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21",
+                "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f",
+                "8ecaa57fcbec4397ca7fd270695ec2dd6d6bffccde24c0ca4f115a5cae1e896d",
+                "54a602d432c601887af7921c248b984f8510cb016580e156e0a647735acaf2bc",
                 "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05"
             ]
             .compactMap({ Data(hexEncoded: String($0)) })
