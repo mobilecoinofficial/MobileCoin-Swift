@@ -56,8 +56,7 @@ final class BlockchainMetaFetcher {
     }
 
     func cachedFee(tokenId: TokenId = .MOB) -> UInt64? {
-        inner.accessWithoutLocking.metaCache?.minimumFees[tokenId] ??
-            (tokenId == .MOB ? inner.accessWithoutLocking.metaCache?.minimumFee : nil)
+        inner.accessWithoutLocking.metaCache?.minimumFees[tokenId]
     }
 
     func getOrFetchMinimumFee(
@@ -65,13 +64,12 @@ final class BlockchainMetaFetcher {
         completion: @escaping (Result<UInt64, ConnectionError>) -> Void
     ) {
         fetchCache {
-            if let minimumFee = $0?.minimumFees[tokenId] ??
-               (tokenId == .MOB ? $0?.minimumFee : nil) {
+            if let minimumFee = $0?.minimumFees[tokenId] {
                 completion(.success(minimumFee))
             } else {
                 self.fetchMeta {
                     completion($0.map { cache in
-                        cache.minimumFees[tokenId] ?? cache.minimumFee
+                        cache.minimumFees[tokenId] ?? McConstants.DEFAULT_MINIMUM_FEE
                     })
                 }
             }
@@ -83,8 +81,7 @@ final class BlockchainMetaFetcher {
         completion: @escaping (UInt64?) -> Void
     ) {
         inner.accessAsync {
-            completion($0.metaCache?.minimumFees[tokenId] ??
-                       (tokenId == .MOB ? $0.metaCache?.minimumFee : nil))
+            completion($0.metaCache?.minimumFees[tokenId])
         }
     }
 
@@ -140,8 +137,11 @@ final class BlockchainMetaFetcher {
         completion: @escaping (MetaCache) -> Void
     ) {
         inner.accessAsync {
+            var minimumFees = minimumFees
+            if minimumFees[.MOB] == nil || minimumFees[.MOB] == nil {
+                minimumFees[.MOB] = minimumFee
+            }
             let newMeta = MetaCache(
-                minimumFee: minimumFee,
                 minimumFees: minimumFees,
                 blockVersion: blockVersion,
                 fetchTimestamp: Date())
@@ -172,7 +172,6 @@ extension BlockchainMetaFetcher {
 
 extension BlockchainMetaFetcher {
     struct MetaCache {
-        let minimumFee: UInt64
         let minimumFees: [TokenId: UInt64]
         let blockVersion: BlockVersion
         let fetchTimestamp: Date
