@@ -23,10 +23,8 @@ public struct Balances {
     
     let blockCount: UInt64
     
-    init(balances: [Balance], blockCount: UInt64) {
-        self.balances = balances.reduce(into: [TokenId:Balance](), { result, balance in
-            result[balance.tokenId] = balance
-        })
+    init(balances: [TokenId:Balance], blockCount: UInt64) {
+        self.balances = balances
         self.blockCount = blockCount
     }
 }

@@ -73,6 +73,9 @@ extension TxOutProcessingPerfTests {
         let balances = cachedTokenIds(txOuts: txOuts).map {
             cachedBalance(for: $0, txOuts: txOuts, knowableBlockCount: knowableBlockCount)
         }
+        .reduce(into: [TokenId: Balance](), { result, balance in
+            result[balance.tokenId] = balance
+        })
         return Balances(balances: balances, blockCount: knowableBlockCount)
     }
 }

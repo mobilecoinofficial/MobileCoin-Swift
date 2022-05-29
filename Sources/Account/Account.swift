@@ -66,7 +66,12 @@ final class Account {
     }
 
     var cachedBalances: Balances {
-        let balances = cachedTxOutTokenIds.map { cachedBalance(for: $0) }
+        let balances = cachedTxOutTokenIds.map {
+            cachedBalance(for: $0)
+        }
+        .reduce(into: [TokenId: Balance](), { result, balance in
+            result[balance.tokenId] = balance
+        })
         return Balances(balances: balances, blockCount: knowableBlockCount)
     }
 
