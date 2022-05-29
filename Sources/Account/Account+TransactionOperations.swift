@@ -92,7 +92,7 @@ extension Account {
                             recipient: recipient,
                             memoType: memoType,
                             amount: amount,
-                            fee: Amount(fee, amount.tokenId),
+                            fee: Amount(fee, in: amount.tokenId),
                             tombstoneBlockIndex: tombstoneBlockIndex,
                             blockVersion: blockVersion,
                             completion: completion)
@@ -174,7 +174,7 @@ extension Account {
                                     recipient: recipient,
                                     memoType: memoType,
                                     amount: amount,
-                                    fee: Amount(fee, amount.tokenId),
+                                    fee: Amount(fee, in: amount.tokenId),
                                     tombstoneBlockIndex: tombstoneBlockIndex,
                                     blockVersion: blockVersion,
                                     completion: completion)
@@ -249,7 +249,7 @@ extension Account {
                                     self.transactionPreparer.prepareSelfAddressedTransaction(
                                         inputs: defragInputs.inputs,
                                         recoverableMemo: recoverableMemo,
-                                        fee: Amount(defragInputs.fee, amountToSend.tokenId),
+                                        fee: Amount(defragInputs.fee, in: amountToSend.tokenId),
                                         tombstoneBlockIndex: tombstoneBlockIndex,
                                         blockVersion: blockVersion,
                                         completion: callback)

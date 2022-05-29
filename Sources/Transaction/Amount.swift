@@ -11,12 +11,7 @@ public struct Amount {
 }
 
 extension Amount {
-    public init(value: UInt64, token: TokenId) {
-        self.value = value
-        self.tokenId = token
-    }
-
-    public init(_ value: UInt64, _ tokenId: TokenId) {
+    public init(_ value: UInt64, in tokenId: TokenId) {
         self.value = value
         self.tokenId = tokenId
     }

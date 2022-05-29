@@ -427,7 +427,7 @@ extension Transaction.Fixtures.BuildTx {
         ]
     }
 
-    fileprivate static let fee: Amount = Amount(10_000_000_000, .MOB)
+    fileprivate static let fee: Amount = Amount(10_000_000_000, in: .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 610
 
@@ -479,7 +479,7 @@ extension Transaction.Fixtures.Default {
         ]
     }
 
-    fileprivate static let fee: Amount = Amount(10_000_000_000, .MOB)
+    fileprivate static let fee: Amount = Amount(10_000_000_000, in: .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 634
 

@@ -199,7 +199,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     
     func submitMobUSDTransaction(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let amount = Amount(value: 100, token: .MOBUSD)
+        let amount = Amount(100, in: .MOBUSD)
 
         func checkBlockVersionAndFee(
                 _ client: MobileCoinClient,
