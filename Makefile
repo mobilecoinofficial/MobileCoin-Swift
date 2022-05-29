@@ -112,7 +112,7 @@ lint-podspec:
 
 .PHONY: publish-podspec
 publish-podspec:
-	bundle exec pod trunk push MobileCoin.podspec --skip-tests
+	bundle exec pod trunk push MobileCoin.podspec --skip-tests --allow-warnings
 
 # CircleCI
 
