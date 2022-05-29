@@ -86,6 +86,9 @@ clean-example-http: clean-docs
 .PHONY: lint
 lint: swiftlint
 
+.PHONY: lint-strict
+lint: swiftlint --strict
+
 .PHONY: lint-all
 lint-all: lint lint-circleci lint-podspec lint-docs
 

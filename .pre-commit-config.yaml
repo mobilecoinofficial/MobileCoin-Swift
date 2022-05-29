@@ -1,0 +1,12 @@
+repos:
+  - repo: local
+    hooks:
+      - id: autocorrect
+        name: autocorrect
+        entry: ./scripts/autocorrect.sh
+        language: script
+        files: \.swift$
+  - repo: https://github.com/realm/SwiftLint
+    rev: 0.46.0
+    hooks:
+      - id: swiftlint
