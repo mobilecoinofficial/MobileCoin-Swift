@@ -10,6 +10,8 @@ defaults:
     devNetworkAuthPassword:
     testNetTestAccountMnemonicsCommaSeparated:
     mobileDevTestAccountMnemonicsCommaSeparated:
+    dynamicTestAccountSeedEntropiesCommaSeparated:
+    dynamicTestAccountFogAuthoritySpki:
 
 commands:
   init-artifacts-submodule:
