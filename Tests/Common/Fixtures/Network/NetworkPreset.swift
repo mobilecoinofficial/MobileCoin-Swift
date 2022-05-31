@@ -616,7 +616,7 @@ extension NetworkPreset {
 
         case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return []
-            
+
         case .dynamic:
             return []
         }
@@ -636,7 +636,7 @@ extension NetworkPreset {
                 "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f",
                 "8ecaa57fcbec4397ca7fd270695ec2dd6d6bffccde24c0ca4f115a5cae1e896d",
                 "54a602d432c601887af7921c248b984f8510cb016580e156e0a647735acaf2bc",
-                "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05"
+                "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05",
             ]
             .compactMap({ Data(hexEncoded: String($0)) })
         default:

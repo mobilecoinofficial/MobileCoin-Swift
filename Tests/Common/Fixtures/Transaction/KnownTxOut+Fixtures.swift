@@ -79,7 +79,7 @@ extension KnownTxOut.Fixtures {
             self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
         }
     }
-    
+
     struct GetSharedSecret {
         let knownTxOut: KnownTxOut
         let senderAccountKey: AccountKey

@@ -109,7 +109,7 @@ extension ConsensusCommon_ProposeTxResult {
      * The name of the enumeration (as written in case).
      */
     var name: String {
-        get { return String(describing: self) }
+        get { String(describing: self) }
     }
 
 }

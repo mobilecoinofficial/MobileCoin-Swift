@@ -2,8 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 class PublicAddressTests: XCTestCase {
     func testRootEntropy() throws {
@@ -22,7 +22,7 @@ class PublicAddressTests: XCTestCase {
             DytzcxOO5Jx7r9i+amQEiIcjBICwyFoEUlVJTgSpqBZGNpznoQ4I2m+uJzM+wMFsinTZN3mp4FU5UHjQ\
             sHKG+ZMCAwEAAQ==
             """
-        
+
         let fogAuthoritySpki = Data(base64Encoded: fogAuthoritySpkiB64Encoded)!
 
         let key = try! AccountKey.make(
@@ -30,7 +30,7 @@ class PublicAddressTests: XCTestCase {
             fogReportUrl: fogUrl,
             fogReportId: "",
             fogAuthoritySpki: fogAuthoritySpki).get()
-        
+
         let publicAddress = key.publicAddress
 
         let expected = """
@@ -39,7 +39,7 @@ class PublicAddressTests: XCTestCase {
         u6w8PfGsCxfYodQ9Ps5YFGu6mVWaXDXhutN4bf93xJ3vtLhWuozLwAWiKkzgundqBPk12t8Q\
         LyAdr2C2njVBFXm7m8cmTYaJUCbLFAqcarugd4gzgi
         """
-        
+
         XCTAssertEqual(Base58Coder.encode(publicAddress), expected)
     }
 }

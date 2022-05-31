@@ -9,11 +9,11 @@ public struct TokenId {
     public var name: String {
         Self.names[self] ?? "TokenId \(self.value)"
     }
-    
+
     public var significantDigits: UInt8 {
         Self.significantDigits[self] ?? 12
     }
-    
+
     public var siPrefix: String? {
         SIDecimalPrefix(rawValue: significantDigits)?.name
     }
@@ -36,14 +36,14 @@ extension TokenId: CustomStringConvertible {
     static var names: [TokenId: String] = {
         [
             .MOB: "MOB",
-            .MOBUSD: "MOBUSD"
+            .MOBUSD: "MOBUSD",
         ]
     }()
-    
+
     static var significantDigits: [TokenId: UInt8] = {
         [
             .MOB: 12,
-            .MOBUSD: 6
+            .MOBUSD: 6,
         ]
     }()
 }

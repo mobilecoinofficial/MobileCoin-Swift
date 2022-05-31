@@ -66,11 +66,11 @@ extension Account {
                             logFunction: false)
                         return
                     }
-                    
+
                     let balances = self.account.readSync { account in
                         account.cachedBalances
                     }
-                    
+
                     logger.info(
                         "Balance updates successful. balances: \(redacting: balances)",
                         logFunction: false)

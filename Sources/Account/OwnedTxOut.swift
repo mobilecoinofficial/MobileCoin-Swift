@@ -10,7 +10,7 @@ public struct OwnedTxOut {
     public var publicKey: Data { publicKeyTyped.data }
 
     public let value: UInt64
-    
+
     public let tokenId: TokenId
 
     let keyImageTyped: KeyImage
@@ -24,7 +24,7 @@ public struct OwnedTxOut {
     public let subaddressIndex: UInt64
 
     public let sharedSecret: Data
-    
+
     init(
         _ knownTxOut: KnownTxOut,
         receivedBlock: BlockMetadata,

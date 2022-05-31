@@ -7,16 +7,16 @@ import Foundation
 public struct Balance {
     public let amountLow: UInt64
     public let amountHigh: UInt64
-    
+
     @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amountLow`")
     public var amountPicoMobLow: UInt64 { amountLow }
-    
+
     @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amountHigh`")
     public var amountPicoMobHigh: UInt64 { amountHigh }
-    
+
     public let tokenId: TokenId
     let blockCount: UInt64
-    
+
     init(values: [UInt64], blockCount: UInt64, tokenId: TokenId) {
         var amountLow: UInt64 = 0
         var amountHigh: UInt64 = 0
@@ -61,7 +61,7 @@ public struct Balance {
     public var amountMobParts: (mobInt: UInt64, picoFrac: UInt64) {
         (mobInt: amountParts.int, picoFrac: amountParts.frac)
     }
-    
+
     /// Convenience accessor for balance value. `int` is the integer part of the value when
     /// represented in `.tokenId`. `frac` is the fractional part of the value when represented in 
     /// `.tokenId`. However, rather than reprenting the fractional part as a decimal fraction,
@@ -122,9 +122,8 @@ public struct Balance {
         // amountMobInt = amountLowMobInt + amountHighMobInt + amountPicoFracCarry
         // amountPicoFrac = (amountLowPicoFrac + amountHighPicoFrac) % 10^12
 
-        
         let significantDigits = tokenId.significantDigits
-        
+
         let divideBy = UInt64(pow(Double(10), Double(significantDigits)))
         let (amountLowInt, amountLowFrac) = { () -> (UInt64, UInt64) in
             let parts = amountLow.quotientAndRemainder(dividingBy: divideBy)

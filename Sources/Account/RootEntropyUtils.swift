@@ -23,7 +23,7 @@ enum RootEntropyUtils {
                 }
             }
         }
-                            
+
         // Safety: It's safe to skip validation because mc_account_private_keys_from_root_entropy
         // should always return valid RistrettoPrivate values on success.
         return (RistrettoPrivate(skippingValidation: viewPrivateKeyOut),
