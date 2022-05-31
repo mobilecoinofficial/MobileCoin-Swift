@@ -21,7 +21,7 @@ extension TransportProtocol {
     }
 }
 
-extension TransportProtocol : CustomStringConvertible {
+extension TransportProtocol: CustomStringConvertible {
     public var description: String {
         switch option {
         case .grpc:
@@ -32,8 +32,8 @@ extension TransportProtocol : CustomStringConvertible {
     }
 }
 
-extension TransportProtocol : Equatable { }
-extension TransportProtocol : Hashable { }
+extension TransportProtocol: Equatable { }
+extension TransportProtocol: Hashable { }
 
 extension TransportProtocol {
     var certificateValidator: SSLCertificateValidator {

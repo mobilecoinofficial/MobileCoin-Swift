@@ -5,8 +5,7 @@
 import Foundation
 import LibMobileCoin
 
-final class FogUntrustedTxOutConnection:
-    Connection<GrpcProtocolConnectionFactory.FogUntrustedTxOutServiceProvider, HttpProtocolConnectionFactory.FogUntrustedTxOutServiceProvider>,
+final class FogUntrustedTxOutConnection: Connection<GrpcProtocolConnectionFactory.FogUntrustedTxOutServiceProvider, HttpProtocolConnectionFactory.FogUntrustedTxOutServiceProvider>,
     FogUntrustedTxOutService
 {
     private let httpFactory: HttpProtocolConnectionFactory

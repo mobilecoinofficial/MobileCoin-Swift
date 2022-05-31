@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable closure_body_length
 
 import Foundation
 import LibMobileCoin
@@ -50,7 +51,7 @@ enum SenderWithPaymentRequestMemoUtils {
             }
         }
     }
-    
+
     static func getAddressHash(
         memoData: Data64
     ) -> AddressHash {
@@ -81,7 +82,7 @@ enum SenderWithPaymentRequestMemoUtils {
         }
         return AddressHash(bytes)
     }
-    
+
     static func create(
         senderAccountKey: AccountKey,
         receipientPublicAddress: PublicAddress,
@@ -121,8 +122,7 @@ enum SenderWithPaymentRequestMemoUtils {
             }
         }
     }
-    
-    
+
     static func getPaymentRequestId(
         memoData: Data64
     ) -> UInt64? {
@@ -134,7 +134,7 @@ enum SenderWithPaymentRequestMemoUtils {
                     &out_payment_request_id,
                     &errorPtr)
             }
-            switch (result) {
+            switch result {
             case .success():
                 return out_payment_request_id
             case .failure(let error):
@@ -154,5 +154,5 @@ enum SenderWithPaymentRequestMemoUtils {
             }
         }
     }
-    
+
 }

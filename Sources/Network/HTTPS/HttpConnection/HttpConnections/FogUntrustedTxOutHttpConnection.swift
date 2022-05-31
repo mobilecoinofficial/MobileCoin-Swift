@@ -7,7 +7,7 @@ import LibMobileCoin
 
 final class FogUntrustedTxOutHttpConnection: HttpConnection, FogUntrustedTxOutService {
     private let client: FogLedger_FogUntrustedTxOutApiRestClient
-    private let requester : RestApiRequester
+    private let requester: RestApiRequester
 
     init(
         config: ConnectionConfig<FogUrl>,

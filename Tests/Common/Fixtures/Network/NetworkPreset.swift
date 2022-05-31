@@ -184,7 +184,7 @@ extension NetworkPreset {
             return "fog://fog-rpt-prd.namda.net"
         case .testNet:
             return "fog://fog-rpt-stg.namda.net"
-            
+
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return ""
         case .dynamic(_):
@@ -200,7 +200,7 @@ extension NetworkPreset {
         "89db0d1684fcc98258295c39f4ab68f7de5917ef30f0004d9a86f29930cebbbd"
     private static let mainNetFogReportMrEnclaveHex =
         "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
-    
+
 //    private static let mainNetConsensusMrEnclaveHex =
 //        "e66db38b8a43a33f6c1610d335a361963bb2b31e056af0dc0a895ac6c857cab9"
 //    private static let mainNetFogViewMrEnclaveHex =
@@ -588,7 +588,7 @@ extension NetworkPreset {
             return false
         }
     }
-    
+
     var invalidCredentials: BasicCredentials {
         BasicCredentials(username: Self.invalidCredUsername, password: Self.invalidCredPassword)
     }

@@ -5,8 +5,7 @@
 import Foundation
 import LibMobileCoin
 
-final class FogBlockConnection:
-    Connection<GrpcProtocolConnectionFactory.FogBlockServiceProvider, HttpProtocolConnectionFactory.FogBlockServiceProvider>, FogBlockService
+final class FogBlockConnection: Connection<GrpcProtocolConnectionFactory.FogBlockServiceProvider, HttpProtocolConnectionFactory.FogBlockServiceProvider>, FogBlockService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -44,7 +43,7 @@ final class FogBlockConnection:
             transportProtocolOption: config.fogBlockConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
-    
+
     func getBlocks(
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void

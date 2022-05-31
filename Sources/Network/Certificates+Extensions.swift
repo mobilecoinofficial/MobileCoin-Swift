@@ -8,7 +8,7 @@ extension Data {
     public func asSecCertificate() -> Result<SecCertificate, InvalidInputError> {
         Self.secCertificate(for: self)
     }
-    
+
     public static func secCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
         let pinnedCertificateData = data as CFData
         if let pinnedCertificate = SecCertificateCreateWithData(nil, pinnedCertificateData) {
@@ -20,7 +20,7 @@ extension Data {
             return .failure(InvalidInputError(errorMessage))
         }
     }
-    
+
     public static func pinnedCertificateKeys(for data: [Data]) -> Result<[SecKey], Error> {
         do {
             let keys = try data.map { bytes in
@@ -39,7 +39,7 @@ extension SecCertificate {
     public func asPublicKey() -> Result<SecKey, SecurityError> {
         Self.publicKey(for: self)
     }
-    
+
     public static func publicKey(for certificate: SecCertificate) -> Result<SecKey, SecurityError> {
         var publicKey: SecKey?
         let policy = SecPolicyCreateBasicX509()
@@ -54,38 +54,38 @@ extension SecCertificate {
             let error = SecurityError(trustCreationStatus, message: message)
             return .failure(error)
         }
-        
+
         guard let key = publicKey else {
             let message = ", root certificate: \(data.base64EncodedString())"
             return .failure(SecurityError(nil, message: SecurityError.nilPublicKey + message))
         }
-        
+
         return .success(key)
     }
-    
+
     public var data: Data {
         SecCertificateCopyData(self) as Data
     }
 }
 
 extension SecTrust {
-    public var certificateCount : Int {
+    public var certificateCount: Int {
         SecTrustGetCertificateCount(self)
     }
 
-    public var certificateTrustChain : [SecCertificate] {
+    public var certificateTrustChain: [SecCertificate] {
         [Int](0..<certificateCount).compactMap {
             SecTrustGetCertificateAtIndex(self, $0)
         }
     }
-    
-    public var publicKeyTrustChain : [SecKey] {
+
+    public var publicKeyTrustChain: [SecKey] {
         certificateTrustChain.compactMap {
             try? $0.asPublicKey().get()
         }
     }
-    
-    public var asPublicKeyTrustChain : Result<[SecKey], Error> {
+
+    public var asPublicKeyTrustChain: Result<[SecKey], Error> {
         do {
             let keys = try certificateTrustChain.map {
                 try $0.asPublicKey().get()

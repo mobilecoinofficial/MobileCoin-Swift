@@ -11,7 +11,7 @@ class FogResolverManagerIntTests: XCTestCase {
             try fogReport(transportProtocol: transportProtocol)
         }
     }
-    
+
     func fogReport(transportProtocol: TransportProtocol) throws {
         let fogResolverManager = try IntegrationTestFixtures.createFogResolverManager(transportProtocol: transportProtocol)
         let publicAddress = try IntegrationTestFixtures.createPublicAddress()
@@ -25,4 +25,3 @@ class FogResolverManagerIntTests: XCTestCase {
         waitForExpectations(timeout: 10)
     }
 }
-

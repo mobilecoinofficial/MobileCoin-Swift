@@ -6,7 +6,7 @@ import Foundation
 import LibMobileCoin
 
 enum DestinationMemoUtils {
-    
+
     static func isValid(
         txOutPublicKey: RistrettoPublic,
         txOutTargetKey: RistrettoPublic,
@@ -18,7 +18,7 @@ enum DestinationMemoUtils {
              viewPrivateKey: accountKey.viewPrivateKey,
              subaddressSpendPrivateKey: accountKey.changeSubaddressSpendPrivateKey)
     }
-    
+
     static func getAddressHash(
         memoData: Data64
     ) -> AddressHash {
@@ -49,7 +49,7 @@ enum DestinationMemoUtils {
         }
         return AddressHash(bytes)
     }
-    
+
     static func create(
         destinationPublicAddress: PublicAddress,
         numberOfRecipients: PositiveUInt8,
@@ -85,7 +85,7 @@ enum DestinationMemoUtils {
             }
         }
     }
-    
+
     static func getFee(
         memoData: Data64
     ) -> UInt64? {
@@ -117,7 +117,7 @@ enum DestinationMemoUtils {
             }
         }
     }
-    
+
     static func getTotalOutlay(
         memoData: Data64
     ) -> UInt64? {
@@ -149,7 +149,7 @@ enum DestinationMemoUtils {
             }
         }
     }
-    
+
     static func getNumberOfRecipients(
         memoData: Data64
     ) -> PositiveUInt8? {

@@ -66,7 +66,7 @@ class FogSyncChecker: FogSyncCheckable {
     var consensusHighestKnownBlock: UInt64 = 0
 
     let maxAllowedBlockDelta: PositiveUInt64
-    
+
     init() {
         guard let maxAllowedBlockDelta = PositiveUInt64(10) else {
             logger.fatalError("Should never be reached as 10 > 0")
@@ -77,7 +77,7 @@ class FogSyncChecker: FogSyncCheckable {
     func setViewsHighestKnownBlock(_ value: UInt64) {
         viewsHighestKnownBlock = value
     }
-    
+
     func setLedgersHighestKnownBlock(_ value: UInt64) {
         ledgersHighestKnownBlock = value
     }

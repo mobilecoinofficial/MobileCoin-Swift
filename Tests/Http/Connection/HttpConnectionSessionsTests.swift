@@ -5,16 +5,15 @@
 @testable import MobileCoin
 import XCTest
 
-
 class HttpConnectionSessionTests: XCTestCase {
 
     func testAuth() throws {
         XCTAssertTrue(true)
         let fixture = try ConnectionSession.HttpFixtures.Default()
         let session = fixture.session
-        
+
         session.authorizationCredentials = fixture.credentials
-        
+
         assertDictionariesEqualCaseInsensitively(session.requestHeaders, fixture.headersWithAuth)
     }
 
@@ -79,7 +78,7 @@ class HttpConnectionSessionTests: XCTestCase {
 struct CaseInsensitiveKeyValue {
     let key: String
     let value: String
-    
+
     init(key: String, value: String) {
         self.key = key.lowercased()
         self.value = value

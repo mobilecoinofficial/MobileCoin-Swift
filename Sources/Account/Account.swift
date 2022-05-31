@@ -8,7 +8,7 @@ final class Account {
     let accountKey: AccountKey
 
     let fogView: FogView
-    
+
     let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
     var allTxOutTrackers: [TxOutTracker] = []

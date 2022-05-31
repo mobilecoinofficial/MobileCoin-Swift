@@ -135,7 +135,7 @@ public struct Receipt {
 
         return amount
     }
-    
+
     enum ReceivedStatus {
         case notReceived(knownToBeNotReceivedBlockCount: UInt64?)
         case received(block: BlockMetadata)

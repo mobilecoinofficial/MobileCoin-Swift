@@ -44,7 +44,7 @@ extension Account {
         func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void) {
             logger.info("Updating balance...", logFunction: false)
             checkForNewTxOuts {
-                guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
+                guard $0.mapError({ .connectionError($0) }).successOr(completion: completion) != nil else {
                     logger.warning(
                         "Failed to update balance: checkForNewTxOuts error: \($0)",
                         logFunction: false)
@@ -52,21 +52,20 @@ extension Account {
                 }
 
                 self.checkForSpentTxOuts {
-                    guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
+                    guard $0.mapError({ .connectionError($0) }).successOr(completion: completion) != nil else {
                         logger.warning(
                             "Failed to update balance: checkForSpentTxOuts error: \($0)",
                             logFunction: false)
                         return
                     }
-                    
+
                     let fogInSync = account.accessWithoutLocking.syncCheckerLock.readSync({ $0.inSync() })
-                    guard fogInSync.mapError({.fogSyncError($0)}).successOr(completion: completion) != nil else {
+                    guard fogInSync.mapError({ .fogSyncError($0) }).successOr(completion: completion) != nil else {
                         logger.warning(
                             "Failed to update balance: checkForSpentTxOuts error: \(fogInSync)",
                             logFunction: false)
                         return
                     }
-                    
                     
                     let balances = self.account.readSync { account in
                         account.cachedBalances

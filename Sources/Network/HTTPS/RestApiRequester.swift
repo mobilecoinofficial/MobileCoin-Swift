@@ -19,11 +19,11 @@ protocol Requester {
     func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void)
 }
 
-extension RestApiRequester : Requester {
+extension RestApiRequester: Requester {
     private func completeURL(path: String) -> URL? {
-        .prefix(baseUrl.httpBasedUrl, pathComponents:[prefix, path])
+        .prefix(baseUrl.httpBasedUrl, pathComponents: [prefix, path])
     }
-    
+
     public func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void) {
         guard let url = completeURL(path: call.path) else {
             let message = "Could not construct URL"
@@ -53,10 +53,10 @@ extension RestApiRequester : Requester {
                 let statusCode = httpResponse.statusCode
                 logger.info("Http Request url: \(url)")
                 logger.info("Status code: \(statusCode)")
-                
-                let responsePayload : T.ResponsePayload? = {
+
+                let responsePayload: T.ResponsePayload? = {
                     guard let data = httpResponse.responseData,
-                          let responsePayload = try? T.ResponsePayload.init(serializedData: data)
+                          let responsePayload = try? T.ResponsePayload(serializedData: data)
                     else {
                         return nil
                     }
@@ -68,6 +68,5 @@ extension RestApiRequester : Requester {
             }
         }
     }
-    
-}
 
+}

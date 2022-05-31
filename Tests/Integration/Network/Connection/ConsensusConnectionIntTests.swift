@@ -12,7 +12,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             try attestationWorks(transportProtocol: transportProtocol)
        }
     }
-    
+
     func attestationWorks(transportProtocol: TransportProtocol) throws {
         // Run test multiple times to minimize the chance that the server assigned by the load
         // balancer for the attest call is the same server that is assigned for the proposeTx call.
@@ -38,7 +38,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             try multipleCalls(transportProtocol: transportProtocol)
         }
     }
-    
+
     func multipleCalls(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let connection = try createConsensusConnection(transportProtocol: transportProtocol)
@@ -73,7 +73,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
         }
     }
-    
+
     func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.consensusRequiresCredentials)
 
@@ -100,7 +100,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             try trustRootWorks(transportProtocol: transportProtocol)
         }
     }
-    
+
     func trustRootWorks(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
@@ -126,14 +126,14 @@ class ConsensusConnectionIntTests: XCTestCase {
             try extraTrustRootWorks(transportProtocol: transportProtocol)
         }
     }
-    
+
     func extraTrustRootWorks(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection = try createConsensusConnection(
             transportProtocol: transportProtocol,
             trustRoots: trustRootsFixture.trustRootsBytes + [trustRootsFixture.wrongTrustRootBytes])
-        
+
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
@@ -154,7 +154,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             try wrongTrustRootFails(transportProtocol: transportProtocol)
         }
     }
-    
+
     func wrongTrustRootFails(transportProtocol: TransportProtocol) throws {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
         try XCTSkipIf(true)
@@ -183,17 +183,17 @@ class ConsensusConnectionIntTests: XCTestCase {
 
 extension ConsensusConnectionIntTests {
     func createConsensusConnection(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
+        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [Data]) throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol, trustRoots: trustRoots)
+        let networkConfig = try NetworkConfigFixtures.create(transportProtocol: transportProtocol, trustRoots: trustRoots)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(using: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 

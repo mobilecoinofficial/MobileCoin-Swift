@@ -55,9 +55,9 @@ class MobileCoinClientIntTests: XCTestCase {
             try transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: $0, expectation: $1)
         }
     }
-    
+
     func transactionStatusFailsWhenInputIsAlreadySpent(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let submitTransaction = { (callback: @escaping (Transaction) -> Void) in
@@ -141,11 +141,10 @@ class MobileCoinClientIntTests: XCTestCase {
             try transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
+    func transactionStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, using: transportProtocol)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         func createTransaction(callback: @escaping (Transaction) -> Void) {
             senderClient.updateBalance {
@@ -202,9 +201,9 @@ class MobileCoinClientIntTests: XCTestCase {
             try receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: $0, expectation: $1)
         }
     }
-    
+
     func receiptStatusDoesNotSucceedWithoutSubmission(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, using: transportProtocol)
         let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
         let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
             accountKey: receiverAccountKey,
@@ -282,9 +281,9 @@ class MobileCoinClientIntTests: XCTestCase {
             try concurrentBalanceChecks(transportProtocol: $0, expectation: $1)
         }
     }
-    
+
     func concurrentBalanceChecks(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
         client.updateBalance {
             guard let balance = $0.successOrFulfill(expectation: expect) else { return }
@@ -322,9 +321,9 @@ class MobileCoinClientIntTests: XCTestCase {
             try concurrentBalanceChecksWhileUpdating(transportProtocol: $0, expectation: $1)
         }
     }
-    
+
     func concurrentBalanceChecksWhileUpdating(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
         let group = DispatchGroup()
 
@@ -366,9 +365,9 @@ class MobileCoinClientIntTests: XCTestCase {
             try concurrentBalanceUpdates(transportProtocol: $0, expectation: $1)
         }
     }
-    
+
     func concurrentBalanceUpdates(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
         let group = DispatchGroup()
 

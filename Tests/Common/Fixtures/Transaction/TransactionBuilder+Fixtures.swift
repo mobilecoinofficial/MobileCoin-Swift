@@ -2,8 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 extension TransactionBuilder {
     enum Fixtures {}
@@ -21,7 +21,7 @@ extension TransactionBuilder.Fixtures {
         let totalOutlay: UInt64
 
         static let Fixtures = TransactionBuilder.Fixtures.self
-        
+
         init() throws {
             self.txFixture = try Self.Fixtures.getTxOutMemo()
             self.memoType = Self.getMemoType()
@@ -32,18 +32,18 @@ extension TransactionBuilder.Fixtures {
             self.receivedTxOut = try
                         Self.Fixtures.getOwnedOutput(
                             accountKey: txFixture.recipientAccountKey,
-                            transaction: try Self.Fixtures.getTransaction(memoType:memoType))
+                            transaction: try Self.Fixtures.getTransaction(memoType: memoType))
             self.sentTxOut = try
                         Self.Fixtures.getOwnedOutput(
                             accountKey: txFixture.senderAccountKey,
                             transaction: try Self.Fixtures.getTransaction(memoType: memoType))
         }
-        
+
         static func getMemoType() -> MemoType {
             .recoverable
         }
     }
-    
+
     struct SenderWithPaymentRequestAndDestination {
         let paymentRequestId: UInt64
         let txFixture: Transaction.Fixtures.TxOutMemo
@@ -56,7 +56,7 @@ extension TransactionBuilder.Fixtures {
         let totalOutlay: UInt64
 
         static let Fixtures = TransactionBuilder.Fixtures.self
-        
+
         init() throws {
             self.memoType = try Self.getMemoType()
             self.txFixture = try Transaction.Fixtures.TxOutMemo()
@@ -74,16 +74,16 @@ extension TransactionBuilder.Fixtures {
                             accountKey: txFixture.senderAccountKey,
                             transaction: try Self.Fixtures.getTransaction(memoType: memoType))
         }
-        
+
         static let paymentRequestId: UInt64 = 301
-        
+
         static func getMemoType() throws -> MemoType {
             .customPaymentRequest(
                     sender: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
                     id: paymentRequestId)
         }
     }
-    
+
     struct SenderAndDestinationBlockVersionOne {
         let txFixture: Transaction.Fixtures.TxOutMemo
         let receivedTxOut: KnownTxOut
@@ -91,9 +91,9 @@ extension TransactionBuilder.Fixtures {
         let recipeintPublicAddress: PublicAddress
         let sentTxOut: KnownTxOut
         let memoType: MemoType
-       
+
         static let Fixtures = TransactionBuilder.Fixtures.self
-        
+
         init() throws {
             self.memoType = Self.getMemoType()
             self.txFixture = try Transaction.Fixtures.TxOutMemo()
@@ -112,21 +112,21 @@ extension TransactionBuilder.Fixtures {
                                                                 memoType: memoType,
                                                                 blockVersion: .legacy))
         }
-        
+
         static func getMemoType() -> MemoType {
             .recoverable
         }
 
     }
-    
+
 }
 
 extension TransactionBuilder.Fixtures {
-    
+
     static func getTxOutMemo() throws -> Transaction.Fixtures.TxOutMemo {
         try Transaction.Fixtures.TxOutMemo()
     }
-    
+
     static func getOwnedOutput(
         accountKey: AccountKey,
         transaction: Transaction,
@@ -143,7 +143,7 @@ extension TransactionBuilder.Fixtures {
                             }
                         ).first)
     }
-    
+
     static func getReceivedTxOut(
         recipientAccountKey: AccountKey,
         transaction: Transaction
@@ -152,7 +152,7 @@ extension TransactionBuilder.Fixtures {
             accountKey: recipientAccountKey,
             transaction: transaction)
     }
-    
+
     static func getSentTxOut(
         senderAccountKey: AccountKey,
         transaction: Transaction
@@ -161,7 +161,7 @@ extension TransactionBuilder.Fixtures {
             accountKey: senderAccountKey,
             transaction: transaction)
     }
-    
+
     static func getTransaction(
         memoType: MemoType,
         blockVersion: BlockVersion = .minRTHEnabled
@@ -178,5 +178,5 @@ extension TransactionBuilder.Fixtures {
                         fogResolver: fixture.fogResolver,
                         blockVersion: blockVersion)).transaction
     }
-    
+
 }

@@ -2,20 +2,20 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 class SenderWithPaymentRequestMemoTests: XCTestCase {
     func testSenderWithPaymentRequestMemoCreate() throws {
         let fixture = try MemoData.Fixtures.SenderWithPaymentRequestMemo()
-        
+
         let memoData = try XCTUnwrap(
             SenderWithPaymentRequestMemoUtils.create(
                 senderAccountKey: fixture.senderAccountKey,
                 receipientPublicAddress: fixture.recieverAccountKey.publicAddress,
                 txOutPublicKey: fixture.txOutPublicKey,
                 paymentRequestId: fixture.paymentRequestId))
-        
+
         XCTAssertEqual(
             memoData.data.hexEncodedString(),
             fixture.expectedMemoData.hexEncodedString())
@@ -36,10 +36,10 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
             SenderWithPaymentRequestMemoUtils.getPaymentRequestId(memoData: memoData),
             fixture.paymentRequestId)
     }
-    
+
     func testInvalidSenderWithPaymentRequestMemoCreateFails() throws {
         let fixture = try MemoData.Fixtures.InvalidSenderWithPaymentRequestMemo()
-        
+
         XCTAssertFalse(
             SenderWithPaymentRequestMemoUtils.isValid(
                 memoData: fixture.invalidMemoData,
@@ -47,17 +47,17 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
                 receipientViewPrivateKey: fixture.recieverAccountKey.subaddressViewPrivateKey,
                 txOutPublicKey: fixture.txOutPublicKey),
             "Expected isValid to be false for invalidMemoData")
-        
+
         XCTAssertNotEqual(
             SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: fixture.invalidMemoData),
             fixture.senderAccountKey.publicAddress.calculateAddressHash(),
             "AddressHash values should not match for invalid memo data")
 
     }
-    
+
     func testSenderWithPaymentRequestMemoWrongPrivateKeyInvalidates() throws {
         let fixture = try MemoData.Fixtures.SenderWithPaymentRequestMemoInvalidates()
-        
+
         XCTAssertFalse(
             SenderWithPaymentRequestMemoUtils.isValid(
                 memoData: fixture.memoData,
@@ -66,10 +66,10 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
                 txOutPublicKey: fixture.txOutPublicKey),
             "Expected isValid to be `false` for incorrect view private key")
     }
-    
+
     func testSenderWithPaymentRequestMemoWrongSenderAddresssInvalidates() throws {
         let fixture = try MemoData.Fixtures.SenderWithPaymentRequestMemoInvalidates()
-        
+
         XCTAssertFalse(
             SenderWithPaymentRequestMemoUtils.isValid(
                 memoData: fixture.memoData,
@@ -78,10 +78,10 @@ class SenderWithPaymentRequestMemoTests: XCTestCase {
                 txOutPublicKey: fixture.txOutPublicKey),
             "Expected isValid to be `false` for incorrect sender address")
     }
-    
+
     func testSenderWithPaymentRequestMemoWrongTxOutPublicKeyInvalidates() throws {
         let fixture = try MemoData.Fixtures.SenderWithPaymentRequestMemoInvalidates()
-        
+
         XCTAssertFalse(
             SenderWithPaymentRequestMemoUtils.isValid(
                 memoData: fixture.memoData,

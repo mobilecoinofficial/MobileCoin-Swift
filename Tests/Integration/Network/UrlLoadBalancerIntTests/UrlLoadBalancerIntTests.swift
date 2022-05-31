@@ -137,12 +137,12 @@ class UrlLoadBalancerIntTests: XCTestCase {
     }
 
     func testUrlRotation(fixture: ServiceFixture, with transProto: TransportProtocol) throws {
-        let serviceName   = fixture.serviceName
+        let serviceName = fixture.serviceName
         let urlType       = "Consensus"
-        let loadBalancer  = fixture.loadBalancer
+        let loadBalancer = fixture.loadBalancer
 
-        let notMessage    = fixture.useValidUrls ? " not" : ""
-        let validMessage  = fixture.useValidUrls ? "valid" : "invalid"
+        let notMessage = fixture.useValidUrls ? " not" : ""
+        let validMessage = fixture.useValidUrls ? "valid" : "invalid"
         let testMessage   = "Test \(serviceName) url rotation does\(notMessage) occur using: "
         let expectMessage = "\(serviceName) call with \(validMessage) URL should \(notMessage) fail"
         let assertMessage = "\(urlType) URL load balancer should\(notMessage) have rotated"

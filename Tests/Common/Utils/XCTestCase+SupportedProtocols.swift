@@ -3,8 +3,8 @@
 //
 
 import Foundation
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 extension XCTestCase {
     /// Serialize the execution of tests for each supported protocol

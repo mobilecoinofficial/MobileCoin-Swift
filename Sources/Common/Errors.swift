@@ -226,7 +226,7 @@ extension SecurityError: CustomStringConvertible {
     static var nilPublicKey = """
         the public key could not be extracted (this can happen if the public key algorithm is not supported).
     """
-    
+
     public var description: String {
         guard let osstatus = status else { return "Security Error Code - \(message ?? "Unknown")" }
         if #available(iOS 11.3, *) {
@@ -236,4 +236,3 @@ extension SecurityError: CustomStringConvertible {
         }
     }
 }
-

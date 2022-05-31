@@ -47,7 +47,6 @@ extension ConsensusHttpConnection {
         let client: ConsensusClient_ConsensusClientAPIRestClient
         let requester: RestApiRequester
 
-
         func call(
             request: Attest_Message,
             callOptions: HTTPCallOptions?,

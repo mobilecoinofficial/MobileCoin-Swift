@@ -81,13 +81,13 @@ extension HttpConnection {
         func processResponse<Response>(callResult: HttpCallResult<Response>)
             -> Result<Response, ConnectionError>
         {
-            
+
             guard let status = callResult.status else {
                 return .failure(.connectionFailure(
                     ["Invalid parameters, request not made.",
-                     callResult.error?.localizedDescription].compactMap({$0}).joined(separator: " ")))
+                     callResult.error?.localizedDescription, ].compactMap({ $0 }).joined(separator: " ")))
             }
-            
+
             guard [403, 401].contains(status.code) == false else {
                 return .failure(.authorizationFailure("url: \(url)"))
             }

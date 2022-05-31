@@ -7,8 +7,7 @@ import LibMobileCoin
 
 extension Data64 {
     static func make(
-        withMcMutableBuffer body:
-            (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
+        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
     ) -> Result<Data64, LibMobileCoinError> {
         var bytes = Data64()
         return bytes.asMcMutableBuffer { bufferPtr in
@@ -19,8 +18,7 @@ extension Data64 {
     }
 
     static func make(
-        withMcMutableBuffer body:
-            (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
+        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
     ) -> Result<Data64, LibMobileCoinError> {
         var bytes = Data64()
         return bytes.asMcMutableBuffer { bufferPtr in

@@ -13,11 +13,12 @@ class FogReportConnectionIntTests: XCTestCase {
             try getReports(transportProtocol: transportProtocol)
         }
     }
-    
+
     func getReports(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetReports request")
 
-        try createFogReportConnection(transportProtocol:transportProtocol).getReports(request: Report_ReportRequest()) {
+        let request = Report_ReportRequest()
+        try createFogReportConnection(using: transportProtocol).getReports(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertGreaterThan(response.reports.count, 0)
@@ -30,18 +31,22 @@ class FogReportConnectionIntTests: XCTestCase {
         }
         waitForExpectations(timeout: 20)
     }
-    
+
     func testGetReportsShortURL() throws {
-        try XCTSkipUnless(IntegrationTestFixtures.network.fogShortURLSupported, "Fog ShortURL not supported on this NetworkPreset")
+        let unless = IntegrationTestFixtures.network.fogShortURLSupported
+        try XCTSkipUnless(unless, "Fog ShortURL not supported on this NetworkPreset")
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try getReportsShortURL(transportProtocol: transportProtocol)
         }
     }
-    
+
     func getReportsShortURL(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetReports request")
 
-        try createShortURLFogReportConnection(transportProtocol:transportProtocol).getReports(request: Report_ReportRequest()) {
+        let request = Report_ReportRequest()
+        try createShortURLFogReportConnection(
+            using: transportProtocol
+        ).getReports(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertGreaterThan(response.reports.count, 0)
@@ -58,7 +63,9 @@ class FogReportConnectionIntTests: XCTestCase {
 }
 
 extension FogReportConnectionIntTests {
-    func createShortURLFogReportConnection(transportProtocol: TransportProtocol) throws -> FogReportConnection {
+    func createShortURLFogReportConnection(
+        using transportProtocol: TransportProtocol
+    ) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportShortUrl).get()
         let httpFactory = HttpProtocolConnectionFactory(httpRequester: DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
@@ -70,7 +77,9 @@ extension FogReportConnectionIntTests {
             targetQueue: DispatchQueue.main)
     }
 
-    func createFogReportConnection(transportProtocol: TransportProtocol) throws -> FogReportConnection {
+    func createFogReportConnection(
+        using transportProtocol: TransportProtocol
+    ) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
         let httpFactory = HttpProtocolConnectionFactory(httpRequester: DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()

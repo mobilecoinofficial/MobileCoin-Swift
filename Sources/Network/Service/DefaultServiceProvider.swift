@@ -25,8 +25,8 @@ final class DefaultServiceProvider: ServiceProvider {
     ) {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
-        
-        let inner = Inner(httpFactory:httpConnectionFactory, grpcFactory:grpcConnectionFactory, targetQueue: targetQueue, transportProtocolOption: networkConfig.transportProtocol.option)
+
+        let inner = Inner(httpFactory: httpConnectionFactory, grpcFactory: grpcConnectionFactory, targetQueue: targetQueue, transportProtocolOption: networkConfig.transportProtocol.option)
         self.inner = .init(inner, targetQueue: targetQueue)
 
         self.consensus = ConsensusConnection(
@@ -119,7 +119,7 @@ extension DefaultServiceProvider {
 
         init(
             httpFactory: HttpProtocolConnectionFactory,
-            grpcFactory:GrpcProtocolConnectionFactory,
+            grpcFactory: GrpcProtocolConnectionFactory,
             targetQueue: DispatchQueue?,
             transportProtocolOption: TransportProtocol.Option)
         {

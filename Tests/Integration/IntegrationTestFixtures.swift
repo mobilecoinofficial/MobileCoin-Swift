@@ -13,8 +13,8 @@ enum IntegrationTestFixtures {
 }
 
 extension IntegrationTestFixtures {
-    static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
-    static let invalidFogUrl = "fog://invalid.mobilecoin.com"
+    static let invalidConsensusUrl = NetworkConfigFixtures.invalidConsensusUrl
+    static let invalidFogUrl = NetworkConfigFixtures.invalidFogUrl
 
     static let fee = McConstants.DEFAULT_MINIMUM_FEE
 
@@ -78,70 +78,7 @@ extension IntegrationTestFixtures {
             syncChecker: syncChecker).get()
     }
 
-    static func createNetworkConfig(transportProtocol: TransportProtocol) throws -> NetworkConfig {
-        try network.networkConfig(transportProtocol: transportProtocol)
-    }
-
-    static func createNetworkConfig(transportProtocol: TransportProtocol, trustRoots: [Data])
-    throws -> NetworkConfig {
-        var networkConfig = try network.networkConfig()
-        networkConfig.setConsensusTrustRoots(trustRoots)
-        networkConfig.setFogTrustRoots(trustRoots)
-        return networkConfig
-    }
-
-    static func createNetworkConfig(
-        transportProtocol: TransportProtocol,
-        consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
-        fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
-    ) throws -> NetworkConfig {
-
-        let attestationConfig = try network.attestationConfig()
-
-        var networkConfig = try NetworkConfig.make(
-            consensusUrlLoadBalancer: consensusUrlLoadBalancer,
-            fogUrlLoadBalancer: fogUrlLoadBalancer,
-            attestation: attestationConfig,
-            transportProtocol: transportProtocol).get()
-
-        networkConfig.httpRequester = DefaultHttpRequester()
-        try networkConfig.setConsensusTrustRoots(NetworkPreset.trustRootsBytes())
-        try networkConfig.setFogTrustRoots(NetworkPreset.trustRootsBytes())
-        networkConfig.consensusAuthorization = network.consensusCredentials
-        networkConfig.fogUserAuthorization = network.fogUserCredentials
-
-        return networkConfig
-    }
-
-    static func createNetworkConfigWithInvalidUrls(using transportProtocol: TransportProtocol)
-    throws -> NetworkConfig {
-        let attestationConfig = try network.attestationConfig()
-
-        return try ConsensusUrl.make(strings: [invalidConsensusUrl]).flatMap { consensusUrls in
-            RandomUrlLoadBalancer<ConsensusUrl>.make(urls: consensusUrls).flatMap
-            { consensusUrlLoadBalancer in
-                FogUrl.make(strings: [invalidFogUrl]).flatMap { fogUrls in
-                    RandomUrlLoadBalancer<FogUrl>.make(urls: fogUrls).map { fogUrlLoadBalancer in
-                        NetworkConfig(
-                            consensusUrlLoadBalancer: consensusUrlLoadBalancer,
-                            fogUrlLoadBalancer: fogUrlLoadBalancer,
-                            attestation: attestationConfig,
-                            transportProtocol: transportProtocol)
-                    }
-                }
-            }
-        }.get()
-    }
-
-    static func createNetworkConfigWithInvalidCredentials(transportProtocol: TransportProtocol)
-    throws -> NetworkConfig {
-        var networkConfig = try network.networkConfig()
-        networkConfig.consensusAuthorization = network.invalidCredentials
-        networkConfig.fogUserAuthorization = network.invalidCredentials
-        return networkConfig
-    }
-
-    static func createMobileCoinClientConfig(transportProtocol: TransportProtocol)
+    static func createMobileCoinClientConfig(using transportProtocol: TransportProtocol)
     throws -> MobileCoinClient.Config {
         try MobileCoinClient.Config.make(
             consensusUrl: network.consensusUrl,
@@ -190,8 +127,9 @@ extension IntegrationTestFixtures {
         return try createMobileCoinClient(config: config, transportProtocol: transportProtocol)
     }
 
-    static func createMobileCoinClientWithPartialValidFogUrls(transportProtocol: TransportProtocol)
-    throws -> MobileCoinClient {
+    static func createMobileCoinClientWithPartialValidFogUrls(
+        using transportProtocol: TransportProtocol
+    ) throws -> MobileCoinClient {
         let config = try createMobileCoinClientConfigWithPartialValidFogUrls(
             using: transportProtocol)
         return try createMobileCoinClient(config: config, transportProtocol: transportProtocol)
@@ -200,7 +138,7 @@ extension IntegrationTestFixtures {
     static func createMobileCoinClient(
         accountIndex: Int = 0,
         fogSyncChecker: FogSyncCheckable = FogSyncChecker(),
-        transportProtocol: TransportProtocol
+        using transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
         try createMobileCoinClient(
             accountKey: createAccountKey(accountIndex: accountIndex),
@@ -225,7 +163,7 @@ extension IntegrationTestFixtures {
         fogSyncChecker: FogSyncCheckable = FogSyncChecker(),
         transportProtocol: TransportProtocol
     ) throws -> MobileCoinClient {
-        var mutableConfig = try createMobileCoinClientConfig(transportProtocol: transportProtocol)
+        var mutableConfig = try createMobileCoinClientConfig(using: transportProtocol)
         mutableConfig.fogSyncCheckable = fogSyncChecker
         return try createMobileCoinClient(
             accountKey: accountKey,
@@ -289,7 +227,7 @@ extension IntegrationTestFixtures {
 
     static func createServiceProvider(transportProtocol: TransportProtocol)
     throws -> ServiceProvider {
-        let networkConfig = try createNetworkConfig(transportProtocol: transportProtocol)
+        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
@@ -310,7 +248,7 @@ extension IntegrationTestFixtures {
     throws -> FogResolverManager {
         let serviceProvider = try createServiceProvider(transportProtocol: transportProtocol)
         let reportAttestation =
-            try createNetworkConfig(transportProtocol: transportProtocol).fogReportAttestation
+            try NetworkConfigFixtures.create(using: transportProtocol).fogReportAttestation
         return FogResolverManager(
             fogReportAttestation: reportAttestation,
             serviceProvider: serviceProvider,
@@ -333,7 +271,7 @@ extension IntegrationTestFixtures {
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
     ) throws -> ServiceProvider {
 
-        let networkConfig = try createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)

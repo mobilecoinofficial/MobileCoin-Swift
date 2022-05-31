@@ -7,7 +7,7 @@ import LibMobileCoin
 
 protocol AuthHttpCallable {
     var requester: RestApiRequester { get }
-    
+
     func auth(
         _ request: Attest_AuthMessage,
         callOptions: HTTPCallOptions?,

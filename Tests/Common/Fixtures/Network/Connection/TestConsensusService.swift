@@ -28,7 +28,7 @@ extension TestConsensusService {
         response.result = result
         self.init(result: .success(response))
     }
-    
+
     init(successWithBlockVersion blockVersion: BlockVersion) {
         var response = ConsensusCommon_ProposeTxResponse()
         response.blockVersion = blockVersion

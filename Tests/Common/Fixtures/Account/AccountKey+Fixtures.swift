@@ -131,7 +131,7 @@ extension AccountKey.Fixtures {
     struct TxOutMemoParser {
         let senderAccountKey: AccountKey
         let destinationAccountKey: AccountKey
-        
+
         init() throws {
             self.senderAccountKey = try XCTUnwrap(
                 AccountKey(serializedData: XCTUnwrap(
@@ -272,7 +272,6 @@ extension AccountKey.Fixtures.AliceAndBob {
         64048887230480b0c85a045255494e04a9a81646369ce7a10e08da6fae27333ec0c16c8a74d93779\
         a9e055395078d0b07286f9930203010001
         """
-    
 
     static let bob_bytes =
         """
@@ -297,7 +296,7 @@ extension AccountKey.Fixtures.AliceAndBob {
 }
 
 extension AccountKey.Fixtures.TxOutMemoParser {
-    
+
     static let senderAccountKeyHex =
         """
         0a220a20553a1c51c1e91d3105b17c909c163f8bc6faf93718deb06e5b9fdb9a24c2560912220a20\
@@ -318,7 +317,7 @@ extension AccountKey.Fixtures.TxOutMemoParser {
         64048887230480b0c85a045255494e04a9a81646369ce7a10e08da6fae27333ec0c16c8a74d93779\
         a9e055395078d0b07286f9930203010001
         """
-    
+
     static let destinationAccountKeyHex =
         """
         0a220a20ec8cb9814ac5c1a4aacbc613e756744679050927cc9e5f8772c6d649d4a5ac0612220a20\
@@ -356,5 +355,3 @@ extension AccountKey.Fixtures.KnownTxOut {
             6578616d706c652e636f6d
             """
 }
-
-

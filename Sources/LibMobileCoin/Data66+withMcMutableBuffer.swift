@@ -7,8 +7,7 @@ import LibMobileCoin
 
 extension Data66 {
     static func make(
-        withMcMutableBuffer body:
-            (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
+        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
     ) -> Result<Data66, LibMobileCoinError> {
         var bytes = Data66()
         return bytes.asMcMutableBuffer { bufferPtr in
@@ -19,8 +18,7 @@ extension Data66 {
     }
 
     static func make(
-        withMcMutableBuffer body:
-            (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
+        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
     ) -> Result<Data66, LibMobileCoinError> {
         var bytes = Data66()
         return bytes.asMcMutableBuffer { bufferPtr in

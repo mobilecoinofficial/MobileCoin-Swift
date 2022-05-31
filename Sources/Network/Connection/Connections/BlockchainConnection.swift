@@ -6,8 +6,7 @@ import Foundation
 import LibMobileCoin
 import SwiftProtobuf
 
-final class BlockchainConnection:
-    Connection<GrpcProtocolConnectionFactory.BlockchainServiceProvider, HttpProtocolConnectionFactory.BlockchainServiceProvider>, BlockchainService
+final class BlockchainConnection: Connection<GrpcProtocolConnectionFactory.BlockchainServiceProvider, HttpProtocolConnectionFactory.BlockchainServiceProvider>, BlockchainService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -24,7 +23,7 @@ final class BlockchainConnection:
         self.grpcFactory = grpcFactory
         self.config = config
         self.targetQueue = targetQueue
-        
+
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
                 let rotatedConfig = config.blockchainConfig()

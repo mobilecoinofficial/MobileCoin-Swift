@@ -72,7 +72,7 @@ extension FogView {
                         $0.setViewsHighestKnownBlock(highestProcessedBlockCount)
                     })
                 }($0)
-                
+
                 let result = $0.flatMap { response in
                     self.fogView.writeSync {
                         $0.processQueryResponse(

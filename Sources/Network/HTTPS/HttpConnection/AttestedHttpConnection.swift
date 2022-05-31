@@ -346,11 +346,11 @@ extension AttestedHttpConnection {
                 return .failure(.connectionError(
                                     .connectionFailure(
                                     ["Invalid parameters, request not made.",
-                                     callResult.error?.localizedDescription,]
-                                        .compactMap({$0})
+                                     callResult.error?.localizedDescription, ]
+                                        .compactMap({ $0 })
                                         .joined(separator: " "))))
             }
-            
+
             // Attestation failure, reattest
             guard status.code != 403 else {
                 return .failure(.attestationFailure())
@@ -365,7 +365,7 @@ extension AttestedHttpConnection {
                 return .failure(.connectionError(
                                     .connectionFailure("url: \(url), status: \(status.code)")))
             }
-            
+
             if let headerFields = callResult.allHeaderFields {
                 session.processResponse(headers: headerFields)
             }

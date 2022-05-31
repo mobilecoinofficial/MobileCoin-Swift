@@ -5,8 +5,7 @@
 import Foundation
 import LibMobileCoin
 
-final class FogKeyImageConnection:
-    Connection<GrpcProtocolConnectionFactory.FogKeyImageServiceProvider, HttpProtocolConnectionFactory.FogKeyImageServiceProvider>, FogKeyImageService
+final class FogKeyImageConnection: Connection<GrpcProtocolConnectionFactory.FogKeyImageServiceProvider, HttpProtocolConnectionFactory.FogKeyImageServiceProvider>, FogKeyImageService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -54,7 +53,7 @@ final class FogKeyImageConnection:
             transportProtocolOption: config.fogKeyImageConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
-    
+
     func checkKeyImages(
         request: FogLedger_CheckKeyImagesRequest,
         completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void

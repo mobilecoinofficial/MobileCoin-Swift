@@ -33,7 +33,7 @@ extension TestBlockchainService {
         response.mobMinimumFee = minimumFee
         self.init(result: .success(response))
     }
-    
+
     init(successWithBlockVersion blockVersion: BlockVersion) {
         var response = ConsensusCommon_LastBlockInfoResponse()
         response.index = 100

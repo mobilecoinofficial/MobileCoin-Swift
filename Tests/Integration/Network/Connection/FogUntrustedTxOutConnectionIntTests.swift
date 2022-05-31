@@ -15,7 +15,9 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
 
     func getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetTxOuts request")
-        try createFogUntrustedTxOutConnection(transportProtocol:transportProtocol).getTxOuts(request: FogLedger_TxOutRequest()) {
+        try createFogUntrustedTxOutConnection(
+            transportProtocol: transportProtocol
+        ).getTxOuts(request: FogLedger_TxOutRequest()) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
             print("numBlocks: \(response.numBlocks)")
             print("globalTxoCount: \(response.globalTxoCount)")
@@ -34,12 +36,15 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
             try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
         }
     }
-    
-    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
+
+    func invalidCredentialsReturnsAuthorizationFailure(
+        transportProtocol: TransportProtocol
+    ) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog GetTxOuts request")
-        let connection = try createFogUntrustedTxOutConnectionWithInvalidCredentials(transportProtocol:transportProtocol)
+        let connection = try createFogUntrustedTxOutConnectionWithInvalidCredentials(
+            transportProtocol: transportProtocol)
         connection.getTxOuts(request: FogLedger_TxOutRequest()) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
 
@@ -56,22 +61,28 @@ class FogUntrustedTxOutConnectionIntTests: XCTestCase {
 }
 
 extension FogUntrustedTxOutConnectionIntTests {
-    func createFogUntrustedTxOutConnection(transportProtocol: TransportProtocol) throws -> FogUntrustedTxOutConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
+    func createFogUntrustedTxOutConnection(
+        transportProtocol: TransportProtocol
+    ) throws -> FogUntrustedTxOutConnection {
+        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createFogUntrustedTxOutConnection(networkConfig: networkConfig)
     }
 
-    func createFogUntrustedTxOutConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws
+    func createFogUntrustedTxOutConnectionWithInvalidCredentials(
+        transportProtocol: TransportProtocol
+    ) throws
         -> FogUntrustedTxOutConnection
     {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(
+            using: transportProtocol)
         return createFogUntrustedTxOutConnection(networkConfig: networkConfig)
     }
 
     func createFogUntrustedTxOutConnection(networkConfig: NetworkConfig)
         -> FogUntrustedTxOutConnection
     {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(
+            httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogUntrustedTxOutConnection(
             httpFactory: httpFactory,

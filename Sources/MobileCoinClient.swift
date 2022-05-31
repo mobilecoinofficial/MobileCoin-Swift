@@ -31,9 +31,9 @@ public final class MobileCoinClient {
     private let serviceProvider: ServiceProvider
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
-    
+
     private let fogSyncChecker: FogSyncCheckable
-    
+
     static let latestBlockVersion = BlockVersion.legacy
 
     init(accountKey: AccountKeyWithFog, config: Config) {
@@ -50,17 +50,16 @@ public final class MobileCoinClient {
         self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
-        
         let grpcFactory = GrpcProtocolConnectionFactory()
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: config.networkConfig.httpRequester)
-        
+
         self.serviceProvider = DefaultServiceProvider(
             networkConfig: config.networkConfig,
             targetQueue: serialQueue,
             grpcConnectionFactory: grpcFactory,
             httpConnectionFactory: httpFactory)
-        
+
         self.fogResolverManager = FogResolverManager(
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
