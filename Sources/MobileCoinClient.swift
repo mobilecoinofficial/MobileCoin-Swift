@@ -65,18 +65,40 @@ public final class MobileCoinClient {
             fogReportAttestation: config.networkConfig.fogReportAttestation,
             serviceProvider: serviceProvider,
             targetQueue: serialQueue)
+        
         self.metaFetcher = BlockchainMetaFetcher(
             blockchainService: serviceProvider.blockchainService,
             metaCacheTTL: config.metaCacheTTL,
             targetQueue: serialQueue)
     }
 
+    @available(*, deprecated, message:
+        """
+        Deprecated in favor of `balance(for:TokenId)` which accepts a TokenId.
+        `balance` will assume the default TokenId == .MOB // UInt64(0)
+        
+        Get a set of all tokenIds that are in TxOuts owned by this account with:
+        
+        `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
+        """)
     public var balance: Balance {
-        accountLock.readSync { $0.cachedBalance }
+        balance(for: .MOB)
+    }
+
+    public var balances: Balances {
+        accountLock.readSync { $0.cachedBalances }
+    }
+
+    public var accountTokenIds: Set<TokenId> {
+        accountLock.readSync { $0.cachedTxOutTokenIds }
     }
 
     public var accountActivity: AccountActivity {
         accountLock.readSync { $0.cachedAccountActivity }
+    }
+
+    public func balance(for tokenId: TokenId = .MOB) -> Balance {
+        accountLock.readSync { $0.cachedBalance(for: tokenId) }
     }
 
     public func setTransportProtocol(_ transportProtocol: TransportProtocol) {
@@ -93,7 +115,33 @@ public final class MobileCoinClient {
         serviceProvider.setFogUserAuthorization(credentials: credentials)
     }
 
-    public func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
+    @available(*, deprecated, message:
+        """
+        Use the new `updateBalances(...)` that passes `Balances` into the completion closure. `Balances`
+            is a new structure that holds multiple `Balance` structs for each known tokenId.
+        
+        ```
+        public func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void)
+        ```
+        
+        this function will return the `Balance` struct for the default TokenId == .MOB
+        """)
+    public func updateBalance(completion: @escaping (Result<Balance, ConnectionError>) -> Void) {
+        updateBalances {
+            completion($0.map({
+                $0.mobBalance
+            }).mapError({
+                switch $0 {
+                case .connectionError(let error):
+                    return error
+                case .fogSyncError(let error):
+                    return ConnectionError.invalidServerResponse(error.description)
+                }
+            }))
+        }
+    }
+
+    public func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void) {
         Account.BalanceUpdater(
             account: accountLock,
             fogViewService: serviceProvider.fogViewService,
@@ -101,14 +149,36 @@ public final class MobileCoinClient {
             fogBlockService: serviceProvider.fogBlockService,
             fogQueryScalingStrategy: fogQueryScalingStrategy,
             targetQueue: serialQueue
-        ).updateBalance { result in
+        ).updateBalances { result in
             self.callbackQueue.async {
                 completion(result)
             }
         }
     }
 
+    @available(*, deprecated, message:
+        """
+        Use the new `amountTransferable(...)` that accepts a `TokenId` as an input parameter.
+        
+        ```
+        public func amountTransferable(
+            tokenId: TokenId = .MOB
+            feeLevel: FeeLevel = .minimum,
+            completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
+        )
+        ```
+        
+        this function will return the amount transferable for the default TokenId == .MOB
+        """)
     public func amountTransferable(
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
+    ) {
+        amountTransferable(tokenId: .MOB, feeLevel: feeLevel, completion: completion)
+    }
+
+    public func amountTransferable(
+        tokenId: TokenId,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<UInt64, BalanceTransferEstimationFetcherError>) -> Void
     ) {
@@ -117,11 +187,36 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
-        ).amountTransferable(feeLevel: feeLevel, completion: completion)
+        ).amountTransferable(tokenId: tokenId, feeLevel: feeLevel, completion: completion)
+    }
+
+    @available(*, deprecated, message:
+        """
+        Use the new `estimateTotalFee(...)` that accepts an `Amount` as an input parameter.
+        
+        ```
+        public func estimateTotalFee(
+            toSendAmount amount: Amount,
+            feeLevel: FeeLevel = .minimum,
+            completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
+        )
+        ```
+        
+        this function will estimate the total fee assuming the default TokenId == .MOB
+        """)
+    public func estimateTotalFee(
+        toSendAmount value: UInt64,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
+    ) {
+        estimateTotalFee(
+            toSendAmount: Amount(value: value, tokenId: .MOB),
+            feeLevel: feeLevel,
+            completion: completion)
     }
 
     public func estimateTotalFee(
-        toSendAmount amount: UInt64,
+        toSendAmount amount: Amount,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<UInt64, TransactionEstimationFetcherError>) -> Void
     ) {
@@ -133,8 +228,33 @@ public final class MobileCoinClient {
         ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
     }
 
+    @available(*, deprecated, message:
+        """
+        Use the new `requiresDefragmentation(...)` that accepts an `Amount` as an input parameter.
+        
+        ```
+        public func requiresDefragmentation(
+            toSendAmount amount: Amount,
+            feeLevel: FeeLevel = .minimum,
+            completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
+        )
+        ```
+        
+        this function returns a Bool to the completion() assuming the default TokenId == .MOB
+        """)
     public func requiresDefragmentation(
-        toSendAmount amount: UInt64,
+        toSendAmount value: UInt64,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
+    ) {
+        requiresDefragmentation(
+            toSendAmount: Amount(value: value, tokenId: .MOB),
+            feeLevel: feeLevel,
+            completion: completion)
+    }
+
+    public func requiresDefragmentation(
+        toSendAmount amount: Amount,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<Bool, TransactionEstimationFetcherError>) -> Void
     ) {
@@ -146,13 +266,50 @@ public final class MobileCoinClient {
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
     }
 
+    @available(*, deprecated, message:
+        """
+        Use the new `prepareTransaction(...)` that accepts an `Amount` as an input parameter.
+        
+        ```
+        public func prepareTransaction(
+            to recipient: PublicAddress,
+            memoType: MemoType = .unused,
+            amount: Amount,
+            fee: UInt64,
+            completion: @escaping (
+                Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            ) -> Void
+        )
+        ```
+        
+        this function prepares a transaction assuming assuming the default TokenId == .MOB
+        """)
     public func prepareTransaction(
         to recipient: PublicAddress,
         memoType: MemoType = .unused,
-        amount: UInt64,
+        amount value: UInt64,
         fee: UInt64,
         completion: @escaping (
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+        ) -> Void
+    ) {
+        prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: Amount(value: value, tokenId: .MOB),
+            fee: fee) {
+                completion($0.map({ ($0.transaction, $0.receipt) }))
+            }
+        
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        fee: UInt64,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
         Account.TransactionOperations(
@@ -170,13 +327,51 @@ public final class MobileCoinClient {
         }
     }
 
+    @available(*, deprecated, message:
+        """
+        Use the new `prepareTransaction(...)` that accepts an `Amount` as an input parameter.
+        
+        ```
+        public func prepareTransaction(
+            to recipient: PublicAddress,
+            memoType: MemoType = .unused,
+            amount: Amount,
+            feeLevel: FeeLevel = .minimum,
+            completion: @escaping (
+                Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            ) -> Void
+        )
+        ```
+        
+        this function prepares a transaction assuming assuming the default TokenId == .MOB
+        """)
     public func prepareTransaction(
         to recipient: PublicAddress,
         memoType: MemoType = .unused,
-        amount: UInt64,
+        amount value: UInt64,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (
             Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+        ) -> Void
+    ) {
+        prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: Amount(value: value, tokenId: .MOB),
+            feeLevel: feeLevel) {
+                completion($0.map { pending in
+                    (pending.transaction, pending.receipt)
+                })
+            }
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
         Account.TransactionOperations(
@@ -194,8 +389,36 @@ public final class MobileCoinClient {
         }
     }
 
+    @available(*, deprecated, message:
+        """
+        Use the new `prepareDefragmentationStepTransactions(...)` that accepts an `Amount` as an input parameter.
+        
+        ```
+        public func prepareDefragmentationStepTransactions(
+            toSendAmount amount: Amount,
+            recoverableMemo: Bool = false,
+            feeLevel: FeeLevel = .minimum,
+            completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
+        )
+        ```
+        
+        this function prepares transactions assuming assuming the default TokenId == .MOB
+        """)
     public func prepareDefragmentationStepTransactions(
-        toSendAmount amount: UInt64,
+        toSendAmount value: UInt64,
+        recoverableMemo: Bool = false,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
+    ) {
+        prepareDefragmentationStepTransactions(
+            toSendAmount: Amount(value: value, tokenId: .MOB),
+            recoverableMemo: false,
+            feeLevel: feeLevel,
+            completion: completion)
+    }
+
+    public func prepareDefragmentationStepTransactions(
+        toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
@@ -208,8 +431,10 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             targetQueue: serialQueue
-        ).prepareDefragmentationStepTransactions(toSendAmount: amount, recoverableMemo: recoverableMemo, feeLevel: feeLevel)
-        { result in
+        ).prepareDefragmentationStepTransactions(
+            toSendAmount: amount,
+            recoverableMemo: recoverableMemo,
+            feeLevel: feeLevel) { result in
             self.callbackQueue.async {
                 completion(result)
             }
@@ -270,47 +495,6 @@ extension MobileCoinClient {
             Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProofConfig().attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
             """
-    }
-}
-
-extension MobileCoinClient {
-    @available(*, deprecated, message: "Use amountTransferable(feeLevel:completion:) instead")
-    public func amountTransferable(feeLevel: FeeLevel = .minimum)
-        -> Result<UInt64, BalanceTransferEstimationError>
-    {
-        Account.TransactionEstimator(
-            account: accountLock,
-            metaFetcher: metaFetcher,
-            txOutSelectionStrategy: txOutSelectionStrategy,
-            targetQueue: serialQueue
-        ).amountTransferable(feeLevel: feeLevel)
-    }
-
-    @available(*, deprecated, message:
-        "Use estimateTotalFee(toSendAmount:feeLevel:completion:) instead")
-    public func estimateTotalFee(
-        toSendAmount amount: UInt64,
-        feeLevel: FeeLevel = .minimum
-    ) -> Result<UInt64, TransactionEstimationError> {
-        Account.TransactionEstimator(
-            account: accountLock,
-            metaFetcher: metaFetcher,
-            txOutSelectionStrategy: txOutSelectionStrategy,
-            targetQueue: serialQueue
-        ).estimateTotalFee(toSendAmount: amount, feeLevel: feeLevel)
-    }
-
-    @available(*, deprecated, message:
-        "Use requiresDefragmentation(toSendAmount:feeLevel:completion:) instead")
-    public func requiresDefragmentation(toSendAmount amount: UInt64, feeLevel: FeeLevel = .minimum)
-        -> Result<Bool, TransactionEstimationError>
-    {
-        Account.TransactionEstimator(
-            account: accountLock,
-            metaFetcher: metaFetcher,
-            txOutSelectionStrategy: txOutSelectionStrategy,
-            targetQueue: serialQueue
-        ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel)
     }
 }
 
@@ -426,4 +610,16 @@ extension MobileCoinClient {
             set { networkConfig.httpRequester = newValue }
         }
     }
+}
+
+extension MobileCoinClient {
+    
+    public func blockVersion(
+        _ completion: @escaping (Result<BlockVersion, ConnectionError>
+    ) -> Void) {
+        metaFetcher.blockVersion {
+            completion($0)
+        }
+    }
+    
 }

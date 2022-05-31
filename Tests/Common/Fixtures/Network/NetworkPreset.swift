@@ -27,12 +27,61 @@ enum NetworkPreset {
     /// Latest internal master
     case master
 
+    /// Dynamic preset that can be configured at runtime
+    case dynamic(DynamicNetworkConfig)
     // Ops dev networks
     case build
     case demo
     case diogenes
     case drakeley
     case eran
+}
+
+struct DynamicNetworkConfig {
+    let user: String
+    let namespace: String
+    let environment: String
+    let fogAuthoritySpkiB64Encoded: String
+
+    init(
+        namespace: String,
+        environment: String,
+        fogAuthoritySpkiB64Encoded: String,
+        user: String = ""
+    ) {
+        self.user = user
+        self.namespace = namespace
+        self.environment = environment
+        self.fogAuthoritySpkiB64Encoded = fogAuthoritySpkiB64Encoded
+    }
+}
+
+extension DynamicNetworkConfig {
+    struct AlphaDevelopment {
+        static let user = ""
+        static let namespace = "alpha"
+        static let environment = "development"
+        static let fogAuthoritySpkiB64Encoded = """
+            MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyFOockvCEc9TcO1NvsiUfFVzvtDsR64UIRRU\
+            l3tBM2Bh8KBA932/Up86RtgJVnbslxuUCrTJZCV4dgd5hAo/mzuJOy9lAGxUTpwWWG0zZJdpt8HJRVLX\
+            76CBpWrWEt7JMoEmduvsCR8q7WkSNgT0iIoSXgT/hfWnJ8KGZkN4WBzzTH7hPrAcxPrzMI7TwHqUFfmO\
+            X7/gc+bDV5ZyRORrpuu+OR2BVObkocgFJLGmcz7KRuN7/dYtdYFpiKearGvbYqBrEjeo/15chI0Bu/9o\
+            QkjPBtkvMBYjyJPrD7oPP67i0ZfqV6xCj4nWwAD3bVjVqsw9cCBHgaykW8ArFFa0VCMdLy7UymYU5SQs\
+            fXrw/mHpr27Pp2Z0/7wpuFgJHL+0ARU48OiUzkXSHX+sBLov9X6f9tsh4q/ZRorXhcJi7FnUoagBxewv\
+            lfwQfcnLX3hp1wqoRFC4w1DC+ki93vIHUqHkNnayRsf1n48fSu5DwaFfNvejap7HCDIOpCCJmRVR8mVu\
+            xi6jgjOUa4Vhb/GCzxfNIn5ZYym1RuoE0TsFO+TPMzjed3tQvG7KemGFz3pQIryb43SbG7Q+EOzIigxY\
+            DytzcxOO5Jx7r9i+amQEiIcjBICwyFoEUlVJTgSpqBZGNpznoQ4I2m+uJzM+wMFsinTZN3mp4FU5UHjQ\
+            sHKG+ZMCAwEAAQ==
+            """
+
+        static func make() -> DynamicNetworkConfig {
+            DynamicNetworkConfig(
+                namespace: Self.namespace,
+                environment: Self.environment,
+                fogAuthoritySpkiB64Encoded: Self.fogAuthoritySpkiB64Encoded,
+                user: Self.user)
+        }
+    }
 }
 
 extension NetworkPreset {
@@ -48,6 +97,7 @@ extension NetworkPreset {
         case diogenes
         case drakeley
         case eran
+        case dynamic(DynamicNetworkConfig)
     }
 
     private var network: Network {
@@ -73,6 +123,8 @@ extension NetworkPreset {
             return .drakeley
         case .eran:
             return .eran
+        case .dynamic(let preset):
+            return .dynamic(preset)
         }
     }
 }
@@ -91,7 +143,7 @@ extension NetworkPreset {
         case .testNet:
             return .testNet
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic(_):
             return .devNetwork
         }
     }
@@ -108,6 +160,8 @@ extension NetworkPreset {
 
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return "mc://node1.\(self).mobilecoin.com"
+        case .dynamic(let preset):
+            return "mc://node1.\(preset.namespace).\(preset.environment).mobilecoin.com"
         }
     }
     var fogUrl: String {
@@ -119,6 +173,9 @@ extension NetworkPreset {
 
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return "fog://fog.\(self).mobilecoin.com"
+        case .dynamic(let preset):
+            return "fog://\(preset.user)fog." +
+                    "\(preset.namespace).\(preset.environment).mobilecoin.com"
         }
     }
     var fogShortUrl: String {
@@ -129,6 +186,8 @@ extension NetworkPreset {
             return "fog://fog-rpt-stg.namda.net"
             
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return ""
+        case .dynamic(_):
             return ""
         }
     }
@@ -345,7 +404,7 @@ extension NetworkPreset {
 
 extension NetworkPreset {
 
-    func networkConfig(transportProtocol: TransportProtocol = TransportProtocol.http) throws -> NetworkConfig {
+    func networkConfig(transportProtocol: TransportProtocol = .http) throws -> NetworkConfig {
         let consensusUrls = try ConsensusUrl.make(strings: [consensusUrl]).get()
         let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
         let fogUrls = try FogUrl.make(strings: [fogUrl]).get()
@@ -396,6 +455,8 @@ extension NetworkPreset {
             fogAuthoritySpkiB64Encoded = Self.drakeleyFogAuthoritySpkiB64Encoded
         case .eran:
             fogAuthoritySpkiB64Encoded = Self.eranFogAuthoritySpkiB64Encoded
+        case .dynamic(let preset):
+            fogAuthoritySpkiB64Encoded = preset.fogAuthoritySpkiB64Encoded
         }
         return try XCTUnwrap(Data(base64Encoded: fogAuthoritySpkiB64Encoded))
     }
@@ -481,7 +542,7 @@ extension NetworkPreset {
         switch self {
         case .mainNet, .testNet:
             return false
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return false
         }
     }
@@ -490,7 +551,7 @@ extension NetworkPreset {
         case .mainNet, .testNet:
             // No credentials necessary.
             return nil
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
         }
     }
@@ -501,6 +562,8 @@ extension NetworkPreset {
             return false
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return true
+        case .dynamic:
+            return true // TODO - do we need creds ?
         }
     }
     var fogUserCredentials: BasicCredentials? {
@@ -510,6 +573,8 @@ extension NetworkPreset {
             return nil
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
+        case .dynamic:
+            return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
         }
     }
 
@@ -518,6 +583,8 @@ extension NetworkPreset {
         case .mainNet, .testNet:
             return true
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return false
+        case .dynamic:
             return false
         }
     }
@@ -543,7 +610,36 @@ extension NetworkPreset {
             return Self.testNetTestAccountMnemonicsCommaSeparated
                 .split(separator: ",").map { String($0) }
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .mobiledev:
+            return Self.mobileDevTestAccountMnemonicsCommaSeparated
+                .split(separator: ",").map { String($0) }
+
+        case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
+            return []
+            
+        case .dynamic:
+            return []
+        }
+    }
+
+    var testAccountRootEntropies: [Data] {
+        switch self {
+        case .dynamic:
+            return [
+                "b01579aab48859b4e9f3ca8ec5e9904d8584bb8da30ae712d4e65426c76daab7",
+                "06edaf5b30852bc5e2033a6a5e4d25f2681b2e27d3499560185cecff4cff205f",
+                "dcd7feec764e02041ed7b835a6fad7bd30bc911207d7a05c772d687d1e3137e6",
+                "d82ed8fedcaae021efce0e6c32460fac32ff8f2918eb157557f7a9c20751af62",
+                "3864150d417afc1ddea49848c5f672c602da152c350473a6947f0f29a3a65825",
+                "43c8272b3e9f5da19761e88204d250b010672ca8a2f540af6bd25c67c3b0c200",
+                "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21",
+                "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f",
+                "8ecaa57fcbec4397ca7fd270695ec2dd6d6bffccde24c0ca4f115a5cae1e896d",
+                "54a602d432c601887af7921c248b984f8510cb016580e156e0a647735acaf2bc",
+                "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05"
+            ]
+            .compactMap({ Data(hexEncoded: String($0)) })
+        default:
             return []
         }
     }
@@ -553,6 +649,20 @@ extension NetworkPreset {
         MobileCoinKeys().testNetTestAccountMnemonicsCommaSeparated
 #else
     private static let testNetTestAccountMnemonicsCommaSeparated = ""
+#endif
+
+#if canImport(Keys)
+    private static let mobileDevTestAccountMnemonicsCommaSeparated =
+        MobileCoinKeys().mobileDevTestAccountMnemonicsCommaSeparated
+#else
+    private static let mobileDevTestAccountMnemonicsCommaSeparated = ""
+#endif
+
+#if canImport(Keys)
+    private static let dynamicTestAccountSeedEntropiesCommaSeparated =
+        MobileCoinKeys().dynamicTestAccountSeedEntropiesCommaSeparated
+#else
+    private static let dynamicTestAccountSeedEntropiesCommaSeparated = ""
 #endif
 
     var testAccountsPrivateKeys:
@@ -574,7 +684,7 @@ extension NetworkPreset {
         case .testNet:
             return []
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic(_):
             return Self.devNetworkTestAccountPrivateKeysHex
         }
     }

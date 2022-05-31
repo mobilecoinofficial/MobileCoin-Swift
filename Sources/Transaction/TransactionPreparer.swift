@@ -36,7 +36,7 @@ struct TransactionPreparer {
     func prepareSelfAddressedTransaction(
         inputs: [KnownTxOut],
         recoverableMemo: Bool,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
@@ -45,7 +45,7 @@ struct TransactionPreparer {
     ) {
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanValue: fee)
+                isGreaterThanValue: fee.value)
         else {
             logger.warning(
                 "Insufficient balance for self-addressed transaction: sum of inputs: " +
@@ -71,7 +71,7 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         sendingAllTo: self.selfPaymentAddress,
-                        memoType: recoverableMemo ? .recoverable : .unused, 
+                        memoType: recoverableMemo ? .recoverable : .unused,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
@@ -86,16 +86,16 @@ struct TransactionPreparer {
         inputs: [KnownTxOut],
         recipient: PublicAddress,
         memoType: MemoType,
-        amount: UInt64,
-        fee: UInt64,
+        amount: Amount,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
-            Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard amount > 0, let amount = PositiveUInt64(amount) else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 MOB"
+        guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amount.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
                 completion(.failure(.invalidInput(errorMessage)))
@@ -104,7 +104,7 @@ struct TransactionPreparer {
         }
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanOrEqualToSumOfValues: [amount.value, fee])
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee.value])
         else {
             logger.warning(
                 "Insufficient balance to prepare transaction: sum of inputs: " +
@@ -132,7 +132,7 @@ struct TransactionPreparer {
                         accountKey: self.accountKey,
                         to: recipient,
                         memoType: memoType,
-                        amount: amount,
+                        amount: positiveValue,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,

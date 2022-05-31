@@ -24,7 +24,7 @@ extension Transaction.Fixtures {
         let blockVersion: BlockVersion
         
         var totalOutlay: UInt64 {
-            fee + amount.value
+            fee.value + amount.value
         }
 
         init() throws {
@@ -82,7 +82,7 @@ extension Transaction.Fixtures.TxOutMemo {
         return [try PreparedTxInput.make(knownTxOut: knownTxOut, ring: ring).get()]
     }
     
-    static let fee: UInt64 = 1
+    static let fee: Amount = Amount(value: 1, tokenId: .MOB)
     
     static let tombstoneBlockIndex: UInt64 = 2000
     

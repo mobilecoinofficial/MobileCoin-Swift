@@ -7,7 +7,6 @@ import LibMobileCoin
 import XCTest
 
 class ConnectionIntTests: XCTestCase {
-
     func testInvalidUrlTimeout() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             print("Testing \(transportProtocol.description) with timeout = " +

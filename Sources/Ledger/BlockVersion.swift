@@ -4,7 +4,7 @@
 
 import Foundation
 
-typealias BlockVersion = UInt32
+public typealias BlockVersion = UInt32
 
 extension BlockVersion {
     static let versionZero: BlockVersion = 0

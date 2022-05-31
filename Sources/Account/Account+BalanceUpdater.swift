@@ -38,10 +38,10 @@ extension Account {
             self.fogKeyImageChecker = FogKeyImageChecker(
                 fogKeyImageService: fogKeyImageService,
                 targetQueue: targetQueue,
-                syncChecker: account.accessWithoutLocking.syncCheckerLock) //TODO - Grokk locking
+                syncChecker: account.accessWithoutLocking.syncCheckerLock)
         }
 
-        func updateBalance(completion: @escaping (Result<Balance, BalanceUpdateError>) -> Void) {
+        func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void) {
             logger.info("Updating balance...", logFunction: false)
             checkForNewTxOuts {
                 guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
@@ -67,12 +67,15 @@ extension Account {
                         return
                     }
                     
-                    let balance = self.account.readSync { $0.cachedBalance }
-
+                    
+                    let balances = self.account.readSync { account in
+                        account.cachedBalances
+                    }
+                    
                     logger.info(
-                        "Balance update successful. balance: \(redacting: balance)",
+                        "Balance updates successful. balances: \(redacting: balances)",
                         logFunction: false)
-                    completion(.success(balance))
+                    completion(.success(balances))
                 }
             }
         }

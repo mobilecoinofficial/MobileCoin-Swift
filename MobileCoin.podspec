@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "1.2.0-pre11"
+  s.version      = "1.2.0-pre17"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -58,7 +58,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/Core", "1.2.0-pre12"
+    subspec.dependency "LibMobileCoin/Core", "1.2.0-pre16"
 
     subspec.dependency "gRPC-Swift", "1.0.0"
     subspec.dependency "Logging", "~> 1.4"
@@ -90,7 +90,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "1.2.0-pre12"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "1.2.0-pre16"
 
     subspec.dependency "Logging", "~> 1.4"
 
@@ -114,7 +114,6 @@ Pod::Spec.new do |s|
   # on the framework target and any testspec targets for this pod.
   pod_target_xcconfig = {
     "GCC_OPTIMIZATION_LEVEL" => "z",
-    "LLVM_LTO" => "YES",
     "ENABLE_BITCODE" => "YES",
     "SUPPORTS_MACCATALYST" => "YES",
     # The LibMobileCoin vendored binary doesn't include support for 32-bit

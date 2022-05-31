@@ -27,7 +27,7 @@ struct PreparedTxInput {
     let ring: [(TxOut, TxOutMembershipProof)]
     let realInputIndex: Int
     
-    var subaddressIndex : UInt64 {
+    var subaddressIndex: UInt64 {
         knownTxOut.subaddressIndex
     }
 

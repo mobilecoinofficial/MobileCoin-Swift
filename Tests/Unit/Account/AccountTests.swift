@@ -14,8 +14,9 @@ class AccountTests: XCTestCase {
         let balanceUpdater = try Self.balanceUpdater(fogService: testFogService)
 
         let expect = expectation(description: "Checking account balance")
-        balanceUpdater.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+        balanceUpdater.updateBalances {
+            guard let balances = $0.successOrFulfill(expectation: expect) else { return }
+            let balance = balances.mobBalance
             if let balancePicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
                 XCTAssertEqual(balancePicoMob, 0)
             }
@@ -34,8 +35,10 @@ class AccountTests: XCTestCase {
         let balanceUpdater = try Self.balanceUpdater(fogService: testFogService)
 
         let expect = expectation(description: "Checking account balance")
-        balanceUpdater.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+        balanceUpdater.updateBalances {
+            guard
+                let balances = $0.successOrFulfill(expectation: expect)?.balances,
+                let balance = balances[.MOB] else { return }
             if let balancePicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
                 XCTAssertEqual(balancePicoMob, txOutFixture.value)
             }
@@ -54,8 +57,10 @@ class AccountTests: XCTestCase {
         let balanceUpdater = try Self.balanceUpdater(fogService: testFogService)
 
         let expect = expectation(description: "Checking account balance")
-        balanceUpdater.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+        balanceUpdater.updateBalances {
+            guard
+                let balances = $0.successOrFulfill(expectation: expect)?.balances,
+                let balance = balances[.MOB] else { return }
             if let balancePicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
                 XCTAssertEqual(balancePicoMob, txOutFixture.value)
             }

@@ -104,15 +104,18 @@ tag-release:
 
 .PHONY: lint-locally-podspec
 lint-locally-podspec:
+	cd Example; bundle exec pod repo update;
 	bundle exec pod lib lint MobileCoin.podspec --skip-tests
 
 .PHONY: lint-podspec
 lint-podspec:
+	cd Example; bundle exec pod repo update;
 	bundle exec pod spec lint MobileCoin.podspec --skip-tests
 
 .PHONY: publish-podspec
 publish-podspec:
-	bundle exec pod trunk push MobileCoin.podspec --skip-tests
+	cd Example; bundle exec pod repo update;
+	bundle exec pod trunk push MobileCoin.podspec --skip-tests --allow-warnings
 
 # CircleCI
 

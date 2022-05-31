@@ -40,14 +40,15 @@ extension Account {
         func prepareTransaction(
             to recipient: PublicAddress,
             memoType: MemoType,
-            amount: UInt64,
+            amount: Amount,
             fee: UInt64,
             completion: @escaping (
-                Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+                Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
         ) {
-            guard amount > 0 else {
-                let errorMessage = "prepareTransactionWithFee failure: Cannot spend 0 MOB"
+            guard amount.value > 0 else {
+                let errorMessage = "prepareTransactionWithFee failure: " +
+                    "Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -56,7 +57,7 @@ extension Account {
             }
 
             let (unspentTxOuts, ledgerBlockCount) =
-                account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
+            account.readSync { ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount) }
             logger.info(
                 "Preparing transaction with provided fee... recipient: \(redacting: recipient), " +
                     "amount: \(redacting: amount), fee: \(redacting: fee), unspentTxOutValues: " +
@@ -91,7 +92,7 @@ extension Account {
                             recipient: recipient,
                             memoType: memoType,
                             amount: amount,
-                            fee: fee,
+                            fee: Amount(fee, in: amount.tokenId),
                             tombstoneBlockIndex: tombstoneBlockIndex,
                             blockVersion: blockVersion,
                             completion: completion)
@@ -99,13 +100,13 @@ extension Account {
                         logger.info(
                             "prepareTransactionWithFee failure: \(error)",
                             logFunction: false)
-                        
+
                         serialQueue.async {
                             completion(.failure(.connectionError(error)))
                         }
                     }
                 }
-                
+
             case .failure(let error):
                 logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
                 serialQueue.async {
@@ -117,14 +118,15 @@ extension Account {
         func prepareTransaction(
             to recipient: PublicAddress,
             memoType: MemoType,
-            amount: UInt64,
+            amount: Amount,
             feeLevel: FeeLevel,
             completion: @escaping (
-                Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+                Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
         ) {
-            guard amount > 0 else {
-                let errorMessage = "prepareTransactionWithFeeLevel failure: Cannot spend 0 MOB"
+            guard amount.value > 0 else {
+                let errorMessage = "prepareTransactionWithFeeLevel failure: " +
+                    "Cannot spend 0 \(amount.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -132,11 +134,13 @@ extension Account {
                 return
             }
 
-            metaFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: amount.tokenId) {
                 switch $0 {
                 case .success(let feeStrategy):
                     let (unspentTxOuts, ledgerBlockCount) =
-                        self.account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
+                        self.account.readSync {
+                            ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount)
+                        }
                     logger.info(
                         "Preparing transaction with fee level... recipient: " +
                             "\(redacting: recipient), amount: \(redacting: amount), feeLevel: " +
@@ -170,7 +174,7 @@ extension Account {
                                     recipient: recipient,
                                     memoType: memoType,
                                     amount: amount,
-                                    fee: fee,
+                                    fee: Amount(fee, in: amount.tokenId),
                                     tombstoneBlockIndex: tombstoneBlockIndex,
                                     blockVersion: blockVersion,
                                     completion: completion)
@@ -178,7 +182,7 @@ extension Account {
                                 logger.info(
                                     "prepareTransactionWithFee failure: \(error)",
                                     logFunction: false)
-                                
+
                                 serialQueue.async {
                                     completion(.failure(.connectionError(error)))
                                 }
@@ -198,14 +202,15 @@ extension Account {
         }
 
         func prepareDefragmentationStepTransactions(
-            toSendAmount amountToSend: UInt64,
+            toSendAmount amountToSend: Amount,
             recoverableMemo: Bool,
             feeLevel: FeeLevel,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
-            guard amountToSend > 0 else {
+            guard amountToSend.value > 0 else {
                 let errorMessage =
-                    "prepareDefragmentationStepTransactions failure: Cannot spend 0 MOB"
+                    "prepareDefragmentationStepTransactions failure: " +
+                    "Cannot spend 0 \(amountToSend.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -213,11 +218,13 @@ extension Account {
                 return
             }
 
-            metaFetcher.feeStrategy(for: feeLevel) {
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: amountToSend.tokenId) {
                 switch $0 {
                 case .success(let feeStrategy):
                     let (unspentTxOuts, ledgerBlockCount) =
-                        self.account.readSync { ($0.unspentTxOuts, $0.knowableBlockCount) }
+                        self.account.readSync {
+                            ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount)
+                        }
                     logger.info(
                         "Preparing defragmentation step transactions... amountToSend: " +
                             "\(redacting: amountToSend), feeLevel: \(feeLevel), " +
@@ -242,7 +249,7 @@ extension Account {
                                     self.transactionPreparer.prepareSelfAddressedTransaction(
                                         inputs: defragInputs.inputs,
                                         recoverableMemo: recoverableMemo,
-                                        fee: defragInputs.fee,
+                                        fee: Amount(defragInputs.fee, in: amountToSend.tokenId),
                                         tombstoneBlockIndex: tombstoneBlockIndex,
                                         blockVersion: blockVersion,
                                         completion: callback)
@@ -251,7 +258,7 @@ extension Account {
                                 logger.info(
                                     "prepareTransactionWithFee failure: \(error)",
                                     logFunction: false)
-                                
+
                                 serialQueue.async {
                                     completion(.failure(.connectionError(error)))
                                 }

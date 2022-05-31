@@ -9,6 +9,9 @@ defaults:
     devNetworkAuthUsername:
     devNetworkAuthPassword:
     testNetTestAccountMnemonicsCommaSeparated:
+    mobileDevTestAccountMnemonicsCommaSeparated:
+    dynamicTestAccountSeedEntropiesCommaSeparated:
+    dynamicTestAccountFogAuthoritySpki:
 
 commands:
   init-artifacts-submodule:
@@ -288,6 +291,9 @@ jobs:
       - set-ruby-version
       - install-gems
       - print-tool-versions
+      - install-example-gems
+      - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
       - run: make lint-locally-podspec
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }

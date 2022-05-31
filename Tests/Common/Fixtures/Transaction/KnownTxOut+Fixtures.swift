@@ -79,6 +79,19 @@ extension KnownTxOut.Fixtures {
             self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
         }
     }
+    
+    struct GetSharedSecret {
+        let knownTxOut: KnownTxOut
+        let senderAccountKey: AccountKey
+        let receiverAccountKey: AccountKey
+
+        init() throws {
+            let accountFixture = try AccountKey.Fixtures.KnownTxOut()
+            self.senderAccountKey = accountFixture.senderAccountKey
+            self.receiverAccountKey = accountFixture.receiverAccountKey
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
+        }
+    }
 }
 
 extension KnownTxOut.Fixtures.DefaultNotSet {
@@ -127,11 +140,11 @@ extension KnownTxOut.Fixtures.DefaultSenderMemo {
 extension KnownTxOut.Fixtures.DefaultDestinationMemo {
     static let viewRecordHex =
         """
-        11d320946556c6eadd1a201e6c1a745fe1632885aedb8c2efbb3a7d0241d3ecd927f00b08c06ab0d\
-        65ec5a2220c0c6a236ed89069f2c6ffe3cb8303c551b6102280cccd858e4da1a8c76108009296400\
-        000000000000310100000000000000390a000000000000004578fd2d5b4a425b81d7d5b98d57f868\
-        4ee9344f567e7d30b22ad0881d3755564c144b861f71bdd7d9b5a5bcba0f52ed891f0c212f29003d\
-        dc9c7c824b4640258c901dbef2bb2e56b5
+        11e8672b2c2a3dfdb01a20d633484d79c87c7eb43174137fb8f3ef76a903480be709aff0b4965f0f9\
+        6f91222207a70b708482ad30825d12029215b0445c838d17c3300f304abc2c99354344d4c29640000\
+        0000000000310100000000000000390a00000000000000450976a45c4a42be19c8919ab21ec0597c8\
+        5816703535faeb208b84a01ae5fb6d708be9cf67280b2d6a2a116f93bf1895ba4c33bf1779728527c\
+        cd621271f0e67e01d1d85cf95c09d1
         """
 
     static let expectedDestinationFee = UInt64(21)
@@ -155,6 +168,21 @@ extension KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo {
 
     static let expectedPaymentRequestId = UInt64(322)
     
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
+    }
+}
+
+extension KnownTxOut.Fixtures.GetSharedSecret {
+    static let viewRecordHex =
+        """
+        11b89889a83748c3b71a20ea28e0a73e2e579163d8710ef1d19bafc1bd04f681168a7eed50054c7c\
+        91b45d2220f40936fb0af75ae89f632685e930a9a53abcac8665ae6a7cd59915e07f15d86e296400\
+        000000000000310100000000000000390a0000000000000045dad4f6064a4246587e555ff2700a08\
+        d66334a78b43f43c02a270bd580225a11d4f1bb4ca56017ab622dcdb26555c7340344a0a0499f6ee\
+        48ea1335e6a8c4ba4424cfe8ccc523dd1e
+        """
+
     static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
         try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
     }

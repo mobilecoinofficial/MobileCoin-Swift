@@ -71,8 +71,10 @@ struct TransactionSubmitter {
              .duplicateKeyImages, .duplicateOutputPublicKey, .missingTxOutMembershipProof,
              .invalidTxOutMembershipProof, .invalidRistrettoPublicKey,
              .tombstoneBlockExceeded, .invalidLedgerContext, .memosNotAllowed,
-             .membershipProofValidationError, .keyError, .unsortedInputs:
-            return .failure(.invalidTransaction())
+             .membershipProofValidationError, .keyError, .unsortedInputs,
+             .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
+             .unsortedOutputs:
+            return .failure(.invalidTransaction("Error Code: \(response.result) (\(response.result.rawValue))"))
         case .txFeeError:
             return .failure(.feeError())
         case .tombstoneBlockTooFar:
@@ -100,4 +102,14 @@ struct TransactionSubmitter {
                 "Consensus.proposeTx returned unrecognized result: \(resultCode)")))
         }
     }
+}
+
+extension ConsensusCommon_ProposeTxResult {
+    /**
+     * The name of the enumeration (as written in case).
+     */
+    var name: String {
+        get { return String(describing: self) }
+    }
+
 }

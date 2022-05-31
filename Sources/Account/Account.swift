@@ -46,12 +46,33 @@ final class Account {
         return knowableBlockCount
     }
 
+    @available(*, deprecated, message: "Use cachedBalance(for:TokenId)")
     var cachedBalance: Balance {
+        cachedBalance(for: .MOB)
+    }
+
+    var cachedTxOutTokenIds: Set<TokenId> {
+        Set(allTxOutTrackers
+            .map { $0.knownTxOut.tokenId })
+    }
+
+    func cachedBalance(for tokenId: TokenId) -> Balance {
         let blockCount = knowableBlockCount
         let txOutValues = allTxOutTrackers
             .filter { $0.receivedAndUnspent(asOfBlockCount: blockCount) }
+            .filter { $0.knownTxOut.tokenId == tokenId }
             .map { $0.knownTxOut.value }
-        return Balance(values: txOutValues, blockCount: blockCount)
+        return Balance(values: txOutValues, blockCount: blockCount, tokenId: tokenId)
+    }
+
+    var cachedBalances: Balances {
+        let balances = cachedTxOutTokenIds.map {
+            cachedBalance(for: $0)
+        }
+        .reduce(into: [TokenId: Balance](), { result, balance in
+            result[balance.tokenId] = balance
+        })
+        return Balances(balances: balances, blockCount: knowableBlockCount)
     }
 
     var cachedAccountActivity: AccountActivity {
@@ -72,14 +93,17 @@ final class Account {
         return (txOuts: txOuts, blockCount: knowableBlockCount)
     }
 
-    var unspentTxOuts: [KnownTxOut] {
-        unspentTxOutsAndBlockCount.txOuts
+    func unspentTxOuts(tokenId: TokenId) -> [KnownTxOut] {
+        unspentTxOutsAndBlockCount(tokenId: tokenId).txOuts
     }
 
-    var unspentTxOutsAndBlockCount: (txOuts: [KnownTxOut], blockCount: UInt64) {
+    func unspentTxOutsAndBlockCount(
+        tokenId: TokenId
+    ) -> (txOuts: [KnownTxOut], blockCount: UInt64) {
         let knowableBlockCount = self.knowableBlockCount
         let txOuts = allTxOutTrackers
             .filter { $0.receivedAndUnspent(asOfBlockCount: knowableBlockCount) }
+            .filter { $0.knownTxOut.tokenId == tokenId }
             .map { $0.knownTxOut }
         return (txOuts: txOuts, blockCount: knowableBlockCount)
     }
@@ -155,7 +179,10 @@ final class Account {
 
 extension Account {
     /// - Returns: `.failure` if `accountKey` doesn't use Fog.
-    static func make(accountKey: AccountKey, syncChecker: FogSyncCheckable) -> Result<Account, InvalidInputError> {
+    static func make(
+        accountKey: AccountKey,
+        syncChecker: FogSyncCheckable
+    ) -> Result<Account, InvalidInputError> {
         guard let accountKey = AccountKeyWithFog(accountKey: accountKey) else {
             let errorMessage = "Accounts without fog URLs are not currently supported."
             logger.error(errorMessage, logFunction: false)
