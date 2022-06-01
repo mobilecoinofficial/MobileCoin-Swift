@@ -1,10 +1,13 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable file_length
 
 import Foundation
 @testable import MobileCoin
 import XCTest
+
+extension Transaction { }
 
 extension Transaction.Fixtures {
     struct TxOutMemo {
@@ -15,7 +18,7 @@ extension Transaction.Fixtures {
         let txOuts: [TxOut]
         let membershipProofs: [TxOutMembershipProof]
         let fee = Self.fee
-        let amount = PositiveUInt64(1)!
+        let amount: PositiveUInt64
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
         let globalIndex: UInt64
@@ -29,6 +32,7 @@ extension Transaction.Fixtures {
         init() throws {
             self.inputs = try Self.inputs()
             self.txOuts = try Self.nativeTxOuts()
+            self.amount = try XCTUnwrap(PositiveUInt64(1))
             self.membershipProofs = try Self.txOutMembershipProofs()
             self.senderAccountKey = try Self.senderAccountKey()
             self.recipientAccountKey = try Self.recipientAccountKey()
@@ -45,6 +49,7 @@ extension Transaction.Fixtures.TxOutMemo {
     fileprivate static let blockVersion = BlockVersion.minRTHEnabled
 
     static let realIndex = 3
+
     static func realKnownTxOut() throws -> KnownTxOut {
         let senderKey = try senderAccountKey()
         let txOuts = try nativeTxOuts()
@@ -134,11 +139,13 @@ extension Transaction.Fixtures.TxOutMemo {
     }
 
     fileprivate static func recipientAccountKey() throws -> AccountKey {
-        try XCTUnwrap(AccountKey(serializedData: Data(hexEncoded: recipientAccountKeyHex)!))
+        try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: recipientAccountKeyHex))))
     }
 
     fileprivate static func senderAccountKey() throws -> AccountKey {
-        try XCTUnwrap(AccountKey(serializedData: Data(hexEncoded: senderAccountKeyHex)!))
+        try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: senderAccountKeyHex))))
     }
 
 }
