@@ -4,37 +4,6 @@
 
 import Foundation
 
-extension Data {
-    public func asSecCertificate() -> Result<SecCertificate, InvalidInputError> {
-        Self.secCertificate(for: self)
-    }
-
-    public static func secCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
-        let pinnedCertificateData = data as CFData
-        if let pinnedCertificate = SecCertificateCreateWithData(nil, pinnedCertificateData) {
-            return .success(pinnedCertificate)
-        } else {
-            let errorMessage = "Error parsing trust root certificate: " +
-                "\(data.base64EncodedString())"
-            logger.error(errorMessage, logFunction: false)
-            return .failure(InvalidInputError(errorMessage))
-        }
-    }
-
-    public static func pinnedCertificateKeys(for data: [Data]) -> Result<[SecKey], Error> {
-        do {
-            let keys = try data.map { bytes in
-                try bytes.asSecCertificate().get()
-            }.compactMap { cert in
-                try SecCertificate.publicKey(for: cert).get()
-            }
-            return .success(keys)
-        } catch {
-            return .failure(error)
-        }
-    }
-}
-
 extension SecCertificate {
     public func asPublicKey() -> Result<SecKey, SecurityError> {
         Self.publicKey(for: self)
@@ -65,6 +34,38 @@ extension SecCertificate {
 
     public var data: Data {
         SecCertificateCopyData(self) as Data
+    }
+}
+
+extension Data {
+    public func asSecCertificate() -> Result<SecCertificate, InvalidInputError> {
+        Self.secCertificate(for: self)
+    }
+
+    public static func secCertificate(for data: Data) -> Result<SecCertificate, InvalidInputError> {
+        let pinnedCertificateData = data as CFData
+        if let pinnedCertificate = SecCertificateCreateWithData(nil, pinnedCertificateData) {
+            return .success(pinnedCertificate)
+        } else {
+            let errorMessage = "Error parsing trust root certificate: " +
+                "\(data.base64EncodedString())"
+            logger.error(errorMessage, logFunction: false)
+            return .failure(InvalidInputError(errorMessage))
+        }
+    }
+
+    public static func pinnedCertificateKeys(for data: [Data]) -> Result<[SecKey], Error> {
+        do {
+            let keys = try data.map { bytes in
+                try bytes.asSecCertificate().get()
+            }
+            .compactMap { cert in
+                try SecCertificate.publicKey(for: cert).get()
+            }
+            return .success(keys)
+        } catch {
+            return .failure(error)
+        }
     }
 }
 
