@@ -104,8 +104,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
             let accountActivity = client.accountActivity
 
-            print("txOuts.count: \(accountActivity.txOuts.count)")
-            XCTAssertGreaterThan(accountActivity.txOuts.count, 0)
+            print("txOuts.count: \(accountActivity.allTxOuts.count)")
+            XCTAssertGreaterThan(accountActivity.allTxOuts.count, 0)
 
             print("blockCount: \(accountActivity.blockCount)")
             XCTAssertGreaterThan(accountActivity.blockCount, 0)
@@ -773,7 +773,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 extension AccountActivity {
     public func describeUnspentTxOuts() -> String {
         [
-            self.txOuts.filter { $0.spentBlock == nil }.map {
+            self.allTxOuts.filter { $0.spentBlock == nil }.map {
                 "Unspent TxOut \($0.value) \($0.tokenId.name)"
             }
         ]
