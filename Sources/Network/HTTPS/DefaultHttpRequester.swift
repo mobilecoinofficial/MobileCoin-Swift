@@ -11,7 +11,8 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
     private var pinnedKeys: [SecKey] {
         [fogTrustRoots, consensusTrustRoots].compactMap {
             $0?.publicKeys
-        }.flatMap { $0 }
+        }
+        .flatMap { $0 }
     }
 
     static let certPinningEnabled = true
@@ -30,7 +31,10 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
     }()
 
     private lazy var session: URLSession = {
-       URLSession(configuration: DefaultHttpRequester.defaultConfiguration, delegate: self, delegateQueue: Self.operationQueue)
+       URLSession(
+            configuration: DefaultHttpRequester.defaultConfiguration,
+            delegate: self,
+            delegateQueue: Self.operationQueue)
     }()
 
     override public init() { }
@@ -78,10 +82,19 @@ extension DefaultHttpRequester {
     private typealias ChainOfTrustKeyMatch = (match: Bool, index: Int, key: SecKey)
     private typealias ChainOfTrustKey = (index: Int, key: SecKey)
 
-    public typealias URLAuthenticationChallengeCompletion = (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    public typealias URLAuthenticationChallengeCompletion = (
+        URLSession.AuthChallengeDisposition,
+        URLCredential?
+    ) -> Void
 
-    func urlSession(didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping URLAuthenticationChallengeCompletion) {
-        guard let trust = challenge.protectionSpace.serverTrust, SecTrustGetCertificateCount(trust) > 0 else {
+    func urlSession(
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping URLAuthenticationChallengeCompletion
+    ) {
+        guard
+            let trust = challenge.protectionSpace.serverTrust,
+            SecTrustGetCertificateCount(trust) > 0
+        else {
             // This case will probably get handled by ATS, but still...
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
@@ -94,13 +107,16 @@ extension DefaultHttpRequester {
 
         /// Compare pinned & server public keys
         let matches: [ChainOfTrustKey]
-        matches = trust.publicKeyTrustChain.enumerated().map { chain -> ChainOfTrustKeyMatch in
+        let trustChainEnumerated = trust.publicKeyTrustChain.enumerated()
+        matches = trustChainEnumerated.map { chain -> ChainOfTrustKeyMatch in
             let serverCertificateKey = chain.element
             let match = pinnedKeys.contains(serverCertificateKey)
             return (match: match, index: chain.offset, key: serverCertificateKey)
-        }.filter {
+        }
+        .filter {
             $0.match
-        }.map {
+        }
+        .map {
             (index: $0.index, key: $0.key)
         }
 
@@ -108,15 +124,16 @@ extension DefaultHttpRequester {
         case true:
             let indexes = matches.map { "\($0.index)" }
             let keys = matches.compactMap { $0.key.data }.map { "\($0.base64EncodedString() )" }
-            let message = "\nSuccess: pinned certificates matched with server's chain of trust at index(es): "
+            let message = "Success: pinned certificates matched with server's chain of trust "
+                          "at index(es): "
                             + "[\(indexes.joined(separator: ", "))] "
                             + "\nwith key(s): \(keys.joined(separator: ", \n"))"
             logger.debug(message)
             completionHandler(.useCredential, URLCredential(trust: trust))
         case false:
-            /// Failing here means that the public key of the server does not match the stored one. This can
-            /// either indicate a MITM attack, or that the backend certificate and the private key changed,
-            /// most likely due to expiration.
+            /// Failing here means that the public key of the server does not match the stored one.
+            /// This can either indicate a MITM attack, or that the backend certificate and the 
+            /// private key changed, most likely due to expiration.
             logger.error("Failure: no pinned certificate matched in the server's chain of trust")
             completionHandler(.cancelAuthenticationChallenge, nil)
         }
@@ -126,10 +143,11 @@ extension DefaultHttpRequester {
 
 extension DefaultHttpRequester: URLSessionDelegate {
 
-    public func urlSession(_ session: URLSession,
-                           didReceive challenge: URLAuthenticationChallenge,
-                           completionHandler: @escaping URLAuthenticationChallengeCompletion)
-    {
+    public func urlSession(
+        _ session: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping URLAuthenticationChallengeCompletion
+    ) {
         urlSession(didReceive: challenge, completionHandler: completionHandler)
     }
 
@@ -137,11 +155,12 @@ extension DefaultHttpRequester: URLSessionDelegate {
 
 extension DefaultHttpRequester: URLSessionTaskDelegate {
 
-    public func urlSession(_ session: URLSession,
-                           task: URLSessionTask,
-                           didReceive challenge: URLAuthenticationChallenge,
-                           completionHandler: @escaping URLAuthenticationChallengeCompletion)
-    {
+    public func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping URLAuthenticationChallengeCompletion
+    ) {
         urlSession(didReceive: challenge, completionHandler: completionHandler)
     }
 
