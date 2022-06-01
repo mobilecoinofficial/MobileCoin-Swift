@@ -95,10 +95,10 @@ public enum FogSyncError: Error {
 extension FogSyncError: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .viewLedgerOutOfSync(let viewBlockIndex, let ledgerBlockIndex):
+        case let .viewLedgerOutOfSync(viewBlockIndex, ledgerBlockIndex):
             return "Fog view and ledger block indices are out of sync. " +
                 "Try again later. View index: \(viewBlockIndex), Ledger index: \(ledgerBlockIndex)"
-        case .consensusOutOfSync(let consensusBlockIndex, let currentBlockIndex):
+        case let .consensusOutOfSync(consensusBlockIndex, currentBlockIndex):
             return "Fog has not finished syncing with Consensus. " +
                 "Try again later (Block index \(currentBlockIndex) / \(consensusBlockIndex)."
         }
