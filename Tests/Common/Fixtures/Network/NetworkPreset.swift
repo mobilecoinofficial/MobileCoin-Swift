@@ -430,7 +430,6 @@ extension NetworkPreset {
     var fogReportShortUrl: String { fogShortUrl }
     var fogReportId: String { "" }
 
-    // swiftlint:disable cyclomatic_complexity
     func fogAuthoritySpki() throws -> Data {
         let fogAuthoritySpkiB64Encoded: String
         switch self {
@@ -460,7 +459,6 @@ extension NetworkPreset {
         }
         return try XCTUnwrap(Data(base64Encoded: fogAuthoritySpkiB64Encoded))
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func attestationConfig() throws -> NetworkConfig.AttestationConfig {
         NetworkConfig.AttestationConfig(

@@ -10,4 +10,4 @@ repos:
     rev: 0.46.0
     hooks:
       - id: swiftlint
-        entry: "swiftlint --config .swiftlint.yml --strict"
+        entry: "make lint-strict"
