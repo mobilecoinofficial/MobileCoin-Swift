@@ -153,8 +153,10 @@ extension Balance: Hashable {}
 extension Balance: CustomStringConvertible {
     public var description: String {
         let amount = amountParts
-        return String(format: "%llu.%0\(tokenId.significantDigits)llu \(tokenId.name)",
-                      amount.int, amount.frac)
+        return String(
+                format: "%llu.%0\(tokenId.significantDigits)llu \(tokenId.name)",
+                amount.int,
+                amount.frac)
     }
 }
 
