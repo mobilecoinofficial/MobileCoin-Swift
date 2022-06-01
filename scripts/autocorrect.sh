@@ -11,7 +11,7 @@ if [[ -e "${SWIFT_LINT}" ]]; then
     while IFS= read -r file_path; do
         export SCRIPT_INPUT_FILE_$count="$file_path"
         count=$((count + 1))
-    done < <(git diff --name-only --diff-filter=d | grep ".swift$")
+    done < <(git diff --name-only --cached --diff-filter=d | grep ".swift$")
     export SCRIPT_INPUT_FILE_COUNT=$count
 
     if [ "$count" -eq 0 ]; then
