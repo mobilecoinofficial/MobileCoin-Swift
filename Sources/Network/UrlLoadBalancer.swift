@@ -2,6 +2,7 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 //
+// swiftlint:disable unavailable_function
 
 class UrlLoadBalancer<MobileCoinUrlType: MobileCoinUrlProtocol> {
 
@@ -20,7 +21,6 @@ class UrlLoadBalancer<MobileCoinUrlType: MobileCoinUrlProtocol> {
         urlsTyped = urls
     }
 
-    @available(*, unavailable)
     func nextUrl() -> MobileCoinUrlType {
         fatalError("abstract method must be overridden")
     }
