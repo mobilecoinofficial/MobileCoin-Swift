@@ -93,8 +93,21 @@ public final class MobileCoinClient {
         accountLock.readSync { $0.cachedTxOutTokenIds }
     }
 
+    @available(*, deprecated, message:
+        """
+        Deprecated in favor of `accountActivity(for:TokenId)` which accepts a TokenId.
+        `accountActivity` will assume the default TokenId == .MOB // UInt64(0)
+        
+        Get a set of all tokenIds that are in TxOuts owned by this account with:
+        
+        `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
+        """)
     public var accountActivity: AccountActivity {
-        accountLock.readSync { $0.cachedAccountActivity }
+        accountActivity(for: .MOB)
+    }
+
+    public func accountActivity(for tokenId: TokenId) -> AccountActivity {
+        accountLock.readSync { $0.cachedAccountActivity(for: tokenId) }
     }
 
     public func balance(for tokenId: TokenId = .MOB) -> Balance {

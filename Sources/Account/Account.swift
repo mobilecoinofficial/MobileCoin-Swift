@@ -75,12 +75,27 @@ final class Account {
         return Balances(balances: balances, blockCount: knowableBlockCount)
     }
 
+    @available(*, deprecated, message:
+        """
+        Deprecated in favor of `cachedAccountActivity(for:TokenId)` which accepts a TokenId.
+        `cachedAccountActivity` will assume the default TokenId == .MOB // UInt64(0)
+        
+        Get a set of all tokenIds that are in TxOuts owned by this account with:
+        
+        `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
+        """)
     var cachedAccountActivity: AccountActivity {
-        let blockCount = knowableBlockCount
-        let txOuts = allTxOutTrackers.compactMap { OwnedTxOut($0, atBlockCount: blockCount) }
-        return AccountActivity(txOuts: txOuts, blockCount: blockCount)
+        cachedAccountActivity(for: .MOB)
     }
 
+    func cachedAccountActivity(for tokenId: TokenId) -> AccountActivity {
+        let blockCount = knowableBlockCount
+        let txOuts = allTxOutTrackers
+            .compactMap { OwnedTxOut($0, atBlockCount: blockCount) }
+            .filter { $0.tokenId == tokenId }
+        return AccountActivity(txOuts: txOuts, blockCount: blockCount, tokenId: tokenId)
+    }
+    
     var ownedTxOuts: [KnownTxOut] {
         ownedTxOutsAndBlockCount.txOuts
     }
