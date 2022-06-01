@@ -9,7 +9,7 @@ import XCTest
 class PublicAddressTests: XCTestCase {
     func testRootEntropy() throws {
         let rootEntropyHex = "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21"
-        let rootEntropy = XCTUnwrap(Data(hexEncoded: rootEntropyHex))
+        let rootEntropy = try XCTUnwrap(Data(hexEncoded: rootEntropyHex))
         let fogUrl = "fog://fog.alpha.development.mobilecoin.com"
         let fogAuthoritySpkiB64Encoded = """
             MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyFOockvCEc9TcO1NvsiUfFVzvtDsR64UIRRU\
@@ -24,9 +24,9 @@ class PublicAddressTests: XCTestCase {
             sHKG+ZMCAwEAAQ==
             """
 
-        let fogAuthoritySpki = XCTUnwrap(Data(base64Encoded: fogAuthoritySpkiB64Encoded))
+        let fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: fogAuthoritySpkiB64Encoded))
 
-        let key = XCTUnwrap(try AccountKey.make(
+        let key = try XCTUnwrap(try AccountKey.make(
             rootEntropy: rootEntropy,
             fogReportUrl: fogUrl,
             fogReportId: "",

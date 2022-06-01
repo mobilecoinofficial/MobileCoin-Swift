@@ -5,8 +5,11 @@ import Foundation
 
 extension TransportProtocol {
     static var grpcTimeout: Double = {
-        Double(
-            (GrpcChannelManager.Defaults.callOptionsTimeLimit.timeout ?? 0).nanoseconds) / 1.0e9
+        guard let timeout = GrpcChannelManager.Defaults.callOptionsTimeLimit.timeout else {
+            logger.error("No GrpcTimeout value !")
+            return Double(0)
+        }
+        return Double(timeout.nanoseconds) / 1.0e9
     }()
 
     static var httpTimeout: Double = {

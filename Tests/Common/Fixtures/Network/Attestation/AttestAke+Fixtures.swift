@@ -32,11 +32,12 @@ extension AttestAke.Fixtures {
     struct DefaultWithAuthBegin {
         let attestAke: AttestAke
 
-        let authResponseData = Default.authResponseData
+        let authResponseData: Data
         let attestationVerifier: AttestationVerifier
 
         init() throws {
-            self.authResponseData = try XCTUnwrap(Data(base64Encoded: authResponseDataBase64))
+            self.authResponseData = try XCTUnwrap(
+                Data(base64Encoded: Default.authResponseDataBase64))
             let defaultFixture = try Default()
             self.attestAke = defaultFixture.attestAke
             let authRequestData = attestAke.authBeginRequestData(
@@ -45,7 +46,7 @@ extension AttestAke.Fixtures {
                 rngContext: defaultFixture.rngContext)
             XCTAssertEqual(
                 authRequestData.base64EncodedString(),
-                Default.authRequestData.base64EncodedString())
+                Default.authRequestDataBase64)
             self.attestationVerifier = defaultFixture.attestationVerifier
         }
     }
@@ -56,10 +57,12 @@ extension AttestAke.Fixtures {
         let attestAkeCipher: AttestAke.Cipher
 
         init() throws {
+            let authResponseData = try XCTUnwrap(
+                Data(base64Encoded: Default.authResponseDataBase64))
             let attestAke = try DefaultWithAuthBegin().attestAke
             let verifier = try Default.attestationVerifier()
             self.attestAkeCipher = try attestAke.authEnd(
-                authResponseData: Default.authResponseData,
+                authResponseData: authResponseData,
                 attestationVerifier: verifier).get()
             XCTAssertTrue(attestAke.isAttested)
         }
@@ -75,7 +78,6 @@ extension AttestAke.Fixtures {
         let encryptedData: Data
 
         init() throws {
-            self.binding = try XCTUnwrap(Data(base64Encoded: Self.bindingBase64))
             self.encryptedData = try XCTUnwrap(Data(base64Encoded: "ChTwWj7piGKspsOpw4KlQg=="))
             self.attestAkeCipher = try AttestAke.Fixtures.DefaultAttested().attestAkeCipher
         }
@@ -162,7 +164,7 @@ extension AttestAke.Fixtures.Default {
 
 extension AttestAke.Fixtures.BlankFirstMessage {
 
-    fileprivate static let bindingBase64 =
+    static let bindingBase64 =
         "DIhSTcCCj2c84OIZg0Dsy3xdFdzBPassZ8wgmIUDjY9vqk1P9Ts+v9T5K8EsSnxHGUEi3+UQYXWfv7b0Tg3MDw=="
 
 }
