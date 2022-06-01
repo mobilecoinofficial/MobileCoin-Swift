@@ -352,6 +352,9 @@ jobs:
       - init-artifacts-submodule
       - set-ruby-version
       - install-gems
+      - install-example-gems
+      - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
       - set-git-credentials
       - publish-to-trunk
 
