@@ -17,7 +17,7 @@ enum SenderWithPaymentRequestMemoUtils {
         // swiftlint:disable closure_body_length
         func ffiCall(
             memoDataPtr: UnsafePointer<McBuffer>,
-            publicAddressPtr: UnsafePointer<McBuffer>
+            publicAddressPtr: UnsafePointer<McPublicAddress>
         ) -> Bool {
             receipientViewPrivateKey.asMcBuffer { receipientViewPrivateKeyPtr in
                 txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in

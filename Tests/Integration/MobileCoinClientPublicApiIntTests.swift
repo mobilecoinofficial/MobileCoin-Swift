@@ -47,7 +47,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     ) throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(
             accountIndex: 0,
-            transportProtocol: transportProtocol)
+            using: transportProtocol)
 
         client.blockVersion {
             guard let blockVersion = try? $0.get(), blockVersion >= 2 else {

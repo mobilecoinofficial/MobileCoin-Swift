@@ -7,25 +7,33 @@ import LibMobileCoin
 
 extension Data16 {
     static func make(
-        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
+        withMcMutableBuffer body: (
+            UnsafeMutablePointer<McMutableBuffer>,
+            inout UnsafeMutablePointer<McError>?
+        ) -> Bool
     ) -> Result<Data16, LibMobileCoinError> {
         var bytes = Data16()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcError { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
-        }.map { bytes }
+        }
+        .map { bytes }
     }
 
     static func make(
-        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
+        withMcMutableBuffer body: (
+            UnsafeMutablePointer<McMutableBuffer>,
+            inout UnsafeMutablePointer<McError>?
+        ) -> Int
     ) -> Result<Data16, LibMobileCoinError> {
         var bytes = Data16()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcErrorReturningArrayCount { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
-        }.map { numBytesReturned in
+        }
+        .map { numBytesReturned in
             guard numBytesReturned == 16 else {
                 // This condition indicates a programming error.
                 logger.fatalError(
