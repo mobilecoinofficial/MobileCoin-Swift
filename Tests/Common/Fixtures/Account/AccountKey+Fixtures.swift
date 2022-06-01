@@ -77,16 +77,29 @@ extension AccountKey.Fixtures {
         let accountKey: AccountKey
         let manualAccountKey: AccountKey
 
-        let viewPrivateKey = Self.viewPrivateKey
-        let spendPrivateKey = Self.spendPrivateKey
-        let publicAddress = Self.publicAddress
-        let rootEntropy = Data(hexEncoded: "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21")!
+        let viewPrivateKey: RistrettoPrivate
+        let spendPrivateKey: RistrettoPrivate
+        let publicAddress: PublicAddress
+        let rootEntropy: Data
         let fogReportUrl = Self.fogReportUrl
         let fogReportId = Self.fogReportId
-        let fogAuthoritySpki = Data(hexEncoded: Self.fogAuthoritySpkiHex)!
+        let fogAuthoritySpki: Data
 
         init() throws {
-            self.accountKey = try AccountKey.make(entropy: rootEntropy, fogReportUrl: fogReportUrl, fogReportId: "", fogAuthoritySpki: fogAuthoritySpki).get()
+            self.fogAuthoritySpki = try XCTUnwrap(Data(hexEncoded: Self.fogAuthoritySpkiHex))
+            self.rootEntropy = try XCTUnwrap(Data(hexEncoded: Self.rootEntropyHex))
+            self.viewPrivateKey = try XCTUnwrap(RistrettoPrivate(
+                XCTUnwrap(Data(hexEncoded: Self.viewPrivateKeyHex))))
+            self.spendPrivateKey = try XCTUnwrap(RistrettoPrivate(
+                XCTUnwrap(Data(hexEncoded: Self.spendPrivateKeyHex))))
+            self.publicAddress = try XCTUnwrap(PublicAddress(
+                serializedData: XCTUnwrap(Data(hexEncoded: Self.publicAddressHex))))
+            self.accountKey = try AccountKey.make(
+                entropy: rootEntropy,
+                fogReportUrl: fogReportUrl,
+                fogReportId: "",
+                fogAuthoritySpki: fogAuthoritySpki).get()
+
             self.manualAccountKey = try AccountKey.make(
                 viewPrivateKey: viewPrivateKey,
                 spendPrivateKey: spendPrivateKey,
@@ -95,6 +108,9 @@ extension AccountKey.Fixtures {
                 fogAuthoritySpki: fogAuthoritySpki).get()
         }
     }
+}
+
+extension AccountKey.Fixtures.AlphaFog {
 }
 
 extension AccountKey.Fixtures {
@@ -190,33 +206,39 @@ extension AccountKey.Fixtures.Init {
 
 extension AccountKey.Fixtures.AlphaFog {
 
-    fileprivate static let spendPrivateKey = RistrettoPrivate(hexEncoded: Self.spendPrivateKeyHex)!
-    fileprivate static let spendPrivateKeyHex = "3379daf11c7d26bde2be0ab557e79285f868a1e58058ab47063950435fc7670a"
-    fileprivate static let viewPrivateKey = RistrettoPrivate(hexEncoded: Self.viewPrivateKeyHex)!
-    fileprivate static let viewPrivateKeyHex = "605845eceee09d9bc719c590aac78b5bc2793420e716a41a12b22248be551d07"
-    fileprivate static let publicAddressHex = "0a220a2046db671dc90016919bf8a2b0f8b2aefb6220cbff0fa30454f8fc0ffd1948820a12220a20340774b1e70402c197efe792b29b989edaa2c97020df6dc8cf09fd3870d83b251a2a666f673a2f2f666f672e616c7068612e646576656c6f706d656e742e6d6f62696c65636f696e2e636f6d2a40281a4c716a006fb8f813b7d42ce11b8b69c42e8ad709086482403a8142d5bd44d090e9e36565be143bd949ef85b0985c5ee44ad5397cbe2e1599551be181a08b"
-    fileprivate static let publicAddress = PublicAddress(serializedData: Data(hexEncoded: Self.publicAddressHex)!)!
+    fileprivate static let spendPrivateKeyHex =
+        "3379daf11c7d26bde2be0ab557e79285f868a1e58058ab47063950435fc7670a"
+    fileprivate static let viewPrivateKeyHex =
+        "605845eceee09d9bc719c590aac78b5bc2793420e716a41a12b22248be551d07"
+    fileprivate static let publicAddressHex = """
+        0a220a2046db671dc90016919bf8a2b0f8b2aefb6220cbff0fa30454f8fc0ffd1948820a12220a20340774b1e70\
+        402c197efe792b29b989edaa2c97020df6dc8cf09fd3870d83b251a2a666f673a2f2f666f672e616c7068612e64\
+        6576656c6f706d656e742e6d6f62696c65636f696e2e636f6d2a40281a4c716a006fb8f813b7d42ce11b8b69c42\
+        e8ad709086482403a8142d5bd44d090e9e36565be143bd949ef85b0985c5ee44ad5397cbe2e1599551be181a08b
+        """
     fileprivate static let fogReportUrl = "fog://fog.alpha.development.mobilecoin.com"
     fileprivate static let fogReportId = ""
-//    fileprivate static let fogAuthoritySpkiHex = """
-//        30820222300d06092a864886f70d01010105000382020f003082020a0282020100c853a8\
-//        724bc211cf5370ed4dbec8947c5573bed0ec47ae14211454977b41336061f0a040f77dbf\
-//        529f3a46d8095676ec971b940ab4c9642578760779840a3f9b3b893b2f65006c544e9c16\
-//        586d33649769b7c1c94552d7efa081a56ad612dec932812676ebec091f2aed69123604f4\
-//        888a125e04ff85f5a727c286664378581cf34c7ee13eb01cc4faf3308ed3c07a9415f98e\
-//        5fbfe073e6c357967244e46ba6ebbe391d8154e6e4a1c80524b1a6733eca46e37bfdd62d\
-//        75816988a79aac6bdb62a06b1237a8ff5e5c848d01bbff684248cf06d92f301623c893eb\
-//        0fba0f3faee2d197ea57ac428f89d6c000f76d58d5aacc3d70204781aca45bc02b1456b4\
-//        54231d2f2ed4ca6614e5242c7d7af0fe61e9af6ecfa76674ffbc29b858091cbfb4011538\
-//        f0e894ce45d21d7fac04ba2ff57e9ff6db21e2afd9468ad785c262ec59d4a1a801c5ec2f\
-//        95fc107dc9cb5f7869d70aa84450b8c350c2fa48bddef20752a1e43676b246c7f59f8f1f\
-//        4aee43c1a15f36f7a36a9ec708320ea42089991551f2656ec62ea38233946b85616ff182\
-//        cf17cd227e596329b546ea04d13b053be4cf3338de777b50bc6eca7a6185cf7a5022bc9b\
-//        e3749b1bb43e10ecc88a0c580f2b7373138ee49c7bafd8be6a64048887230480b0c85a04\
-//        5255494e04a9a81646369ce7a10e08da6fae27333ec0c16c8a74d93779a9e055395078d0\
-//        b07286f9930203010001
-//        """
-    fileprivate static let fogAuthoritySpkiHex = "30820222300d06092a864886f70d01010105000382020f003082020a0282020100c853a8724bc211cf5370ed4dbec8947c5573bed0ec47ae14211454977b41336061f0a040f77dbf529f3a46d8095676ec971b940ab4c9642578760779840a3f9b3b893b2f65006c544e9c16586d33649769b7c1c94552d7efa081a56ad612dec932812676ebec091f2aed69123604f4888a125e04ff85f5a727c286664378581cf34c7ee13eb01cc4faf3308ed3c07a9415f98e5fbfe073e6c357967244e46ba6ebbe391d8154e6e4a1c80524b1a6733eca46e37bfdd62d75816988a79aac6bdb62a06b1237a8ff5e5c848d01bbff684248cf06d92f301623c893eb0fba0f3faee2d197ea57ac428f89d6c000f76d58d5aacc3d70204781aca45bc02b1456b454231d2f2ed4ca6614e5242c7d7af0fe61e9af6ecfa76674ffbc29b858091cbfb4011538f0e894ce45d21d7fac04ba2ff57e9ff6db21e2afd9468ad785c262ec59d4a1a801c5ec2f95fc107dc9cb5f7869d70aa84450b8c350c2fa48bddef20752a1e43676b246c7f59f8f1f4aee43c1a15f36f7a36a9ec708320ea42089991551f2656ec62ea38233946b85616ff182cf17cd227e596329b546ea04d13b053be4cf3338de777b50bc6eca7a6185cf7a5022bc9be3749b1bb43e10ecc88a0c580f2b7373138ee49c7bafd8be6a64048887230480b0c85a045255494e04a9a81646369ce7a10e08da6fae27333ec0c16c8a74d93779a9e055395078d0b07286f9930203010001"
+    fileprivate static let fogAuthoritySpkiHex = """
+        30820222300d06092a864886f70d01010105000382020f003082020a0282020100c853a8\
+        724bc211cf5370ed4dbec8947c5573bed0ec47ae14211454977b41336061f0a040f77dbf\
+        529f3a46d8095676ec971b940ab4c9642578760779840a3f9b3b893b2f65006c544e9c16\
+        586d33649769b7c1c94552d7efa081a56ad612dec932812676ebec091f2aed69123604f4\
+        888a125e04ff85f5a727c286664378581cf34c7ee13eb01cc4faf3308ed3c07a9415f98e\
+        5fbfe073e6c357967244e46ba6ebbe391d8154e6e4a1c80524b1a6733eca46e37bfdd62d\
+        75816988a79aac6bdb62a06b1237a8ff5e5c848d01bbff684248cf06d92f301623c893eb\
+        0fba0f3faee2d197ea57ac428f89d6c000f76d58d5aacc3d70204781aca45bc02b1456b4\
+        54231d2f2ed4ca6614e5242c7d7af0fe61e9af6ecfa76674ffbc29b858091cbfb4011538\
+        f0e894ce45d21d7fac04ba2ff57e9ff6db21e2afd9468ad785c262ec59d4a1a801c5ec2f\
+        95fc107dc9cb5f7869d70aa84450b8c350c2fa48bddef20752a1e43676b246c7f59f8f1f\
+        4aee43c1a15f36f7a36a9ec708320ea42089991551f2656ec62ea38233946b85616ff182\
+        cf17cd227e596329b546ea04d13b053be4cf3338de777b50bc6eca7a6185cf7a5022bc9b\
+        e3749b1bb43e10ecc88a0c580f2b7373138ee49c7bafd8be6a64048887230480b0c85a04\
+        5255494e04a9a81646369ce7a10e08da6fae27333ec0c16c8a74d93779a9e055395078d0\
+        b07286f9930203010001
+        """
+
+    fileprivate static let rootEntropyHex =
+        "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21"
 
 }
 
