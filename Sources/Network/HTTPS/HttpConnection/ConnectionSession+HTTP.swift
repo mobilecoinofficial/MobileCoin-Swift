@@ -16,7 +16,8 @@ extension ConnectionSession {
                 guard let name = key as? String else { return nil }
                 guard let value = value as? String else { return nil }
                 return (name:name, value:value)
-            }).map { ($0.name.capitalized, $0.value) },
+            })
+            .map { ($0.name.capitalized, $0.value) },
             uniquingKeysWith: { k, _ in k })
 
         let receivedCookies = HTTPCookie.cookies(
