@@ -67,11 +67,11 @@ extension RecoverableMemo: Equatable {
             return true
         case (.unused, .unused):
             return true
-        case (.sender(let lhsMemo), .sender(let rhsMemo)):
+        case let (.sender(lhsMemo), .sender(rhsMemo)):
             return lhsMemo == rhsMemo
-        case (.destination(let lhsMemo), .destination(let rhsMemo)):
+        case let (.destination(lhsMemo), .destination(rhsMemo)):
             return lhsMemo == rhsMemo
-        case (.senderWithPaymentRequest(let lhsMemo), .senderWithPaymentRequest(let rhsMemo)):
+        case let (.senderWithPaymentRequest(lhsMemo), .senderWithPaymentRequest(rhsMemo)):
             return lhsMemo == rhsMemo
         default:
             return false
