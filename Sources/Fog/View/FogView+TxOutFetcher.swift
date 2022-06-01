@@ -65,7 +65,9 @@ extension FogView {
             }
             fogViewService.query(requestWrapper: requestWrapper) {
                 {
-                    guard let highestProcessedBlockCount = try? $0.get().highestProcessedBlockCount else {
+                    guard let highestProcessedBlockCount = try?
+                                $0.get().highestProcessedBlockCount
+                    else {
                         return
                     }
                     self.syncCheckerLock.writeSync({
