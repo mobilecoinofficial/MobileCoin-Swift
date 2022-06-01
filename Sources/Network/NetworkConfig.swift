@@ -5,10 +5,17 @@
 import Foundation
 
 struct NetworkConfig {
-    static func make(consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol)
-        -> Result<NetworkConfig, InvalidInputError>
-    {
-        .success(NetworkConfig(consensusUrlLoadBalancer: consensusUrlLoadBalancer, fogUrlLoadBalancer: fogUrlLoadBalancer, attestation: attestation, transportProtocol: transportProtocol))
+    static func make(
+        consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
+        fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
+        attestation: AttestationConfig,
+        transportProtocol: TransportProtocol
+    ) -> Result<NetworkConfig, InvalidInputError> {
+        .success(NetworkConfig(
+                    consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                    fogUrlLoadBalancer: fogUrlLoadBalancer,
+                    attestation: attestation,
+                    transportProtocol: transportProtocol))
     }
 
     private let attestation: AttestationConfig
@@ -38,7 +45,12 @@ struct NetworkConfig {
         }
     }
 
-    init(consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>, fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>, attestation: AttestationConfig, transportProtocol: TransportProtocol) {
+    init(
+        consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
+        fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
+        attestation: AttestationConfig,
+        transportProtocol: TransportProtocol
+    ) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
         self.consensusUrlLoadBalancer = consensusUrlLoadBalancer
@@ -107,6 +119,34 @@ struct NetworkConfig {
 
     var fogReportAttestation: Attestation { attestation.fogReport }
 
+    private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
+    private func validatedCertificates(
+        _ trustRoots: [Data]
+    ) -> (grpc: PossibleCertificates, http: PossibleCertificates) {
+        let grpc = TransportProtocol.grpc.certificateValidator.validate(trustRoots)
+        let http = TransportProtocol.http.certificateValidator.validate(trustRoots)
+        return (grpc, http)
+    }
+
+    private func currentProtocolValidation(grpc: PossibleCertificates, http: PossibleCertificates)
+        -> Result<(), InvalidInputError>
+    {
+        switch (transportProtocol, grpc, http) {
+        case (.grpc, .success, _):
+            return .success(())
+        case (.grpc, .failure(let error), _):
+            return .failure(error)
+        case (.http, _, .success):
+            return .success(())
+        case (.http, _, .failure(let error)):
+            return .failure(error)
+        case (_, _, _):
+            return .failure(InvalidInputError("Empty certificates"))
+        }
+    }
+}
+
+extension NetworkConfig {
     @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
@@ -131,29 +171,6 @@ struct NetworkConfig {
         return currentProtocolValidation(grpc: grpc, http: http)
     }
 
-    private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
-    private func validatedCertificates(_ trustRoots: [Data]) -> (grpc: PossibleCertificates, http: PossibleCertificates) {
-        let grpc = TransportProtocol.grpc.certificateValidator.validate(trustRoots)
-        let http = TransportProtocol.http.certificateValidator.validate(trustRoots)
-        return (grpc, http)
-    }
-
-    private func currentProtocolValidation(grpc: PossibleCertificates, http: PossibleCertificates)
-        -> Result<(), InvalidInputError>
-    {
-        switch (transportProtocol, grpc, http) {
-        case (.grpc, .success, _):
-            return .success(())
-        case (.grpc, .failure(let error), _):
-            return .failure(error)
-        case (.http, _, .success):
-            return .success(())
-        case (.http, _, .failure(let error)):
-            return .failure(error)
-        case (_, _, _):
-            return .failure(InvalidInputError("Empty certificates"))
-        }
-    }
 }
 
 extension NetworkConfig {
