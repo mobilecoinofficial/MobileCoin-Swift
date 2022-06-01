@@ -13,7 +13,8 @@ class FogResolverManagerIntTests: XCTestCase {
     }
 
     func fogReport(transportProtocol: TransportProtocol) throws {
-        let fogResolverManager = try IntegrationTestFixtures.createFogResolverManager(transportProtocol: transportProtocol)
+        let fogResolverManager = try IntegrationTestFixtures.createFogResolverManager(
+                transportProtocol: transportProtocol)
         let publicAddress = try IntegrationTestFixtures.createPublicAddress()
 
         let expect = expectation(description: "Retrieve fog reports")

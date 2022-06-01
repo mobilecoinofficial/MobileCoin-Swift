@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable closure_body_length
+// swiftlint:disable closure_body_length multiline_arguments
 
 import Foundation
 import LibMobileCoin
