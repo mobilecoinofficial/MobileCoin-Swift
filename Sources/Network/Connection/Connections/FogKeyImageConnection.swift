@@ -5,7 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class FogKeyImageConnection: Connection<GrpcProtocolConnectionFactory.FogKeyImageServiceProvider, HttpProtocolConnectionFactory.FogKeyImageServiceProvider>, FogKeyImageService
+final class FogKeyImageConnection: Connection<
+        GrpcProtocolConnectionFactory.FogKeyImageServiceProvider,
+        HttpProtocolConnectionFactory.FogKeyImageServiceProvider
+    >,
+    FogKeyImageService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -60,9 +64,13 @@ final class FogKeyImageConnection: Connection<GrpcProtocolConnectionFactory.FogK
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.checkKeyImages(request: request, completion: rotateURLOnError(completion))
-       case .http(let httpConnection):
-            httpConnection.checkKeyImages(request: request, completion: rotateURLOnError(completion))
+            grpcConnection.checkKeyImages(
+                    request: request,
+                    completion: rotateURLOnError(completion))
+        case .http(let httpConnection):
+            httpConnection.checkKeyImages(
+                    request: request,
+                    completion: rotateURLOnError(completion))
         }
     }
 }
