@@ -3,6 +3,7 @@ disabled_rules: # rule identifiers to exclude from running
   - nesting
   - opening_brace
   # disabled by default
+  - inclusive_language
   - conditional_returns_on_newline
   - file_types_order
   - missing_docs

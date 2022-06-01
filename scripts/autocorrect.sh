@@ -1,5 +1,6 @@
 #!/bin/bash
 
+pwd
 SWIFT_LINT=$(which swiftlint)
 
 # Change directory to repo root

@@ -1,7 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable file_length inclusive_language multiline_function_chains
+// swiftlint:disable file_length multiline_function_chains
 
 @testable import MobileCoin
 import XCTest
@@ -430,6 +430,7 @@ extension NetworkPreset {
     var fogReportShortUrl: String { fogShortUrl }
     var fogReportId: String { "" }
 
+    // swiftlint:disable cyclomatic_complexity
     func fogAuthoritySpki() throws -> Data {
         let fogAuthoritySpkiB64Encoded: String
         switch self {
@@ -459,6 +460,7 @@ extension NetworkPreset {
         }
         return try XCTUnwrap(Data(base64Encoded: fogAuthoritySpkiB64Encoded))
     }
+    // swiftlint:enable cyclomatic_complexity
 
     func attestationConfig() throws -> NetworkConfig.AttestationConfig {
         NetworkConfig.AttestationConfig(
@@ -664,6 +666,7 @@ extension NetworkPreset {
     private static let dynamicTestAccountSeedEntropiesCommaSeparated = ""
 #endif
 
+    // swiftlint:disable force_unwrapping
     var testAccountsPrivateKeys:
         [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]
     {
@@ -672,6 +675,7 @@ extension NetworkPreset {
              RistrettoPrivate(hexEncoded: $0.spendPrivateKeyHex)!)
         }
     }
+    // swiftlint:enable force_unwrapping
 
     private var testAccountsPrivateKeysHex:
         [(viewPrivateKeyHex: String, spendPrivateKeyHex: String)]
