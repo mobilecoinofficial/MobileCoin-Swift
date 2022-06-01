@@ -1,7 +1,6 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-
 // swiftlint:disable file_length inclusive_language multiline_function_chains
 
 @testable import MobileCoin
@@ -57,7 +56,7 @@ struct DynamicNetworkConfig {
 }
 
 extension DynamicNetworkConfig {
-    struct AlphaDevelopment {
+    enum AlphaDevelopment {
         static let user = ""
         static let namespace = "alpha"
         static let environment = "development"
@@ -97,7 +96,7 @@ extension NetworkPreset {
         case diogenes
         case drakeley
         case eran
-        case dynamic(DynamicNetworkConfig)
+        case dynamic
     }
 
     private var network: Network {
@@ -143,7 +142,7 @@ extension NetworkPreset {
         case .testNet:
             return .testNet
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic(_):
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return .devNetwork
         }
     }
@@ -187,7 +186,7 @@ extension NetworkPreset {
 
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return ""
-        case .dynamic(_):
+        case .dynamic:
             return ""
         }
     }
@@ -563,7 +562,7 @@ extension NetworkPreset {
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return true
         case .dynamic:
-            return true // TODO - do we need creds ?
+            return true
         }
     }
     var fogUserCredentials: BasicCredentials? {
@@ -684,7 +683,7 @@ extension NetworkPreset {
         case .testNet:
             return []
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic(_):
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return Self.devNetworkTestAccountPrivateKeysHex
         }
     }
