@@ -20,15 +20,18 @@ class ConsensusConnectionIntTests: XCTestCase {
             let fixture = try Transaction.Fixtures.Default()
 
             let expect = expectation(description: "Consensus connection")
-            try createConsensusConnection(transportProtocol: transportProtocol).proposeTx(fixture.tx, completion: {
-                guard let response = $0.successOrFulfill(expectation: expect) else { return }
-                print("response: \(response)")
+            try createConsensusConnection(transportProtocol: transportProtocol).proposeTx(
+                fixture.tx,
+                completion: {
+                    guard let response = $0.successOrFulfill(expectation: expect) else { return }
+                    print("response: \(response)")
 
-                XCTAssertNotEqual(response.result, .ok)
-                XCTAssertGreaterThan(response.blockCount, 0)
+                    XCTAssertNotEqual(response.result, .ok)
+                    XCTAssertGreaterThan(response.blockCount, 0)
 
-                expect.fulfill()
-            })
+                    expect.fulfill()
+                }
+            )
             waitForExpectations(timeout: 20)
         }
     }
@@ -74,11 +77,14 @@ class ConsensusConnectionIntTests: XCTestCase {
         }
     }
 
-    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
+    func invalidCredentialsReturnsAuthorizationFailure(
+    transportProtocol: TransportProtocol
+    ) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.consensusRequiresCredentials)
 
         let fixture = try Transaction.Fixtures.Default()
-        let connection = try createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol.http)
+        let connection = try createConsensusConnectionWithInvalidCredentials(
+                transportProtocol: .http)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -104,7 +110,9 @@ class ConsensusConnectionIntTests: XCTestCase {
     func trustRootWorks(transportProtocol: TransportProtocol) throws {
         let fixture = try Transaction.Fixtures.Default()
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
-        let connection = try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: trustRootsFixture.trustRootsBytes)
+        let connection = try createConsensusConnection(
+                transportProtocol: transportProtocol,
+                trustRoots: trustRootsFixture.trustRootsBytes)
 
         let expect = expectation(description: "Consensus connection")
         connection.proposeTx(fixture.tx, completion: {
@@ -160,7 +168,9 @@ class ConsensusConnectionIntTests: XCTestCase {
         try XCTSkipIf(true)
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection =
-            try createConsensusConnection(transportProtocol: transportProtocol, trustRoots: [trustRootsFixture.wrongTrustRootBytes])
+            try createConsensusConnection(
+                    transportProtocol: transportProtocol,
+                    trustRoots: [trustRootsFixture.wrongTrustRootBytes])
 
         let fixture = try Transaction.Fixtures.Default()
 
@@ -182,23 +192,34 @@ class ConsensusConnectionIntTests: XCTestCase {
 }
 
 extension ConsensusConnectionIntTests {
-    func createConsensusConnection(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
+    func createConsensusConnection(
+        transportProtocol: TransportProtocol
+    ) throws -> ConsensusConnection {
         let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
-    func createConsensusConnection(transportProtocol: TransportProtocol, trustRoots: [Data]) throws -> ConsensusConnection {
-        let networkConfig = try NetworkConfigFixtures.create(transportProtocol: transportProtocol, trustRoots: trustRoots)
+    func createConsensusConnection(
+        transportProtocol: TransportProtocol,
+        trustRoots: [Data]
+    ) throws -> ConsensusConnection {
+        let networkConfig = try NetworkConfigFixtures.create(
+                transportProtocol: transportProtocol,
+                trustRoots: trustRoots)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
-    func createConsensusConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> ConsensusConnection {
-        let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(using: transportProtocol)
+    func createConsensusConnectionWithInvalidCredentials(
+        transportProtocol: TransportProtocol
+    ) throws -> ConsensusConnection {
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(
+                using: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
 
     func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return ConsensusConnection(
             httpFactory: httpFactory,
