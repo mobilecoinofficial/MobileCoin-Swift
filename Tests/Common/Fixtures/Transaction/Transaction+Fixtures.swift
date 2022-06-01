@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable file_length multiline_function_chains force_unwrapping function_body_length
 
 import LibMobileCoin
 @testable import MobileCoin
