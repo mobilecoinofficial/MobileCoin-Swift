@@ -53,10 +53,10 @@ extension PartialTxOut {
               let publicKey = RistrettoPublic(txOutRecord.txOutPublicKeyData),
               [0, 4, 8].contains(txOutRecord.txOutAmountMaskedTokenID.count),
               let commitment = TxOutUtils.reconstructCommitment(
-                                                    maskedValue: txOutRecord.txOutAmountMaskedValue,
-                                                    maskedTokenId: txOutRecord.txOutAmountMaskedTokenID,
-                                                    publicKey: publicKey,
-                                                    viewPrivateKey: viewKey),
+                                            maskedValue: txOutRecord.txOutAmountMaskedValue,
+                                            maskedTokenId: txOutRecord.txOutAmountMaskedTokenID,
+                                            publicKey: publicKey,
+                                            viewPrivateKey: viewKey),
               Self.isCrc32Matching(commitment, txOutRecord: txOutRecord)
         else {
             return nil

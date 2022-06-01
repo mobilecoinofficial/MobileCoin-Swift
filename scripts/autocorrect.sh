@@ -21,7 +21,7 @@ if [[ -e "${SWIFT_LINT}" ]]; then
 
     echo "Found $count lintable files! Linting now.."
     $SWIFT_LINT autocorrect --use-script-input-files --config "$(git rev-parse --show-toplevel)/.swiftlint.yml"
-    $SWIFT_LINT --use-script-input-files --strict --config "$(git rev-parse --show-toplevel)/.swiftlint.yml"
+    #$SWIFT_LINT --use-script-input-files --strict --config "$(git rev-parse --show-toplevel)/.swiftlint.yml"
     RESULT=$? # swiftline exit value is number of errors
 
     if [ $RESULT -eq 0 ]; then

@@ -17,7 +17,9 @@ final class FogKeyImageHttpConnection: AttestedHttpConnection, FogKeyImageServic
         rngContext: Any? = nil
     ) {
         self.requester = requester
-        self.client = AuthHttpCallableClientWrapper(client: FogLedger_FogKeyImageAPIRestClient(), requester: self.requester)
+        self.client = AuthHttpCallableClientWrapper(
+                client: FogLedger_FogKeyImageAPIRestClient(),
+                requester: self.requester)
         super.init(
             client: self.client,
             requester: self.requester,

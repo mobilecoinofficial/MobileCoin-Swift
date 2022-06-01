@@ -16,7 +16,10 @@ public class RestApiRequester {
 }
 
 protocol Requester {
-    func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void)
+    func makeRequest<T: HTTPClientCall>(
+            call: T,
+            completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void
+        )
 }
 
 extension RestApiRequester: Requester {
@@ -24,7 +27,10 @@ extension RestApiRequester: Requester {
         .prefix(baseUrl.httpBasedUrl, pathComponents: [prefix, path])
     }
 
-    public func makeRequest<T: HTTPClientCall>(call: T, completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void) {
+    public func makeRequest<T: HTTPClientCall>(
+            call: T,
+            completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void
+    ) {
         guard let url = completeURL(path: call.path) else {
             let message = "Could not construct URL"
             logger.assertionFailure(message)
@@ -44,7 +50,12 @@ extension RestApiRequester: Requester {
             return
         }
 
-        requester.request(url: url, method: call.method, headers: request.allHTTPHeaderFields, body: request.httpBody) { result in
+        requester.request(
+                url: url,
+                method: call.method,
+                headers: request.allHTTPHeaderFields,
+                body: request.httpBody) { result in
+
             switch result {
             case .failure(let error):
                 logger.error(error.localizedDescription)
@@ -63,7 +74,10 @@ extension RestApiRequester: Requester {
                     return responsePayload
                 }()
 
-                let result = HttpCallResult(status: HTTPStatus(code: statusCode, message: ""), allHeaderFields: httpResponse.allHeaderFields, response: responsePayload)
+                let result = HttpCallResult(
+                        status: HTTPStatus(code: statusCode, message: ""),
+                        allHeaderFields: httpResponse.allHeaderFields,
+                        response: responsePayload)
                 completion(result)
             }
         }

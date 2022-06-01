@@ -28,15 +28,22 @@ class AccountKeyTests: XCTestCase {
             fogReportUrl: fixture.fogReportUrl,
             fogReportId: fixture.fogReportId,
             fogAuthoritySpki: fixture.fogAuthoritySpki))
-//        XCTAssertEqual(fixture.accountKey.publicAddress.serializedData.hexEncodedString(), fixture.publicAddress.serializedData.hexEncodedString())
-//        XCTAssertEqual(fixture.manualAccountKey.publicAddress.serializedData.hexEncodedString(), fixture.publicAddress.serializedData.hexEncodedString())
-//        XCTAssertEqual(fixture.manualAccountKey.viewPrivateKey.data.hexEncodedString(), fixture.accountKey.viewPrivateKey.data.hexEncodedString())
-        XCTAssertEqual(fixture.manualAccountKey.viewPrivateKey.data.hexEncodedString(), fixture.viewPrivateKey.data.hexEncodedString())
-        XCTAssertEqual(fixture.manualAccountKey.spendPrivateKey.data.hexEncodedString(), fixture.spendPrivateKey.data.hexEncodedString())
-        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.reportUrlString, fixture.fogReportUrl)
-        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.reportId, fixture.fogReportId)
-        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.authoritySpki.hexEncodedString(), fixture.fogAuthoritySpki.hexEncodedString())
-        XCTAssertEqual(fixture.manualAccountKey.fogInfo!.reportUrl.description, fixture.fogReportUrl)
+
+        let accountKey = fixture.manualAccountKey
+        XCTAssertEqual(
+                accountKey.viewPrivateKey.data.hexEncodedString(),
+                fixture.viewPrivateKey.data.hexEncodedString())
+        XCTAssertEqual(
+                accountKey.spendPrivateKey.data.hexEncodedString(),
+                fixture.spendPrivateKey.data.hexEncodedString())
+
+        let fogInfo = try XCTUnwrap(accountKey.fogInfo)
+        XCTAssertEqual(fogInfo.reportUrlString, fixture.fogReportUrl)
+        XCTAssertEqual(fogInfo.reportId, fixture.fogReportId)
+        XCTAssertEqual(
+                fogInfo.authoritySpki.hexEncodedString(),
+                fixture.fogAuthoritySpki.hexEncodedString())
+        XCTAssertEqual(fogInfo.reportUrl.description, fixture.fogReportUrl)
     }
 
     func testFromMnemonic() throws {

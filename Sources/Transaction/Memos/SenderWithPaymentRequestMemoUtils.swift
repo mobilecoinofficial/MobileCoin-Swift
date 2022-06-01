@@ -1,7 +1,6 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable closure_body_length
 
 import Foundation
 import LibMobileCoin
@@ -14,42 +13,50 @@ enum SenderWithPaymentRequestMemoUtils {
         receipientViewPrivateKey: RistrettoPrivate,
         txOutPublicKey: RistrettoPublic
     ) -> Bool {
-        memoData.asMcBuffer { memoDataPtr in
-            senderPublicAddress.withUnsafeCStructPointer { publicAddressPtr in
-                receipientViewPrivateKey.asMcBuffer { receipientViewPrivateKeyPtr in
-                    txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
-                        var matches = false
-                        let result = withMcError { errorPtr in
-                            mc_memo_sender_with_payment_request_memo_is_valid(
-                                memoDataPtr,
-                                publicAddressPtr,
-                                receipientViewPrivateKeyPtr,
-                                txOutPublicKeyPtr,
-                                &matches,
-                                &errorPtr)
-                        }
-                        switch result {
-                        case .success:
-                            return matches
-                        case .failure(let error):
-                            switch error.errorCode {
-                            case .invalidInput:
-                                // Safety: This condition indicates a programming error and can only
-                                // happen if arguments to mc_memo_sender_with_payment_request_memo_is_valid are
-                                // supplied incorrectly.
-                                logger.warning("error: \(redacting: error)")
-                                return false
-                            default:
-                                // Safety: mc_memo_sender_with_payment_request_memo_is_valid should not throw
-                                // non-documented errors.
-                                logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
-                                return false
-                            }
+        // using in-line function to keep closure levels lower
+        // swiftlint:disable closure_body_length
+        func ffiCall(
+            memoDataPtr: UnsafePointer<McBuffer>,
+            publicAddressPtr: UnsafePointer<McBuffer>
+        ) -> Bool {
+            receipientViewPrivateKey.asMcBuffer { receipientViewPrivateKeyPtr in
+                txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
+                    var matches = false
+                    let result = withMcError { errorPtr in
+                        mc_memo_sender_with_payment_request_memo_is_valid(
+                            memoDataPtr,
+                            publicAddressPtr,
+                            receipientViewPrivateKeyPtr,
+                            txOutPublicKeyPtr,
+                            &matches,
+                            &errorPtr)
+                    }
+                    switch result {
+                    case .success:
+                        return matches
+                    case .failure(let error):
+                        switch error.errorCode {
+                        case .invalidInput:
+                            // Safety: This condition indicates a programming error and can only
+                            // happen if arguments to the above FFI func are supplied incorrectly.
+                            logger.warning("error: \(redacting: error)")
+                            return false
+                        default:
+                            // Safety: mc_memo_sender_with_payment_request_memo_is_valid
+                            // should not throw non-documented errors.
+                            logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                            return false
                         }
                     }
                 }
             }
         }
+        return memoData.asMcBuffer { memoDataPtr in
+            senderPublicAddress.withUnsafeCStructPointer { publicAddressPtr in
+                ffiCall(memoDataPtr: memoDataPtr, publicAddressPtr: publicAddressPtr)
+            }
+        }
+        // swiftlint:enable closure_body_length
     }
 
     static func getAddressHash(
@@ -68,13 +75,14 @@ enum SenderWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_sender_with_payment_request_memo_get_address_hash are
+                    // happen if arguments to
+                    // mc_memo_sender_with_payment_request_memo_get_address_hash are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return Data16()
                 default:
-                    // Safety: mc_memo_sender_with_payment_request_memo_get_address_hash should not throw
-                    // non-documented errors.
+                    // Safety: mc_memo_sender_with_payment_request_memo_get_address_hash
+                    // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return Data16()
                 }
@@ -135,19 +143,18 @@ enum SenderWithPaymentRequestMemoUtils {
                     &errorPtr)
             }
             switch result {
-            case .success():
+            case .success:
                 return out_payment_request_id
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_sender_with_payment_request_memo_get_payment_request_id are
-                    // supplied incorrectly.
+                    // happen if arguments to the above FFI are supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_memo_sender_with_payment_request_memo_get_payment_request_id should not throw
-                    // non-documented errors.
+                    // Safety: mc_memo_sender_with_payment_request_memo_get_payment_request_id
+                    // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }

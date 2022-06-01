@@ -24,7 +24,7 @@ public enum MemoType {
             return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: id,
                 accountKey: accountKey)
-        case .customPaymentRequest(let sender, let id):
+        case let .customPaymentRequest(sender, id):
             return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: id,
                 accountKey: sender)
@@ -57,8 +57,13 @@ class TxOutMemoBuilder {
         DefaultMemoBuilder()
     }
 
-    static func createRecoverablePaymentRequestMemoBuilder(paymentRequestId: UInt64, accountKey: AccountKey) -> RecoverablePaymentRequestMemoBuilder {
-        RecoverablePaymentRequestMemoBuilder(paymentRequestId: paymentRequestId, accountKey: accountKey)
+    static func createRecoverablePaymentRequestMemoBuilder(
+            paymentRequestId: UInt64,
+            accountKey: AccountKey
+    ) -> RecoverablePaymentRequestMemoBuilder {
+        RecoverablePaymentRequestMemoBuilder(
+                paymentRequestId: paymentRequestId,
+                accountKey: accountKey)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
@@ -71,8 +76,10 @@ class TxOutMemoBuilder {
             return createDefaultMemoBuilder()
         case .recoverable(let sender):
             return createRecoverableMemoBuilder(accountKey: sender)
-        case .recoverablePaymentRequest(let sender, let id):
-            return createRecoverablePaymentRequestMemoBuilder(paymentRequestId: id, accountKey: sender)
+        case let .recoverablePaymentRequest(sender, id):
+            return createRecoverablePaymentRequestMemoBuilder(
+                    paymentRequestId: id,
+                    accountKey: sender)
         }
     }
 }

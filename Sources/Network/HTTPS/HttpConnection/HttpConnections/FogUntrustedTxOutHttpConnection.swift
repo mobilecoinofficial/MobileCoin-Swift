@@ -23,7 +23,10 @@ final class FogUntrustedTxOutHttpConnection: HttpConnection, FogUntrustedTxOutSe
         request: FogLedger_TxOutRequest,
         completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
     ) {
-        performCall(GetTxOutsCall(client: client, requester: self.requester), request: request, completion: completion)
+        performCall(
+                GetTxOutsCall(client: client, requester: self.requester),
+                request: request,
+                completion: completion)
     }
 }
 
