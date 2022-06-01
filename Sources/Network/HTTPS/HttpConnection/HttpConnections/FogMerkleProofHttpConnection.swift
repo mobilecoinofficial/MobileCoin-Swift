@@ -17,7 +17,9 @@ final class FogMerkleProofHttpConnection: AttestedHttpConnection, FogMerkleProof
         rngContext: Any? = nil
     ) {
         self.requester = requester
-        self.client = AuthHttpCallableClientWrapper(client: FogLedger_FogMerkleProofAPIRestClient(), requester: self.requester)
+        self.client = AuthHttpCallableClientWrapper(
+                client: FogLedger_FogMerkleProofAPIRestClient(),
+                requester: self.requester)
         super.init(
             client: self.client,
             requester: self.requester,

@@ -38,7 +38,12 @@ class AttestedHttpConnection: ConnectionProtocol {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) {
-        let inner = Inner(client: client, requester: requester, config: config, rng: rng, rngContext: rngContext)
+        let inner = Inner(
+                client: client,
+                requester: requester,
+                config: config,
+                rng: rng,
+                rngContext: rngContext)
         self.requester = requester
         self.inner = .init(inner, targetQueue: targetQueue)
     }
