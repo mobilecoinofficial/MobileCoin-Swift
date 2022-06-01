@@ -133,49 +133,83 @@ extension ProtocolConnectionFactory {
 }
 
 class EmptyConsensusService: ConsensusService, ConnectionProtocol, ConsensusServiceConnection {
-    func proposeTx(_ tx: External_Tx, completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void) {
+    func proposeTx(
+        _ tx: External_Tx,
+        completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
+typealias LastBlockInfoRespResult = Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>
 class EmptyBlockchainService: BlockchainService, ConnectionProtocol, BlockchainServiceConnection {
-    func getLastBlockInfo(completion: @escaping (Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>) -> Void) {
+    func getLastBlockInfo(
+        completion: @escaping (LastBlockInfoRespResult) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
 class EmptyFogViewService: FogViewService, ConnectionProtocol, FogViewServiceConnection {
-    func query(requestAad: FogView_QueryRequestAAD, request: FogView_QueryRequest, completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void) {
+    func query(
+        requestAad: FogView_QueryRequestAAD,
+        request: FogView_QueryRequest,
+        completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
-class EmptyFogMerkleProofService: FogMerkleProofService, ConnectionProtocol, FogMerkleProofServiceConnection {
-    func getOutputs(request: FogLedger_GetOutputsRequest, completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void) {
+class EmptyFogMerkleProofService: FogMerkleProofService,
+    ConnectionProtocol,
+    FogMerkleProofServiceConnection
+{
+    func getOutputs(
+            request: FogLedger_GetOutputsRequest,
+            completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
-class EmptyFogKeyImageService: FogKeyImageService, ConnectionProtocol, FogKeyImageServiceConnection {
-    func checkKeyImages(request: FogLedger_CheckKeyImagesRequest, completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void) {
+class EmptyFogKeyImageService: FogKeyImageService,
+    ConnectionProtocol,
+    FogKeyImageServiceConnection
+{
+    func checkKeyImages(
+        request: FogLedger_CheckKeyImagesRequest,
+        completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
 class EmptyFogBlockService: FogBlockService, ConnectionProtocol, FogBlockServiceConnection {
-    func getBlocks(request: FogLedger_BlockRequest, completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void) {
+    func getBlocks(
+        request: FogLedger_BlockRequest,
+        completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
-class EmptyFogUntrustedTxOutService: FogUntrustedTxOutService, ConnectionProtocol, FogUntrustedTxOutServiceConnection {
-    func getTxOuts(request: FogLedger_TxOutRequest, completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void) {
+class EmptyFogUntrustedTxOutService: FogUntrustedTxOutService,
+    ConnectionProtocol,
+    FogUntrustedTxOutServiceConnection
+{
+    func getTxOuts(
+        request: FogLedger_TxOutRequest,
+        completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
 
 class EmptyFogReportService: FogReportService {
-    func getReports(request: Report_ReportRequest, completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void) {
+    func getReports(
+        request: Report_ReportRequest,
+        completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void
+    ) {
         logger.assertionFailure("Not Implemented")
     }
 }
