@@ -33,7 +33,7 @@ extension MemoData.Fixtures {
             self.expectedMemoData = try Self.getExpectedMemoData()
             self.fee = Self.expectedFee
             self.totalOutlay = Self.expectedTotalOutlay
-            self.numberOfRecipients = Self.expectedNumberOfRecipients
+            self.numberOfRecipients = try XCTUnwrap(PositiveUInt8(1))
         }
     }
 
@@ -49,7 +49,7 @@ extension MemoData.Fixtures {
             self.expectedMemoData = try Self.getExpectedMemoData()
             self.fee = Self.expectedFee
             self.totalOutlay = Self.expectedTotalOutlay
-            self.numberOfRecipients = Self.expectedNumberOfRecipients
+            self.numberOfRecipients = try XCTUnwrap(PositiveUInt8(1))
         }
     }
 
@@ -185,7 +185,6 @@ extension MemoData.Fixtures.DefaultDestinationMemo {
 
     static let expectedFee: UInt64 = 3
     static let expectedTotalOutlay: UInt64 = 100
-    static let expectedNumberOfRecipients = PositiveUInt8(1)!
 
     static func getExpectedMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(
@@ -203,7 +202,6 @@ extension MemoData.Fixtures.DestinationZeroOutlayMemo {
 
     static let expectedFee: UInt64 = 0
     static let expectedTotalOutlay: UInt64 = 0
-    static let expectedNumberOfRecipients = PositiveUInt8(1)!
 
     static func getExpectedMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(

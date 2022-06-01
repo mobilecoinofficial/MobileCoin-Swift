@@ -17,11 +17,12 @@ extension AttestAke.Fixtures {
 
         let rng: @convention(c) (UnsafeMutableRawPointer?) -> UInt64 = testRngCallback
         let rngContext = TestRng()
-        let authRequestData = Self.authRequestData
+        let authRequestData: Data
         let responderId = Self.responderId
         let attestationVerifier: AttestationVerifier
 
         init() throws {
+            self.authRequestData = try XCTUnwrap(Data(base64Encoded: Self.authRequestDataBase64))
             self.attestationVerifier = try Self.attestationVerifier()
         }
     }
@@ -35,6 +36,7 @@ extension AttestAke.Fixtures {
         let attestationVerifier: AttestationVerifier
 
         init() throws {
+            self.authResponseData = try XCTUnwrap(Data(base64Encoded: authResponseDataBase64))
             let defaultFixture = try Default()
             self.attestAke = defaultFixture.attestAke
             let authRequestData = attestAke.authBeginRequestData(
@@ -68,13 +70,13 @@ extension AttestAke.Fixtures {
     struct BlankFirstMessage {
         let attestAkeCipher: AttestAke.Cipher
 
-        let binding = Self.binding
-
         let aad = Data()
         let plaintext = Data()
-        let encryptedData = Data(base64Encoded: "ChTwWj7piGKspsOpw4KlQg==")!
+        let encryptedData: Data
 
         init() throws {
+            self.binding = try XCTUnwrap(Data(base64Encoded: Self.bindingBase64))
+            self.encryptedData = try XCTUnwrap(Data(base64Encoded: "ChTwWj7piGKspsOpw4KlQg=="))
             self.attestAkeCipher = try AttestAke.Fixtures.DefaultAttested().attestAkeCipher
         }
     }
@@ -92,9 +94,9 @@ extension AttestAke.Fixtures.Default {
         AttestationVerifier(attestation: try attestation())
     }
 
-    fileprivate static let authRequestData = Data(base64Encoded:
-        "RirBiNYMxQ+67j/DCQxwrFSnQ56n2SFsouqfDh7wciA=")!
-    fileprivate static let authResponseData = Data(base64Encoded: """
+    fileprivate static let authRequestDataBase64 =
+        "RirBiNYMxQ+67j/DCQxwrFSnQ56n2SFsouqfDh7wciA="
+    fileprivate static let authResponseDataBase64 = """
         oXtZxPg/INwprEGoXPAfknmrqqTDvNJnrWNt6tzzW3rwSnsJD53vYPk2w8SLrrBIUWxBeE6IUFYbJo+F0jDouCKwdOV\
         skTBjmaKU+VDc3YnsCuoKnfH9KPozjAjrpYQ0KbnOHbFq5mxvKszT8HAjOzs/cOFa90jXHS8oDnpeFG+F1EGJFxqkPw\
         Ux+2ft7hurQY7GKb1MoWNaiXm3t2Al5Mino5qw2SKLQH/I8FYhNjf63DSc8v/0lPBl86lH4bDr2M5p0DF2qcz62aF8Z\
@@ -154,13 +156,13 @@ extension AttestAke.Fixtures.Default {
         0+LCJkrYNnLX5spOxYo3F5diNEC9WLl5Aj/1FiHxogXby6hLnrmF7Qi6cuE0c4oRz8HJS3D3GkakN+mOoeqmcANoBVk\
         zUh8XtLbbzSGTCu5it4jl0AAWMsT8lAWa3OKaikVCeEnw5re/068LKYpcMu3hmmr/lXS3qO4RZmKa9umd9dzxA0r1Nz\
         rmfJsARjcowRWBWOI0eLU/pyLzTg==
-        """)!
+        """
 
 }
 
 extension AttestAke.Fixtures.BlankFirstMessage {
 
-    fileprivate static let binding = Data(base64Encoded:
-        "DIhSTcCCj2c84OIZg0Dsy3xdFdzBPassZ8wgmIUDjY9vqk1P9Ts+v9T5K8EsSnxHGUEi3+UQYXWfv7b0Tg3MDw==")!
+    fileprivate static let bindingBase64 =
+        "DIhSTcCCj2c84OIZg0Dsy3xdFdzBPassZ8wgmIUDjY9vqk1P9Ts+v9T5K8EsSnxHGUEi3+UQYXWfv7b0Tg3MDw=="
 
 }
