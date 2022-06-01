@@ -195,7 +195,7 @@ extension FogBlockConnectionIntTests {
         transportProtocol: TransportProtocol
     ) throws -> FogBlockConnection {
         let networkConfig = try NetworkConfigFixtures.create(
-                transportProtocol: transportProtocol)
+                using: transportProtocol)
         return createFogBlockConnection(networkConfig: networkConfig)
     }
 
@@ -203,7 +203,7 @@ extension FogBlockConnectionIntTests {
         transportProtocol: TransportProtocol
     ) throws -> FogBlockConnection {
         let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(
-                transportProtocol: transportProtocol)
+                using: transportProtocol)
         return createFogBlockConnection(networkConfig: networkConfig)
     }
 

@@ -122,8 +122,8 @@ extension NetworkPreset {
             return .drakeley
         case .eran:
             return .eran
-        case .dynamic(let preset):
-            return .dynamic(preset)
+        case .dynamic:
+            return .dynamic
         }
     }
 }
