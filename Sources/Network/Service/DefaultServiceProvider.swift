@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable function_body_length
 
 import Foundation
 
@@ -26,7 +27,12 @@ final class DefaultServiceProvider: ServiceProvider {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
 
-        let inner = Inner(httpFactory: httpConnectionFactory, grpcFactory: grpcConnectionFactory, targetQueue: targetQueue, transportProtocolOption: networkConfig.transportProtocol.option)
+        let inner = Inner(
+                httpFactory: httpConnectionFactory,
+                grpcFactory: grpcConnectionFactory,
+                targetQueue: targetQueue,
+                transportProtocolOption: networkConfig.transportProtocol.option)
+
         self.inner = .init(inner, targetQueue: targetQueue)
 
         self.consensus = ConsensusConnection(
@@ -121,8 +127,8 @@ extension DefaultServiceProvider {
             httpFactory: HttpProtocolConnectionFactory,
             grpcFactory: GrpcProtocolConnectionFactory,
             targetQueue: DispatchQueue?,
-            transportProtocolOption: TransportProtocol.Option)
-        {
+            transportProtocolOption: TransportProtocol.Option
+        ) {
             self.httpFactory = httpFactory
             self.grpcFactory = grpcFactory
             self.targetQueue = targetQueue
