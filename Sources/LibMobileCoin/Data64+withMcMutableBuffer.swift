@@ -7,25 +7,33 @@ import LibMobileCoin
 
 extension Data64 {
     static func make(
-        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
+        withMcMutableBuffer body: (
+            UnsafeMutablePointer<McMutableBuffer>,
+            inout UnsafeMutablePointer<McError>?
+        ) -> Bool
     ) -> Result<Data64, LibMobileCoinError> {
         var bytes = Data64()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcError { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
-        }.map { bytes }
+        }
+        .map { bytes }
     }
 
     static func make(
-        withMcMutableBuffer body: (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
+        withMcMutableBuffer body: (
+            UnsafeMutablePointer<McMutableBuffer>,
+            inout UnsafeMutablePointer<McError>?
+        ) -> Int
     ) -> Result<Data64, LibMobileCoinError> {
         var bytes = Data64()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcErrorReturningArrayCount { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
-        }.map { numBytesReturned in
+        }
+        .map { numBytesReturned in
             guard numBytesReturned == 64 else {
                 // This condition indicates a programming error.
                 logger.fatalError(
