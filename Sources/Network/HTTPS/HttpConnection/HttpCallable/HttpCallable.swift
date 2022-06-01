@@ -13,7 +13,8 @@ public protocol HttpCallable {
     func call(
         request: Request,
         callOptions: HTTPCallOptions?,
-        completion: @escaping (HttpCallResult<Response>) -> Void)
+        completion: @escaping (HttpCallResult<Response>) -> Void
+    )
 }
 
 extension HttpCallable {

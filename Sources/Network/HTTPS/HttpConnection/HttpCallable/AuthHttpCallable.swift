@@ -11,7 +11,8 @@ protocol AuthHttpCallable {
     func auth(
         _ request: Attest_AuthMessage,
         callOptions: HTTPCallOptions?,
-        completion: @escaping (HttpCallResult<Attest_AuthMessage>) -> Void)
+        completion: @escaping (HttpCallResult<Attest_AuthMessage>) -> Void
+    )
 }
 
 protocol AuthHttpCallee {

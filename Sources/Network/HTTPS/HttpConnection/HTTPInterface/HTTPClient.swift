@@ -17,7 +17,15 @@ extension HTTPClient {
         request: Request,
         callOptions: HTTPCallOptions? = nil,
         responseType: Response.Type = Response.self
-    ) -> HTTPUnaryCall<Request, Response> where Request: SwiftProtobuf.Message, Response: SwiftProtobuf.Message {
-        HTTPUnaryCall(path: path, options: callOptions, requestPayload: request, responseType: responseType)
+    ) -> HTTPUnaryCall<
+            Request,
+            Response
+        > where Request: SwiftProtobuf.Message, Response: SwiftProtobuf.Message
+    {
+        HTTPUnaryCall(
+                path: path,
+                options: callOptions,
+                requestPayload: request,
+                responseType: responseType)
     }
 }
