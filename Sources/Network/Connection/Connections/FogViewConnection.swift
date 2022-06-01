@@ -5,7 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class FogViewConnection: Connection<GrpcProtocolConnectionFactory.FogViewServiceProvider, HttpProtocolConnectionFactory.FogViewServiceProvider>, FogViewService
+final class FogViewConnection: Connection<
+        GrpcProtocolConnectionFactory.FogViewServiceProvider,
+        HttpProtocolConnectionFactory.FogViewServiceProvider
+    >,
+    FogViewService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -62,9 +66,15 @@ final class FogViewConnection: Connection<GrpcProtocolConnectionFactory.FogViewS
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.query(requestAad: requestAad, request: request, completion: rotateURLOnError(completion))
+            grpcConnection.query(
+                    requestAad: requestAad,
+                    request: request,
+                    completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.query(requestAad: requestAad, request: request, completion: rotateURLOnError(completion))
+            httpConnection.query(
+                    requestAad: requestAad,
+                    request: request,
+                    completion: rotateURLOnError(completion))
         }
     }
 }

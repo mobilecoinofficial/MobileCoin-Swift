@@ -5,7 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class FogMerkleProofConnection: Connection<GrpcProtocolConnectionFactory.FogMerkleProofServiceProvider, HttpProtocolConnectionFactory.FogMerkleProofServiceProvider>, FogMerkleProofService
+final class FogMerkleProofConnection: Connection<
+        GrpcProtocolConnectionFactory.FogMerkleProofServiceProvider,
+        HttpProtocolConnectionFactory.FogMerkleProofServiceProvider
+    >,
+    FogMerkleProofService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory

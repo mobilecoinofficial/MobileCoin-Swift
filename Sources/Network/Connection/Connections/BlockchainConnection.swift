@@ -6,7 +6,11 @@ import Foundation
 import LibMobileCoin
 import SwiftProtobuf
 
-final class BlockchainConnection: Connection<GrpcProtocolConnectionFactory.BlockchainServiceProvider, HttpProtocolConnectionFactory.BlockchainServiceProvider>, BlockchainService
+final class BlockchainConnection: Connection<
+        GrpcProtocolConnectionFactory.BlockchainServiceProvider,
+        HttpProtocolConnectionFactory.BlockchainServiceProvider
+    >,
+    BlockchainService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory

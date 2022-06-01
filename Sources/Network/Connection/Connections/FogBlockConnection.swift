@@ -5,7 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class FogBlockConnection: Connection<GrpcProtocolConnectionFactory.FogBlockServiceProvider, HttpProtocolConnectionFactory.FogBlockServiceProvider>, FogBlockService
+final class FogBlockConnection: Connection<
+        GrpcProtocolConnectionFactory.FogBlockServiceProvider,
+        HttpProtocolConnectionFactory.FogBlockServiceProvider
+    >,
+    FogBlockService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory

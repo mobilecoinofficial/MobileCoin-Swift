@@ -7,7 +7,9 @@ class UrlLoadBalancer<MobileCoinUrlType: MobileCoinUrlProtocol> {
 
     var urlsTyped: [MobileCoinUrlType]
 
-    static func make(urls: [MobileCoinUrlType]) -> Result<UrlLoadBalancer<MobileCoinUrlType>, InvalidInputError> {
+    static func make(
+        urls: [MobileCoinUrlType]
+    ) -> Result<UrlLoadBalancer<MobileCoinUrlType>, InvalidInputError> {
         guard urls.isNotEmpty else {
             return .failure(InvalidInputError("url list cannot be empty"))
         }
@@ -18,6 +20,7 @@ class UrlLoadBalancer<MobileCoinUrlType: MobileCoinUrlProtocol> {
         urlsTyped = urls
     }
 
+    @available(*, unavailable)
     func nextUrl() -> MobileCoinUrlType {
         fatalError("abstract method must be overridden")
     }
