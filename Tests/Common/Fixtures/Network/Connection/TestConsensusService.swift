@@ -9,7 +9,10 @@ import LibMobileCoin
 struct TestConsensusService: ConsensusService {
     let result: Result<ConsensusCommon_ProposeTxResponse, ConnectionError>
 
-    func proposeTx(_ tx: External_Tx, completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void) {
+    func proposeTx(
+        _ tx: External_Tx,
+        completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void
+    ) {
         DispatchQueue.main.async {
             completion(self.result)
         }
