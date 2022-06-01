@@ -5,7 +5,7 @@
 @testable import MobileCoin
 import XCTest
 
-class HttpConnectionSessionTests: XCTestCase {
+class HttpConnectionSessionsTests: XCTestCase {
 
     func testAuth() throws {
         XCTAssertTrue(true)
@@ -61,7 +61,9 @@ class HttpConnectionSessionTests: XCTestCase {
         session.authorizationCredentials = fixture.credentials
         session.processResponse(headers: fixture.responseHeadersWithSetCookie1)
 
-        assertDictionariesEqualCaseInsensitively(session.requestHeaders, fixture.headersWithAuthAndCookie1)
+        assertDictionariesEqualCaseInsensitively(
+                session.requestHeaders,
+                fixture.headersWithAuthAndCookie1)
     }
 
     func assertDictionariesEqualCaseInsensitively(_ a: [String: String], _ b: [String: String]) {
