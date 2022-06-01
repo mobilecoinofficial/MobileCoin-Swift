@@ -8,11 +8,12 @@ import Foundation
 /// `blockCount`.
 public struct AccountActivity {
     public let txOuts: Set<OwnedTxOut>
-
     public let blockCount: UInt64
+    public let tokenId: TokenId
 
-    init(txOuts: [OwnedTxOut], blockCount: UInt64) {
+    init(txOuts: [OwnedTxOut], blockCount: UInt64, tokenId: TokenId) {
         self.txOuts = Set(txOuts)
         self.blockCount = blockCount
+        self.tokenId = tokenId
     }
 }

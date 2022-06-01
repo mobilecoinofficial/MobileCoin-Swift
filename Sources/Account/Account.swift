@@ -93,7 +93,7 @@ final class Account {
         let txOuts = allTxOutTrackers
             .compactMap { OwnedTxOut($0, atBlockCount: blockCount) }
             .filter { $0.tokenId == tokenId }
-        return AccountActivity(txOuts: txOuts, blockCount: blockCount)
+        return AccountActivity(txOuts: txOuts, blockCount: blockCount, tokenId: tokenId)
     }
     
     var ownedTxOuts: [KnownTxOut] {
