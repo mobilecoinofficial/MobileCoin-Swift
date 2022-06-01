@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable function_parameter_count
 
 @testable import MobileCoin
 import XCTest

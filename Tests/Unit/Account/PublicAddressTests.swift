@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable multiline_function_chains
 
 @testable import MobileCoin
 import XCTest
@@ -8,7 +9,7 @@ import XCTest
 class PublicAddressTests: XCTestCase {
     func testRootEntropy() throws {
         let rootEntropyHex = "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21"
-        let rootEntropy = Data(hexEncoded: rootEntropyHex)!
+        let rootEntropy = XCTUnwrap(Data(hexEncoded: rootEntropyHex))
         let fogUrl = "fog://fog.alpha.development.mobilecoin.com"
         let fogAuthoritySpkiB64Encoded = """
             MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyFOockvCEc9TcO1NvsiUfFVzvtDsR64UIRRU\
@@ -23,13 +24,13 @@ class PublicAddressTests: XCTestCase {
             sHKG+ZMCAwEAAQ==
             """
 
-        let fogAuthoritySpki = Data(base64Encoded: fogAuthoritySpkiB64Encoded)!
+        let fogAuthoritySpki = XCTUnwrap(Data(base64Encoded: fogAuthoritySpkiB64Encoded))
 
-        let key = try! AccountKey.make(
+        let key = XCTUnwrap(try AccountKey.make(
             rootEntropy: rootEntropy,
             fogReportUrl: fogUrl,
             fogReportId: "",
-            fogAuthoritySpki: fogAuthoritySpki).get()
+            fogAuthoritySpki: fogAuthoritySpki).get())
 
         let publicAddress = key.publicAddress
 
