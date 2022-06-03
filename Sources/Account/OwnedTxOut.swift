@@ -22,8 +22,6 @@ public struct OwnedTxOut {
     public let spentBlock: BlockMetadata?
 
     public let subaddressIndex: UInt64
-
-    public let sharedSecret: Data
     
     init(
         _ knownTxOut: KnownTxOut,
@@ -37,7 +35,6 @@ public struct OwnedTxOut {
         self.receivedBlock = receivedBlock
         self.spentBlock = spentBlock
         self.subaddressIndex = knownTxOut.subaddressIndex
-        self.sharedSecret = knownTxOut.sharedSecret.data
     }
 }
 

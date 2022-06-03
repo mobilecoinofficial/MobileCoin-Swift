@@ -8,8 +8,7 @@
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let dyanmicConfig = DynamicNetworkConfig.AlphaDevelopment.make()
-    static let network: NetworkPreset = .dynamic(dyanmicConfig)
+    static let network: NetworkPreset = .testNet
 }
 
 extension IntegrationTestFixtures {
@@ -25,40 +24,25 @@ extension IntegrationTestFixtures {
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
         let fogAuthoritySpki = try network.fogAuthoritySpki()
 
-        switch network {
-        case .dynamic(let preset):
-            let rootEntropies = network.testAccountRootEntropies
-            if rootEntropies.count > accountIndex {
-                let entropy = rootEntropies[accountIndex]
-                return try AccountKey.make(
-                    rootEntropy: entropy,
-                    fogReportUrl: network.fogReportUrl,
-                    fogReportId: network.fogReportId,
-                    fogAuthoritySpki: fogAuthoritySpki).get()
-            }
+        let mnemonics = network.testAccountsMnemonics
+        if mnemonics.count > accountIndex {
+            let mnemonic = mnemonics[accountIndex]
+            return try AccountKey.make(
+                mnemonic: mnemonic,
+                fogReportUrl: network.fogReportUrl,
+                fogReportId: network.fogReportId,
+                fogAuthoritySpki: fogAuthoritySpki).get()
+        }
 
-        default:
-            let mnemonics = network.testAccountsMnemonics
-            if mnemonics.count > accountIndex {
-                let mnemonic = mnemonics[accountIndex]
-                return try AccountKey.make(
-                    mnemonic: mnemonic,
-                    fogReportUrl: network.fogReportUrl,
-                    fogReportId: network.fogReportId,
-                    fogAuthoritySpki: fogAuthoritySpki).get()
-            }
-
-            let testAccountsPrivateKeys = network.testAccountsPrivateKeys
-            if testAccountsPrivateKeys.count > accountIndex {
-                let tuple = network.testAccountsPrivateKeys[accountIndex]
-                let (viewPrivateKey, spendPrivateKey) = tuple
-                return try AccountKey.make(
-                    viewPrivateKey: viewPrivateKey,
-                    spendPrivateKey: spendPrivateKey,
-                    fogReportUrl: network.fogReportUrl,
-                    fogReportId: network.fogReportId,
-                    fogAuthoritySpki: fogAuthoritySpki).get()
-            }
+        let testAccountsPrivateKeys = network.testAccountsPrivateKeys
+        if testAccountsPrivateKeys.count > accountIndex {
+            let (viewPrivateKey, spendPrivateKey) = network.testAccountsPrivateKeys[accountIndex]
+            return try AccountKey.make(
+                viewPrivateKey: viewPrivateKey,
+                spendPrivateKey: spendPrivateKey,
+                fogReportUrl: network.fogReportUrl,
+                fogReportId: network.fogReportId,
+                fogAuthoritySpki: fogAuthoritySpki).get()
         }
 
         throw TestingError(
