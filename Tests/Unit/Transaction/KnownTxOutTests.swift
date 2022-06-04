@@ -107,17 +107,5 @@ class KnownTxOutTests: XCTestCase {
         XCTAssertEqual(recovered.addressHash, senderAddressHash)
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
     }
-    
-    func testKnownTxOutShareSecret() throws {
-        let fixture = try KnownTxOut.Fixtures.GetSharedSecret()
-        let txOut = fixture.knownTxOut
-
-        let txOutSharedSecret = txOut.sharedSecret
-        let sharedSecret = try XCTUnwrap(TxOutUtils.sharedSecret(
-            viewPrivateKey: fixture.receiverAccountKey.viewPrivateKey,
-            publicKey: fixture.knownTxOut.publicKey))
         
-        XCTAssertEqual(sharedSecret.data.hexEncodedString(), sharedSecret.hexEncodedString())
-    }
-    
 }
