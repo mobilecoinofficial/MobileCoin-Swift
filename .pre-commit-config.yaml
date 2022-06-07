@@ -3,11 +3,15 @@ repos:
     hooks:
       - id: autocorrect
         name: autocorrect
-        entry: ./scripts/autocorrect.sh
+        entry: "./scripts/autocorrect.sh autocorrect"
         language: script
+        verbose: true
         files: \.swift$
-  - repo: https://github.com/realm/SwiftLint
-    rev: 0.46.0
+  - repo: local
     hooks:
-      - id: swiftlint
-        entry: "make lint-strict"
+      - id: linting
+        name: linting
+        entry: "./scripts/autocorrect.sh lint"
+        language: script
+        verbose: true
+        files: \.swift$
