@@ -25,6 +25,8 @@ public struct OwnedTxOut {
 
     public let sharedSecret: Data
 
+    let recoverableMemo: RecoverableMemo
+
     init(
         _ knownTxOut: KnownTxOut,
         receivedBlock: BlockMetadata,
@@ -38,6 +40,7 @@ public struct OwnedTxOut {
         self.spentBlock = spentBlock
         self.subaddressIndex = knownTxOut.subaddressIndex
         self.sharedSecret = knownTxOut.sharedSecret.data
+        self.recoverableMemo = knownTxOut.recoverableMemo
     }
 }
 
