@@ -12,13 +12,15 @@ extension ConnectionSession {
 
     func processCookieHeader(headers: [AnyHashable: Any]) {
         let http1Headers = Dictionary(
-            headers.compactMap({ (key: AnyHashable, value: Any) -> (name: String, value: String)? in
-                guard let name = key as? String else { return nil }
-                guard let value = value as? String else { return nil }
-                return (name:name, value:value)
-            })
-            .map { ($0.name.capitalized, $0.value) },
-            uniquingKeysWith: { k, _ in k })
+            headers
+                .compactMap({ (key: AnyHashable, value: Any) -> (name: String, value: String)? in
+                    guard let name = key as? String else { return nil }
+                    guard let value = value as? String else { return nil }
+                    return (name:name, value:value)
+                })
+                .map { ($0.name.capitalized, $0.value) },
+            uniquingKeysWith: { k, _ in k }
+        )
 
         let receivedCookies = HTTPCookie.cookies(
             withResponseHeaderFields: http1Headers,

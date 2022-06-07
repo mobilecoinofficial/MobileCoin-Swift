@@ -120,10 +120,11 @@ extension DefaultHttpRequester {
         case true:
             let indexes = matches.map { "\($0.index)" }
             let keys = matches.compactMap { $0.key.data }.map { "\($0.base64EncodedString() )" }
-            let message = "Success: pinned certificates matched with server's chain of trust " +
-                          "at index(es): " +
-                          "[\(indexes.joined(separator: ", "))] " +
-                          "\nwith key(s): \(keys.joined(separator: ", \n"))"
+            let message = """
+                    Success: pinned certificates matched with server's chain of trust
+                    at index(es): [\(indexes.joined(separator: ", "))] \
+                    with key(s): \(keys.joined(separator: ", \n"))
+                    """
             logger.debug(message)
             completionHandler(.useCredential, URLCredential(trust: trust))
         case false:
