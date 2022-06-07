@@ -28,8 +28,8 @@ extension RestApiRequester: Requester {
     }
 
     public func makeRequest<T: HTTPClientCall>(
-            call: T,
-            completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void
+        call: T,
+        completion: @escaping (HttpCallResult<T.ResponsePayload>) -> Void
     ) {
         guard let url = completeURL(path: call.path) else {
             let message = "Could not construct URL"
