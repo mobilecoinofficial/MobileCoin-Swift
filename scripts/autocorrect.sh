@@ -1,7 +1,8 @@
 #!/bin/bash
 
-pwd
-SWIFT_LINT=$(which swiftlint)
+MODE=$1
+
+SWIFT_LINT="$(git rev-parse --show-toplevel)/ExampleHTTP/Pods/SwiftLint/swiftlint"
 
 # Change directory to repo root
 cd "$(git rev-parse --show-toplevel)" || exit;
@@ -20,9 +21,8 @@ if [[ -e "${SWIFT_LINT}" ]]; then
         exit 0
     fi
 
-    echo "Found $count lintable files! Linting now.."
-    $SWIFT_LINT autocorrect --use-script-input-files --config "$(git rev-parse --show-toplevel)/.swiftlint.yml"
-    #$SWIFT_LINT --use-script-input-files --strict --config "$(git rev-parse --show-toplevel)/.swiftlint.yml"
+    echo "Found $count files! $MODE now.."
+    $SWIFT_LINT $MODE --use-script-input-files --strict --config "$(git rev-parse --show-toplevel)/.swiftlint.yml"
     RESULT=$? # swiftline exit value is number of errors
 
     if [ $RESULT -eq 0 ]; then
