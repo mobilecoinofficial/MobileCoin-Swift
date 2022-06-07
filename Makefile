@@ -162,10 +162,6 @@ lint-docs:
 
 # Swiftlint
 
-.PHONY: autocorrect
-autocorrect:
-	@PATH="./Example/Pods/SwiftLint:$$PATH" swiftlint autocorrect
-
 .PHONY: swiftlint
 swiftlint:
 	@PATH="./Example/Pods/SwiftLint:$$PATH" swiftlint
