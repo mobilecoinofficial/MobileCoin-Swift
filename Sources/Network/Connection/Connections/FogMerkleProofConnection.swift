@@ -5,15 +5,18 @@
 import Foundation
 import LibMobileCoin
 
-final class FogMerkleProofConnection:
-    Connection<GrpcProtocolConnectionFactory.FogMerkleProofServiceProvider, HttpProtocolConnectionFactory.FogMerkleProofServiceProvider>, FogMerkleProofService
+final class FogMerkleProofConnection: Connection<
+        GrpcProtocolConnectionFactory.FogMerkleProofServiceProvider,
+        HttpProtocolConnectionFactory.FogMerkleProofServiceProvider
+    >,
+    FogMerkleProofService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
-    private let rngContext: Any? 
+    private let rngContext: Any?
 
     init(
         httpFactory: HttpProtocolConnectionFactory,

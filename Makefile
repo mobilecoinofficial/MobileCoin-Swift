@@ -86,6 +86,10 @@ clean-example-http: clean-docs
 .PHONY: lint
 lint: swiftlint
 
+.PHONY: lint-strict
+lint-strict: 
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict
+
 .PHONY: lint-all
 lint-all: lint lint-circleci lint-podspec lint-docs
 
@@ -115,7 +119,7 @@ lint-podspec:
 .PHONY: publish-podspec
 publish-podspec:
 	cd Example; bundle exec pod repo update;
-	bundle exec pod trunk push MobileCoin.podspec --skip-tests --allow-warnings
+	bundle exec pod trunk push MobileCoin.podspec --skip-tests
 
 # CircleCI
 

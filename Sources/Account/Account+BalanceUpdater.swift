@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable closure_body_length multiline_function_chains
 
 import Foundation
 import LibMobileCoin
@@ -44,7 +45,9 @@ extension Account {
         func updateBalances(completion: @escaping (Result<Balances, BalanceUpdateError>) -> Void) {
             logger.info("Updating balance...", logFunction: false)
             checkForNewTxOuts {
-                guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
+                guard $0.mapError({
+                    .connectionError($0)
+                }).successOr(completion: completion) != nil else {
                     logger.warning(
                         "Failed to update balance: checkForNewTxOuts error: \($0)",
                         logFunction: false)
@@ -52,26 +55,31 @@ extension Account {
                 }
 
                 self.checkForSpentTxOuts {
-                    guard $0.mapError({.connectionError($0)}).successOr(completion: completion) != nil else {
+                    guard $0.mapError({
+                        .connectionError($0)
+                    }).successOr(completion: completion) != nil else {
                         logger.warning(
                             "Failed to update balance: checkForSpentTxOuts error: \($0)",
                             logFunction: false)
                         return
                     }
-                    
-                    let fogInSync = account.accessWithoutLocking.syncCheckerLock.readSync({ $0.inSync() })
-                    guard fogInSync.mapError({.fogSyncError($0)}).successOr(completion: completion) != nil else {
+
+                    let fogInSync = account.accessWithoutLocking.syncCheckerLock.readSync({
+                        $0.inSync()
+                    })
+                    guard fogInSync.mapError({
+                        .fogSyncError($0)
+                    }).successOr(completion: completion) != nil else {
                         logger.warning(
                             "Failed to update balance: checkForSpentTxOuts error: \(fogInSync)",
                             logFunction: false)
                         return
                     }
-                    
-                    
+
                     let balances = self.account.readSync { account in
                         account.cachedBalances
                     }
-                    
+
                     logger.info(
                         "Balance updates successful. balances: \(redacting: balances)",
                         logFunction: false)

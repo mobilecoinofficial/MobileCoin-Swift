@@ -2,19 +2,19 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 class SenderMemoTests: XCTestCase {
     func testSenderMemoCreate() throws {
         let fixture = try MemoData.Fixtures.SenderMemo()
-        
+
         let memoData = try XCTUnwrap(
             SenderMemoUtils.create(
                 senderAccountKey: fixture.senderAccountKey,
                 receipientPublicAddress: fixture.recieverAccountKey.publicAddress,
                 txOutPublicKey: fixture.txOutPublicKey))
-        
+
         XCTAssertEqual(
             memoData.data.hexEncodedString(),
             fixture.expectedMemoData.hexEncodedString())
@@ -31,7 +31,7 @@ class SenderMemoTests: XCTestCase {
             SenderMemoUtils.getAddressHash(memoData: memoData),
             fixture.senderAccountKey.publicAddress.calculateAddressHash())
     }
-    
+
     func testInvalidSenderMemoCreateFails() throws {
         let fixture = try MemoData.Fixtures.InvalidSenderMemo()
 
@@ -42,16 +42,16 @@ class SenderMemoTests: XCTestCase {
                 receipientViewPrivateKey: fixture.recieverAccountKey.subaddressViewPrivateKey,
                 txOutPublicKey: fixture.txOutPublicKey),
             "Expected isValid to be false for invalidMemoData")
-        
+
         XCTAssertNotEqual(
             SenderMemoUtils.getAddressHash(memoData: fixture.invalidMemoData),
             fixture.senderAccountKey.publicAddress.calculateAddressHash(),
             "AddressHash values should not match for invalid memo data")
     }
-    
+
     func testSenderMemoWrongPrivateViewKeyInvalidates() throws {
         let fixture = try MemoData.Fixtures.SenderMemoInvalidates()
-        
+
         XCTAssertFalse(
             SenderMemoUtils.isValid(
                 memoData: fixture.memoData,
@@ -60,10 +60,10 @@ class SenderMemoTests: XCTestCase {
                 txOutPublicKey: fixture.txOutPublicKey),
             "Expected isValid to be `false` for incorrect private view key")
     }
-    
+
     func testSenderMemoWrongSenderAddressInvalidates() throws {
         let fixture = try MemoData.Fixtures.SenderMemoInvalidates()
-        
+
         XCTAssertFalse(
             SenderMemoUtils.isValid(
                 memoData: fixture.memoData,
@@ -72,10 +72,10 @@ class SenderMemoTests: XCTestCase {
                 txOutPublicKey: fixture.txOutPublicKey),
             "Expected isValid to be `false` for incorrect senderPublicAddress")
     }
-    
+
     func testSenderMemoWrongPublicAddressInvalidates() throws {
         let fixture = try MemoData.Fixtures.SenderMemoInvalidates()
-        
+
         XCTAssertFalse(
             SenderMemoUtils.isValid(
                 memoData: fixture.memoData,
@@ -84,5 +84,5 @@ class SenderMemoTests: XCTestCase {
                 txOutPublicKey: fixture.badTxOutPublicKey),
             "Expected isValid to be `false` for incorrect txOutPublicKey")
     }
-    
+
 }

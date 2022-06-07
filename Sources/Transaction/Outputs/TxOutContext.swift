@@ -8,15 +8,15 @@ public struct TxOutContext {
     let txOut: TxOut
     public let receipt: Receipt
     let sharedSecret: RistrettoPublic
-    
+
     public var sharedSecretBytes: Data {
         sharedSecret.data
     }
-    
+
     public var txOutPublicKey: Data {
         txOut.publicKey.data
     }
-    
+
     var confirmation: TxOutConfirmationNumber {
         receipt.confirmationNumber
     }

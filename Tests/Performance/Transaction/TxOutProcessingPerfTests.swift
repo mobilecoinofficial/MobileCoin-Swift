@@ -5,8 +5,8 @@
 import Foundation
 @testable import MobileCoin
 
-class TxOutProcessingPerfTests : PerformanceTestCase {
-    
+class TxOutProcessingPerfTests: PerformanceTestCase {
+
     func testPerformanceTxOutTokenIdsSet() throws {
         let fixture = try TxOut.Fixtures.RandomTxOuts(number: 10_000)
         measure {
@@ -14,7 +14,7 @@ class TxOutProcessingPerfTests : PerformanceTestCase {
             print("number of tokens \(tokenIds.count)")
         }
     }
-    
+
     func testPerformanceTxOutTokenIdsSetXL() throws {
         let fixture = try TxOut.Fixtures.RandomTxOuts(number: 1_000_000)
         measure {
@@ -22,14 +22,14 @@ class TxOutProcessingPerfTests : PerformanceTestCase {
             print("number of tokens \(tokenIds.count)")
         }
     }
-    
+
     func testPerformanceTxOutBalancesExtreme() throws {
         // The slowest part of this process is creating the Balance struct,
         // the filtering and creating the Set<TokenId> is fast.
         // This essentially creates 5000 Balances.
         let fixture = try TxOut.Fixtures.RandomTxOuts(number: 5000)
         let knowableBlockCount = fixture.knowableBlockCount
-        
+
         measure {
             let balances = Self.cachedBalances(
                 txOuts: fixture.txOuts,
@@ -37,13 +37,13 @@ class TxOutProcessingPerfTests : PerformanceTestCase {
             print("number of balances \(balances.balances.count)")
         }
     }
-    
+
     func testPerformanceTxOutBalancesRealWorldExtreme() throws {
         // This is a more real-world test where the user may have 1_000_000 txOuts but spread over
         // 10 possible tokens.
         let fixture = try TxOut.Fixtures.RealWorldTxOuts(number: 1_000_000, possibleTokens: 10)
         let knowableBlockCount = fixture.knowableBlockCount
-        
+
         measure {
             let balances = Self.cachedBalances(
                 txOuts: fixture.txOuts,
@@ -55,7 +55,7 @@ class TxOutProcessingPerfTests : PerformanceTestCase {
 
 extension TxOutProcessingPerfTests {
     static func cachedTokenIds(txOuts: [MockOwnedTxOut]) -> Set<TokenId> {
-        return Set(txOuts.map { $0.tokenId })
+        Set(txOuts.map { $0.tokenId })
     }
 
     static func cachedBalance(

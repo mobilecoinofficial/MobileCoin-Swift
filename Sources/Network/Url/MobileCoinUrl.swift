@@ -60,9 +60,9 @@ struct MobileCoinUrl<Scheme: MobileCoin.Scheme>: MobileCoinUrlProtocol {
             return .failure(InvalidInputError("String url array cannot be empty"))
         }
 
-        var mcUrls:[MobileCoinUrl] = []
+        var mcUrls: [MobileCoinUrl] = []
         for string in strings {
-            let result = make(string:string)
+            let result = make(string: string)
             switch result {
             case .success(let mcUrl):
                 mcUrls.append(mcUrl)

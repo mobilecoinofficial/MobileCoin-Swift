@@ -4,4 +4,4 @@
 
 import Foundation
 
-class HttpProtocolConnectionFactory : ProtocolConnectionFactory {}
+class HttpProtocolConnectionFactory: ProtocolConnectionFactory {}

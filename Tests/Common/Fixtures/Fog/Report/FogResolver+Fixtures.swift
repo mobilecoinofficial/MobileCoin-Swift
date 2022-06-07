@@ -34,7 +34,7 @@ extension FogResolver.Fixtures {
             }
         }
     }
-    
+
     struct TxOutMemo {
         let fogResolver: FogResolver
 
@@ -468,4 +468,3 @@ extension FogResolver.Fixtures.TxOutMemo {
 //    private static let reportPubkeyExpiry: UInt64 = 1462
 
 }
-

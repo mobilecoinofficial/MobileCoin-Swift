@@ -342,8 +342,11 @@ extension AttestedGrpcConnection {
         {
             switch callResult {
             case .failure(let error):
-                return .failure(.connectionError(
-                                .connectionFailure("url: \(url), error: \(error.localizedDescription)")))
+                return .failure(
+                        .connectionError(
+                            .connectionFailure(
+                                "url: \(url), " +
+                                "error: \(error.localizedDescription)")))
             case .success(let callResponse):
                 // Basic credential authorization failure
                 guard callResponse.status.code != .unauthenticated else {

@@ -74,7 +74,9 @@ struct TransactionSubmitter {
              .membershipProofValidationError, .keyError, .unsortedInputs,
              .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
              .unsortedOutputs:
-            return .failure(.invalidTransaction("Error Code: \(response.result) (\(response.result.rawValue))"))
+            return .failure(.invalidTransaction(
+                        "Error Code: \(response.result) " +
+                        "(\(response.result.rawValue))"))
         case .txFeeError:
             return .failure(.feeError())
         case .tombstoneBlockTooFar:
@@ -108,8 +110,6 @@ extension ConsensusCommon_ProposeTxResult {
     /**
      * The name of the enumeration (as written in case).
      */
-    var name: String {
-        get { return String(describing: self) }
-    }
+    var name: String { String(describing: self) }
 
 }

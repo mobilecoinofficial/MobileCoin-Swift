@@ -17,7 +17,7 @@ extension IntegrationTestFixtures {
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -40,7 +40,7 @@ extension IntegrationTestFixtures {
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -62,8 +62,8 @@ extension IntegrationTestFixtures {
         fogUrlLoadBalancer.rotationEnabled = false
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
-        
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -86,7 +86,7 @@ extension IntegrationTestFixtures {
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -109,7 +109,7 @@ extension IntegrationTestFixtures {
 
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
 
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -132,7 +132,7 @@ extension IntegrationTestFixtures {
 
         let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsFogUrlBalancer
 
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -155,7 +155,7 @@ extension IntegrationTestFixtures {
 
         let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsFogUrlBalancer
 
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(
+        let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
@@ -172,7 +172,7 @@ extension IntegrationTestFixtures {
 
     static func createConsensusConnectionWithInvalidUrls(transportProtocol: TransportProtocol)
     throws -> ConsensusConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidUrls(
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidUrls(
             using: transportProtocol)
         return createConsensusConnection(networkConfig: networkConfig)
     }
@@ -190,7 +190,7 @@ extension IntegrationTestFixtures {
 
     static func createFogBlockConnectionWithInvalidUrls(using transportProtocol: TransportProtocol)
     throws -> FogBlockConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidUrls(
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidUrls(
             using: transportProtocol)
         return createFogBlockConnection(networkConfig: networkConfig)
     }

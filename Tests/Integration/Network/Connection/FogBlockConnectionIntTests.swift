@@ -19,7 +19,9 @@ class FogBlockConnectionIntTests: XCTestCase {
         let expect = expectation(description: "Fog GetBlocks request")
         let fixtures = FogBlockConnection.Fixtures.Default()
         let request = fixtures.request
-        try createFogBlockConnection(transportProtocol: transportProtocol).getBlocks(request: request) {
+        try createFogBlockConnection(
+            transportProtocol: transportProtocol
+        ).getBlocks(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             print("numBlocks: \(response.numBlocks)")
@@ -52,7 +54,9 @@ class FogBlockConnectionIntTests: XCTestCase {
 
         var request = FogLedger_BlockRequest()
         request.rangeValues = [0..<1]
-        try createFogBlockConnection(transportProtocol: transportProtocol).getBlocks(request: request) {
+        try createFogBlockConnection(
+            transportProtocol: transportProtocol
+        ).getBlocks(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.blocks.count, request.ranges.count)
@@ -80,7 +84,9 @@ class FogBlockConnectionIntTests: XCTestCase {
     func getBlocksReturnsNoBlocksWithoutRange(transportProtocol: TransportProtocol) throws {
         let expect = expectation(description: "Fog GetBlocks request")
 
-        try createFogBlockConnection(transportProtocol: transportProtocol).getBlocks(request: FogLedger_BlockRequest()) {
+        try createFogBlockConnection(
+            transportProtocol: transportProtocol
+        ).getBlocks(request: FogLedger_BlockRequest()) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.blocks.count, 0)
@@ -103,7 +109,9 @@ class FogBlockConnectionIntTests: XCTestCase {
 
         var request = FogLedger_BlockRequest()
         request.rangeValues = [0..<0]
-        try createFogBlockConnection(transportProtocol: transportProtocol).getBlocks(request: request) {
+        try createFogBlockConnection(
+            transportProtocol: transportProtocol
+        ).getBlocks(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.blocks.count, 0)
@@ -131,7 +139,9 @@ class FogBlockConnectionIntTests: XCTestCase {
             request.rangeValues = [0..<UInt64.max]
 
             group.enter()
-            try createFogBlockConnection(transportProtocol: transportProtocol).getBlocks(request: request) {
+            try createFogBlockConnection(
+                transportProtocol: transportProtocol
+            ).getBlocks(request: request) {
                 guard let response = $0.successOrLeaveGroup(group) else { return }
 
                 XCTAssertEqual(response.blocks.count, 0)
@@ -153,14 +163,18 @@ class FogBlockConnectionIntTests: XCTestCase {
         }
     }
 
-    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
+    func invalidCredentialsReturnsAuthorizationFailure(
+        transportProtocol: TransportProtocol
+    ) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog GetBlocks request")
 
         var request = FogLedger_BlockRequest()
         request.rangeValues = [1..<2]
-        try createFogBlockConnectionWithInvalidCredentials(transportProtocol: transportProtocol).getBlocks(request: request) {
+        try createFogBlockConnectionWithInvalidCredentials(
+            transportProtocol: transportProtocol
+        ).getBlocks(request: request) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
 
             switch error {
@@ -177,18 +191,25 @@ class FogBlockConnectionIntTests: XCTestCase {
 }
 
 extension FogBlockConnectionIntTests {
-    func createFogBlockConnection(transportProtocol: TransportProtocol) throws -> FogBlockConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol: transportProtocol)
+    func createFogBlockConnection(
+        transportProtocol: TransportProtocol
+    ) throws -> FogBlockConnection {
+        let networkConfig = try NetworkConfigFixtures.create(
+                using: transportProtocol)
         return createFogBlockConnection(networkConfig: networkConfig)
     }
 
-    func createFogBlockConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> FogBlockConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
+    func createFogBlockConnectionWithInvalidCredentials(
+        transportProtocol: TransportProtocol
+    ) throws -> FogBlockConnection {
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(
+                using: transportProtocol)
         return createFogBlockConnection(networkConfig: networkConfig)
     }
 
     func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogBlockConnection(
             httpFactory: httpFactory,

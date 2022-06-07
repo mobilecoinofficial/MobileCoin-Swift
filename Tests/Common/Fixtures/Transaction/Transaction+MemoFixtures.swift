@@ -1,28 +1,30 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable file_length
 
 import Foundation
 @testable import MobileCoin
 import XCTest
 
+extension Transaction { }
 
 extension Transaction.Fixtures {
     struct TxOutMemo {
         let senderAccountKey: AccountKey
         let recipientAccountKey: AccountKey
-        
+
         let inputs: [PreparedTxInput]
         let txOuts: [TxOut]
         let membershipProofs: [TxOutMembershipProof]
         let fee = Self.fee
-        let amount = PositiveUInt64(1)!
+        let amount: PositiveUInt64
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
         let globalIndex: UInt64
         let blockMetadata: BlockMetadata
         let blockVersion: BlockVersion
-        
+
         var totalOutlay: UInt64 {
             fee.value + amount.value
         }
@@ -30,6 +32,7 @@ extension Transaction.Fixtures {
         init() throws {
             self.inputs = try Self.inputs()
             self.txOuts = try Self.nativeTxOuts()
+            self.amount = try XCTUnwrap(PositiveUInt64(1))
             self.membershipProofs = try Self.txOutMembershipProofs()
             self.senderAccountKey = try Self.senderAccountKey()
             self.recipientAccountKey = try Self.recipientAccountKey()
@@ -42,10 +45,11 @@ extension Transaction.Fixtures {
 }
 
 extension Transaction.Fixtures.TxOutMemo {
-    
+
     fileprivate static let blockVersion = BlockVersion.minRTHEnabled
 
     static let realIndex = 3
+
     static func realKnownTxOut() throws -> KnownTxOut {
         let senderKey = try senderAccountKey()
         let txOuts = try nativeTxOuts()
@@ -54,7 +58,7 @@ extension Transaction.Fixtures.TxOutMemo {
                             PartialTxOut(realTxOut), globalIndex: globalIndex, block: blockMetadata)
         return try XCTUnwrap(KnownTxOut(ledgerTxOut, accountKey: senderKey))
     }
-    
+
     static let globalIndex: UInt64 = 100011
     static let blockMetadata: BlockMetadata = {
         BlockMetadata(
@@ -63,15 +67,15 @@ extension Transaction.Fixtures.TxOutMemo {
                 timestamp: Date(timeIntervalSince1970: 1602883052.0))
         )
     }()
-    
+
     fileprivate static func inputs() throws -> [PreparedTxInput] {
         let senderKey = try senderAccountKey()
         let txOuts = try nativeTxOuts()
         let membershipProofs = try txOutMembershipProofs()
-        
+
         let realTxOut = txOuts[realIndex]
         let partialTxOut = PartialTxOut(realTxOut)
-        
+
         let ledgerTxOut = LedgerTxOut(partialTxOut, globalIndex: globalIndex, block: blockMetadata)
         let knownTxOut = try XCTUnwrap(KnownTxOut(
                                             ledgerTxOut,
@@ -81,11 +85,11 @@ extension Transaction.Fixtures.TxOutMemo {
 
         return [try PreparedTxInput.make(knownTxOut: knownTxOut, ring: ring).get()]
     }
-    
-    static let fee: Amount = Amount(value: 1, tokenId: .MOB)
-    
+
+    static let fee = Amount(value: 1, tokenId: .MOB)
+
     static let tombstoneBlockIndex: UInt64 = 2000
-    
+
     fileprivate static let fogAlphaUri = "fog://fog.alpha.mobilecoin.com/"
 
     private static func fogReportUrl() throws -> FogUrl {
@@ -109,10 +113,10 @@ extension Transaction.Fixtures.TxOutMemo {
         serializedNativeTxOut8,
         serializedNativeTxOut9,
         serializedNativeTxOut10,
-        serializedNativeTxOut11
-       ].map {
+        serializedNativeTxOut11,
+        ].map {
             try XCTUnwrap(TxOut(serializedData: XCTUnwrap(Data(hexEncoded: $0))))
-       }
+        }
     }
 
     static func txOutMembershipProofs() throws -> [TxOutMembershipProof] {
@@ -127,25 +131,27 @@ extension Transaction.Fixtures.TxOutMemo {
         serializedTxOutMembershipProof8,
         serializedTxOutMembershipProof9,
         serializedTxOutMembershipProof10,
-        serializedTxOutMembershipProof11
-       ].map {
+        serializedTxOutMembershipProof11,
+        ].map {
             try XCTUnwrapSuccess(
                 TxOutMembershipProof.make(serializedData: XCTUnwrap(Data(hexEncoded: $0))))
         }
     }
 
     fileprivate static func recipientAccountKey() throws -> AccountKey {
-        try XCTUnwrap(AccountKey(serializedData: Data(hexEncoded: recipientAccountKeyHex)!))
+        try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: recipientAccountKeyHex))))
     }
 
     fileprivate static func senderAccountKey() throws -> AccountKey {
-        try XCTUnwrap(AccountKey(serializedData: Data(hexEncoded: senderAccountKeyHex)!))
+        try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: senderAccountKeyHex))))
     }
-    
+
 }
-    
+
 extension Transaction.Fixtures.TxOutMemo {
-        
+
     static let serializedNativeTxOut1 =
         """
         0a2d0a220a2096d8617e40ed91a2d64e178eaa094e368d79ba99e0e4635e8eb4\
@@ -641,7 +647,7 @@ extension Transaction.Fixtures.TxOutMemo {
         c85a045255494e04a9a81646369ce7a10e08da6fae27333ec0c16c8a74d93779\
         a9e055395078d0b07286f9930203010001
         """
-    
+
     static let recipientAccountKeyHex =
         """
         0a220a20553a1c51c1e91d3105b17c909c163f8bc6faf93718deb06e5b9fdb9a\

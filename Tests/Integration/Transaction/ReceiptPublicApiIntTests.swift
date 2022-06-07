@@ -14,7 +14,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
     }
 
     func serializedData(transportProtocol: TransportProtocol) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Testing Receipt serialization")
@@ -42,10 +42,12 @@ class ReceiptPublicApiIntTests: XCTestCase {
             try validateAndUnmaskValueAccepts(transportProtocol: transportProtocol)
         }
     }
-    
+
     func validateAndUnmaskValueAccepts(transportProtocol: TransportProtocol) throws {
         let accountKey = try IntegrationTestFixtures.createAccountKey()
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol)
 
         let expect = expectation(description: "testing confirmation number")
         client.updateBalance {
@@ -73,12 +75,14 @@ class ReceiptPublicApiIntTests: XCTestCase {
             try validateAndUnmaskValueRejects(transportProtocol: transportProtocol)
         }
     }
-    
+
     func validateAndUnmaskValueRejects(transportProtocol: TransportProtocol) throws {
         let accountKey = try IntegrationTestFixtures.createAccountKey()
         let accountKey2 = try IntegrationTestFixtures.createAccountKey(accountIndex: 2)
         let accountKey3 = try IntegrationTestFixtures.createAccountKey(accountIndex: 3)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol)
 
         let expect = expectation(description: "testing confirmation number")
         client.updateBalance {

@@ -78,7 +78,7 @@ extension TxOut.Fixtures {
         let knowableBlockCount = UInt64(100)
 
         init(number: UInt64) throws {
-            self.txOuts = [UInt64](0..<number).map({ value in
+            self.txOuts = [UInt64](0..<number).map({ _ in
                 Self.createRandomTxOut()
             })
         }
@@ -118,7 +118,7 @@ struct MockOwnedTxOut {
     let value: UInt64
 
     let tokenId: TokenId
-    
+
     init(
         value: UInt64,
         tokenId: TokenId

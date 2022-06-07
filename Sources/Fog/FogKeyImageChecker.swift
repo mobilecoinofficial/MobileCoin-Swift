@@ -12,7 +12,11 @@ struct FogKeyImageChecker {
     private let fogKeyImageService: FogKeyImageService
     private let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
-    init(fogKeyImageService: FogKeyImageService, targetQueue: DispatchQueue?, syncChecker: ReadWriteDispatchLock<FogSyncCheckable>) {
+    init(
+        fogKeyImageService: FogKeyImageService,
+        targetQueue: DispatchQueue?,
+        syncChecker: ReadWriteDispatchLock<FogSyncCheckable>
+    ) {
         self.serialQueue = DispatchQueue(label: "com.mobilecoin.\(Self.self)", target: targetQueue)
         self.fogKeyImageService = fogKeyImageService
         self.syncCheckerLock = syncChecker

@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable file_length multiline_function_chains force_unwrapping function_body_length
 
 import LibMobileCoin
 @testable import MobileCoin
@@ -27,7 +28,7 @@ extension Transaction.Fixtures {
             self.fogResolver = try Self.fogResolver()
         }
     }
-    
+
     struct ExactChange {
         let inputs: [PreparedTxInput]
         let accountKey: AccountKey
@@ -403,7 +404,7 @@ extension Transaction.Fixtures.BuildTx {
             efNlL0LAAGilmb2c6Ly9mb2ctaW5nZXN0Lm1vYmlsZWRldi5tb2JpbGVjb2luLmNvbSoUI+nfq9r3TGlCjsDfrB\
             V4Tu3HRm4=
             """)!))
-        
+
         return try AccountKey.make(
             viewPrivateKey: rootAccountKey.viewPrivateKey,
             spendPrivateKey: rootAccountKey.spendPrivateKey,
@@ -427,7 +428,7 @@ extension Transaction.Fixtures.BuildTx {
         ]
     }
 
-    fileprivate static let fee: Amount = Amount(10_000_000_000, in: .MOB)
+    fileprivate static let fee = Amount(10_000_000_000, in: .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 610
 
@@ -479,7 +480,7 @@ extension Transaction.Fixtures.Default {
         ]
     }
 
-    fileprivate static let fee: Amount = Amount(10_000_000_000, in: .MOB)
+    fileprivate static let fee = Amount(10_000_000_000, in: .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 634
 

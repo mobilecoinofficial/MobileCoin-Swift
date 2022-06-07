@@ -7,27 +7,33 @@ import LibMobileCoin
 
 extension Data66 {
     static func make(
-        withMcMutableBuffer body:
-            (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Bool
+        withMcMutableBuffer body: (
+            UnsafeMutablePointer<McMutableBuffer>,
+            inout UnsafeMutablePointer<McError>?
+        ) -> Bool
     ) -> Result<Data66, LibMobileCoinError> {
         var bytes = Data66()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcError { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
-        }.map { bytes }
+        }
+        .map { bytes }
     }
 
     static func make(
-        withMcMutableBuffer body:
-            (UnsafeMutablePointer<McMutableBuffer>, inout UnsafeMutablePointer<McError>?) -> Int
+        withMcMutableBuffer body: (
+            UnsafeMutablePointer<McMutableBuffer>,
+            inout UnsafeMutablePointer<McError>?
+        ) -> Int
     ) -> Result<Data66, LibMobileCoinError> {
         var bytes = Data66()
         return bytes.asMcMutableBuffer { bufferPtr in
             withMcErrorReturningArrayCount { errorPtr in
                 body(bufferPtr, &errorPtr)
             }
-        }.map { numBytesReturned in
+        }
+        .map { numBytesReturned in
             guard numBytesReturned == 66 else {
                 // This condition indicates a programming error.
                 logger.fatalError(
