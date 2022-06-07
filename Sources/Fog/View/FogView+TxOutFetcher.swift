@@ -70,8 +70,6 @@ extension FogView {
                     else {
                         return
                     }
-                        return
-                    }
                     self.syncCheckerLock.writeSync({
                         $0.setViewsHighestKnownBlock(highestProcessedBlockCount)
                     })

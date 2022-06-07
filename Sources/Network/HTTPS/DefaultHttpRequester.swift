@@ -9,10 +9,9 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
     private var consensusTrustRoots: SecSSLCertificates?
 
     private var pinnedKeys: [SecKey] {
-        [fogTrustRoots, consensusTrustRoots].compactMap {
-            $0?.publicKeys
-        }
-        .flatMap { $0 }
+        [fogTrustRoots, consensusTrustRoots]
+            .compactMap { $0?.publicKeys }
+            .flatMap { $0 }
     }
 
     static let certPinningEnabled = true
@@ -108,17 +107,14 @@ extension DefaultHttpRequester {
         /// Compare pinned & server public keys
         let matches: [ChainOfTrustKey]
         let trustChainEnumerated = trust.publicKeyTrustChain.enumerated()
-        matches = trustChainEnumerated.map { chain -> ChainOfTrustKeyMatch in
-            let serverCertificateKey = chain.element
-            let match = pinnedKeys.contains(serverCertificateKey)
-            return (match: match, index: chain.offset, key: serverCertificateKey)
-        }
-        .filter {
-            $0.match
-        }
-        .map {
-            (index: $0.index, key: $0.key)
-        }
+        matches = trustChainEnumerated
+            .map { chain -> ChainOfTrustKeyMatch in
+                let serverCertificateKey = chain.element
+                let match = pinnedKeys.contains(serverCertificateKey)
+                return (match: match, index: chain.offset, key: serverCertificateKey)
+            }
+            .filter { $0.match }
+            .map { (index: $0.index, key: $0.key) }
 
         switch matches.isNotEmpty {
         case true:
