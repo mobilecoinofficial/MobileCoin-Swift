@@ -224,7 +224,7 @@ public struct SecurityError: Error {
 
 extension SecurityError: CustomStringConvertible {
     static var nilPublicKey = """
-        the public key could not be extracted
+        the public key could not be extracted \
         (this can happen if the public key algorithm is not supported).
     """
 
