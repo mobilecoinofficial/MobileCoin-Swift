@@ -165,8 +165,8 @@ class EmptyFogMerkleProofService: FogMerkleProofService,
     FogMerkleProofServiceConnection
 {
     func getOutputs(
-            request: FogLedger_GetOutputsRequest,
-            completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
+        request: FogLedger_GetOutputsRequest,
+        completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
     ) {
         logger.assertionFailure("Not Implemented")
     }
