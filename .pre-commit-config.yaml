@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: autocorrect
         name: autocorrect
-        entry: "./scripts/autocorrect.sh autocorrect"
+        entry: "./scripts/autocorrect.sh --fix"
         language: script
         verbose: true
         files: \.swift$
