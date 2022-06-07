@@ -60,12 +60,6 @@ The workspace can be built with `make`.
     gem install bundler
     ```
 
-1. Install swiftlint
-
-    ```
-    brew install swiftlint
-    ```
-
 1. Install pre-commit
 
     ```
