@@ -88,7 +88,11 @@ lint: swiftlint
 
 .PHONY: lint-strict
 lint-strict: 
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict --quiet
+
+.PHONY: autocorrect
+autocorrect: 
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
 
 .PHONY: lint-all
 lint-all: lint lint-circleci lint-podspec lint-docs

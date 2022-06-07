@@ -1,9 +1,5 @@
 #!/bin/bash
 
-MODE=$1
-
-echo $@
-
 SWIFT_LINT="$(git rev-parse --show-toplevel)/ExampleHTTP/Pods/SwiftLint/swiftlint"
 
 # Change directory to repo root

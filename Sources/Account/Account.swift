@@ -79,11 +79,12 @@ final class Account {
         """
         Deprecated in favor of `cachedAccountActivity(for:TokenId)` which accepts a TokenId.
         `cachedAccountActivity` will assume the default TokenId == .MOB // UInt64(0)
-        
+
         Get a set of all tokenIds that are in TxOuts owned by this account with:
-        
+
         `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
         """)
+
     var cachedAccountActivity: AccountActivity {
         cachedAccountActivity(for: .MOB)
     }
@@ -95,7 +96,7 @@ final class Account {
             .filter { $0.tokenId == tokenId }
         return AccountActivity(txOuts: txOuts, blockCount: blockCount, tokenId: tokenId)
     }
-    
+
     var ownedTxOuts: [KnownTxOut] {
         ownedTxOutsAndBlockCount.txOuts
     }

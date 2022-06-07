@@ -3,23 +3,13 @@ repos:
     hooks:
       - id: autocorrect
         name: autocorrect
-        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --fix --config .swiftlint.yml"
+        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --fix"
         language: script
-        verbose: true
         files: \.swift$
-  #- repo: local
-    #hooks:
-      #- id: autocorrect
-        #name: autocorrect
-        #entry: "./scripts/autocorrect.sh --fix"
-        #language: script
-        #verbose: true
-        #files: \.swift$
-  #- repo: local
-    #hooks:
-      #- id: linting
-        #name: linting
-        #entry: "./scripts/autocorrect.sh lint"
-        #language: script
-        #verbose: true
-        #files: \.swift$
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --strict --quiet" 
+        language: script
+        files: \.swift$
