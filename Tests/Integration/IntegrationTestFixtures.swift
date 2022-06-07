@@ -8,7 +8,7 @@
 import XCTest
 
 enum IntegrationTestFixtures {
-    static let network: NetworkPreset = .testNet
+    static let network: NetworkPreset = NetworkConfigFixtures.network
 }
 
 extension IntegrationTestFixtures {
@@ -24,25 +24,39 @@ extension IntegrationTestFixtures {
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
         let fogAuthoritySpki = try network.fogAuthoritySpki()
 
-        let mnemonics = network.testAccountsMnemonics
-        if mnemonics.count > accountIndex {
-            let mnemonic = mnemonics[accountIndex]
-            return try AccountKey.make(
-                mnemonic: mnemonic,
-                fogReportUrl: network.fogReportUrl,
-                fogReportId: network.fogReportId,
-                fogAuthoritySpki: fogAuthoritySpki).get()
-        }
+        switch network {
+        case .dynamic:
+            let rootEntropies = network.testAccountRootEntropies
+            if rootEntropies.count > accountIndex {
+                let entropy = rootEntropies[accountIndex]
+                return try AccountKey.make(
+                    rootEntropy: entropy,
+                    fogReportUrl: network.fogReportUrl,
+                    fogReportId: network.fogReportId,
+                    fogAuthoritySpki: fogAuthoritySpki).get()
+            }
 
-        let testAccountsPrivateKeys = network.testAccountsPrivateKeys
-        if testAccountsPrivateKeys.count > accountIndex {
-            let (viewPrivateKey, spendPrivateKey) = network.testAccountsPrivateKeys[accountIndex]
-            return try AccountKey.make(
-                viewPrivateKey: viewPrivateKey,
-                spendPrivateKey: spendPrivateKey,
-                fogReportUrl: network.fogReportUrl,
-                fogReportId: network.fogReportId,
-                fogAuthoritySpki: fogAuthoritySpki).get()
+        default:
+            let mnemonics = network.testAccountsMnemonics
+            if mnemonics.count > accountIndex {
+                let mnemonic = mnemonics[accountIndex]
+                return try AccountKey.make(
+                    mnemonic: mnemonic,
+                    fogReportUrl: network.fogReportUrl,
+                    fogReportId: network.fogReportId,
+                    fogAuthoritySpki: fogAuthoritySpki).get()
+            }
+            let testAccountsPrivateKeys = network.testAccountsPrivateKeys
+            if testAccountsPrivateKeys.count > accountIndex {
+                let tuple = network.testAccountsPrivateKeys[accountIndex]
+                let (viewPrivateKey, spendPrivateKey) = tuple
+                return try AccountKey.make(
+                    viewPrivateKey: viewPrivateKey,
+                    spendPrivateKey: spendPrivateKey,
+                    fogReportUrl: network.fogReportUrl,
+                    fogReportId: network.fogReportId,
+                    fogAuthoritySpki: fogAuthoritySpki).get()
+            }
         }
 
         throw TestingError(
@@ -198,9 +212,9 @@ extension IntegrationTestFixtures {
     ) throws {
         let client =
             try createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
-        client.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expectation) else { return }
-            guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
+        client.updateBalances {
+            guard let balances = $0.successOrFulfill(expectation: expectation) else { return }
+            guard let picoMob = try? XCTUnwrap(balances.mobBalance.amount()) else
                 { expectation.fulfill(); return }
             XCTAssertGreaterThan(picoMob, 0)
             guard picoMob > 0 else { expectation.fulfill(); return }
