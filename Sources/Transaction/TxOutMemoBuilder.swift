@@ -58,8 +58,8 @@ class TxOutMemoBuilder {
     }
 
     static func createRecoverablePaymentRequestMemoBuilder(
-            paymentRequestId: UInt64,
-            accountKey: AccountKey
+        paymentRequestId: UInt64,
+        accountKey: AccountKey
     ) -> RecoverablePaymentRequestMemoBuilder {
         RecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: paymentRequestId,
