@@ -2,10 +2,9 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
-@testable import MobileCoin
 import LibMobileCoin
-
+@testable import MobileCoin
+import XCTest
 
 extension TxOutMemoParser {
     enum Fixtures { }
@@ -57,7 +56,7 @@ extension TxOutMemoParser.Fixtures {
             self.payload = try Self.getPayload()
         }
     }
-    
+
     struct DefaultDestinationMemo {
         let txOut: TxOut
         let payload: Data
@@ -72,7 +71,7 @@ extension TxOutMemoParser.Fixtures {
             self.payload = try Self.getPayload()
         }
     }
-    
+
     struct DefaultSenderWithPaymentRequestMemo {
         let txOut: TxOut
         let payload: Data
@@ -87,7 +86,7 @@ extension TxOutMemoParser.Fixtures {
             self.payload = try Self.getPayload()
         }
     }
-    
+
 }
 
 extension TxOutMemoParser.Fixtures.DefaultEmptyPayload {
@@ -101,11 +100,11 @@ extension TxOutMemoParser.Fixtures.DefaultEmptyPayload {
         000000000000002a440a4246597e555ff2700a08d66334a78b43f43c02a270bd580225a05f4f1bb4\
         ca56017ab622dcdb26555c7340344a0a0499f6ee48a77a1fe9525496cd87f70d154ca2a436
         """
-    
+
     static func getTxOut() throws -> TxOut {
         try TxOutMemoParser.Fixtures.makeTxOut(hex: txOutHex)
     }
-    
+
     static func getPayload() throws -> Data {
         Data()
     }
@@ -123,17 +122,16 @@ extension TxOutMemoParser.Fixtures.DefaultUnusedPayload {
         ca56017ab622dcdb26555c7340344a0a0499f6ee48a77a1fe9525496cd87f70d154ca2a436
         """
 
-    
     static func getTxOut() throws -> TxOut {
         try TxOutMemoParser.Fixtures.makeTxOut(hex: txOutHex)
     }
-    
+
     static let decryptedUnusedMemoPayload =
         """
         00000000000000000000000000000000000000000000000000000000000000000000000000000000\
         0000000000000000000000000000000000000000000000000000
         """
-    
+
     static func getPayload() throws -> Data {
         try TxOutMemoParser.Fixtures.makePayloadData(hex: decryptedUnusedMemoPayload)
     }
@@ -154,13 +152,13 @@ extension TxOutMemoParser.Fixtures.DefaultSenderMemo {
     static func getTxOut() throws -> TxOut {
         try TxOutMemoParser.Fixtures.makeTxOut(hex: senderMemoTxOutHex)
     }
-    
+
     static let decryptedSenderMemoPayload =
         """
         0100477458144e8cf4f6d54b6cc4ddf68bb200000000000000000000000000000000000000000000\
         00000000000000000000228aef692188b3cefc94b5198bdbbca2
         """
-    
+
     static func getPayload() throws -> Data {
         try TxOutMemoParser.Fixtures.makePayloadData(hex: decryptedSenderMemoPayload)
     }
@@ -181,7 +179,7 @@ extension TxOutMemoParser.Fixtures.DefaultDestinationMemo {
     static func getTxOut() throws -> TxOut {
         try TxOutMemoParser.Fixtures.makeTxOut(hex: destinationMemoTxOutHex)
     }
-    
+
     static let decryptedDestinationMemoPayload =
         """
         020040b3a58c408ddb104b2ef471e451588a010000000000001500000000000001d80000000000000\
@@ -192,7 +190,6 @@ extension TxOutMemoParser.Fixtures.DefaultDestinationMemo {
         try TxOutMemoParser.Fixtures.makePayloadData(hex: decryptedDestinationMemoPayload)
     }
 }
-
 
 extension TxOutMemoParser.Fixtures.DefaultSenderWithPaymentRequestMemo {
     static let senderWithPaymentRequestMemoTxOutHex =
@@ -209,13 +206,13 @@ extension TxOutMemoParser.Fixtures.DefaultSenderWithPaymentRequestMemo {
     static func getTxOut() throws -> TxOut {
         try TxOutMemoParser.Fixtures.makeTxOut(hex: senderWithPaymentRequestMemoTxOutHex)
     }
-    
+
     static let decryptedSenderWithPaymentRequestMemoPayload =
         """
         0101477458144e8cf4f6d54b6cc4ddf68bb200000000000001420000000000000000000000000000\
         000000000000000000006fe3c566db189f475fac50c0025ac58a
         """
-    
+
     static func getPayload() throws -> Data {
         try TxOutMemoParser.Fixtures.makePayloadData(hex:
                                             decryptedSenderWithPaymentRequestMemoPayload)
@@ -228,9 +225,8 @@ extension TxOutMemoParser.Fixtures {
         let serializedData = try External_TxOut(contiguousBytes: data).serializedData()
         return try XCTUnwrap(TxOut(serializedData: serializedData))
     }
-    
+
     static func makePayloadData(hex: String) throws -> Data {
         try XCTUnwrap(Data(hexEncoded: hex))
     }
 }
-

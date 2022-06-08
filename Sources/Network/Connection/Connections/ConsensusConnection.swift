@@ -5,8 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class ConsensusConnection:
-    Connection<GrpcProtocolConnectionFactory.ConsensusServiceProvider, HttpProtocolConnectionFactory.ConsensusServiceProvider>, ConsensusService
+final class ConsensusConnection: Connection<
+        GrpcProtocolConnectionFactory.ConsensusServiceProvider,
+        HttpProtocolConnectionFactory.ConsensusServiceProvider
+    >,
+    ConsensusService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory

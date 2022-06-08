@@ -2,11 +2,11 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 class TxOutMemoIntegrationTests: XCTestCase {
-    
+
     func testBuildTransactionWithSenderAndDestinationMemo() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
         let txFixture = fixture.txFixture
@@ -27,7 +27,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
         let senderPublicAddress = fixture.senderPublicAddress
         let receivedTxOut = fixture.receivedTxOut
-        
+
         guard
             case let .sender(recoverable) = receivedTxOut.recoverableMemo,
             let recovered = recoverable.recover(senderPublicAddress: senderPublicAddress)
@@ -35,7 +35,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         XCTAssertEqual(recovered.addressHash, senderPublicAddress.calculateAddressHash())
     }
 
@@ -51,7 +51,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
@@ -86,7 +86,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         XCTAssertEqual(recovered.addressHash, senderPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
     }
@@ -103,7 +103,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)

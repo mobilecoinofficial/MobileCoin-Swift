@@ -9,7 +9,7 @@ public struct Balances {
     public var tokenIds: Set<TokenId> {
         Set(balances.keys)
     }
-    
+
     var mobBalance: Balance {
         guard let balance = balances[.MOB] else {
             return Balance(
@@ -20,10 +20,10 @@ public struct Balances {
         }
         return balance
     }
-    
+
     let blockCount: UInt64
-    
-    init(balances: [TokenId:Balance], blockCount: UInt64) {
+
+    init(balances: [TokenId: Balance], blockCount: UInt64) {
         self.balances = balances
         self.blockCount = blockCount
     }
@@ -34,4 +34,3 @@ extension Balances: CustomStringConvertible {
         "Balances: " + balances.values.map({ $0.description }).joined(separator: ", ")
     }
 }
-

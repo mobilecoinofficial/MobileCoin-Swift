@@ -20,7 +20,9 @@ class FogKeyImageConnectionIntTests: XCTestCase {
         var query = FogLedger_KeyImageQuery()
         query.keyImage = External_KeyImage(Data(repeating: 0, count: 32))
         request.queries = [query]
-        try createFogKeyImageConnection(transportProtocol:transportProtocol).checkKeyImages(request: request) {
+        try createFogKeyImageConnection(
+            transportProtocol: transportProtocol
+        ).checkKeyImages(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             print("numBlocks: \(response.numBlocks)")
@@ -47,18 +49,23 @@ class FogKeyImageConnectionIntTests: XCTestCase {
 
     func testCheckKeyImagesResponseIsPaddedForTooShortKeyImage() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
-            try checkKeyImagesResponseIsPaddedForTooShortKeyImage(transportProtocol: transportProtocol)
+            try checkKeyImagesResponseIsPaddedForTooShortKeyImage(
+                    transportProtocol: transportProtocol)
         }
     }
-    
-    func checkKeyImagesResponseIsPaddedForTooShortKeyImage(transportProtocol: TransportProtocol) throws {
+
+    func checkKeyImagesResponseIsPaddedForTooShortKeyImage(
+        transportProtocol: TransportProtocol
+    ) throws {
         let expect = expectation(description: "Fog CheckKeyImages request")
 
         var request = FogLedger_CheckKeyImagesRequest()
         var query = FogLedger_KeyImageQuery()
         query.keyImage = External_KeyImage(Data(repeating: 0, count: 0))
         request.queries = [query]
-        try createFogKeyImageConnection(transportProtocol:transportProtocol).checkKeyImages(request: request) {
+        try createFogKeyImageConnection(
+            transportProtocol: transportProtocol
+        ).checkKeyImages(request: request) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
             XCTAssertEqual(response.results.count, request.queries.count)
@@ -83,15 +90,19 @@ class FogKeyImageConnectionIntTests: XCTestCase {
             try checkKeyImagesResponseFailsForTooLongKeyImage(transportProtocol: transportProtocol)
         }
     }
-    
-    func checkKeyImagesResponseFailsForTooLongKeyImage(transportProtocol: TransportProtocol) throws {
+
+    func checkKeyImagesResponseFailsForTooLongKeyImage(
+        transportProtocol: TransportProtocol
+    ) throws {
         let expect = expectation(description: "Fog CheckKeyImages request")
 
         var request = FogLedger_CheckKeyImagesRequest()
         var query = FogLedger_KeyImageQuery()
         query.keyImage = External_KeyImage(Data(repeating: 0, count: 33))
         request.queries = [query]
-        try createFogKeyImageConnection(transportProtocol: transportProtocol).checkKeyImages(request: request) {
+        try createFogKeyImageConnection(
+            transportProtocol: transportProtocol
+        ).checkKeyImages(request: request) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
             print("error: \(error)")
 
@@ -105,8 +116,10 @@ class FogKeyImageConnectionIntTests: XCTestCase {
             try invalidCredentialsReturnsAuthorizationFailure(transportProtocol: transportProtocol)
         }
     }
-    
-    func invalidCredentialsReturnsAuthorizationFailure(transportProtocol: TransportProtocol) throws {
+
+    func invalidCredentialsReturnsAuthorizationFailure(
+        transportProtocol: TransportProtocol
+    ) throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.fogRequiresCredentials)
 
         let expect = expectation(description: "Fog CheckKeyImages request")
@@ -115,7 +128,9 @@ class FogKeyImageConnectionIntTests: XCTestCase {
         var query = FogLedger_KeyImageQuery()
         query.keyImage = External_KeyImage(Data(repeating: 0, count: 32))
         request.queries = [query]
-        try createFogKeyImageConnectionWithInvalidCredentials(transportProtocol:transportProtocol).checkKeyImages(request: request) {
+        try createFogKeyImageConnectionWithInvalidCredentials(
+            transportProtocol: transportProtocol
+        ).checkKeyImages(request: request) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
 
             switch error {
@@ -131,18 +146,23 @@ class FogKeyImageConnectionIntTests: XCTestCase {
 }
 
 extension FogKeyImageConnectionIntTests {
-    func createFogKeyImageConnection(transportProtocol:TransportProtocol) throws -> FogKeyImageConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfig(transportProtocol:transportProtocol)
+    func createFogKeyImageConnection(
+        transportProtocol: TransportProtocol
+    ) throws -> FogKeyImageConnection {
+        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createFogKeyImageConnection(networkConfig: networkConfig)
     }
 
-    func createFogKeyImageConnectionWithInvalidCredentials(transportProtocol: TransportProtocol) throws -> FogKeyImageConnection {
-        let networkConfig = try IntegrationTestFixtures.createNetworkConfigWithInvalidCredentials(transportProtocol: transportProtocol)
+    func createFogKeyImageConnectionWithInvalidCredentials(
+        transportProtocol: TransportProtocol
+    ) throws -> FogKeyImageConnection {
+        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createFogKeyImageConnection(networkConfig: networkConfig)
     }
 
     func createFogKeyImageConnection(networkConfig: NetworkConfig) -> FogKeyImageConnection {
-        let httpFactory = HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+        let httpFactory = HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
         let grpcFactory = GrpcProtocolConnectionFactory()
         return FogKeyImageConnection(
             httpFactory: httpFactory,

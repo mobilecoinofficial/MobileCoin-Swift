@@ -4,7 +4,6 @@
 
 import Foundation
 
-
 struct SenderMemo {
     let memoData: Data64
     let addressHash: AddressHash
@@ -24,10 +23,11 @@ struct RecoverableSenderMemo {
     }
 
     func recover(senderPublicAddress: PublicAddress) -> SenderMemo? {
-        guard SenderMemoUtils.isValid(memoData: memoData,
-                                   senderPublicAddress: senderPublicAddress,
-                                   receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
-                                   txOutPublicKey: txOutPublicKey)
+        guard SenderMemoUtils.isValid(
+            memoData: memoData,
+            senderPublicAddress: senderPublicAddress,
+            receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
+            txOutPublicKey: txOutPublicKey)
         else {
             return nil
         }
@@ -39,6 +39,6 @@ extension RecoverableSenderMemo: Hashable { }
 
 extension RecoverableSenderMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.memoData == rhs.memoData
+        lhs.memoData == rhs.memoData
     }
 }

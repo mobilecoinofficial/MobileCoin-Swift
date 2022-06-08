@@ -6,7 +6,7 @@ import Foundation
 
 enum TxOutMemoParser {
     static let emptyEMemo = Data66()
-    
+
     static func parse(
         encryptedPayload: Data66,
         accountKey: AccountKey,
@@ -20,13 +20,13 @@ enum TxOutMemoParser {
         else {
             return .notset
         }
-        
+
         return RecoverableMemo(
                         decryptedMemo: decryptedMemo,
                         accountKey: accountKey,
                         txOutKeys: txOutKeys)
     }
-    
+
     static func parse(
         decryptedPayload: Data,
         accountKey: AccountKey,

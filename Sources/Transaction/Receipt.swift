@@ -1,5 +1,4 @@
 //
-
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
@@ -110,7 +109,7 @@ public struct Receipt {
     public func validateAndUnmaskValue(accountKey: AccountKey) -> UInt64? {
         validateAndUnmaskAmount(accountKey: accountKey)?.value
     }
-    
+
     /// Validates whether or not `Receipt` is well-formed and matches `accountKey`, returning `nil`
     /// if either of these conditions are not met. Otherwise, returns the `Amount` of the `TxOut`
     /// represented by this `Receipt`. `Amount` is a value and a tokenId
@@ -135,7 +134,7 @@ public struct Receipt {
 
         return amount
     }
-    
+
     enum ReceivedStatus {
         case notReceived(knownToBeNotReceivedBlockCount: UInt64?)
         case received(block: BlockMetadata)

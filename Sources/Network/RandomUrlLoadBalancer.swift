@@ -2,10 +2,10 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> : UrlLoadBalancer<ServiceUrl> {
+class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol>: UrlLoadBalancer<ServiceUrl> {
     private var rng = SystemRandomNumberGenerator()
     private(set) var currentUrl: ServiceUrl
-    
+
     override func nextUrl() -> ServiceUrl {
         guard urlsTyped.count > 1 else {
             return currentUrl
@@ -25,7 +25,7 @@ class RandomUrlLoadBalancer<ServiceUrl: MobileCoinUrlProtocol> : UrlLoadBalancer
         currentUrl = nextUrl
         return currentUrl
     }
-    
+
     required init(urls: [ServiceUrl]) {
         // this is to work around the 'Property not initialized at super.init call' compiler error
         currentUrl = urls[0]

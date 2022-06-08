@@ -14,13 +14,13 @@ extension MemoData.Fixtures {
     struct Shared {
         let txOutPublicKey: RistrettoPublic
         let badTxOutPublicKey: RistrettoPublic
-        
+
         init() throws {
             self.txOutPublicKey = try Self.getTxOutPublicKey()
             self.badTxOutPublicKey = try Self.getBadTxOutPublicKey()
         }
     }
-    
+
     struct DefaultDestinationMemo {
         let accountKey: AccountKey
         let expectedMemoData: Data64
@@ -33,10 +33,10 @@ extension MemoData.Fixtures {
             self.expectedMemoData = try Self.getExpectedMemoData()
             self.fee = Self.expectedFee
             self.totalOutlay = Self.expectedTotalOutlay
-            self.numberOfRecipients = Self.expectedNumberOfRecipients
+            self.numberOfRecipients = try XCTUnwrap(PositiveUInt8(1))
         }
     }
-    
+
     struct DestinationZeroOutlayMemo {
         let accountKey: AccountKey
         let expectedMemoData: Data64
@@ -49,10 +49,10 @@ extension MemoData.Fixtures {
             self.expectedMemoData = try Self.getExpectedMemoData()
             self.fee = Self.expectedFee
             self.totalOutlay = Self.expectedTotalOutlay
-            self.numberOfRecipients = Self.expectedNumberOfRecipients
+            self.numberOfRecipients = try XCTUnwrap(PositiveUInt8(1))
         }
     }
-    
+
     struct SenderMemo {
         let senderAccountKey: AccountKey
         let recieverAccountKey: AccountKey
@@ -66,13 +66,13 @@ extension MemoData.Fixtures {
             self.expectedMemoData = try Self.getExpectedMemoData()
         }
     }
-    
+
     struct SenderMemoInvalidates {
         let senderAccountKey: AccountKey
         let recieverAccountKey: AccountKey
         let txOutPublicKey: RistrettoPublic
         let memoData: Data64
-        
+
         let wrongSenderAccountKey: AccountKey
         let wrongReceiverAccountKey: AccountKey
         let badTxOutPublicKey: RistrettoPublic
@@ -101,7 +101,7 @@ extension MemoData.Fixtures {
             self.invalidMemoData = try Self.getInvalidMemoData()
         }
     }
-    
+
     struct SenderWithPaymentRequestMemo {
         let senderAccountKey: AccountKey
         let recieverAccountKey: AccountKey
@@ -117,7 +117,7 @@ extension MemoData.Fixtures {
             self.paymentRequestId = Self.expectedPaymentRequestId
         }
     }
-    
+
     struct InvalidSenderWithPaymentRequestMemo {
         let senderAccountKey: AccountKey
         let recieverAccountKey: AccountKey
@@ -133,7 +133,7 @@ extension MemoData.Fixtures {
             self.paymentRequestId = Self.expectedPaymentRequestId
         }
     }
-    
+
     struct SenderWithPaymentRequestMemoInvalidates {
         let senderAccountKey: AccountKey
         let recieverAccountKey: AccountKey
@@ -161,37 +161,36 @@ extension MemoData.Fixtures.Shared {
         """
         c235c13c4dedd808e95f428036716d52561fad7f51ce675f4d4c9c1fa1ea2165
         """
-    
+
     static func getTxOutPublicKey() throws -> RistrettoPublic {
         try XCTUnwrap(
                 RistrettoPublic(try XCTUnwrap(
                                     Data(hexEncoded: txOutPublicKeyHex))))
     }
-    
+
     static let badTxOutPublicKeyHex =
         """
         0e61ca061876b651e6981ad9a74fd5fe8d4af2f6981283bafe4c1ba40c3d0803
         """
-    
+
     static func getBadTxOutPublicKey() throws -> RistrettoPublic {
         try XCTUnwrap(
                 RistrettoPublic(try XCTUnwrap(
                                     Data(hexEncoded: badTxOutPublicKeyHex))))
     }
-    
+
 }
-    
+
 extension MemoData.Fixtures.DefaultDestinationMemo {
-    
+
     static let expectedFee: UInt64 = 3
     static let expectedTotalOutlay: UInt64 = 100
-    static let expectedNumberOfRecipients = PositiveUInt8(1)!
-    
+
     static func getExpectedMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
     }
-    
+
     static var validMemoDataHexBytes: String =
         """
         ccb5a98f0c0c42f68491e5e0c936245201000000000000040000000000000064\
@@ -200,16 +199,15 @@ extension MemoData.Fixtures.DefaultDestinationMemo {
 }
 
 extension MemoData.Fixtures.DestinationZeroOutlayMemo {
-    
+
     static let expectedFee: UInt64 = 0
     static let expectedTotalOutlay: UInt64 = 0
-    static let expectedNumberOfRecipients = PositiveUInt8(1)!
-    
+
     static func getExpectedMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
     }
-    
+
     static var validMemoDataHexBytes: String =
         """
         ccb5a98f0c0c42f68491e5e0c936245201000000000000040000000000000064\
@@ -229,7 +227,7 @@ extension MemoData.Fixtures.SenderMemo {
         00000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
         """
 }
-    
+
 extension MemoData.Fixtures.SenderMemoInvalidates {
     static func getMemoData() throws -> Data64 {
         let shared = try MemoData.Fixtures.Shared()
@@ -241,7 +239,7 @@ extension MemoData.Fixtures.SenderMemoInvalidates {
                 txOutPublicKey: shared.txOutPublicKey))
     }
 }
-    
+
 extension MemoData.Fixtures.InvalidSenderMemo {
     static func getInvalidMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(
@@ -254,11 +252,11 @@ extension MemoData.Fixtures.InvalidSenderMemo {
         1eff7121e85fe09fc6fc70c818e2f7b6bacf94237a3a0d9549f5bb5708f14a15
         """
 }
-    
+
 extension MemoData.Fixtures.SenderWithPaymentRequestMemo {
-    
+
     static let expectedPaymentRequestId: UInt64 = 17014
-    
+
     static func getExpectedMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
@@ -272,9 +270,9 @@ extension MemoData.Fixtures.SenderWithPaymentRequestMemo {
 }
 
 extension MemoData.Fixtures.InvalidSenderWithPaymentRequestMemo {
-    
+
     static let expectedPaymentRequestId: UInt64 = 17014
-    
+
     static func getInvalidMemoData() throws -> Data64 {
         try XCTUnwrap(Data64(
                         XCTUnwrap(Data(hexEncoded: invalidMemoDataHexBytes))))
@@ -288,9 +286,9 @@ extension MemoData.Fixtures.InvalidSenderWithPaymentRequestMemo {
 }
 
 extension MemoData.Fixtures.SenderWithPaymentRequestMemoInvalidates {
-    
+
     static let expectedPaymentRequestId: UInt64 = 17014
-    
+
     static func getMemoData() throws -> Data64 {
         let shared = try MemoData.Fixtures.Shared()
         let keys = try AccountKey.Fixtures.AliceAndBob()

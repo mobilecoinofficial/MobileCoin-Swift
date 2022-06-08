@@ -2,8 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 class KnownTxOutTests: XCTestCase {
 
@@ -11,7 +11,7 @@ class KnownTxOutTests: XCTestCase {
         let fixture = try KnownTxOut.Fixtures.DefaultNotSet()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case .notset = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -22,18 +22,18 @@ class KnownTxOutTests: XCTestCase {
         let fixture = try KnownTxOut.Fixtures.DefaultUnused()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case .unused = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
         }
     }
-    
+
     func testFogViewRecordSenderMemoPayload() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderMemo()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case .sender = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -44,7 +44,7 @@ class KnownTxOutTests: XCTestCase {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderMemo()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case let .sender(recoverableMemo) = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -54,12 +54,12 @@ class KnownTxOutTests: XCTestCase {
         let senderAddressHash = fixture.senderAccountKey.publicAddress.calculateAddressHash()
         XCTAssertEqual(recovered.addressHash, senderAddressHash)
     }
-    
+
     func testFogViewRecordDestinationMemoPayload() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultDestinationMemo()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case .destination = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -70,7 +70,7 @@ class KnownTxOutTests: XCTestCase {
         let fixture = try KnownTxOut.Fixtures.DefaultDestinationMemo()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case let .destination(recoverableMemo) = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -80,12 +80,12 @@ class KnownTxOutTests: XCTestCase {
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
         XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
-    
+
     func testFogViewRecordSenderWithPaymentRequestMemoPayload() throws {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case .senderWithPaymentRequest = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -96,7 +96,7 @@ class KnownTxOutTests: XCTestCase {
         let fixture = try KnownTxOut.Fixtures.DefaultSenderWithPaymentRequestMemo()
         let txOut = fixture.knownTxOut
         let txOutMemo = txOut.recoverableMemo
-        
+
         guard case let .senderWithPaymentRequest(recoverableMemo) = txOutMemo else {
             XCTFail("TxOutMemo type mismatch")
             return
@@ -107,5 +107,5 @@ class KnownTxOutTests: XCTestCase {
         XCTAssertEqual(recovered.addressHash, senderAddressHash)
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
     }
-        
+
 }

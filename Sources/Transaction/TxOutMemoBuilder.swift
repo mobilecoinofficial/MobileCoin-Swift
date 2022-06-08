@@ -11,7 +11,7 @@ public enum MemoType {
     case customRecoverable(sender: AccountKey)
     case recoverablePaymentRequest(id: UInt64)
     case customPaymentRequest(sender: AccountKey, id: UInt64)
-    
+
     func createMemoBuilder(accountKey: AccountKey) -> TxOutMemoBuilder {
         switch self {
         case .unused:
@@ -24,7 +24,7 @@ public enum MemoType {
             return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: id,
                 accountKey: accountKey)
-        case .customPaymentRequest(let sender, let id):
+        case let .customPaymentRequest(sender, id):
             return TxOutMemoBuilder.createRecoverablePaymentRequestMemoBuilder(
                 paymentRequestId: id,
                 accountKey: sender)
@@ -44,7 +44,7 @@ class TxOutMemoBuilder {
     init(ptr: OpaquePointer) {
         self.ptr = ptr
     }
-    
+
     deinit {
         mc_memo_builder_free(ptr)
     }
@@ -52,33 +52,39 @@ class TxOutMemoBuilder {
     static func createRecoverableMemoBuilder(accountKey: AccountKey) -> RecoverableMemoBuilder {
         RecoverableMemoBuilder(accountKey: accountKey)
     }
-    
+
     static func createDefaultMemoBuilder() -> DefaultMemoBuilder {
         DefaultMemoBuilder()
     }
-    
-    static func createRecoverablePaymentRequestMemoBuilder(paymentRequestId: UInt64, accountKey: AccountKey) -> RecoverablePaymentRequestMemoBuilder {
-        RecoverablePaymentRequestMemoBuilder(paymentRequestId: paymentRequestId, accountKey: accountKey)
+
+    static func createRecoverablePaymentRequestMemoBuilder(
+        paymentRequestId: UInt64,
+        accountKey: AccountKey
+    ) -> RecoverablePaymentRequestMemoBuilder {
+        RecoverablePaymentRequestMemoBuilder(
+                paymentRequestId: paymentRequestId,
+                accountKey: accountKey)
     }
-    
+
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
         try body(ptr)
     }
-    
+
     static func createMemoBuilder(type: RTHMemoType) -> TxOutMemoBuilder {
         switch type {
         case .unused:
             return createDefaultMemoBuilder()
         case .recoverable(let sender):
             return createRecoverableMemoBuilder(accountKey: sender)
-        case .recoverablePaymentRequest(let sender, let id):
-            return createRecoverablePaymentRequestMemoBuilder(paymentRequestId: id, accountKey: sender)
+        case let .recoverablePaymentRequest(sender, id):
+            return createRecoverablePaymentRequestMemoBuilder(
+                    paymentRequestId: id,
+                    accountKey: sender)
         }
     }
 }
 
-
-final class RecoverableMemoBuilder : TxOutMemoBuilder {
+final class RecoverableMemoBuilder: TxOutMemoBuilder {
     init(
         accountKey: AccountKey
     ) {
@@ -92,7 +98,7 @@ final class RecoverableMemoBuilder : TxOutMemoBuilder {
     }
 }
 
-final class DefaultMemoBuilder : TxOutMemoBuilder {
+final class DefaultMemoBuilder: TxOutMemoBuilder {
     init() {
         // Safety: mc_memo_builder_default_create should never return nil.
         let pointer = withMcInfallible {
@@ -102,7 +108,7 @@ final class DefaultMemoBuilder : TxOutMemoBuilder {
     }
 }
 
-final class RecoverablePaymentRequestMemoBuilder : TxOutMemoBuilder {
+final class RecoverablePaymentRequestMemoBuilder: TxOutMemoBuilder {
     init(
         paymentRequestId requestId: UInt64,
         accountKey: AccountKey

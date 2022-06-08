@@ -10,15 +10,15 @@ extension BlockVersion {
     static let versionZero: BlockVersion = 0
     static let versionOne: BlockVersion = 1
     static let versionTwo: BlockVersion = 2
-    
+
     static func canEnableRecoverableMemos(version: BlockVersion) -> Bool {
         version >= versionOne
     }
-    
+
     static var legacy: BlockVersion {
         Self.versionZero
     }
-    
+
     static var minRTHEnabled: BlockVersion {
         Self.versionOne
     }

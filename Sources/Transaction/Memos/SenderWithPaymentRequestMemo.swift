@@ -24,21 +24,27 @@ struct RecoverableSenderWithPaymentRequestMemo {
     }
 
     func recover(senderPublicAddress: PublicAddress) -> SenderWithPaymentRequestMemo? {
-        guard SenderWithPaymentRequestMemoUtils.isValid(memoData: memoData,
-                                       senderPublicAddress: senderPublicAddress,
-                                       receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
-                                       txOutPublicKey: txOutPublicKey) else {
+        guard SenderWithPaymentRequestMemoUtils.isValid(
+            memoData: memoData,
+            senderPublicAddress: senderPublicAddress,
+            receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
+            txOutPublicKey: txOutPublicKey)
+        else {
             logger.debug("Memo did not validate")
             return nil
         }
-        
-        guard let paymentRequestId = SenderWithPaymentRequestMemoUtils.getPaymentRequestId(memoData: memoData) else {
+
+        let paymentReqId = SenderWithPaymentRequestMemoUtils.getPaymentRequestId(memoData: memoData)
+        guard let paymentRequestId = paymentReqId else {
             logger.debug("Unable to get payment request id")
             return nil
         }
-        
+
         let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
-        return SenderWithPaymentRequestMemo(memoData: memoData, addressHash: addressHash, paymentRequestId: paymentRequestId)
+        return SenderWithPaymentRequestMemo(
+            memoData: memoData,
+            addressHash: addressHash,
+            paymentRequestId: paymentRequestId)
     }
 }
 

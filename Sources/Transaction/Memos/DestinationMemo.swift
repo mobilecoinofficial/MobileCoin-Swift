@@ -18,7 +18,7 @@ struct RecoverableDestinationMemo {
     private let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
     let txOutTargetKey: RistrettoPublic
-    
+
     init(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         self.memoData = memoData
         self.addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
@@ -29,7 +29,10 @@ struct RecoverableDestinationMemo {
 
     func recover() -> DestinationMemo? {
         guard
-            DestinationMemoUtils.isValid(txOutPublicKey: txOutPublicKey, txOutTargetKey: txOutTargetKey, accountKey: accountKey),
+            DestinationMemoUtils.isValid(
+                txOutPublicKey: txOutPublicKey,
+                txOutTargetKey: txOutTargetKey,
+                accountKey: accountKey),
             let numberOfRecipients = DestinationMemoUtils.getNumberOfRecipients(memoData: memoData),
             let fee = DestinationMemoUtils.getFee(memoData: memoData),
             let totalOutlay = DestinationMemoUtils.getTotalOutlay(memoData: memoData)
@@ -38,7 +41,12 @@ struct RecoverableDestinationMemo {
             return nil
         }
         let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
-        return DestinationMemo(memoData: memoData, addressHash: addressHash, numberOfRecipients: numberOfRecipients, fee: fee, totalOutlay: totalOutlay)
+        return DestinationMemo(
+            memoData: memoData,
+            addressHash: addressHash,
+            numberOfRecipients: numberOfRecipients,
+            fee: fee,
+            totalOutlay: totalOutlay)
     }
 }
 

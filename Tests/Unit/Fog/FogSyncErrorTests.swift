@@ -2,8 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import MobileCoin
+import XCTest
 
 class FogSyncErrorTests: XCTestCase {
 
@@ -41,13 +41,13 @@ class FogSyncErrorTests: XCTestCase {
         syncChecker.setViewsHighestKnownBlock(UInt64.max - 1)
         XCTAssertEqual(syncChecker.currentBlockIndex, (UInt64.max - 1))
         XCTAssertSuccess(syncChecker.inSync())
-        
+
         syncChecker.setLedgersHighestKnownBlock(UInt64.max - 1)
         syncChecker.setViewsHighestKnownBlock(UInt64.max)
         XCTAssertEqual(syncChecker.currentBlockIndex, (UInt64.max - 1))
         XCTAssertSuccess(syncChecker.inSync())
     }
-    
+
     func testViewLedgerArithmeticOverflowMaxMinusOne() throws {
         let syncChecker = FogSyncChecker()
         syncChecker.setLedgersHighestKnownBlock(UInt64.max)
@@ -60,7 +60,7 @@ class FogSyncErrorTests: XCTestCase {
         XCTAssertEqual(syncChecker.currentBlockIndex, 1)
         XCTAssertFailure(syncChecker.inSync())
     }
-    
+
     func testConsensusArithmeticOverflowMaxMinusMaxMinusThreshold() throws {
         let syncChecker = FogSyncChecker()
         let delta = syncChecker.maxAllowedBlockDelta
@@ -68,21 +68,21 @@ class FogSyncErrorTests: XCTestCase {
         syncChecker.setViewsHighestKnownBlock(UInt64.max - delta.value - 1)
         syncChecker.setConsensusHighestKnownBlock(UInt64.max)
         XCTAssertFailure(syncChecker.inSync())
-        
+
         syncChecker.setLedgersHighestKnownBlock(UInt64.max)
         syncChecker.setViewsHighestKnownBlock(UInt64.max)
         syncChecker.setConsensusHighestKnownBlock(UInt64.max - delta.value - 1)
         XCTAssertSuccess(syncChecker.inSync())
     }
-    
+
     func testConsensusArithmeticOverflowMaxMinusOne() throws {
         let syncChecker = FogSyncChecker()
-        
+
         syncChecker.setLedgersHighestKnownBlock(UInt64.max)
         syncChecker.setViewsHighestKnownBlock(UInt64.max)
         syncChecker.setConsensusHighestKnownBlock(1)
         XCTAssertSuccess(syncChecker.inSync())
-        
+
         syncChecker.setLedgersHighestKnownBlock(1)
         syncChecker.setViewsHighestKnownBlock(1)
         syncChecker.setConsensusHighestKnownBlock(UInt64.max)

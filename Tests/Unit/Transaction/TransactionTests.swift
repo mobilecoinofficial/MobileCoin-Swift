@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable multiline_function_chains
 
 @testable import MobileCoin
 import XCTest
@@ -71,7 +72,6 @@ class TransactionTests: XCTestCase {
     func testExactChangeCreatesChangeOutput() throws {
         let fixture = try Transaction.Fixtures.ExactChange()
 
-        // TODO - Do we need to test on both blockversions ?
         let txOutContext = try TransactionBuilder.build(
             inputs: fixture.inputs,
             accountKey: fixture.accountKey,

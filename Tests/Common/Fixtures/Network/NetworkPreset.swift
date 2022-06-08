@@ -1,8 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-
-// swiftlint:disable file_length inclusive_language multiline_function_chains
+// swiftlint:disable file_length multiline_function_chains
 
 @testable import MobileCoin
 import XCTest
@@ -57,7 +56,7 @@ struct DynamicNetworkConfig {
 }
 
 extension DynamicNetworkConfig {
-    struct AlphaDevelopment {
+    enum AlphaDevelopment {
         static let user = ""
         static let namespace = "alpha"
         static let environment = "development"
@@ -97,7 +96,7 @@ extension NetworkPreset {
         case diogenes
         case drakeley
         case eran
-        case dynamic(DynamicNetworkConfig)
+        case dynamic
     }
 
     private var network: Network {
@@ -123,8 +122,8 @@ extension NetworkPreset {
             return .drakeley
         case .eran:
             return .eran
-        case .dynamic(let preset):
-            return .dynamic(preset)
+        case .dynamic:
+            return .dynamic
         }
     }
 }
@@ -143,7 +142,7 @@ extension NetworkPreset {
         case .testNet:
             return .testNet
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic(_):
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return .devNetwork
         }
     }
@@ -184,10 +183,10 @@ extension NetworkPreset {
             return "fog://fog-rpt-prd.namda.net"
         case .testNet:
             return "fog://fog-rpt-stg.namda.net"
-            
+
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return ""
-        case .dynamic(_):
+        case .dynamic:
             return ""
         }
     }
@@ -200,7 +199,7 @@ extension NetworkPreset {
         "89db0d1684fcc98258295c39f4ab68f7de5917ef30f0004d9a86f29930cebbbd"
     private static let mainNetFogReportMrEnclaveHex =
         "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
-    
+
 //    private static let mainNetConsensusMrEnclaveHex =
 //        "e66db38b8a43a33f6c1610d335a361963bb2b31e056af0dc0a895ac6c857cab9"
 //    private static let mainNetFogViewMrEnclaveHex =
@@ -563,7 +562,7 @@ extension NetworkPreset {
         case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return true
         case .dynamic:
-            return true // TODO - do we need creds ?
+            return true
         }
     }
     var fogUserCredentials: BasicCredentials? {
@@ -588,7 +587,7 @@ extension NetworkPreset {
             return false
         }
     }
-    
+
     var invalidCredentials: BasicCredentials {
         BasicCredentials(username: Self.invalidCredUsername, password: Self.invalidCredPassword)
     }
@@ -616,7 +615,7 @@ extension NetworkPreset {
 
         case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return []
-            
+
         case .dynamic:
             return []
         }
@@ -636,7 +635,7 @@ extension NetworkPreset {
                 "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f",
                 "8ecaa57fcbec4397ca7fd270695ec2dd6d6bffccde24c0ca4f115a5cae1e896d",
                 "54a602d432c601887af7921c248b984f8510cb016580e156e0a647735acaf2bc",
-                "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05"
+                "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05",
             ]
             .compactMap({ Data(hexEncoded: String($0)) })
         default:
@@ -665,6 +664,7 @@ extension NetworkPreset {
     private static let dynamicTestAccountSeedEntropiesCommaSeparated = ""
 #endif
 
+    // swiftlint:disable force_unwrapping
     var testAccountsPrivateKeys:
         [(viewPrivateKey: RistrettoPrivate, spendPrivateKey: RistrettoPrivate)]
     {
@@ -673,6 +673,7 @@ extension NetworkPreset {
              RistrettoPrivate(hexEncoded: $0.spendPrivateKeyHex)!)
         }
     }
+    // swiftlint:enable force_unwrapping
 
     private var testAccountsPrivateKeysHex:
         [(viewPrivateKeyHex: String, spendPrivateKeyHex: String)]
@@ -684,7 +685,7 @@ extension NetworkPreset {
         case .testNet:
             return []
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic(_):
+        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return Self.devNetworkTestAccountPrivateKeysHex
         }
     }
