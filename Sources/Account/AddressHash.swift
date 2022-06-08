@@ -5,7 +5,7 @@
 import Foundation
 import LibMobileCoin
 
-public struct AddressHash {
+struct AddressHash {
     let data16: Data16
 
     var hex: String {

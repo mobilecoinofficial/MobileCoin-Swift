@@ -4,11 +4,15 @@
 
 import Foundation
 
-struct SenderWithPaymentRequestMemo {
-    let memoData: Data64
+public struct SenderWithPaymentRequestMemo {
+    public var memoData: Data { memoData64.data }
+    let memoData64: Data64
+    public var addressHashHex: String { addressHash.hex }
     let addressHash: AddressHash
     let paymentRequestId: UInt64
 }
+
+extension SenderWithPaymentRequestMemo: Equatable, Hashable { }
 
 struct RecoverableSenderWithPaymentRequestMemo {
     let memoData: Data64
@@ -42,7 +46,7 @@ struct RecoverableSenderWithPaymentRequestMemo {
 
         let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
         return SenderWithPaymentRequestMemo(
-            memoData: memoData,
+            memoData64: memoData,
             addressHash: addressHash,
             paymentRequestId: paymentRequestId)
     }

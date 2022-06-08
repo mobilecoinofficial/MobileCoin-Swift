@@ -9,3 +9,11 @@ public struct HistoricalTransaction {
     public let txOut: OwnedTxOut
     public let contact: PublicAddressProvider?
 }
+
+extension HistoricalTransaction {
+    init(txOut: OwnedTxOut) {
+        self.memo = nil
+        self.contact = nil
+        self.txOut = txOut
+    }
+}

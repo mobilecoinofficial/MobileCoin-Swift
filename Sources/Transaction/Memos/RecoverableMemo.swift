@@ -4,11 +4,13 @@
 
 import Foundation
 
-enum RecoveredMemo {
+public enum RecoveredMemo {
     case sender(SenderMemo)
     case destination(DestinationMemo)
     case senderWithPaymentRequest(SenderWithPaymentRequestMemo)
 }
+
+extension RecoveredMemo: Equatable { }
 
 enum RecoverableMemo {
     case notset
