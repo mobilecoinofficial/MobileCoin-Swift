@@ -6,6 +6,19 @@
 import Foundation
 
 extension MobileCoinClient {
+    @available(*, deprecated, message:
+        """
+        Deprecated in favor of `accountActivity(for:TokenId)` which accepts a TokenId.
+        `accountActivity` will assume the default TokenId == .MOB // UInt64(0)
+
+        Get a set of all tokenIds that are in TxOuts owned by this account with:
+
+        `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
+        """)
+
+    public var accountActivity: AccountActivity {
+        accountActivity(for: .MOB)
+    }
 
     @available(*, deprecated, message:
         """

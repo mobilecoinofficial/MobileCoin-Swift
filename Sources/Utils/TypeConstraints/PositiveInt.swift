@@ -28,7 +28,7 @@ struct PositiveUInt8 {
     }
 }
 
-extension PositiveUInt8: Equatable { }
+extension PositiveUInt8: Equatable, Hashable { }
 
 struct PositiveUInt64 {
     let value: UInt64

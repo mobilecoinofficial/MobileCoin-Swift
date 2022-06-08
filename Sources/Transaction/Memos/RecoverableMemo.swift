@@ -4,11 +4,13 @@
 
 import Foundation
 
-enum RecoveredMemo {
+public enum RecoveredMemo {
     case sender(SenderMemo)
     case destination(DestinationMemo)
     case senderWithPaymentRequest(SenderWithPaymentRequestMemo)
 }
+
+extension RecoveredMemo: Equatable { }
 
 enum RecoverableMemo {
     case notset
@@ -55,6 +57,26 @@ enum RecoverableMemo {
         static let SENDER_WITH_PAYMENT_REQUEST = "0101"
         static let DESTINATION = "0200"
         static let UNUSED = "0000"
+    }
+}
+
+extension RecoverableMemo {
+    func recover(publicAddress: PublicAddress) -> RecoveredMemo? {
+        switch self {
+        case .notset, .unused:
+            return nil
+        case let .destination(recoverable):
+            guard let memo = recoverable.recover() else { return nil }
+            return .destination(memo)
+        case let .sender(recoverable):
+            guard let memo = recoverable.recover(senderPublicAddress: publicAddress)
+            else { return nil }
+            return .sender(memo)
+        case let .senderWithPaymentRequest(recoverable):
+            guard let memo = recoverable.recover(senderPublicAddress: publicAddress)
+            else { return nil }
+            return .senderWithPaymentRequest(memo)
+        }
     }
 }
 
