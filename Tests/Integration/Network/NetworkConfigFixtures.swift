@@ -9,7 +9,8 @@ import Foundation
 import XCTest
 
 enum NetworkConfigFixtures {
-    static let network: NetworkPreset = IntegrationTestFixtures.network
+    static let dyanmicConfig = DynamicNetworkConfig.AlphaDevelopment.make()
+    static let network: NetworkPreset = .dynamic(dyanmicConfig)
 }
 
 extension NetworkConfigFixtures {

@@ -10,7 +10,7 @@ extension Data {
         var bytes = [UInt8](repeating: 0, count: length)
         let status = SecRandomCopyBytes(kSecRandomDefault, length, &bytes)
         if status == errSecSuccess {
-            self.init(bytes: bytes)
+            self.init(bytes)
         } else {
             throw SecurityError()
         }

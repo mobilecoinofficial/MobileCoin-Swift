@@ -21,7 +21,7 @@ struct TestConsensusService: ConsensusService {
 
 extension TestConsensusService {
     static func makeWithSuccess() -> TestConsensusService {
-        var response = ConsensusCommon_ProposeTxResponse()
+        let response = ConsensusCommon_ProposeTxResponse()
         return TestConsensusService(result: .success(response))
     }
 

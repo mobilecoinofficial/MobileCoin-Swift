@@ -36,6 +36,43 @@ enum TxOutUtils {
         }
     }
 
+    static func sharedSecret(
+        viewPrivateKey: RistrettoPrivate,
+        publicKey: RistrettoPublic
+    ) -> RistrettoPrivate? {
+        publicKey.asMcBuffer { publicKeyBufferPtr in
+            viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
+                switch Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+                    mc_tx_out_get_shared_secret(
+                        viewPrivateKeyPtr,
+                        publicKeyBufferPtr,
+                        bufferPtr,
+                        &errorPtr)
+                }) {
+                case .success(let bytes):
+                    // Safety: It's safe to skip validation because
+                    // mc_tx_out_get_subaddress_spend_public_key should always return a valid
+                    // RistrettoPrivate on success.
+                    return RistrettoPrivate(skippingValidation: bytes)
+                case .failure(let error):
+                    switch error.errorCode {
+                    case .invalidInput:
+                        // Safety: This condition indicates a programming error and can only
+                        // happen if arguments to mc_tx_out_get_shared_secret are
+                        // supplied incorrectly.
+                        logger.warning("error: \(redacting: error)")
+                        return nil
+                    default:
+                        // Safety: mc_tx_out_get_shared_secret should not throw
+                        // non-documented errors.
+                        logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                        return nil
+                    }
+                }
+            }
+        }
+    }
+
     static func reconstructCommitment(
         maskedValue: UInt64,
         publicKey: RistrettoPublic,
