@@ -156,7 +156,8 @@ extension FogKeyImageConnectionIntTests {
     func createFogKeyImageConnectionWithInvalidCredentials(
         transportProtocol: TransportProtocol
     ) throws -> FogKeyImageConnection {
-        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
+        let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(
+                using: transportProtocol)
         return createFogKeyImageConnection(networkConfig: networkConfig)
     }
 
