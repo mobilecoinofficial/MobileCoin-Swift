@@ -156,8 +156,10 @@ extension NetworkPreset {
             return "mc://node1.prod.mobilecoinww.com"
         case .testNet:
             return "mc://node1.test.mobilecoin.com"
+        case .alpha:
+            return "mc://node1.alpha.development.mobilecoin.com"
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return "mc://node1.\(self).mobilecoin.com"
         case .dynamic(let preset):
             return "mc://node1.\(preset.namespace).\(preset.environment).mobilecoin.com"
@@ -169,8 +171,10 @@ extension NetworkPreset {
             return "fog://fog.prod.mobilecoinww.com"
         case .testNet:
             return "fog://fog.test.mobilecoin.com"
+        case .alpha:
+            return "fog://fog.alpha.development.mobilecoin.com"
 
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return "fog://fog.\(self).mobilecoin.com"
         case .dynamic(let preset):
             return "fog://\(preset.user)fog." +
@@ -483,6 +487,7 @@ extension NetworkPreset {
                 allowedHardeningAdvisories: ["INTEL-SA-00334"]))
         }
     }
+
     func fogViewAttestation() throws -> Attestation {
         switch networkGroup {
         case .mainNet:
@@ -497,6 +502,7 @@ extension NetworkPreset {
                 allowedHardeningAdvisories: ["INTEL-SA-00334"]))
         }
     }
+
     func fogLedgerAttestation() throws -> Attestation {
         switch networkGroup {
         case .mainNet:
@@ -511,6 +517,7 @@ extension NetworkPreset {
                 allowedHardeningAdvisories: ["INTEL-SA-00334"]))
         }
     }
+
     func fogReportAttestation() throws -> Attestation {
         switch networkGroup {
         case .mainNet:
@@ -525,6 +532,7 @@ extension NetworkPreset {
                 allowedHardeningAdvisories: ["INTEL-SA-00334"]))
         }
     }
+
     private func defaultAttestation(mrEnclaveHex: String) throws -> Attestation {
         Attestation(mrEnclaves: [
             try XCTUnwrapSuccess(Attestation.MrEnclave.make(
@@ -545,6 +553,7 @@ extension NetworkPreset {
             return false
         }
     }
+
     var consensusCredentials: BasicCredentials? {
         switch self {
         case .mainNet, .testNet:
@@ -565,6 +574,7 @@ extension NetworkPreset {
             return true
         }
     }
+
     var fogUserCredentials: BasicCredentials? {
         switch self {
         case .mainNet, .testNet:
