@@ -556,19 +556,19 @@ extension NetworkPreset {
 
     var consensusCredentials: BasicCredentials? {
         switch self {
-        case .mainNet, .testNet:
+        case .mainNet, .testNet, .mobiledev:
             // No credentials necessary.
             return nil
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
+        case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
             return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
         }
     }
 
     var fogRequiresCredentials: Bool {
         switch self {
-        case .mainNet, .testNet:
+        case .mainNet, .testNet, .mobiledev:
             return false
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return true
         case .dynamic:
             return true
@@ -577,10 +577,10 @@ extension NetworkPreset {
 
     var fogUserCredentials: BasicCredentials? {
         switch self {
-        case .mainNet, .testNet:
+        case .mainNet, .testNet, .mobiledev:
             // No credentials necessary.
             return nil
-        case .alpha, .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+        case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
         case .dynamic:
             return BasicCredentials(username: Self.devAuthUsername, password: Self.devAuthPassword)
