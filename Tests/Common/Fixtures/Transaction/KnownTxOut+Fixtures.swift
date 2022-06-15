@@ -199,6 +199,22 @@ extension KnownTxOut.Fixtures.GetSharedSecret {
 }
 
 extension KnownTxOut.Fixtures {
+    static func makeLedgerTxOut(
+        txHex: String,
+        viewKey: RistrettoPrivate,
+        globalIndex: UInt64 = 10000,
+        block: BlockMetadata = BlockMetadata(index: 9999, timestamp: nil)
+    ) throws -> LedgerTxOut {
+        try XCTUnwrap(
+            LedgerTxOut(
+                try XCTUnwrap(PartialTxOut(
+                    try XCTUnwrap(TxOut(serializedData:
+                        try XCTUnwrap(Data(hexEncoded: txHex)))))),
+                globalIndex: globalIndex,
+                block: block))
+
+    }
+
     static func makeLedgerTxOut(hex: String, viewKey: RistrettoPrivate) throws -> LedgerTxOut {
         try XCTUnwrap(
             LedgerTxOut(

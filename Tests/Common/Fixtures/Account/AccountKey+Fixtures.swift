@@ -377,3 +377,69 @@ extension AccountKey.Fixtures.KnownTxOut {
             6578616d706c652e636f6d
             """
 }
+
+extension AccountKey.Fixtures {
+    struct SeedableRng {
+        // The rust code uses a seedable random number generator when testing transactions and the
+        // transaction builder. The following account keys were generated with the corresponding
+        // "seed" input 1u8, 2u8, etc..
+
+        // let mut rng: StdRng = SeedableRng::from_seed([1u8; 32]);
+        // let recipient = AccountKey::random_with_fog(&mut rng);
+        let oneSeed: AccountKey
+
+        // let mut rng: StdRng = SeedableRng::from_seed([2u8; 32]);
+        // let recipient = AccountKey::random_with_fog(&mut rng);
+        let twoSeed: AccountKey
+
+        // let mut rng: StdRng = SeedableRng::from_seed([3u8; 32]);
+        // let recipient = AccountKey::random_with_fog(&mut rng);
+        let threeSeed: AccountKey
+
+        // let mut rng: StdRng = SeedableRng::from_seed([4u8; 32]);
+        // let recipient = AccountKey::random_with_fog(&mut rng);
+        let fourSeed: AccountKey
+
+        init() throws {
+            self.oneSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.oneSeed))))
+            self.twoSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.twoSeed))))
+            self.threeSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.threeSeed))))
+            self.fourSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.fourSeed))))
+        }
+    }
+}
+
+extension AccountKey.Fixtures.SeedableRng {
+    static let oneSeed =
+            """
+            0a220a209af500f3af465b5954ab07b6eacd34c2bc6cadeea065ebd8b7f51f9383ccb\
+            50312220a2037b1398cd78e25e251fa46019c7519e6b1859c97a6cee287a28d60e26c\
+            4e79061a11666f673a2f2f6578616d706c652e636f6d
+            """
+
+    static let twoSeed =
+            """
+            0a220a2095ba5c2207ab830d05a6c4adac0d10f3961c518acf990f1577ac7ff5eae8d\
+            d0f12220a20b7b08e9435d572cc67540c2d08677c176ec89af06a42453ed6d1faa01d\
+            0839031a11666f673a2f2f6578616d706c652e636f6d
+            """
+
+    static let threeSeed =
+            """
+            0a220a2095ba5c2207ab830d05a6c4adac0d10f3961c518acf990f1577ac7ff5eae8d\
+            d0f12220a20b7b08e9435d572cc67540c2d08677c176ec89af06a42453ed6d1faa01d\
+            0839031a11666f673a2f2f6578616d706c652e636f6d
+            """
+
+    static let fourSeed =
+            """
+            0a220a20502f8a05935f6bcb8f09273c09fbd6f26a4343ea88ba44966ed202f0cf25d\
+            b0a12220a200ba7060b742ba4b324a4def279ecb4beeb8e56f6910b24f12638ea4ab3\
+            175f0d1a11666f673a2f2f6578616d706c652e636f6d
+            """
+
+}
