@@ -199,6 +199,36 @@ extension KnownTxOut.Fixtures.GetSharedSecret {
 }
 
 extension KnownTxOut.Fixtures {
+    struct RTHSeedableRng {
+        let knownTxOut: KnownTxOut
+        let senderAccountKey: AccountKey
+        let receiverAccountKey: AccountKey
+
+        init() throws {
+            let accountFixture = try AccountKey.Fixtures.KnownTxOut()
+            self.senderAccountKey = accountFixture.senderAccountKey
+            self.receiverAccountKey = accountFixture.receiverAccountKey
+            self.knownTxOut = try Self.getKnownTxOut(accountKey: receiverAccountKey)
+        }
+    }
+}
+
+extension KnownTxOut.Fixtures.RTHSeedableRng {
+    static let viewRecordHex =
+        """
+        11b89889a83748c3b71a20ea28e0a73e2e579163d8710ef1d19bafc1bd04f681168a7eed50054c7c\
+        91b45d2220f40936fb0af75ae89f632685e930a9a53abcac8665ae6a7cd59915e07f15d86e296400\
+        000000000000310100000000000000390a0000000000000045dad4f6064a4246587e555ff2700a08\
+        d66334a78b43f43c02a270bd580225a11d4f1bb4ca56017ab622dcdb26555c7340344a0a0499f6ee\
+        48ea1335e6a8c4ba4424cfe8ccc523dd1e
+        """
+
+    static func getKnownTxOut(accountKey: AccountKey) throws -> KnownTxOut {
+        try KnownTxOut.Fixtures.getKnownTxOut(hex: viewRecordHex, accountKey: accountKey)
+    }
+}
+
+extension KnownTxOut.Fixtures {
     static func makeLedgerTxOut(
         txHex: String,
         viewKey: RistrettoPrivate,
