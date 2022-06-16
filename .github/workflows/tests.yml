@@ -20,6 +20,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Install CocoaPodsKeys
+        run: gem install cocoapods-keys
+
       - name: Checkout
         uses: actions/checkout@v2
       
