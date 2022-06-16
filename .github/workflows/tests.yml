@@ -78,13 +78,9 @@ jobs:
           cd ..
           echo 'Running make lock as a prerequisite for setting up credentials' 
           make lock 
-          echo 'Generating CocoaPods Keys for Example'
-          cd Example
-          bundle exec pod keys generate
-          cd ..
-          echo 'Generating CocoaPods Keys for ExampleHTTP'
-          cd ExampleHTTP
-          bundle exec pod keys generate
+
+          echo 'Generating CocoaPods Keys'
+          ./scripts/setkeys
           #echo 'setting dev user and password for ExampleHTTP'
           #cd ../ExampleHTTP
           #bundle exec pod keys set devNetworkAuthUsername ${TEST_DEV_USER}
