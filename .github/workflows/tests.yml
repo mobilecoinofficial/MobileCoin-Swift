@@ -52,7 +52,7 @@ jobs:
           echo 'Setting TestNet Mnemonics'
           bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "${TEST_NET_MNEMONICS}"
           echo 'Setting DevNet Mnemonics'
-          bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "${$DEV_NET_MNEMONICS}"
+          bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "${DEV_NET_MNEMONICS}"
           echo 'Setting Dynamic Fog SPKI'
           bundle exec pod keys set dynamicTestAccountFogAuthoritySpki "${DYNAMIC_FOG_AUTH_SPKI}"
           echo 'Setting Dynamic Seed Entropies'
