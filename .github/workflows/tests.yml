@@ -23,6 +23,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Install tools
+        run: brew install rename
+
       - name: Checkout
         uses: actions/checkout@v2
 
