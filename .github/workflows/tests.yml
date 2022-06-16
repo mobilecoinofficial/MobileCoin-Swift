@@ -55,6 +55,11 @@ jobs:
           echo 'Providing DevNet Mnemonics'
           bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "$DEV_NET_MNEMONICS"
 
+      - name: Make Lock 
+        run: |
+          echo 'Running make lock as a prerequisite for generating the CocoaPods Keys'
+          make lock 
+
       - name: Generate CocoaPods Keys
         run:
           echo 'Generating CocoaPods Keys'
