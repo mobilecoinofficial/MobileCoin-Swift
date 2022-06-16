@@ -32,6 +32,9 @@ jobs:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
         run: echo 'SKIPPING SETTING NETWORK FOR NOW' 
 
+      - name: Make Setup
+        run: make setup
+
       - name: Make Lock 
         run: |
           echo 'Running make lock as a prerequisite for setting up credentials' 
