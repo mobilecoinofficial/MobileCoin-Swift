@@ -43,4 +43,4 @@ jobs:
         run: echo 'providing network entropies'
 
       - name: Build
-        run: make build
+        run: make 
