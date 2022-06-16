@@ -15,11 +15,15 @@ on:
           - 'alpha'
           - 'testNet'
 
+env:
+  DEVELOPER_DIR: /Applications/Xcode_12.5.1.app/Contents/Developer
+
 jobs:
   test:
     runs-on: macos-latest
 
     steps:
+      -
 
       - name: Checkout
         uses: actions/checkout@v2
