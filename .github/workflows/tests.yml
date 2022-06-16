@@ -39,7 +39,7 @@ jobs:
       - name: Set the Network
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
-        run: echo 'SKIPPING FOR NOW - using default, re: setting the network'
+        run: echo 'SKIPPING SETTING NETWORK FOR NOW' 
 
       - name: Provide TestNet Mnemonics 
         env:
