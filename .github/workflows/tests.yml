@@ -48,11 +48,13 @@ jobs:
           bundle exec pod keys set devNetworkAuthUsername ${TEST_DEV_USER}
           bundle exec pod keys set devNetworkAuthPassword ${TEST_DEV_PASSWORD}
           echo 'Providing TestNet Mnemonics'
-          bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "$TEST_NET_MNEMONICS"
+          bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated ${TEST_NET_MNEMONICS}
           echo 'Providing DevNet Mnemonics'
-          bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "$DEV_NET_MNEMONICS"
-          #echo 'Running make lock as a prerequisite for setting up credentials' 
-          #make lock 
+          bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated ${$DEV_NET_MNEMONICS}
+          cd ..
+          echo 'Running make lock as a prerequisite for setting up credentials' 
+          make lock 
+          cd Example
           echo 'Generating CocoaPods Keys'
           bundle exec pod keys generate
           #echo 'setting dev user and password for ExampleHTTP'
