@@ -81,13 +81,16 @@ jobs:
           cd ..
           echo 'Running make lock as a prerequisite for setting up credentials' 
           make lock 
+      
+      - name: Pre-Keys make lock
+        run: make lock
 
-          echo 'Generating CocoaPods Keys'
-          ./scripts/setkeys
-          #echo 'setting dev user and password for ExampleHTTP'
-          #cd ../ExampleHTTP
-          #bundle exec pod keys set devNetworkAuthUsername ${TEST_DEV_USER}
-          #bundle exec pod keys set devNetworkAuthPassword ${TEST_DEV_PASSWORD}
+      - name: Generating CocoaPods Keys
+        run: ./scripts/setkeys
+
+      # when keys file is renamed from incorrect Example, build is failing b/c ExampleKeys not found :/
+      - name: Post-Keys make lock
+        run: make lock
 
       - name: Build
         run: make build-example-http 
