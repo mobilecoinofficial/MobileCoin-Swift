@@ -12,6 +12,19 @@ public enum RecoveredMemo {
 
 extension RecoveredMemo: Equatable { }
 
+extension RecoveredMemo {
+    var addressHash: AddressHash {
+        switch self {
+        case let .senderWithPaymentRequest(memo):
+            return memo.addressHash
+        case let .sender(memo):
+            return memo.addressHash
+        case let .destination(memo):
+            return memo.addressHash
+        }
+    }
+}
+
 enum RecoverableMemo {
     case notset
     case unused
@@ -57,6 +70,15 @@ enum RecoverableMemo {
         static let SENDER_WITH_PAYMENT_REQUEST = "0101"
         static let DESTINATION = "0200"
         static let UNUSED = "0000"
+    }
+
+    var isAuthenticatedSenderMemo: Bool {
+        switch self {
+        case .notset, .unused, .destination:
+            return false
+        case .sender, .senderWithPaymentRequest:
+            return true
+        }
     }
 }
 

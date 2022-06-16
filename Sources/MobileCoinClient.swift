@@ -80,11 +80,61 @@ public final class MobileCoinClient {
         accountLock.readSync { $0.cachedTxOutTokenIds }
     }
 
+    static func recover<Contact: PublicAddressProvider>(
+        txOut: OwnedTxOut,
+        contacts: Set<Contact>
+    ) -> HistoricalTransaction where Contact: Hashable {
+        switch txOut.recoverableMemo {
+        case let .destination(memo):
+            guard
+                let recoveredMemo = memo.recover(),
+                let matchingContact = contacts.first(where: {
+                    guard let contactHash = $0.publicAddress.calculateAddressHash(),
+                          contactHash == recoveredMemo.addressHash else {
+                        return false
+                    }
+                    return true
+                })
+            else {
+                return HistoricalTransaction(memo: nil, txOut: txOut, contact: nil)
+            }
+            return HistoricalTransaction(
+                memo: .destination(recoveredMemo),
+                txOut: txOut,
+                contact: matchingContact)
+        case .sender, .senderWithPaymentRequest:
+            return contacts
+                .compactMap { contact in
+                    guard let memo = txOut.recoverableMemo.recover(
+                        publicAddress: contact.publicAddress)
+                    else {
+                        return nil
+                    }
+                    return HistoricalTransaction(memo: memo, txOut: txOut, contact: contact)
+                }
+                .first ?? HistoricalTransaction(txOut: txOut)
+        case .notset, .unused:
+            return HistoricalTransaction(txOut: txOut)
+        }
+    }
+
     public func recoverTransactions<Contact: PublicAddressProvider>(
         contacts: Set<Contact>
     ) -> [HistoricalTransaction] where Contact: Hashable {
-        let activity = accountLock.readSync { $0.allCachedAccountActivity }
-        return activity.txOuts.map { txOut in
+        recoverTransactions(allAccountActivity().txOuts, contacts: contacts)
+    }
+
+    public func recoverContactTransactions<Contact: PublicAddressProvider>(
+        contact: Contact
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        recoverTransactions(contacts: Set([contact]))
+    }
+
+    static public func recoverTransactions<Contact: PublicAddressProvider>(
+        _ transactions: Set<OwnedTxOut>,
+        contacts: Set<Contact>
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        transactions.map { txOut in
             Self.recover(txOut: txOut, contacts: contacts)
         }
         .sorted { lhs, rhs in
@@ -92,25 +142,22 @@ public final class MobileCoinClient {
         }
     }
 
-    static func recover<Contact: PublicAddressProvider>(
-        txOut: OwnedTxOut,
+    public func recoverTransactions<Contact: PublicAddressProvider>(
+        _ transactions: Set<OwnedTxOut>,
         contacts: Set<Contact>
-    ) -> HistoricalTransaction where Contact: Hashable {
-        contacts
-            .compactMap { contact in
-                guard let memo = txOut.recoverableMemo.recover(publicAddress: contact.publicAddress)
-                else {
-                    return nil
-                }
-                return HistoricalTransaction(memo: memo, txOut: txOut, contact: contact)
-            }
-            .first ?? HistoricalTransaction(txOut: txOut)
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        Self.recoverTransactions(transactions, contacts: contacts)
     }
 
     public func recoverContactTransactions<Contact: PublicAddressProvider>(
+        _ transactions: Set<OwnedTxOut>,
         contact: Contact
     ) -> [HistoricalTransaction] where Contact: Hashable {
-        recoverTransactions(contacts: Set([contact]))
+        recoverTransactions(transactions, contacts: Set([contact]))
+    }
+
+    public func allAccountActivity() -> AccountActivity {
+        accountLock.readSync { $0.allCachedAccountActivity }
     }
 
     public func accountActivity(for tokenId: TokenId) -> AccountActivity {

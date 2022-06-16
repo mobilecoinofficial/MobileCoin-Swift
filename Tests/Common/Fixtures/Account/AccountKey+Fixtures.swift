@@ -383,22 +383,15 @@ extension AccountKey.Fixtures {
         // The rust code uses a seedable random number generator when testing transactions and the
         // transaction builder. The following account keys were generated with the corresponding
         // "seed" input 1u8, 2u8, etc..
-
         // let mut rng: StdRng = SeedableRng::from_seed([1u8; 32]);
         // let recipient = AccountKey::random_with_fog(&mut rng);
         let oneSeed: AccountKey
-
-        // let mut rng: StdRng = SeedableRng::from_seed([2u8; 32]);
-        // let recipient = AccountKey::random_with_fog(&mut rng);
         let twoSeed: AccountKey
-
-        // let mut rng: StdRng = SeedableRng::from_seed([3u8; 32]);
-        // let recipient = AccountKey::random_with_fog(&mut rng);
         let threeSeed: AccountKey
-
-        // let mut rng: StdRng = SeedableRng::from_seed([4u8; 32]);
-        // let recipient = AccountKey::random_with_fog(&mut rng);
         let fourSeed: AccountKey
+        let fiveSeed: AccountKey
+        let sixSeed: AccountKey
+        let sevenSeed: AccountKey
 
         init() throws {
             self.oneSeed = try XCTUnwrap(
@@ -409,6 +402,12 @@ extension AccountKey.Fixtures {
                 AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.threeSeed))))
             self.fourSeed = try XCTUnwrap(
                 AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.fourSeed))))
+            self.fiveSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.fiveSeed))))
+            self.sixSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.sixSeed))))
+            self.sevenSeed = try XCTUnwrap(
+                AccountKey(serializedData: XCTUnwrap(Data(hexEncoded: Self.sevenSeed))))
         }
     }
 }
@@ -423,9 +422,9 @@ extension AccountKey.Fixtures.SeedableRng {
 
     static let twoSeed =
             """
-            0a220a2095ba5c2207ab830d05a6c4adac0d10f3961c518acf990f1577ac7ff5eae8d\
-            d0f12220a20b7b08e9435d572cc67540c2d08677c176ec89af06a42453ed6d1faa01d\
-            0839031a11666f673a2f2f6578616d706c652e636f6d
+            0a220a20c76ec8723f3b198bf8bde76fca07cf98082189ad30a057d25271faabdd105\
+            e0912220a20e9ee1a958444aef8bb3b9f8a4b3e01b3ea2e1d25dca8fd8ae91ce3adbc\
+            fcb1081a11666f673a2f2f6578616d706c652e636f6d
             """
 
     static let threeSeed =
@@ -440,6 +439,27 @@ extension AccountKey.Fixtures.SeedableRng {
             0a220a20502f8a05935f6bcb8f09273c09fbd6f26a4343ea88ba44966ed202f0cf25d\
             b0a12220a200ba7060b742ba4b324a4def279ecb4beeb8e56f6910b24f12638ea4ab3\
             175f0d1a11666f673a2f2f6578616d706c652e636f6d
+            """
+
+    static let fiveSeed =
+            """
+            0a220a203669115236ed0475033f224692803c125bfb8c92e1733f3b24939e69d9f53f0512220a20\
+            c695947b751a352326e2bbdf6e5f4e91547d57ad3676dad1b2d429574192be061a11666f673a2f2f\
+            6578616d706c652e636f6d
+            """
+
+    static let sixSeed =
+            """
+            0a220a20e75fb8cd4426d483ecf2cb57d9707e956829620f643717726029891e3cf4200f12220a20\
+            c3e3517fa7262b43ac9a485c68e84f88697d88a57eab9555986c9b84c9dafd0e1a11666f673a2f2f\
+            6578616d706c652e636f6d
+            """
+
+    static let sevenSeed =
+            """
+            0a220a20f27e1e42d395de188cf0d55e063e544642053e655125ba259e4753618d3b1e0a12220a20\
+            76a08a852248c6ce5d94c8e60dfdbdec5ec18fc896e8ab3208e2bbffe5a09e091a11666f673a2f2f\
+            6578616d706c652e636f6d
             """
 
 }
