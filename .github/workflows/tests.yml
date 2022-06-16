@@ -23,6 +23,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Get Submodules
+        run: git submodule update --recursive
       
       - name: GCP Service Account
         run: |
