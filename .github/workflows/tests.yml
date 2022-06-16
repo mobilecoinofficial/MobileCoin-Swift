@@ -52,19 +52,36 @@ jobs:
           cd Example
           bundle exec pod keys set devNetworkAuthUsername ${TEST_DEV_USER}
           bundle exec pod keys set devNetworkAuthPassword ${TEST_DEV_PASSWORD}
-          echo 'Setting TestNet Mnemonics'
+          echo 'Setting TestNet Mnemonics for Example'
           bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "${TEST_NET_MNEMONICS}"
-          echo 'Setting DevNet Mnemonics'
+          echo 'Setting DevNet Mnemonics for Example'
           bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "${DEV_NET_MNEMONICS}"
-          echo 'Setting Dynamic Fog SPKI'
+          echo 'Setting Dynamic Fog SPKI for Example'
           bundle exec pod keys set dynamicTestAccountFogAuthoritySpki "${DYNAMIC_FOG_AUTH_SPKI}"
-          echo 'Setting Dynamic Seed Entropies'
+          echo 'Setting Dynamic Seed Entropies for Example'
+          bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "${DYNAMIC_SEED_ENTROPIES}"
+          cd ..
+          echo 'setting dev user and password for ExampleHTTP'
+          cd ExampleHTTP
+          bundle exec pod keys set devNetworkAuthUsername ${TEST_DEV_USER}
+          bundle exec pod keys set devNetworkAuthPassword ${TEST_DEV_PASSWORD}
+          echo 'Setting TestNet Mnemonics for ExampleHTTP'
+          bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "${TEST_NET_MNEMONICS}"
+          echo 'Setting DevNet Mnemonics for ExampleHTTP'
+          bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "${DEV_NET_MNEMONICS}"
+          echo 'Setting Dynamic Fog SPKI for ExampleHTTP'
+          bundle exec pod keys set dynamicTestAccountFogAuthoritySpki "${DYNAMIC_FOG_AUTH_SPKI}"
+          echo 'Setting Dynamic Seed Entropies for ExampleHTTP'
           bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "${DYNAMIC_SEED_ENTROPIES}"
           cd ..
           echo 'Running make lock as a prerequisite for setting up credentials' 
           make lock 
+          echo 'Generating CocoaPods Keys for Example'
           cd Example
-          echo 'Generating CocoaPods Keys'
+          bundle exec pod keys generate
+          cd ..
+          echo 'Generating CocoaPods Keys for ExampleHTTP'
+          cd ExampleHTTP
           bundle exec pod keys generate
           #echo 'setting dev user and password for ExampleHTTP'
           #cd ../ExampleHTTP
