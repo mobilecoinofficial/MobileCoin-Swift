@@ -56,7 +56,7 @@ jobs:
           echo 'Setting Dynamic Fog SPKI'
           bundle exec pod keys set dynamicTestAccountFogAuthoritySpki "${DYNAMIC_FOG_AUTH_SPKI}"
           echo 'Setting Dynamic Seed Entropies'
-          bundle exec pod keys set dyanmicTestAccountSeedEntropiesCommaSeparated "${DYNAMIC_SEED_ENTROPIES}"
+          bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "${DYNAMIC_SEED_ENTROPIES}"
           cd ..
           echo 'Running make lock as a prerequisite for setting up credentials' 
           make lock 
