@@ -1,0 +1,46 @@
+name: sdk-tests
+
+on:
+  #  workflow_dispatch:
+  push:
+    branches: [ task/github-actions-tests ]
+    intputs:
+      network:
+        description: 'MobileCoin Network'
+        required: true
+        default: 'mobiledev'
+        type: choice
+        options:
+          - 'mobiledev'
+          - 'alpha'
+          - 'testNet'
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+      
+      - name: GCP Service Account
+        run: |
+          echo '${{ secrets.GCP_SERVICE_KEY }}' > "service-key.json"
+
+      - name: Provide Dev Credentials
+        env:
+          TEST_DEV_USER: ${{ secrets.TEST_DEV_USER }}
+          TEST_DEV_PASSWORD: ${{ secrets.TEST_DEV_PASSWORD }}
+        run: |
+          echo 'setting dev user and password'
+
+      - name: Set the Network
+        env:
+          NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
+        run: echo 'setting the network'
+
+      - name: Provide Network Entropies
+        run: echo 'providing network entropies'
+
+      - name: Build
+        run: make build
