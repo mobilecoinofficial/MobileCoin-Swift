@@ -20,6 +20,11 @@ extension InvalidInputError: CustomStringConvertible {
     }
 }
 
+public enum BalanceUpdateError: Error {
+    case connectionError(ConnectionError)
+    case fogSyncError(FogSyncError)
+}
+
 public enum ConnectionError: Error {
     case connectionFailure(String)
     case authorizationFailure(String)
@@ -219,16 +224,17 @@ public struct SecurityError: Error {
 
 extension SecurityError: CustomStringConvertible {
     static var nilPublicKey = """
-        the public key could not be extracted (this can happen if the public key algorithm is not supported).
+        the public key could not be extracted \
+        (this can happen if the public key algorithm is not supported).
     """
-    
+
     public var description: String {
         guard let osstatus = status else { return "Security Error Code - \(message ?? "Unknown")" }
         if #available(iOS 11.3, *) {
-            return "Security Error Code - \(osstatus): \(SecCopyErrorMessageString(osstatus, nil) ?? "Unknown" as CFString)"
+            return "Security Error Code - \(osstatus): " +
+                   "\(SecCopyErrorMessageString(osstatus, nil) ?? "Unknown" as CFString)"
         } else {
             return "Security Error Code - \(osstatus) ... see Apple Security Framework SecBase.h"
         }
     }
 }
-

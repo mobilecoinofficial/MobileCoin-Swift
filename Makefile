@@ -86,6 +86,14 @@ clean-example-http: clean-docs
 .PHONY: lint
 lint: swiftlint
 
+.PHONY: lint-strict
+lint-strict: 
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict --quiet
+
+.PHONY: autocorrect
+autocorrect: 
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
+
 .PHONY: lint-all
 lint-all: lint lint-circleci lint-podspec lint-docs
 
@@ -104,14 +112,17 @@ tag-release:
 
 .PHONY: lint-locally-podspec
 lint-locally-podspec:
-	bundle exec pod lib lint MobileCoin.podspec --skip-tests
+	cd Example; bundle exec pod repo update;
+	bundle exec pod lib lint MobileCoin.podspec --skip-tests --allow-warnings
 
 .PHONY: lint-podspec
 lint-podspec:
+	cd Example; bundle exec pod repo update;
 	bundle exec pod spec lint MobileCoin.podspec --skip-tests
 
 .PHONY: publish-podspec
 publish-podspec:
+	cd Example; bundle exec pod repo update;
 	bundle exec pod trunk push MobileCoin.podspec --skip-tests
 
 # CircleCI
@@ -150,10 +161,6 @@ lint-docs:
 	)" == "" ]] || { echo 'Error: Found one or more public types not categorized in jazzy.'; exit 1; }
 
 # Swiftlint
-
-.PHONY: autocorrect
-autocorrect:
-	@PATH="./Example/Pods/SwiftLint:$$PATH" swiftlint autocorrect
 
 .PHONY: swiftlint
 swiftlint:

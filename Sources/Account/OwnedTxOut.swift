@@ -11,6 +11,8 @@ public struct OwnedTxOut {
 
     public let value: UInt64
 
+    public let tokenId: TokenId
+
     let keyImageTyped: KeyImage
     /// - Returns: `TxOut` key  image
     public var keyImage: Data { keyImageTyped.data }
@@ -21,6 +23,8 @@ public struct OwnedTxOut {
 
     public let subaddressIndex: UInt64
 
+    public let sharedSecret: Data
+
     init(
         _ knownTxOut: KnownTxOut,
         receivedBlock: BlockMetadata,
@@ -28,10 +32,12 @@ public struct OwnedTxOut {
     ) {
         self.publicKeyTyped = knownTxOut.publicKey
         self.value = knownTxOut.value
+        self.tokenId = knownTxOut.tokenId
         self.keyImageTyped = knownTxOut.keyImage
         self.receivedBlock = receivedBlock
         self.spentBlock = spentBlock
         self.subaddressIndex = knownTxOut.subaddressIndex
+        self.sharedSecret = knownTxOut.sharedSecret.data
     }
 }
 

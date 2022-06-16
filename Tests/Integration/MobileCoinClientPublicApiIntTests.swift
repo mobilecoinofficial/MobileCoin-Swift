@@ -1,8 +1,8 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-
 // swiftlint:disable type_body_length
+// swiftlint:disable file_length
 
 import MobileCoin
 import XCTest
@@ -16,8 +16,11 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
-    func balance(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+    func balance(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
         client.updateBalance {
             guard $0.successOrFulfill(expectation: expect) != nil else { return }
@@ -31,15 +34,79 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+    func testBalances() throws {
+        let description = "Updating account balance"
+        try testSupportedProtocols(description: description) {
+            try balances(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func balances(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 0,
+            using: transportProtocol)
+
+        client.blockVersion {
+            guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
+                print("Test cannot run on blockversion < 2 ... " +
+                      "fulfilling the expectation as a success")
+                expect.fulfill()
+                return
+            }
+
+            client.updateBalances {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                let balances = client.balances
+                print(balances)
+
+                XCTAssertGreaterThan(balances.balances.count, 1)
+
+                print(client.accountActivity.describeUnspentTxOuts())
+
+                guard let mobBalance = balances.balances[.MOB] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+
+                XCTAssertTrue(
+                    mobBalance.amountParts.int > 0 ||
+                    mobBalance.amountParts.frac > 0
+                )
+
+                guard let mobUSDBalance = balances.balances[.MOB] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+
+                XCTAssertTrue(
+                    mobUSDBalance.amountParts.int > 0 ||
+                    mobUSDBalance.amountParts.frac > 0
+                )
+
+                let unknownTokenId = TokenId(UInt64(17000))
+                XCTAssertNil(balances.balances[unknownTokenId])
+
+                expect.fulfill()
+            }
+        }
+    }
+
     func testAccountActivity() throws {
         let description = "Updating account balance"
         try testSupportedProtocols(description: description) {
             try accountActivity(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func accountActivity(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+
+    func accountActivity(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
         client.updateBalance {
             guard $0.successOrFulfill(expectation: expect) != nil else { return }
@@ -62,9 +129,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try updateBalance(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func updateBalance(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol).updateBalance {
+
+    func updateBalance(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol).updateBalance {
             guard let balance = $0.successOrFulfill(expectation: expect) else { return }
 
             if let amountPicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
@@ -81,11 +151,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try prepareTransaction(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func prepareTransaction(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+
+    func prepareTransaction(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
                 to: recipient,
@@ -106,11 +181,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try submitTransaction(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func submitTransaction(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+
+    func submitTransaction(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(expectation: expect, transportProtocol: transportProtocol)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
                 to: recipient,
@@ -119,6 +199,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             ) {
                 guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
                 else { return }
+
+                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
 
                 client.submitTransaction(transaction) {
                     guard $0.successOrFulfill(expectation: expect) != nil else { return }
@@ -130,16 +212,188 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+    func testSubmitMobUSDTransaction() throws {
+        let description = "Submitting transaction"
+        try testSupportedProtocols(description: description) {
+            try submitMobUSDTransaction(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func submitMobUSDTransaction(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
+        let amount = Amount(100, in: .MOBUSD)
+
+        func checkBlockVersionAndFee(
+                _ client: MobileCoinClient,
+                _ expect: XCTestExpectation,
+                _ completion: @escaping (UInt64) -> Void
+        ) {
+
+            client.blockVersion {
+                guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
+                    print("Test cannot run on blockversion < 2 ... " +
+                          "fulfilling the expectation as a success")
+                    expect.fulfill()
+                    return
+                }
+
+                client.estimateTotalFee(toSendAmount: amount, feeLevel: .minimum) { estimatedFee in
+                    guard let fee = estimatedFee.successOrFulfill(expectation: expect)
+                    else { return }
+
+                    completion(fee)
+                }
+            }
+        }
+
+        func prepareAndSubmit(
+                _ client: MobileCoinClient,
+                _ expect: XCTestExpectation,
+                _ fee: UInt64,
+                _ completion: @escaping () -> Void
+        ) {
+
+            client.prepareTransaction(
+                to: recipient,
+                amount: amount,
+                fee: fee
+            ) {
+                guard let pendingTransaction = $0.successOrFulfill(expectation: expect)
+                else { return }
+
+                let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+                XCTAssertNotNil(publicKey)
+
+                let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+                XCTAssertNotNil(sharedSecret)
+
+                let transaction = pendingTransaction.transaction
+                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+                client.submitTransaction(transaction) {
+                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                    print("Transaction submission successful")
+
+                    completion()
+                }
+            }
+        }
+
+        func checkBalances(
+                _ client: MobileCoinClient,
+                _ expect: XCTestExpectation,
+                _ completion: @escaping (Balances) -> Void
+        ) {
+
+            client.updateBalances {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                let balances = client.balances
+                print(balances)
+
+                XCTAssertGreaterThan(balances.balances.count, 1)
+
+                print(client.accountActivity.describeUnspentTxOuts())
+
+                guard let mobBalance = balances.balances[.MOB] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+
+                XCTAssertTrue(
+                    mobBalance.amountParts.int > 0 ||
+                    mobBalance.amountParts.frac > 0
+                )
+
+                guard let mobUSDBalance = balances.balances[.MOBUSD] else {
+                    XCTFail("Expected Balance")
+                    return
+                }
+
+                XCTAssertTrue(
+                    mobUSDBalance.amountParts.int > 0 ||
+                    mobUSDBalance.amountParts.frac > 0
+                )
+
+                let unknownTokenId = TokenId(UInt64(17000))
+                XCTAssertNil(balances.balances[unknownTokenId])
+
+                completion(balances)
+            }
+        }
+
+        func verifyBalanceChange(
+                _ client: MobileCoinClient,
+                _ balancesBefore: Balances,
+                _ expect: XCTestExpectation
+                ) {
+
+            var numChecksRemaining = 5
+            func checkBalanceChange() {
+                numChecksRemaining -= 1
+                print("Updating balance...")
+                client.updateBalances {
+                    guard let balances = $0.successOrFulfill(expectation: expect) else { return }
+                    print("Balances: \(balances)")
+
+                    do {
+                        let balancesMap = balances.balances
+                        let balancesBeforeMap = balancesBefore.balances
+                        let mobUSD = try XCTUnwrap(balancesMap[.MOBUSD]?.amount())
+                        let initialMobUSD = try XCTUnwrap(balancesBeforeMap[.MOBUSD]?.amount())
+
+                        guard mobUSD != initialMobUSD else {
+                            guard numChecksRemaining > 0 else {
+                                XCTFail("Failed to receive a changed balance. initial balance: " +
+                                    "\(initialMobUSD), current balance: " +
+                                    "\(mobUSD) microMOBUSD")
+                                expect.fulfill()
+                                return
+                            }
+
+                            Thread.sleep(forTimeInterval: 2)
+                            checkBalanceChange()
+                            return
+                        }
+                    } catch {}
+                    expect.fulfill()
+                }
+            }
+            checkBalanceChange()
+        }
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol) { client in
+            checkBlockVersionAndFee(client, expect) { fee in
+                checkBalances(client, expect) { balancesBefore in
+                    prepareAndSubmit(client, expect, fee) {
+                        verifyBalanceChange(client, balancesBefore, expect)
+                    }
+                }
+            }
+        }
+    }
+
     func testSelfPaymentBalanceChange() throws {
         let description = "Self payment"
         try testSupportedProtocols(description: description) {
             try selfPaymentBalanceChange(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func selfPaymentBalanceChange(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+
+    func selfPaymentBalanceChange(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
         let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 2)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+                accountKey: accountKey,
+                transportProtocol: transportProtocol)
 
         func submitTransaction(callback: @escaping (Balance) -> Void) {
             client.updateBalance {
@@ -205,10 +459,15 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try selfPaymentBalanceChangeFeeLevel(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func selfPaymentBalanceChangeFeeLevel(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
+
+    func selfPaymentBalanceChangeFeeLevel(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
         let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+                accountKey: accountKey,
+                transportProtocol: transportProtocol)
 
         func submitTransaction(callback: @escaping (Balance) -> Void) {
             client.updateBalance {
@@ -272,11 +531,15 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try transactionStatus(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func transactionStatus(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, transportProtocol: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
+    func transactionStatus(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+                accountIndex: 1,
+                using: transportProtocol)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         func submitTransaction(callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
@@ -349,14 +612,18 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try receiptStatus(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func receiptStatus(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, transportProtocol: transportProtocol)
+
+    func receiptStatus(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(
+                accountIndex: 0,
+                using: transportProtocol)
         let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
         let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
             accountKey: receiverAccountKey,
             transportProtocol: transportProtocol)
-
 
         func submitTransaction(callback: @escaping (Receipt) -> Void) {
             senderClient.updateBalance {
@@ -428,12 +695,18 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try consensusTrustRootWorks(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func consensusTrustRootWorks(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
+
+    func consensusTrustRootWorks(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
+                using: transportProtocol)
         XCTAssertSuccess(
             config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()))
-        let client = try IntegrationTestFixtures.createMobileCoinClient(config: config, transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+                config: config,
+                transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         client.updateBalance {
@@ -468,13 +741,20 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try extraConsensusTrustRootWorks(transportProtocol: $0, expect: $1)
         }
     }
-    
-    func extraConsensusTrustRootWorks(transportProtocol: TransportProtocol, expect: XCTestExpectation) throws {
-        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
+
+    func extraConsensusTrustRootWorks(
+        transportProtocol: TransportProtocol,
+        expect: XCTestExpectation
+    ) throws {
+        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
+                using: transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()
             + [try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes]))
         let client =
-            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 1, config: config, transportProtocol: transportProtocol)
+            try IntegrationTestFixtures.createMobileCoinClient(
+                    accountIndex: 1,
+                    config: config,
+                    transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         client.updateBalance {
@@ -512,14 +792,21 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try wrongConsensusTrustRootReturnsError(transportProtocol: $0, expectation: $1)
         }
     }
-    
-    func wrongConsensusTrustRootReturnsError(transportProtocol: TransportProtocol, expectation expect: XCTestExpectation) throws {
-        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(transportProtocol:transportProtocol)
+
+    func wrongConsensusTrustRootReturnsError(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
+                using: transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots([
             try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
         ]))
         let client =
-            try IntegrationTestFixtures.createMobileCoinClient(accountIndex: 0, config: config, transportProtocol: transportProtocol)
+            try IntegrationTestFixtures.createMobileCoinClient(
+                    accountIndex: 0,
+                    config: config,
+                    transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
         client.updateBalance {
@@ -547,4 +834,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+}
+
+extension AccountActivity {
+    public func describeUnspentTxOuts() -> String {
+        [
+            self.txOuts.filter { $0.spentBlock == nil }.map {
+                "Unspent TxOut \($0.value) \($0.tokenId.name)"
+            },
+        ]
+        .flatMap({ $0 })
+        .joined(separator: ", \n")
+    }
 }

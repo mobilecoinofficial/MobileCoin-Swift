@@ -19,4 +19,3 @@ class CertificateTests: XCTestCase {
     }
 
 }
-

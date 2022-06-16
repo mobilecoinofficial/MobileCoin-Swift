@@ -5,11 +5,11 @@
 import Foundation
 import NIOSSL
 
-struct WrappedNIOSSLCertificate : SSLCertificates {
+struct WrappedNIOSSLCertificate: SSLCertificates {
     let trustRootsBytes: [Data]
-    
+
     var trustRoots: [NIOSSLCertificate] = []
-    
+
     init?(trustRootBytes bytes: [Data]) throws {
         switch Self.trustRoots(from: bytes) {
         case .success(let certificates as [NIOSSLCertificate]):

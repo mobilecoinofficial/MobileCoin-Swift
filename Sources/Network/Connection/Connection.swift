@@ -23,7 +23,7 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
         let inner = Inner(connectionOptionWrapper: connectionOptionWrapper)
         self.inner = .init(inner, targetQueue: targetQueue)
     }
-    
+
     func rotateConnection() {
         let connectionOptionWrapper = connectionOptionWrapperFactory(self.transportProtocolOption)
         inner.accessAsync { $0.connectionOptionWrapper = connectionOptionWrapper }
@@ -42,7 +42,7 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
     var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService> {
         inner.accessWithoutLocking.connectionOptionWrapper
     }
-    
+
     func rotateURLOnError<T>(
         _ completion: @escaping (Result<T, ConnectionError>) -> Void
     ) -> (Result<T, ConnectionError>) -> Void {
@@ -52,10 +52,8 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
                 completion(result)
             case .failure:
                 logger.debug("rotating config on error")
+                completion(result)
                 self?.rotateConnection()
-                // schedule the completion on the queue so that the inner
-                // has a chance to process the scheduled connection update
-                self?.inner.serialExclusionQueue.async { completion(result) }
             }
         }
     }

@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable file_length multiline_function_chains force_unwrapping function_body_length
 
 import LibMobileCoin
 @testable import MobileCoin
@@ -14,16 +15,38 @@ extension Transaction.Fixtures {
     struct BuildTx {
         let inputs: [PreparedTxInput]
         let accountKey: AccountKey
-        let outputs: [(recipient: PublicAddress, amount: PositiveUInt64)]
+        let outputs: [TransactionOutput]
         let fee = Self.fee
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
+        let blockVersion = Self.defaultBlockVersion
 
         init() throws {
             self.inputs = try Self.inputs()
             self.accountKey = try Self.accountKey()
             self.outputs = try Self.outputs()
             self.fogResolver = try Self.fogResolver()
+        }
+    }
+
+    struct ExactChange {
+        let inputs: [PreparedTxInput]
+        let accountKey: AccountKey
+        let outputs: [TransactionOutput]
+        let fee: Amount
+        let tombstoneBlockIndex: UInt64
+        let fogResolver: FogResolver
+        let blockVersion = BlockVersion.minRTHEnabled
+
+        init() throws {
+            let buildTxFixture = try Transaction.Fixtures.BuildTx()
+            self.fee = buildTxFixture.fee
+            self.tombstoneBlockIndex = buildTxFixture.tombstoneBlockIndex
+            self.inputs = buildTxFixture.inputs
+            self.accountKey = buildTxFixture.accountKey
+            self.outputs = try Self.outputs()
+            self.fogResolver = buildTxFixture.fogResolver
+            /*self.blockVersion = buildTxFixture.blockVersion*/
         }
     }
 }
@@ -61,14 +84,17 @@ extension Transaction.Fixtures {
 }
 
 extension Transaction.Fixtures.BuildTx {
+    fileprivate static var defaultBlockVersion = BlockVersion.minRTHEnabled
 
     fileprivate static func inputs() throws -> [PreparedTxInput] {
         let knownTxOut = try XCTUnwrap(KnownTxOut(
             LedgerTxOut(
                 PartialTxOut(
+                    encryptedMemo: Data66(),
                     commitment: Data32(base64Encoded:
                         "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
                     maskedValue: 2886556578342610519,
+                    maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
                     targetKey: RistrettoPublic(base64Encoded:
                         "VECBlIdhtmTFaXtlWphlqELpDL04EKMbbPWu3CoJ2UE=")!,
                     publicKey: RistrettoPublic(base64Encoded:
@@ -373,29 +399,36 @@ extension Transaction.Fixtures.BuildTx {
     }
 
     fileprivate static func accountKey() throws -> AccountKey {
-        try XCTUnwrap(AccountKey(serializedData: Data(base64Encoded: """
+        let rootAccountKey = try XCTUnwrap(AccountKey(serializedData: Data(base64Encoded: """
             CiIKIOehy72XOCsNdTLzG/RefRYoupEnA502UKNx5mdax7QNEiIKILuf18L68eT2bJeXd+3f153oGnliqORaT9p\
             efNlL0LAAGilmb2c6Ly9mb2ctaW5nZXN0Lm1vYmlsZWRldi5tb2JpbGVjb2luLmNvbSoUI+nfq9r3TGlCjsDfrB\
             V4Tu3HRm4=
             """)!))
+
+        return try AccountKey.make(
+            viewPrivateKey: rootAccountKey.viewPrivateKey,
+            spendPrivateKey: rootAccountKey.spendPrivateKey,
+            fogReportUrl: try AccountKey.Fixtures.Init().fogReportUrl,
+            fogReportId: try AccountKey.Fixtures.Init().fogReportId,
+            fogAuthoritySpki: try AccountKey.Fixtures.Init().fogAuthoritySpki).get()
     }
 
     fileprivate static func outputs() throws
-        -> [(recipient: PublicAddress, amount: PositiveUInt64)]
+        -> [TransactionOutput]
     {
         [
-            (
+            TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
                 amount: try XCTUnwrap(PositiveUInt64(10))
             ),
-            (
+            TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
                 amount: try XCTUnwrap(PositiveUInt64(2499979999999990))
             ),
         ]
     }
 
-    fileprivate static let fee: UInt64 = 10_000_000_000
+    fileprivate static let fee = Amount(10_000_000_000, in: .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 610
 
@@ -406,6 +439,20 @@ extension Transaction.Fixtures.BuildTx {
     fileprivate static func fogResolver() throws -> FogResolver {
         let fogReportUrl = try self.fogReportUrl()
         return try FogResolver.Fixtures.Default(reportUrl: fogReportUrl).fogResolver
+    }
+
+}
+
+extension Transaction.Fixtures.ExactChange {
+    fileprivate static func outputs() throws
+        -> [TransactionOutput]
+    {
+        [
+            TransactionOutput(
+                recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
+                amount: try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
+            ),
+        ]
     }
 
 }
@@ -433,7 +480,7 @@ extension Transaction.Fixtures.Default {
         ]
     }
 
-    fileprivate static let fee: UInt64 = 10_000_000_000
+    fileprivate static let fee = Amount(10_000_000_000, in: .MOB)
 
     fileprivate static let tombstoneBlockIndex: UInt64 = 634
 

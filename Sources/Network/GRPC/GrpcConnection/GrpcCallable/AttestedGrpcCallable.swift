@@ -21,7 +21,7 @@ protocol AttestedGrpcCallable: GrpcCallable {
     func processResponse(
         response: Response,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+    ) -> Result < (responseAad: InnerResponseAad, response: InnerResponse),
                 AttestedGrpcConnectionError>
 }
 
@@ -37,7 +37,7 @@ extension AttestedGrpcCallable where InnerRequestAad == (), InnerRequest == Requ
 
 extension AttestedGrpcCallable where InnerResponseAad == (), InnerResponse == Response {
     func processResponse(response: Response, attestAkeCipher: AttestAke.Cipher)
-        -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+        -> Result < (responseAad: InnerResponseAad, response: InnerResponse),
                   AttestedGrpcConnectionError>
     {
         .success((responseAad: (), response: response))
@@ -69,7 +69,7 @@ extension AttestedGrpcCallable
     func processResponse(
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+    ) -> Result < (responseAad: InnerResponseAad, response: InnerResponse),
                 AttestedGrpcConnectionError>
     {
         guard response.aad == Data() else {
@@ -119,7 +119,7 @@ extension AttestedGrpcCallable
     func processResponse(
         response: Attest_Message,
         attestAkeCipher: AttestAke.Cipher
-    ) -> Result<(responseAad: InnerResponseAad, response: InnerResponse),
+    ) -> Result < (responseAad: InnerResponseAad, response: InnerResponse),
                 AttestedGrpcConnectionError>
     {
         guard let responseAad = try? InnerResponseAad(serializedData: response.aad) else {

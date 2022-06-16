@@ -7,11 +7,17 @@ import LibMobileCoin
 
 struct TransactionSubmitter {
     private let consensusService: ConsensusService
-    private let feeFetcher: BlockchainFeeFetcher
+    private let metaFetcher: BlockchainMetaFetcher
+    private let syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>
 
-    init(consensusService: ConsensusService, feeFetcher: BlockchainFeeFetcher) {
+    init(
+        consensusService: ConsensusService,
+        metaFetcher: BlockchainMetaFetcher,
+        syncChecker: ReadWriteDispatchLock<FogSyncCheckable>
+    ) {
         self.consensusService = consensusService
-        self.feeFetcher = feeFetcher
+        self.metaFetcher = metaFetcher
+        self.syncCheckerLock = syncChecker
     }
 
     func submitTransaction(
@@ -22,12 +28,24 @@ struct TransactionSubmitter {
             "Submitting transaction... transaction: " +
             "\(redacting: transaction.serializedData.base64EncodedString())",
             logFunction: false)
+
         consensusService.proposeTx(External_Tx(transaction)) {
             switch $0 {
             case .success(let response):
+                syncCheckerLock.writeSync {
+                    // Consensus Block Index Cannot be less than 0
+                    $0.setConsensusHighestKnownBlock(
+                        response.blockCount > 0 ? response.blockCount - 1 : 0)
+                }
+
                 let responseResult = self.processResponse(response)
+
                 if case .txFeeError = response.result {
-                    self.feeFetcher.resetCache {
+                    self.metaFetcher.resetCache {
+                        completion(responseResult)
+                    }
+                } else if metaFetcher.cachedBlockVersion() ?? 0 != response.blockVersion {
+                    self.metaFetcher.resetCache {
                         completion(responseResult)
                     }
                 } else {
@@ -53,8 +71,12 @@ struct TransactionSubmitter {
              .duplicateKeyImages, .duplicateOutputPublicKey, .missingTxOutMembershipProof,
              .invalidTxOutMembershipProof, .invalidRistrettoPublicKey,
              .tombstoneBlockExceeded, .invalidLedgerContext, .memosNotAllowed,
-             .membershipProofValidationError, .keyError, .unsortedInputs:
-            return .failure(.invalidTransaction())
+             .membershipProofValidationError, .keyError, .unsortedInputs,
+             .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
+             .unsortedOutputs:
+            return .failure(.invalidTransaction(
+                        "Error Code: \(response.result) " +
+                        "(\(response.result.rawValue))"))
         case .txFeeError:
             return .failure(.feeError())
         case .tombstoneBlockTooFar:
@@ -82,4 +104,12 @@ struct TransactionSubmitter {
                 "Consensus.proposeTx returned unrecognized result: \(resultCode)")))
         }
     }
+}
+
+extension ConsensusCommon_ProposeTxResult {
+    /**
+     * The name of the enumeration (as written in case).
+     */
+    var name: String { String(describing: self) }
+
 }

@@ -1,7 +1,7 @@
 version: 2.1
 
 defaults:
-  default-xcode-version: &default-xcode-version "12.2.0"
+  default-xcode-version: &default-xcode-version "12.5.1"
   default-ruby-version: &default-ruby-version "2.7"
 
   default-environment: &default-environment
@@ -9,6 +9,9 @@ defaults:
     devNetworkAuthUsername:
     devNetworkAuthPassword:
     testNetTestAccountMnemonicsCommaSeparated:
+    mobileDevTestAccountMnemonicsCommaSeparated:
+    dynamicTestAccountSeedEntropiesCommaSeparated:
+    dynamicTestAccountFogAuthoritySpki:
 
 commands:
   init-artifacts-submodule:
@@ -288,10 +291,37 @@ jobs:
       - set-ruby-version
       - install-gems
       - print-tool-versions
+      - install-example-gems
+      - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
       - run: make lint-locally-podspec
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
+      - check-dirty-git
+
+  swiftlint:
+    parameters:
+      xcode-version:
+        type: string
+        default: *default-xcode-version
+    macos:
+      xcode: << parameters.xcode-version >>
+    environment:
+      <<: *default-environment
+      FL_BUILDLOG_PATH: ../output/buildlogs
+      SCAN_OUTPUT_DIRECTORY: ../output/scan
+      SCAN_OUTPUT_TYPES: junit
+    steps:
+      - checkout
+      - init-artifacts-submodule
+      - set-ruby-version
+      - install-gems
+      - install-example-http-gems
+      - install-example-http-pods:
+          xcode-version: << parameters.xcode-version >>
+      - print-tool-versions
+      - run: make lint-strict
       - check-dirty-git
 
   generate-docs:
@@ -346,6 +376,9 @@ jobs:
       - init-artifacts-submodule
       - set-ruby-version
       - install-gems
+      - install-example-gems
+      - install-example-pods:
+          xcode-version: << parameters.xcode-version >>
       - set-git-credentials
       - publish-to-trunk
 
@@ -360,6 +393,11 @@ workflows:
               xcode-version: [*default-xcode-version]
       - build-and-test-example-http:
           name: build-and-test-example-http-xcode-<< matrix.xcode-version >>
+          matrix:
+            parameters:
+              xcode-version: [*default-xcode-version]
+      - swiftlint:
+          name: swiftlint-<< matrix.xcode-version >>
           matrix:
             parameters:
               xcode-version: [*default-xcode-version]

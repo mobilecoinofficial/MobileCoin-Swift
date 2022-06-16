@@ -5,8 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class FogViewConnection:
-    Connection<GrpcProtocolConnectionFactory.FogViewServiceProvider, HttpProtocolConnectionFactory.FogViewServiceProvider>, FogViewService
+final class FogViewConnection: Connection<
+        GrpcProtocolConnectionFactory.FogViewServiceProvider,
+        HttpProtocolConnectionFactory.FogViewServiceProvider
+    >,
+    FogViewService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -29,7 +32,7 @@ final class FogViewConnection:
         self.targetQueue = targetQueue
         self.rng = rng
         self.rngContext = rngContext
-        
+
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
                 let rotatedConfig = config.fogViewConfig()
@@ -63,9 +66,15 @@ final class FogViewConnection:
     ) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.query(requestAad: requestAad, request: request, completion: rotateURLOnError(completion))
+            grpcConnection.query(
+                    requestAad: requestAad,
+                    request: request,
+                    completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.query(requestAad: requestAad, request: request, completion: rotateURLOnError(completion))
+            httpConnection.query(
+                    requestAad: requestAad,
+                    request: request,
+                    completion: rotateURLOnError(completion))
         }
     }
 }
