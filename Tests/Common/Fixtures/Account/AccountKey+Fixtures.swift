@@ -383,8 +383,12 @@ extension AccountKey.Fixtures {
         // The rust code uses a seedable random number generator when testing transactions and the
         // transaction builder. The following account keys were generated with the corresponding
         // "seed" input 1u8, 2u8, etc..
+        //
+        // ```rust
         // let mut rng: StdRng = SeedableRng::from_seed([1u8; 32]);
         // let recipient = AccountKey::random_with_fog(&mut rng);
+        // ```
+
         let oneSeed: AccountKey
         let twoSeed: AccountKey
         let threeSeed: AccountKey
