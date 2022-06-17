@@ -5,7 +5,9 @@
 import Foundation
 
 /// Provides a snapshot of account activity at a particular point in the ledger, as indicated by
-/// `blockCount`for a particular token type
+/// `blockCount`.
+/// `nil` tokenId means its a mixed set of transactions.
+/// `.some` tokenId means all OwnedTxOut's have the same tokenId
 public struct AccountActivity {
     public let txOuts: Set<OwnedTxOut>
     public let blockCount: UInt64
@@ -17,15 +19,3 @@ public struct AccountActivity {
         self.tokenId = tokenId
     }
 }
-
-///// Provides a snapshot of account activity at a particular point in the ledger, as indicated by
-///// `blockCount`.
-// public struct AllAccountActivity {
-//    public let txOuts: Set<OwnedTxOut>
-//    public let blockCount: UInt64
-//
-//    init(txOuts: [OwnedTxOut], blockCount: UInt64) {
-//        self.txOuts = Set(txOuts)
-//        self.blockCount = blockCount
-//    }
-// }
