@@ -6,8 +6,9 @@ import Foundation
 
 public struct SenderMemo {
     public var memoData: Data { memoData64.data }
-    let memoData64: Data64
     public var addressHashHex: String { addressHash.hex }
+
+    let memoData64: Data64
     let addressHash: AddressHash
 }
 
@@ -16,8 +17,8 @@ extension SenderMemo: Equatable, Hashable { }
 struct RecoverableSenderMemo {
     let memoData: Data64
     let addressHash: AddressHash
-    private let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
+    private let accountKey: AccountKey
 
     init(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
         self.memoData = memoData

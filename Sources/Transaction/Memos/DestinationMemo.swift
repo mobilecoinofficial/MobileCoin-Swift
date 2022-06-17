@@ -6,10 +6,11 @@ import Foundation
 
 public struct DestinationMemo {
     public var memoData: Data { memoData64.data }
-    let memoData64: Data64
     public var addressHashHex: String { addressHash.hex }
-    let addressHash: AddressHash
     public var numberOfRecipients: UInt8 { numRecipients.value }
+
+    let memoData64: Data64
+    let addressHash: AddressHash
     let numRecipients: PositiveUInt8
     let fee: UInt64
     let totalOutlay: UInt64
@@ -20,9 +21,9 @@ extension DestinationMemo: Equatable, Hashable { }
 struct RecoverableDestinationMemo {
     let memoData: Data64
     let addressHash: AddressHash
-    private let accountKey: AccountKey
     let txOutPublicKey: RistrettoPublic
     let txOutTargetKey: RistrettoPublic
+    private let accountKey: AccountKey
 
     init(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         self.memoData = memoData
