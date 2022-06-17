@@ -85,11 +85,3 @@ extension Contact.Fixtures {
         }
     }
 }
-
-extension Contact.Fixtures.DefaultValidSet {
-//    static func matchingContact() throws -> Contact {
-//        let accountFixture = try AccountKey.Fixtures.KnownTxOut()
-//        return
-//
-//    }
-}
