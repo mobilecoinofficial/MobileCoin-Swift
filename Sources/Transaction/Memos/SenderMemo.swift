@@ -4,10 +4,14 @@
 
 import Foundation
 
-struct SenderMemo {
-    let memoData: Data64
+public struct SenderMemo {
+    public var memoData: Data { memoData64.data }
+    let memoData64: Data64
+    public var addressHashHex: String { addressHash.hex }
     let addressHash: AddressHash
 }
+
+extension SenderMemo: Equatable, Hashable { }
 
 struct RecoverableSenderMemo {
     let memoData: Data64
@@ -31,7 +35,7 @@ struct RecoverableSenderMemo {
         else {
             return nil
         }
-        return SenderMemo(memoData: memoData, addressHash: addressHash)
+        return SenderMemo(memoData64: memoData, addressHash: addressHash)
     }
 }
 

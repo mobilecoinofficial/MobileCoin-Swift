@@ -78,7 +78,7 @@ class KnownTxOutTests: XCTestCase {
         let recovered = try XCTUnwrap(recoverableMemo.recover())
         XCTAssertEqual(recovered.fee, fixture.fee)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
-        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients.value)
     }
 
     func testFogViewRecordSenderWithPaymentRequestMemoPayload() throws {

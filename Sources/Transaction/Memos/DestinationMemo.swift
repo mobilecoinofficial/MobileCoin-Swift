@@ -4,13 +4,18 @@
 
 import Foundation
 
-struct DestinationMemo {
-    let memoData: Data64
+public struct DestinationMemo {
+    public var memoData: Data { memoData64.data }
+    let memoData64: Data64
+    public var addressHashHex: String { addressHash.hex }
     let addressHash: AddressHash
-    let numberOfRecipients: PositiveUInt8
+    public var numberOfRecipients: UInt8 { numRecipients.value }
+    let numRecipients: PositiveUInt8
     let fee: UInt64
     let totalOutlay: UInt64
 }
+
+extension DestinationMemo: Equatable, Hashable { }
 
 struct RecoverableDestinationMemo {
     let memoData: Data64
@@ -42,9 +47,9 @@ struct RecoverableDestinationMemo {
         }
         let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
         return DestinationMemo(
-            memoData: memoData,
+            memoData64: memoData,
             addressHash: addressHash,
-            numberOfRecipients: numberOfRecipients,
+            numRecipients: numberOfRecipients,
             fee: fee,
             totalOutlay: totalOutlay)
     }
