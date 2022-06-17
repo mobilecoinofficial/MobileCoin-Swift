@@ -80,6 +80,7 @@ enum RecoverableMemo {
             return true
         }
     }
+
 }
 
 extension RecoverableMemo {
@@ -119,6 +120,37 @@ extension RecoverableMemo: Equatable {
             return lhsMemo == rhsMemo
         default:
             return false
+        }
+    }
+}
+
+extension RecoverableMemo {
+    func recover<Contact: PublicAddressProvider>(
+        contacts: Set<Contact>
+    ) -> (memo: RecoveredMemo?, contact: Contact?) {
+        switch self {
+        case let .destination(memo):
+            guard let recoveredMemo = memo.recover() else {
+                return (memo: nil, contact: nil)
+            }
+            guard let matchingContact = contacts.first(where: {
+                    $0.publicAddress.calculateAddressHash() == recoveredMemo.addressHash
+                })
+            else {
+                return (memo: .destination(recoveredMemo), contact: nil)
+            }
+            return (memo: .destination(recoveredMemo), contact: matchingContact)
+        case .sender, .senderWithPaymentRequest:
+            return contacts.compactMap { contact in
+                guard let memo = self.recover(publicAddress: contact.publicAddress)
+                else {
+                    return nil
+                }
+                return (memo: memo, contact: contact)
+            }
+            .first ?? (memo: nil, contact: nil)
+        case .notset, .unused:
+            return (memo: nil, contact: nil)
         }
     }
 }
