@@ -23,8 +23,9 @@ extension RecoverableMemo.Fixtures {
                 fixture.knownTxOut,
                 receivedBlock: Self.receivedBlock,
                 spentBlock: Self.spentBlock)
-            self.contacts = try Contact.Fixtures.DefaultValidSet().contacts
-            self.matchingContact = try XCTUnwrap(self.contacts.first)
+            let contacts = try Contact.Fixtures.DefaultValidSet().contacts
+            self.matchingContact = try XCTUnwrap(contacts.first)
+            self.contacts = contacts
 
             let senderPublicAddress = fixture.senderAccountKey.publicAddress
             self.memo = try XCTUnwrap(
