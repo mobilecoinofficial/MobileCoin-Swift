@@ -8,7 +8,7 @@ on:
       network:
         description: 'MobileCoin Network'
         required: true
-        default: 'mobiledev'
+        default: 'mobileDev'
         type: choice
         options:
           - 'mobileDev'
