@@ -80,18 +80,34 @@ public final class MobileCoinClient {
         accountLock.readSync { $0.cachedTxOutTokenIds }
     }
 
-    @available(*, deprecated, message:
-        """
-        Deprecated in favor of `accountActivity(for:TokenId)` which accepts a TokenId.
-        `accountActivity` will assume the default TokenId == .MOB // UInt64(0)
+    public func recoverTransactions<Contact: PublicAddressProvider>(
+        contacts: Set<Contact>
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        recoverTransactions(allAccountActivity().txOuts, contacts: contacts)
+    }
 
-        Get a set of all tokenIds that are in TxOuts owned by this account with:
+    public func recoverContactTransactions<Contact: PublicAddressProvider>(
+        contact: Contact
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        recoverTransactions(contacts: Set([contact]))
+    }
 
-        `MobileCoinClient(...).accountTokenIds // Set<TokenId>`
-        """)
+    public func recoverTransactions<Contact: PublicAddressProvider>(
+        _ transactions: Set<OwnedTxOut>,
+        contacts: Set<Contact>
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        Self.recoverTransactions(transactions, contacts: contacts)
+    }
 
-    public var accountActivity: AccountActivity {
-        accountActivity(for: .MOB)
+    public func recoverContactTransactions<Contact: PublicAddressProvider>(
+        _ transactions: Set<OwnedTxOut>,
+        contact: Contact
+    ) -> [HistoricalTransaction] where Contact: Hashable {
+        recoverTransactions(transactions, contacts: Set([contact]))
+    }
+
+    public func allAccountActivity() -> AccountActivity {
+        accountLock.readSync { $0.allCachedAccountActivity }
     }
 
     public func accountActivity(for tokenId: TokenId) -> AccountActivity {

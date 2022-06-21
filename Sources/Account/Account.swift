@@ -97,6 +97,13 @@ final class Account {
         return AccountActivity(txOuts: txOuts, blockCount: blockCount, tokenId: tokenId)
     }
 
+    var allCachedAccountActivity: AccountActivity {
+        let blockCount = knowableBlockCount
+        let txOuts = allTxOutTrackers
+            .compactMap { OwnedTxOut($0, atBlockCount: blockCount) }
+        return AccountActivity(txOuts: txOuts, blockCount: blockCount)
+    }
+
     var ownedTxOuts: [KnownTxOut] {
         ownedTxOutsAndBlockCount.txOuts
     }
