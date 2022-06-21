@@ -1,9 +1,9 @@
 name: sdk-tests
 
 on:
-  #  workflow_dispatch:
-  push:
-    branches: [ task/github-actions-tests ]
+  #push:
+  #  branches: [ task/github-actions-tests ]
+  workflow_dispatch:
     intputs:
       network:
         description: 'MobileCoin Network'
@@ -11,9 +11,10 @@ on:
         default: 'mobiledev'
         type: choice
         options:
-          - 'mobiledev'
+          - 'mobileDev'
           - 'alpha'
           - 'testNet'
+          - 'dynamicConfig'
 
 env:
   DEVELOPER_DIR: /Applications/Xcode_12.5.1.app/Contents/Developer
@@ -39,7 +40,7 @@ jobs:
       - name: Set the Network
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
-        run: echo 'SKIPPING SETTING NETWORK FOR NOW' 
+        run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Network/NetworkConfigFixtures.swift
 
       - name: Make Setup
         run: make setup
