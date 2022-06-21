@@ -13,11 +13,6 @@ on:
           - 'alpha'
           - 'testNet'
           - 'dynamicConfig'
-  push:
-    branches:
-      - 'task/github-actions-tests'
-    env:
-      DEFAULT_NETWORK_FOR_PUSH: 'testNet'
 
 env:
   DEVELOPER_DIR: /Applications/Xcode_12.5.1.app/Contents/Developer
@@ -43,8 +38,7 @@ jobs:
       - name: Set the Network
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
-          # only one of the values will be set at a time - either workflow input or push
-        run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}${DEFAULT_NETWORK_FOR_PUSH}/" ./Tests/Integration/Network/NetworkConfigFixtures.swift
+        run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Network/NetworkConfigFixtures.swift
 
       - name: Make Setup
         run: make setup
