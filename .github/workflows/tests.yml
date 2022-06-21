@@ -1,8 +1,6 @@
 name: sdk-tests
 
 on:
-  #push:
-  #  branches: [ task/github-actions-tests ]
   workflow_dispatch:
     intputs:
       network:
@@ -15,6 +13,9 @@ on:
           - 'alpha'
           - 'testNet'
           - 'dynamicConfig'
+  push:
+    branches:
+      - 'task/github-actions-tests'
 
 env:
   DEVELOPER_DIR: /Applications/Xcode_12.5.1.app/Contents/Developer
