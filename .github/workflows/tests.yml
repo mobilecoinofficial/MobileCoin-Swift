@@ -27,10 +27,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Check Test Environment Selection
-        shell: bash
-        run: |
-          if [ " 
       - name: Install tools
         run: brew install rename
 
