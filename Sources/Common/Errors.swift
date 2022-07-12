@@ -144,11 +144,11 @@ extension DefragTransactionPreparationError: CustomStringConvertible {
 
 public enum TransactionSubmissionError: Error {
     case connectionError(ConnectionError)
-    case invalidTransaction(String = String())
-    case feeError(String = String())
-    case tombstoneBlockTooFar(String = String())
-    case missingMemo(String = String())
-    case inputsAlreadySpent(String = String())
+    case invalidTransaction(UInt64, String = String())
+    case feeError(UInt64, String = String())
+    case tombstoneBlockTooFar(UInt64, String = String())
+    case missingMemo(UInt64, String = String())
+    case inputsAlreadySpent(UInt64, String = String())
 }
 
 extension TransactionSubmissionError: CustomStringConvertible {
@@ -157,15 +157,15 @@ extension TransactionSubmissionError: CustomStringConvertible {
             switch self {
             case .connectionError(let connectionError):
                 return "\(connectionError)"
-            case .missingMemo(let reason):
+            case .missingMemo(_, let reason):
                 return "Missing memo error\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .feeError(let reason):
+            case .feeError(_, let reason):
                 return "Fee error\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .invalidTransaction(let reason):
+            case .invalidTransaction(_, let reason):
                 return "Invalid transaction\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .tombstoneBlockTooFar(let reason):
+            case .tombstoneBlockTooFar(_, let reason):
                 return "Tombstone block too far\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .inputsAlreadySpent(let reason):
+            case .inputsAlreadySpent(_, let reason):
                 return "Inputs already spent\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()

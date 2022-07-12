@@ -75,15 +75,15 @@ struct TransactionSubmitter {
              .membershipProofValidationError, .keyError, .unsortedInputs,
              .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
              .unsortedOutputs:
-            return .failure(.invalidTransaction(
+            return .failure(.invalidTransaction(blockIndex,
                         "Error Code: \(response.result) " +
                         "(\(response.result.rawValue))"))
         case .txFeeError:
-            return .failure(.feeError())
+            return .failure(.feeError(blockIndex))
         case .tombstoneBlockTooFar:
-            return .failure(.tombstoneBlockTooFar())
+            return .failure(.tombstoneBlockTooFar(blockIndex))
         case .missingMemo:
-            return .failure(.missingMemo("Missing memo"))
+            return .failure(.missingMemo(blockIndex, "Missing memo"))
         case .containsSpentKeyImage, .containsExistingOutputPublicKey:
             // This exact Tx might have already been submitted (and succeeded), or else the
             // inputs were already spent by another Tx.
@@ -96,7 +96,7 @@ struct TransactionSubmitter {
             // For the time being, we'll just return .inputsAlreadySpent and let the user
             // decide how they want to proceed. Note: performing a Transaction status check
             // can help disambiguate the situation.
-            return .failure(.inputsAlreadySpent())
+            return .failure(.inputsAlreadySpent(blockIndex))
         case .ledger:
             return .failure(.connectionError(
                 .invalidServerResponse("Consensus.proposeTx returned ledger error")))
