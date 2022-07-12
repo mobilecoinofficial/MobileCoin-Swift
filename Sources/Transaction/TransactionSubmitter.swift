@@ -75,7 +75,8 @@ struct TransactionSubmitter {
              .membershipProofValidationError, .keyError, .unsortedInputs,
              .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
              .unsortedOutputs:
-            return .failure(.invalidTransaction(blockIndex,
+            return .failure(.invalidTransaction(
+                        blockIndex,
                         "Error Code: \(response.result) " +
                         "(\(response.result.rawValue))"))
         case .txFeeError:
