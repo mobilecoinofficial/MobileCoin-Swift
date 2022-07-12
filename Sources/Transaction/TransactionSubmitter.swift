@@ -33,7 +33,7 @@ struct TransactionSubmitter {
             switch $0 {
             case .success(let response):
                 // Consensus Block Index Cannot be less than 0
-                let blockCount = response.blockCount > 0 ? response.blockCount - 1 : 0;
+                let blockCount = response.blockCount > 0 ? response.blockCount - 1 : 0
 
                 syncCheckerLock.writeSync {
                     $0.setConsensusHighestKnownBlock(blockCount)
