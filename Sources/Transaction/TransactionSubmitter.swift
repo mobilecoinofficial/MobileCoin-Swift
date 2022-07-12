@@ -32,13 +32,14 @@ struct TransactionSubmitter {
         consensusService.proposeTx(External_Tx(transaction)) {
             switch $0 {
             case .success(let response):
+                // Consensus Block Index Cannot be less than 0
+                let blockCount = response.blockCount > 0 ? response.blockCount - 1 : 0;
+
                 syncCheckerLock.writeSync {
-                    // Consensus Block Index Cannot be less than 0
-                    $0.setConsensusHighestKnownBlock(
-                        response.blockCount > 0 ? response.blockCount - 1 : 0)
+                    $0.setConsensusHighestKnownBlock(blockCount)
                 }
 
-                let responseResult = self.processResponse(response)
+                let responseResult = self.processResponse(response, blockCount)
 
                 if case .txFeeError = response.result {
                     self.metaFetcher.resetCache {
@@ -57,12 +58,12 @@ struct TransactionSubmitter {
         }
     }
 
-    func processResponse(_ response: ConsensusCommon_ProposeTxResponse)
+    func processResponse(_ response: ConsensusCommon_ProposeTxResponse, _ blockCount: UInt64)
         -> Result<(UInt64), TransactionSubmissionError>
     {
         switch response.result {
         case .ok:
-            return .success((response.blockIndex - 1))
+            return .success(blockCount)
         case .inputsProofsLengthMismatch, .noInputs, .tooManyInputs,
              .insufficientInputSignatures, .invalidInputSignature,
              .invalidTransactionSignature, .invalidRangeProof, .insufficientRingSize,
