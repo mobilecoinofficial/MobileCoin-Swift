@@ -22,7 +22,7 @@ struct TransactionSubmitter {
 
     func submitTransaction(
         _ transaction: Transaction,
-        completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
+        completion: @escaping (Result<(UInt64), TransactionSubmissionError>) -> Void
     ) {
         logger.info(
             "Submitting transaction... transaction: " +
@@ -58,11 +58,11 @@ struct TransactionSubmitter {
     }
 
     func processResponse(_ response: ConsensusCommon_ProposeTxResponse)
-        -> Result<(), TransactionSubmissionError>
+        -> Result<(UInt64), TransactionSubmissionError>
     {
         switch response.result {
         case .ok:
-            return .success(())
+            return .success((response.blockIndex - 1))
         case .inputsProofsLengthMismatch, .noInputs, .tooManyInputs,
              .insufficientInputSignatures, .invalidInputSignature,
              .invalidTransactionSignature, .invalidRangeProof, .insufficientRingSize,
