@@ -22,7 +22,7 @@ struct TransactionSubmitter {
 
     func submitTransaction(
         _ transaction: Transaction,
-        completion: @escaping (Result<(UInt64), SubmitTransactionError>) -> Void
+        completion: @escaping (Result<UInt64, SubmitTransactionError>) -> Void
     ) {
         logger.info(
             "Submitting transaction... transaction: " +
@@ -64,7 +64,7 @@ struct TransactionSubmitter {
     }
 
     func processResponse(_ response: ConsensusCommon_ProposeTxResponse, _ blockIndex: UInt64)
-        -> Result<(UInt64), TransactionSubmissionError>
+        -> Result<UInt64, TransactionSubmissionError>
     {
         switch response.result {
         case .ok:
