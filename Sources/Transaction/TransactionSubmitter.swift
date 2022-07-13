@@ -22,7 +22,7 @@ struct TransactionSubmitter {
 
     func submitTransaction(
         _ transaction: Transaction,
-        completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
+        completion: @escaping (Result<UInt64, SubmitTransactionError>) -> Void
     ) {
         logger.info(
             "Submitting transaction... transaction: " +
@@ -32,13 +32,16 @@ struct TransactionSubmitter {
         consensusService.proposeTx(External_Tx(transaction)) {
             switch $0 {
             case .success(let response):
+                // Consensus Block Index Cannot be less than 0
+                let blockCount = response.blockCount > 0 ? response.blockCount - 1 : 0
+
                 syncCheckerLock.writeSync {
-                    // Consensus Block Index Cannot be less than 0
-                    $0.setConsensusHighestKnownBlock(
-                        response.blockCount > 0 ? response.blockCount - 1 : 0)
+                    $0.setConsensusHighestKnownBlock(blockCount)
                 }
 
-                let responseResult = self.processResponse(response)
+                let responseResult = self.processResponse(response, blockCount).mapError {
+                    SubmitTransactionError(submissionError: $0, consensusBlockCount: blockCount)
+                }
 
                 if case .txFeeError = response.result {
                     self.metaFetcher.resetCache {
@@ -52,17 +55,20 @@ struct TransactionSubmitter {
                     completion(responseResult)
                 }
             case .failure(let error):
-                completion(.failure(.connectionError(error)))
+                completion(.failure(
+                    SubmitTransactionError(
+                        submissionError: .connectionError(error),
+                        consensusBlockCount: nil)))
             }
         }
     }
 
-    func processResponse(_ response: ConsensusCommon_ProposeTxResponse)
-        -> Result<(), TransactionSubmissionError>
+    func processResponse(_ response: ConsensusCommon_ProposeTxResponse, _ blockIndex: UInt64)
+        -> Result<UInt64, TransactionSubmissionError>
     {
         switch response.result {
         case .ok:
-            return .success(())
+            return .success(blockIndex)
         case .inputsProofsLengthMismatch, .noInputs, .tooManyInputs,
              .insufficientInputSignatures, .invalidInputSignature,
              .invalidTransactionSignature, .invalidRangeProof, .insufficientRingSize,

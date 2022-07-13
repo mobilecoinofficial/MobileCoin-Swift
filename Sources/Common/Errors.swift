@@ -142,6 +142,18 @@ extension DefragTransactionPreparationError: CustomStringConvertible {
     }
 }
 
+public struct SubmitTransactionError: Error {
+    public let submissionError: TransactionSubmissionError
+    public let consensusBlockCount: UInt64?
+}
+
+extension SubmitTransactionError: CustomStringConvertible {
+    public var description: String {
+        "Submit Transaction Error: Consensus Block Count == \(consensusBlockCount), " +
+        "\(submissionError)"
+    }
+}
+
 public enum TransactionSubmissionError: Error {
     case connectionError(ConnectionError)
     case invalidTransaction(String = String())
