@@ -238,4 +238,36 @@ extension MobileCoinClient {
             completion: completion)
     }
 
+    @available(*, deprecated, message:
+        """
+        Use the new `submitTransaction(...)` which accepts a completion closure with a new result
+        type with the success type being a UInt64 representing the conensus block height, and the
+        failure type is a new error `SubmitTransactionError` which wraps the consensus block height
+        and the existing `TransactionSubmissionError`. Consensus Block Height can be useful for
+        querying fog to get information about the block your transaction landed in and/or when
+        determining the "freshness"/"staleness" of an AccountActivitySnapshot.
+
+        ```
+        public func submitTransaction(
+            transaction: Transaction,
+            completion: @escaping (Result<UInt64, SubmitTransactionError>) -> Void
+        )
+        ```
+
+        this function prepares transactions assuming assuming the default TokenId == .MOB
+        """)
+    public func submitTransaction(
+        _ transaction: Transaction,
+        completion: @escaping (Result<(), TransactionSubmissionError>) -> Void
+    ) {
+        // Wrap the new call, and map the success and error states for existing signature.
+        submitTransaction(transaction: transaction) { result in
+            completion(result.map({ _ in
+                ()
+            }).mapError({ submitTransactionError in
+                submitTransactionError.submissionError
+            }))
+        }
+    }
+
 }

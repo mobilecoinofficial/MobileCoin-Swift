@@ -271,8 +271,8 @@ public final class MobileCoinClient {
     }
 
     public func submitTransaction(
-        _ transaction: Transaction,
-        completion: @escaping (Result<(UInt64), TransactionSubmissionError>) -> Void
+        transaction: Transaction,
+        completion: @escaping (Result<UInt64, SubmitTransactionError>) -> Void
     ) {
         TransactionSubmitter(
             consensusService: serviceProvider.consensusService,

@@ -22,7 +22,7 @@ struct TransactionSubmitter {
 
     func submitTransaction(
         _ transaction: Transaction,
-        completion: @escaping (Result<(UInt64), TransactionSubmissionError>) -> Void
+        completion: @escaping (Result<(UInt64), SubmitTransactionError>) -> Void
     ) {
         logger.info(
             "Submitting transaction... transaction: " +
@@ -33,13 +33,15 @@ struct TransactionSubmitter {
             switch $0 {
             case .success(let response):
                 // Consensus Block Index Cannot be less than 0
-                let blockIndex = response.blockCount > 0 ? response.blockCount - 1 : 0
+                let blockCount = response.blockCount > 0 ? response.blockCount - 1 : 0
 
                 syncCheckerLock.writeSync {
-                    $0.setConsensusHighestKnownBlock(blockIndex)
+                    $0.setConsensusHighestKnownBlock(blockCount)
                 }
 
-                let responseResult = self.processResponse(response, blockIndex)
+                let responseResult = self.processResponse(response, blockCount).mapError {
+                    SubmitTransactionError(submissionError: $0, consensusBlockCount: blockCount)
+                }
 
                 if case .txFeeError = response.result {
                     self.metaFetcher.resetCache {
@@ -53,7 +55,10 @@ struct TransactionSubmitter {
                     completion(responseResult)
                 }
             case .failure(let error):
-                completion(.failure(.connectionError(error)))
+                completion(.failure(
+                    SubmitTransactionError(
+                        submissionError: .connectionError(error),
+                        consensusBlockCount: nil)))
             }
         }
     }
@@ -76,15 +81,14 @@ struct TransactionSubmitter {
              .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
              .unsortedOutputs:
             return .failure(.invalidTransaction(
-                        blockIndex,
                         "Error Code: \(response.result) " +
                         "(\(response.result.rawValue))"))
         case .txFeeError:
-            return .failure(.feeError(blockIndex))
+            return .failure(.feeError())
         case .tombstoneBlockTooFar:
-            return .failure(.tombstoneBlockTooFar(blockIndex))
+            return .failure(.tombstoneBlockTooFar())
         case .missingMemo:
-            return .failure(.missingMemo(blockIndex, "Missing memo"))
+            return .failure(.missingMemo("Missing memo"))
         case .containsSpentKeyImage, .containsExistingOutputPublicKey:
             // This exact Tx might have already been submitted (and succeeded), or else the
             // inputs were already spent by another Tx.
@@ -97,7 +101,7 @@ struct TransactionSubmitter {
             // For the time being, we'll just return .inputsAlreadySpent and let the user
             // decide how they want to proceed. Note: performing a Transaction status check
             // can help disambiguate the situation.
-            return .failure(.inputsAlreadySpent(blockIndex))
+            return .failure(.inputsAlreadySpent())
         case .ledger:
             return .failure(.connectionError(
                 .invalidServerResponse("Consensus.proposeTx returned ledger error")))

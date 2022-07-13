@@ -142,13 +142,25 @@ extension DefragTransactionPreparationError: CustomStringConvertible {
     }
 }
 
+public struct SubmitTransactionError: Error {
+    public let submissionError: TransactionSubmissionError
+    public let consensusBlockCount: UInt64?
+}
+
+extension SubmitTransactionError: CustomStringConvertible {
+    public var description: String {
+        "Submit Transaction Error: Consensus Block Count == \(consensusBlockCount), " +
+        "\(submissionError)"
+    }
+}
+
 public enum TransactionSubmissionError: Error {
     case connectionError(ConnectionError)
-    case invalidTransaction(UInt64, String = String())
-    case feeError(UInt64, String = String())
-    case tombstoneBlockTooFar(UInt64, String = String())
-    case missingMemo(UInt64, String = String())
-    case inputsAlreadySpent(UInt64, String = String())
+    case invalidTransaction(String = String())
+    case feeError(String = String())
+    case tombstoneBlockTooFar(String = String())
+    case missingMemo(String = String())
+    case inputsAlreadySpent(String = String())
 }
 
 extension TransactionSubmissionError: CustomStringConvertible {
@@ -157,15 +169,15 @@ extension TransactionSubmissionError: CustomStringConvertible {
             switch self {
             case .connectionError(let connectionError):
                 return "\(connectionError)"
-            case .missingMemo(_, let reason):
+            case .missingMemo(let reason):
                 return "Missing memo error\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .feeError(_, let reason):
+            case .feeError(let reason):
                 return "Fee error\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .invalidTransaction(_, let reason):
+            case .invalidTransaction(let reason):
                 return "Invalid transaction\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .tombstoneBlockTooFar(_, let reason):
+            case .tombstoneBlockTooFar(let reason):
                 return "Tombstone block too far\(!reason.isEmpty ? ": \(reason)" : "")"
-            case .inputsAlreadySpent(_, let reason):
+            case .inputsAlreadySpent(let reason):
                 return "Inputs already spent\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()
