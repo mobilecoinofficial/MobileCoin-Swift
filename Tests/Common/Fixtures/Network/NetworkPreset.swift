@@ -1,7 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable file_length multiline_function_chains
+// swiftlint:disable file_length multiline_function_chains vertical_parameter_alignment_on_call
 
 @testable import MobileCoin
 import XCTest
@@ -213,14 +213,25 @@ extension NetworkPreset {
 //    private static let mainNetFogReportMrEnclaveHex =
 //        "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
 
-    private static let testNetConsensusMrEnclaveHex =
+    // v1.1.0 Enclave Values
+    private static let legacy_v1_1_0_testNetConsensusMrEnclaveHex =
         "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
-    private static let testNetFogViewMrEnclaveHex =
+    private static let legacy_v1_1_0_testNetFogViewMrEnclaveHex =
         "e154f108c7758b5aa7161c3824c176f0c20f63012463bf3cc5651e678f02fb9e"
-    private static let testNetFogLedgerMrEnclaveHex =
+    private static let legacy_v1_1_0_testNetFogLedgerMrEnclaveHex =
         "768f7bea6171fb83d775ee8485e4b5fcebf5f664ca7e8b9ceef9c7c21e9d9bf3"
-    private static let testNetFogReportMrEnclaveHex =
+    private static let legacy_v1_1_0_testNetFogReportMrEnclaveHex =
         "a4764346f91979b4906d4ce26102228efe3aba39216dec1e7d22e6b06f919f11"
+
+    // v1.2.0 Enclave Values
+    private static let testNetConsensusMrEnclaveHex =
+        "4f134dcfd9c0885956f2f9af0f05c2050d8bdee2dc63b468a640670d7adeb7f8"
+    private static let testNetFogViewMrEnclaveHex =
+        "719ca43abbe02f507bb91ea11ff8bc900aa86363a7d7e77b8130426fc53d8684"
+    private static let testNetFogLedgerMrEnclaveHex =
+        "685481b33f2846585f33506ab65649c98a4a6d1244989651fd0fcde904ebd82f"
+    private static let testNetFogReportMrEnclaveHex =
+        "8f2f3bf81f24bf493fa6d76e29e0f081815022592b1e854f95bda750aece7452"
 
     private static let devMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
@@ -237,17 +248,17 @@ extension NetworkPreset {
         AwEAAQ==
         """
     private static let testNetFogAuthoritySpkiB64Encoded = """
-        MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvnB9wTbTOT5uoizRYaYbw7XIEkInl8E7MGOAQj+xnC+F1rI\
-        XiCnc/t1+5IIWjbRGhWzo7RAwI5sRajn2sT4rRn9NXbOzZMvIqE4hmhmEzy1YQNDnfALAWNQ+WBbYGW+Vqm3IlQvAFF\
-        jVN1YYIdYhbLjAPdkgeVsWfcLDforHn6rR3QBZYZIlSBQSKRMY/tywTxeTCvK2zWcS0kbbFPtBcVth7VFFVPAZXhPi9\
-        yy1AvnldO6n7KLiupVmojlEMtv4FQkk604nal+j/dOplTATV8a9AJBbPRBZ/yQg57EG2Y2MRiHOQifJx0S5VbNyMm9b\
-        kS8TD7Goi59aCW6OT1gyeotWwLg60JRZTfyJ7lYWBSOzh0OnaCytRpSWtNZ6barPUeOnftbnJtE8rFhF7M4F66et0LI\
-        /cuvXYecwVwykovEVBKRF4HOK9GgSm17mQMtzrD7c558TbaucOWabYR04uhdAc3s10MkuONWG0wIQhgIChYVAGnFLvS\
-        pp2/aQEq3xrRSETxsixUIjsZyWWROkuA0IFnc8d7AmcnUBvRW7FT/5thWyk5agdYUGZ+7C1o69ihR1YxmoGh69fLMPI\
-        EOhYh572+3ckgl2SaV4uo9Gvkz8MMGRBcMIMlRirSwhCfozV2RyT5Wn1NgPpyc8zJL7QdOhL7Qxb+5WjnCVrQYHI2cC\
-        AwEAAQ==
+        MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvnB9wTbTOT5uoizRYaYbw7XIEkInl8E7MGOA\
+        Qj+xnC+F1rIXiCnc/t1+5IIWjbRGhWzo7RAwI5sRajn2sT4rRn9NXbOzZMvIqE4hmhmEzy1YQNDnfALA\
+        WNQ+WBbYGW+Vqm3IlQvAFFjVN1YYIdYhbLjAPdkgeVsWfcLDforHn6rR3QBZYZIlSBQSKRMY/tywTxeT\
+        CvK2zWcS0kbbFPtBcVth7VFFVPAZXhPi9yy1AvnldO6n7KLiupVmojlEMtv4FQkk604nal+j/dOplTAT\
+        V8a9AJBbPRBZ/yQg57EG2Y2MRiHOQifJx0S5VbNyMm9bkS8TD7Goi59aCW6OT1gyeotWwLg60JRZTfyJ\
+        7lYWBSOzh0OnaCytRpSWtNZ6barPUeOnftbnJtE8rFhF7M4F66et0LI/cuvXYecwVwykovEVBKRF4HOK\
+        9GgSm17mQMtzrD7c558TbaucOWabYR04uhdAc3s10MkuONWG0wIQhgIChYVAGnFLvSpp2/aQEq3xrRSE\
+        TxsixUIjsZyWWROkuA0IFnc8d7AmcnUBvRW7FT/5thWyk5agdYUGZ+7C1o69ihR1YxmoGh69fLMPIEOh\
+        Yh572+3ckgl2SaV4uo9Gvkz8MMGRBcMIMlRirSwhCfozV2RyT5Wn1NgPpyc8zJL7QdOhL7Qxb+5WjnCV\
+        rQYHI2cCAwEAAQ==
         """
-
     private static let alphaFogAuthoritySpkiB64Encoded = """
         MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyFOockvCEc9TcO1NvsiUfFVzvtDsR64UIRRUl3tBM2Bh8KB\
         A932/Up86RtgJVnbslxuUCrTJZCV4dgd5hAo/mzuJOy9lAGxUTpwWWG0zZJdpt8HJRVLX76CBpWrWEt7JMoEmduvsCR\
@@ -478,7 +489,9 @@ extension NetworkPreset {
         case .mainNet:
             return try defaultAttestation(mrEnclaveHex: Self.mainNetConsensusMrEnclaveHex)
         case .testNet:
-            return try defaultAttestation(mrEnclaveHex: Self.testNetConsensusMrEnclaveHex)
+            return try defaultAttestation(mrEnclaveHex:
+                                            Self.legacy_v1_1_0_testNetConsensusMrEnclaveHex,
+                                            Self.testNetConsensusMrEnclaveHex)
         case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
@@ -493,7 +506,9 @@ extension NetworkPreset {
         case .mainNet:
             return try defaultAttestation(mrEnclaveHex: Self.mainNetFogViewMrEnclaveHex)
         case .testNet:
-            return try defaultAttestation(mrEnclaveHex: Self.testNetFogViewMrEnclaveHex)
+            return try defaultAttestation(mrEnclaveHex:
+                                            Self.legacy_v1_1_0_testNetFogViewMrEnclaveHex,
+                                            Self.testNetFogViewMrEnclaveHex)
         case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
@@ -508,7 +523,9 @@ extension NetworkPreset {
         case .mainNet:
             return try defaultAttestation(mrEnclaveHex: Self.mainNetFogLedgerMrEnclaveHex)
         case .testNet:
-            return try defaultAttestation(mrEnclaveHex: Self.testNetFogLedgerMrEnclaveHex)
+            return try defaultAttestation(mrEnclaveHex:
+                                            Self.legacy_v1_1_0_testNetFogLedgerMrEnclaveHex,
+                                            Self.testNetFogLedgerMrEnclaveHex)
         case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
@@ -523,7 +540,9 @@ extension NetworkPreset {
         case .mainNet:
             return try defaultAttestation(mrEnclaveHex: Self.mainNetFogReportMrEnclaveHex)
         case .testNet:
-            return try defaultAttestation(mrEnclaveHex: Self.testNetFogReportMrEnclaveHex)
+            return try defaultAttestation(mrEnclaveHex:
+                                            Self.legacy_v1_1_0_testNetFogReportMrEnclaveHex,
+                                            Self.testNetFogReportMrEnclaveHex)
         case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
@@ -533,12 +552,14 @@ extension NetworkPreset {
         }
     }
 
-    private func defaultAttestation(mrEnclaveHex: String) throws -> Attestation {
-        Attestation(mrEnclaves: [
-            try XCTUnwrapSuccess(Attestation.MrEnclave.make(
-                mrEnclave: try XCTUnwrap(Data(hexEncoded: mrEnclaveHex)),
-                allowedHardeningAdvisories: ["INTEL-SA-00334"])),
-        ])
+    private func defaultAttestation(mrEnclaveHex: String...) throws -> Attestation {
+        Attestation(mrEnclaves:
+            try mrEnclaveHex.map({
+                try XCTUnwrapSuccess(Attestation.MrEnclave.make(
+                        mrEnclave: try XCTUnwrap(Data(hexEncoded: $0)),
+                        allowedHardeningAdvisories: ["INTEL-SA-00334"]))
+            })
+        )
     }
 
     static func trustRootsBytes() throws -> [Data] {
