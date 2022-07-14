@@ -1,0 +1,38 @@
+#!/bin/bash
+
+function generate_and_rename_keys() {
+  echo "----------------------------"
+  echo "Set keys for $1 Project"
+  echo "----------------------------"
+
+  cd $(git rev-parse --show-toplevel)
+  cd "$1"
+  # bundle exec pod keys set devNetworkAuthUsername $DEV_NETWORK_AUTH_USERNAME
+  # bundle exec pod keys set devNetworkAuthPassword "$DEV_NETWORK_AUTH_PASSWORD"
+  # bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "$TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED"
+  # bundle exec pod keys set dynamicTestAccountFogAuthoritySpki "$DYNAMIC_TEST_ACCOUNT_FOG_AUTHORITY_SPKI"
+  # bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "$DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED"
+  # bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "$MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED"
+
+  bundle exec pod keys generate
+
+  FILE=Pods/CocoaPodsKeys/ExampleKeys.h
+  if test -f "$FILE"; then
+    echo "----------------------------"
+    echo "Keys files generated with INCORRECT name, renaming"
+    echo "----------------------------"
+    set -x
+    find . -name "*ExampleKeys*" | xargs -n 1 -I {} sed -i ''  's/ExampleKeys/MobileCoinKeys/g' {} ;
+    rm Pods/CocoaPodsKeys/MobileCoinKeys* || true; rename 's/Example/MobileCoin/' Pods/CocoaPodsKeys/*
+    set +x
+    echo "----------------------------"
+    echo "Naming substitution complete"
+    echo "----------------------------"
+  else
+    echo "----------------------------"
+    echo "Keys files generated with correct name."
+    echo "----------------------------"
+  fi
+}
+
+generate_and_rename_keys $1
