@@ -5,7 +5,12 @@
 // swiftlint:disable file_length
 
 import MobileCoin
+@testable import NIOPosix
 import XCTest
+
+enum TestError: Error {
+    case mock
+}
 
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
@@ -32,6 +37,41 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
             expect.fulfill()
         }
+    }
+
+    func testPrintBalance() throws {
+        let description = "Printing account balance"
+        try testSupportedProtocols(description: description) {
+            try printBalance(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func printBalance(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        try Array(0...9).forEach({ index in
+            let key = try IntegrationTestFixtures.createAccountKey(accountIndex: index)
+
+            let client = try IntegrationTestFixtures.createMobileCoinClient(
+                accountKey: key,
+                transportProtocol: transportProtocol)
+
+            client.updateBalance {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
+                    print("account index \(index) public address \(key.publicAddress)")
+                    print("account index \(index) balance: \(amountPicoMob)")
+                    XCTAssertGreaterThan(amountPicoMob, 0)
+                }
+
+                if index == 9 {
+                    expect.fulfill()
+                }
+            }
+        })
+
     }
 
     func testBalances() throws {

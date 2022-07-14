@@ -7,6 +7,10 @@
 
 import Foundation
 
+public struct SignedContingentInput {
+
+}
+
 public final class MobileCoinClient {
     /// - Returns: `InvalidInputError` when `accountKey` isn't configured to use Fog.
     public static func make(accountKey: AccountKey, config: Config)
@@ -186,6 +190,27 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             targetQueue: serialQueue
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
+    }
+
+    public func prepareSCI(
+        inputAmount: Amount,
+        outputAmount: Amount,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        // Create a new public type for the transaction Fragment, which can be shared with others.
+        // Return SignedContingentInput
+    }
+
+    public func prepareTransactionWithSCI(
+        sci: SignedContingentInput,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        // Create a new public type for the transaction Fragment, which can be shared with others.
+        // Return SignedContingentInput
     }
 
     public func prepareTransaction(
