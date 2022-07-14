@@ -39,7 +39,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
-    func testPrintBalance() throws {
+    func testPrintBalances() throws {
         let description = "Printing account balance"
         try testSupportedProtocols(description: description) {
             try printBalance(transportProtocol: $0, expectation: $1)
@@ -63,7 +63,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
                     print("account index \(index) public address \(key.publicAddress)")
                     print("account index \(index) balance: \(amountPicoMob)")
-                    XCTAssertGreaterThan(amountPicoMob, 0)
                 }
 
                 if index == 9 {
