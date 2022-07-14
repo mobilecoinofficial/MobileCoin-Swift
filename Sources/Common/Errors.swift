@@ -149,7 +149,8 @@ public struct SubmitTransactionError: Error {
 
 extension SubmitTransactionError: CustomStringConvertible {
     public var description: String {
-        "Submit Transaction Error: Consensus Block Count == \(consensusBlockCount), " +
+        "Submit Transaction Error: " +
+        "Consensus Block Count == \(consensusBlockCount?.description ?? "nil"), " +
         "\(submissionError)"
     }
 }
