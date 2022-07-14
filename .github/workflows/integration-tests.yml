@@ -12,12 +12,6 @@ on:
           - 'mobiledev'
           - 'testNet'
           - 'dynamic(alphaDev)'
-      suppress-xcode-output:
-        default: '--suppress_xcode_output'
-        type: choice
-        options:
-          - '--suppress_xcode_output'
-          - ' '
 
 env:
   DEVELOPER_DIR: /Applications/Xcode_12.5.1.app/Contents/Developer
@@ -75,10 +69,10 @@ jobs:
         env:
           TEST_DEV_USER: ${{ secrets.DEV_NETWORK_AUTH_USERNAME }}
           TEST_DEV_PASSWORD: ${{ secrets.DEV_NETWORK_AUTH_PASSWORD }}
-          TEST_NET_MNEMONICS: ${{ secrets.TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+          TEST_NET_MNEMONICS: ${{ secrets.TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
           DEV_NET_MNEMONICS: ${{ secrets.MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
-          DYNAMIC_FOG_AUTH_SPKI: ${{ secrets.DYNAMIC_TEST_ACCOUNT_FOG_AUTHORITY_SPKI }}
-          DYNAMIC_SEED_ENTROPIES: ${{ secrets.DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED }}
+          DYNAMIC_FOG_AUTH_SPKI: ${{ secrets.DYNAMIC_FOG_AUTHORITY_SPKI }}
+          DYNAMIC_SEED_ENTROPIES: ${{ secrets.DYNAMIC_TEST_ACCOUNT_ENTROPIES_COMMA_SEPARATED }}
         run: |
           bundle exec pod keys set devNetworkAuthUsername "${TEST_DEV_USER}"
           bundle exec pod keys set devNetworkAuthPassword "${TEST_DEV_PASSWORD}"
@@ -100,13 +94,21 @@ jobs:
 
       - name: Run Integration Tests On Example
         working-directory: ./Example
-        env:
-          SUPPRESS_XCODE_OUTPUT: ${{ github.event.inputs.suppress-xcode-output }}
-        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration Tests" $${SUPPRESS_XCODE_OUTPUT}} 
+        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration Tests" --suppress_xcode_output
 
-      - name: Archive Tests Results
+      - name: Archive Build Results
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: test-results
-          path: ./Example/test_output/report.html
+          name: integration-test-logs
+          path: |
+            ~/Library/Logs/scan
+
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-logs
+          path: |
+            ./Example/test_output/report.html
+
