@@ -5,12 +5,7 @@
 // swiftlint:disable file_length
 
 import MobileCoin
-@testable import NIOPosix
 import XCTest
-
-enum TestError: Error {
-    case mock
-}
 
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
