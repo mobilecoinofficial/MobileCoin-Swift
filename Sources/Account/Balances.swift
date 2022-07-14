@@ -10,7 +10,7 @@ public struct Balances {
         Set(balances.keys)
     }
 
-    var mobBalance: Balance {
+    public var mobBalance: Balance {
         guard let balance = balances[.MOB] else {
             return Balance(
                 amountLow: 0,
