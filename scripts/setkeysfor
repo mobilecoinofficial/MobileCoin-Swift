@@ -7,12 +7,6 @@ function generate_and_rename_keys() {
 
   cd $(git rev-parse --show-toplevel)
   cd "$1"
-  # bundle exec pod keys set devNetworkAuthUsername $DEV_NETWORK_AUTH_USERNAME
-  # bundle exec pod keys set devNetworkAuthPassword "$DEV_NETWORK_AUTH_PASSWORD"
-  # bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "$TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED"
-  # bundle exec pod keys set dynamicTestAccountFogAuthoritySpki "$DYNAMIC_TEST_ACCOUNT_FOG_AUTHORITY_SPKI"
-  # bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "$DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED"
-  # bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "$MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED"
 
   bundle exec pod keys generate
 

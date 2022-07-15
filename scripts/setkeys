@@ -1,5 +1,0 @@
-#!/bin/bash
-script_path=$(dirname "$0")
-
-${script_path}/setkeysfor Example
-${script_path}/setkeysfor ExampleHTTP
