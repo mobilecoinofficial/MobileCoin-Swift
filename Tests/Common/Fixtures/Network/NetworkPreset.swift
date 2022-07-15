@@ -677,8 +677,8 @@ extension NetworkPreset {
 #endif
 
 #if canImport(Keys)
-private static let mobileDevTestAccountMnemonicsCommaSeparated =
-    MobileCoinKeys().mobileDevTestAccountMnemonicsCommaSeparated
+    private static let mobileDevTestAccountMnemonicsCommaSeparated =
+        MobileCoinKeys().mobileDevTestAccountMnemonicsCommaSeparated
 #else
     private static let mobileDevTestAccountMnemonicsCommaSeparated = ""
 #endif
