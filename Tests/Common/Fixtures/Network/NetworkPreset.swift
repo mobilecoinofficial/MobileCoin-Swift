@@ -56,22 +56,19 @@ struct DynamicNetworkConfig {
 }
 
 extension DynamicNetworkConfig {
+
+    #if canImport(Keys)
+        private static let dynamicFogAuthoritySpki =
+            MobileCoinKeys().dynamicFogAuthoritySpki
+    #else
+        private static let dynamicFogAuthoritySpki = ""
+    #endif
+
     enum AlphaDevelopment {
         static let user = ""
         static let namespace = "alpha"
         static let environment = "development"
-        static let fogAuthoritySpkiB64Encoded = """
-            MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyFOockvCEc9TcO1NvsiUfFVzvtDsR64UIRRU\
-            l3tBM2Bh8KBA932/Up86RtgJVnbslxuUCrTJZCV4dgd5hAo/mzuJOy9lAGxUTpwWWG0zZJdpt8HJRVLX\
-            76CBpWrWEt7JMoEmduvsCR8q7WkSNgT0iIoSXgT/hfWnJ8KGZkN4WBzzTH7hPrAcxPrzMI7TwHqUFfmO\
-            X7/gc+bDV5ZyRORrpuu+OR2BVObkocgFJLGmcz7KRuN7/dYtdYFpiKearGvbYqBrEjeo/15chI0Bu/9o\
-            QkjPBtkvMBYjyJPrD7oPP67i0ZfqV6xCj4nWwAD3bVjVqsw9cCBHgaykW8ArFFa0VCMdLy7UymYU5SQs\
-            fXrw/mHpr27Pp2Z0/7wpuFgJHL+0ARU48OiUzkXSHX+sBLov9X6f9tsh4q/ZRorXhcJi7FnUoagBxewv\
-            lfwQfcnLX3hp1wqoRFC4w1DC+ki93vIHUqHkNnayRsf1n48fSu5DwaFfNvejap7HCDIOpCCJmRVR8mVu\
-            xi6jgjOUa4Vhb/GCzxfNIn5ZYym1RuoE0TsFO+TPMzjed3tQvG7KemGFz3pQIryb43SbG7Q+EOzIigxY\
-            DytzcxOO5Jx7r9i+amQEiIcjBICwyFoEUlVJTgSpqBZGNpznoQ4I2m+uJzM+wMFsinTZN3mp4FU5UHjQ\
-            sHKG+ZMCAwEAAQ==
-            """
+        static let fogAuthoritySpkiB64Encoded = dynamicFogAuthoritySpki
 
         static func make() -> DynamicNetworkConfig {
             DynamicNetworkConfig(
@@ -623,13 +620,8 @@ extension NetworkPreset {
         BasicCredentials(username: Self.invalidCredUsername, password: Self.invalidCredPassword)
     }
 
-#if canImport(Keys)
-    private static let devAuthUsername = MobileCoinKeys().devNetworkAuthUsername
-    private static let devAuthPassword = MobileCoinKeys().devNetworkAuthPassword
-#else
-    private static let devAuthUsername = ""
-    private static let devAuthPassword = ""
-#endif
+    private static let devAuthUsername = devNetworkAuthUsername
+    private static let devAuthPassword = devNetworkAuthPassword
 
     var testAccountsMnemonics: [String] {
         switch self {
@@ -655,24 +647,27 @@ extension NetworkPreset {
     var testAccountRootEntropies: [Data] {
         switch self {
         case .dynamic:
-            return [
-                "b01579aab48859b4e9f3ca8ec5e9904d8584bb8da30ae712d4e65426c76daab7",
-                "06edaf5b30852bc5e2033a6a5e4d25f2681b2e27d3499560185cecff4cff205f",
-                "dcd7feec764e02041ed7b835a6fad7bd30bc911207d7a05c772d687d1e3137e6",
-                "d82ed8fedcaae021efce0e6c32460fac32ff8f2918eb157557f7a9c20751af62",
-                "3864150d417afc1ddea49848c5f672c602da152c350473a6947f0f29a3a65825",
-                "43c8272b3e9f5da19761e88204d250b010672ca8a2f540af6bd25c67c3b0c200",
-                "a801af55a4f6b35f0dbb4a9c754ae62b926d25dd6ed954f6e697c562a1641c21",
-                "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f",
-                "8ecaa57fcbec4397ca7fd270695ec2dd6d6bffccde24c0ca4f115a5cae1e896d",
-                "54a602d432c601887af7921c248b984f8510cb016580e156e0a647735acaf2bc",
-                "793e7c54c384e236343f1854e0626de16bff318561d8aa6ba040ebec4cff4c05",
-            ]
-            .compactMap({ Data(hexEncoded: String($0)) })
+            return Self.dynamicTestAccountSeedEntropiesCommaSeparated
+                .split(separator: ",")
+                .compactMap({ Data(hexEncoded: String($0)) })
         default:
             return []
         }
     }
+
+#if canImport(Keys)
+    private static let devNetworkAuthUsername =
+        MobileCoinKeys().devNetworkAuthUsername
+#else
+    private static let devNetworkAuthUsername = ""
+#endif
+
+#if canImport(Keys)
+    private static let devNetworkAuthPassword =
+        MobileCoinKeys().devNetworkAuthPassword
+#else
+    private static let devNetworkAuthPassword = ""
+#endif
 
 #if canImport(Keys)
     private static let testNetTestAccountMnemonicsCommaSeparated =

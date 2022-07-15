@@ -104,8 +104,6 @@ class FogKeyImageConnectionIntTests: XCTestCase {
             transportProtocol: transportProtocol
         ).checkKeyImages(request: request) {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
-            print("error: \(error)")
-
             expect.fulfill()
         }
         waitForExpectations(timeout: 20)
@@ -157,7 +155,7 @@ extension FogKeyImageConnectionIntTests {
         transportProtocol: TransportProtocol
     ) throws -> FogKeyImageConnection {
         let networkConfig = try NetworkConfigFixtures.createWithInvalidCredentials(
-                using: transportProtocol)
+            using: transportProtocol)
         return createFogKeyImageConnection(networkConfig: networkConfig)
     }
 
