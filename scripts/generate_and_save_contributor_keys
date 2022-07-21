@@ -1,0 +1,65 @@
+#!/bin/bash
+
+set -e
+
+scriptdir="$( dirname -- "$BASH_SOURCE"; )";
+source "$scriptdir/secrets_manager"
+
+usage()
+{
+    echo "usage: generate_and_save_contributor_keys"
+    echo "  -f    force re-creation of keys"
+    echo "  -h    help"
+}
+
+MODE=""
+
+# Get the options
+while getopts ":fh" option; do
+   case $option in
+      f) # force re-creation of keys
+         MODE="force_key_recreation"
+         echo $MODE
+         usage
+         exit;;
+      h) # display Help
+         usage
+         exit;;
+     \?) # Invalid option
+         echo "Error: Invalid option"
+         exit;;
+   esac
+done
+
+function generate_and_save_contributor_keys() {
+
+  echo '----------------------------'
+  echo 'Generating contributor keys'
+  echo '----------------------------'
+
+  output=$(age-keygen); 
+  private_key=$(echo "$output" | tail -n 1); 
+  public_key=$(echo "$output" | head -n 2 | tail -n1 | sed 's/# public key\: //');
+
+  echo '----------------------------'
+  echo 'Saving keys into the macOS Keychain with the `security` command'
+  echo '----------------------------'
+
+  security add-generic-password -a swift-repo-user -s swift-repo-public -w $public_key
+  security add-generic-password -a swift-repo-user -s swift-repo-private -w $private_key
+
+  echo '----------------------------'
+  echo 'Adding public key to `secrets/contributor_public_keys` file '
+  echo '----------------------------'
+
+  project_dir=$(project_directory)
+  echo "$public_key" >> "$project_dir/secrets/contributor_public_keys"
+
+  echo '----------------------------'
+  echo 'Complete! Checkin the changes and ask a contributor to re-encrypt the secrets'
+  echo '----------------------------'
+}
+
+check_for_existing_keys $MODE
+
+generate_and_save_contributor_keys
