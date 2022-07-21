@@ -7,6 +7,10 @@ source "$scriptdir/secrets_manager"
 
 check_dependencies
 
+echo "----------------------------"
+echo "Re-initializing keys"
+echo "----------------------------"
+
 set_secrets "Example"
 generate_and_rename_keys "Example"
 
