@@ -18,10 +18,7 @@ MODE=""
 while getopts ":fh" option; do
    case $option in
       f) # force re-creation of keys
-         MODE="force_key_recreation"
-         echo $MODE
-         usage
-         exit;;
+         MODE="force_key_recreation";;
       h) # display Help
          usage
          exit;;
@@ -59,6 +56,8 @@ function generate_and_save_contributor_keys() {
   echo 'Complete! Checkin the changes and ask a contributor to re-encrypt the secrets'
   echo '----------------------------'
 }
+
+check_dependencies 
 
 check_for_existing_keys $MODE
 

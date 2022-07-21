@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+scriptdir="$( dirname -- "$BASH_SOURCE"; )";
+source "$scriptdir/secrets_manager"
+
+check_dependencies
+
+set_secrets "Example"
+generate_and_rename_keys "Example"
+
+set_secrets "ExampleHTTP"
+generate_and_rename_keys "ExampleHTTP"
