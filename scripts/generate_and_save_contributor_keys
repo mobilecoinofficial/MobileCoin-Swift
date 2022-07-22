@@ -5,29 +5,6 @@ set -e
 scriptdir="$( dirname -- "$BASH_SOURCE"; )";
 source "$scriptdir/secrets_manager"
 
-usage()
-{
-    echo "usage: generate_and_save_contributor_keys"
-    echo "  -f    force re-creation of keys"
-    echo "  -h    help"
-}
-
-MODE=""
-
-# Get the options
-while getopts ":fh" option; do
-   case $option in
-      f) # force re-creation of keys
-         MODE="force_key_recreation";;
-      h) # display Help
-         usage
-         exit;;
-     \?) # Invalid option
-         echo "Error: Invalid option"
-         exit;;
-   esac
-done
-
 function generate_and_save_contributor_keys() {
 
   echo '----------------------------'
@@ -59,6 +36,6 @@ function generate_and_save_contributor_keys() {
 
 check_dependencies 
 
-check_for_existing_keys $MODE
+check_for_existing_keys
 
 generate_and_save_contributor_keys
