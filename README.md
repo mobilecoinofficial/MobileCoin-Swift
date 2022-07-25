@@ -52,7 +52,7 @@ The workspace can be built with `make`.
     git submodule update --init --recursive
     ```
 
-1. Install Ruby
+1. Install Ruby 3.x
 
 1. Install the gem bundler
 
@@ -65,6 +65,12 @@ The workspace can be built with `make`.
     ```
     brew install pre-commit
     pre-commit install
+    ```
+
+1. Install rename
+
+    ```
+    brew install rename
     ```
 
 1. Build the MobileCoin Swift SDK
