@@ -38,6 +38,8 @@ Please check your country's laws before downloading or using this software.
 | [Docs](./docs) | Integration Guide. |
 | [Example](./Example) | Example application. |
 | [ExampleHTTP](./ExampleHTTP) | Example "HTTP Only" application. |
+| [scripts](./scripts) | Scripts used by this repo. |
+| [secrets](./secrets) | Secrets file for contributors, and their public keys. |
 | [Sources](./Sources) | Sources for the MobileCoin Swift SDK. |
 | [Tests](./Tests) | Tests. |
 | [Vendor](./Vendor) | iOS Artifacts. |
@@ -67,12 +69,6 @@ The workspace can be built with `make`.
     pre-commit install
     ```
 
-1. Install rename
-
-    ```
-    brew install rename
-    ```
-
 1. Build the MobileCoin Swift SDK
 
     ```
@@ -80,6 +76,10 @@ The workspace can be built with `make`.
     ```
 
 Note: To build libmobilecoin, run `make` in [libmobilecoin-ios-artifacts](./Vendor/libmobilecoin-ios-artifacts).
+
+## Secrets
+
+New contributors should follow the directions in the [Secrets' README.md](./secrets/README.md) to get access to the keys used in internal testing.
 
 ## Overview
 
@@ -90,6 +90,15 @@ payments in a blockchain data structure. Cryptography is used extensively to est
 and to preserve cash-like privacy for users.
 
 For more information about the cryptocurrency, see [MobileCoinFoundation/MobileCoin](https://github.com/mobilecoinfoundation/mobilecoin).
+
+## Important Technical Documentation
+
+A list of documents and resources that are useful for understanding how MobileCoin works.
+
+- [MobileCoin Whitepapers](https://developers.mobilecoin.com/overview/read-the-whitepapers/)
+- [Mechanics of MobileCoin](https://developers.mobilecoin.com/overview/read-the-whitepapers/mechanics)
+  
+> Pay particular attention to the discussion of Fog, as it is key mobilecoin’s ability to function well on mobile devices.
 
 ## Support
 
