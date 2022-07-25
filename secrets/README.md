@@ -6,7 +6,7 @@ All contributors to this repo will create a public/private keypair which will be
 
 > Most importantly, how do we use these secrets ? 
 
-They're used by `cocoapod-keys` to "generate" `MobileCoinKeys.h`MobileCoinKeys.m` files which we pull from at runtime for integration & unit testing. Assuming a contributor has already gone through "New Contributor" steps and the secrets have been re-encrypted, they can re-initialize the project with:
+They're used by `cocoapod-keys` to "generate" `MobileCoinKeys.h,MobileCoinKeys.m` files which we pull from at runtime for integration & unit testing. Assuming a contributor has already gone through "New Contributor" steps and the secrets have been re-encrypted, they can re-initialize the project with:
 
 ```
 $ scripts/reinitialize_keys
