@@ -54,7 +54,7 @@ The workspace can be built with `make`.
     git submodule update --init --recursive
     ```
 
-1. Install Ruby 3.x
+1. Install Ruby 2.7.x
 
 1. Install the gem bundler
 
