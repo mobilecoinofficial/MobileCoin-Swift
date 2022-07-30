@@ -10,13 +10,8 @@ extension MobileCoinClient {
     @discardableResult
     public func updateBalances() async throws -> Balances {
         try await withCheckedThrowingContinuation { continuation in
-            updateBalances { result in
-                switch result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+            updateBalances {
+                continuation.resume(with: $0)
             }
         }
     }
@@ -24,13 +19,8 @@ extension MobileCoinClient {
     @discardableResult
     public func blockVersion() async throws -> BlockVersion {
         try await withCheckedThrowingContinuation { continuation in
-            blockVersion { result in
-                switch result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+            blockVersion {
+                continuation.resume(with: $0)
             }
         }
     }
@@ -45,13 +35,8 @@ extension MobileCoinClient {
             prepareTransaction(to: recipient,
                                memoType: memoType,
                                amount: amount,
-                               fee: fee) { result in
-                switch result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+                               fee: fee) {
+                continuation.resume(with: $0)
             }
         }
     }
@@ -61,13 +46,8 @@ extension MobileCoinClient {
         transaction: Transaction
     ) async throws -> UInt64 {
         try await withCheckedThrowingContinuation { continuation in
-            submitTransaction(transaction: transaction) { result in
-                switch result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+            submitTransaction(transaction: transaction) {
+                continuation.resume(with: $0)
             }
         }
     }
@@ -78,13 +58,8 @@ extension MobileCoinClient {
     ) async throws -> UInt64 {
         try await withCheckedThrowingContinuation { continuation in
             estimateTotalFee(toSendAmount: amount,
-                             feeLevel: feeLevel) { result in
-                switch result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+                             feeLevel: feeLevel) {
+                continuation.resume(with: $0)
             }
         }
     }
@@ -93,13 +68,8 @@ extension MobileCoinClient {
         of transaction: Transaction
     ) async throws -> TransactionStatus {
         try await withCheckedThrowingContinuation { continuation in
-            status(of: transaction) { result in
-                switch result {
-                case .success(let value):
-                    continuation.resume(returning: value)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+            status(of: transaction) {
+                continuation.resume(with: $0)
             }
         }
     }
