@@ -36,11 +36,7 @@ extension XCTestCase {
         let supportedProtocols = TransportProtocol.supportedProtocols
         let last = supportedProtocols.last
         for transportProtocol in supportedProtocols {
-            do {
-                try await testCase(transportProtocol)
-            } catch {
-                XCTFail((error as CustomStringConvertible).description)
-            }
+            try await testCase(transportProtocol)
             sleep(transportProtocol == last ? 0 : interval)
         }
     }
