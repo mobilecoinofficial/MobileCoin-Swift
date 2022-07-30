@@ -277,7 +277,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                             return
                         }
 
-                        Thread.sleep(forTimeInterval: 2)
+                        try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
                         try await checkBalanceChange()
                         return
                     }
@@ -346,7 +346,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                         return
                     }
 
-                    Thread.sleep(forTimeInterval: 2)
+                    try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
                     try await checkBalance()
                     return
                 }
@@ -400,7 +400,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                         return
                     }
 
-                    Thread.sleep(forTimeInterval: 2)
+                    try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
                     try await checkBalance()
                     return
                 }
@@ -454,7 +454,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                     return
                 }
 
-                Thread.sleep(forTimeInterval: 2)
+                try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
                 try await checkStatus()
                 return
             case .accepted(block: let block):
@@ -520,7 +520,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                     return
                 }
 
-                Thread.sleep(forTimeInterval: 2)
+                try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
                 try await checkStatus()
                 return
             case .received(block: let block):
