@@ -2,9 +2,6 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable multiline_function_chains
-// swiftlint:disable function_default_parameter_at_end
-
 import Foundation
 
 @available(iOS 13.0, *)
