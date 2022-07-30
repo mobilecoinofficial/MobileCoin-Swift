@@ -32,12 +32,13 @@ extension XCTestCase {
                 timeout: Double = 40.0,
                 interval: UInt32 = 10,
                 _ testCase: (TransportProtocol) async throws -> Void
-    ) async rethrows {
+    ) async throws {
         let supportedProtocols = TransportProtocol.supportedProtocols
         let last = supportedProtocols.last
         for transportProtocol in supportedProtocols {
             try await testCase(transportProtocol)
-            sleep(transportProtocol == last ? 0 : interval)
+            let sleepDuration = UInt64(transportProtocol == last ? 0 : interval * 1_000_000_000)
+            try await Task.sleep(nanoseconds: sleepDuration)
         }
     }
 
