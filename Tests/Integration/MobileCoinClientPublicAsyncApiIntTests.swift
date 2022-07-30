@@ -149,8 +149,10 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     ) async throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(accountKey: accountKey,
-                                                                                         transportProtocol: transportProtocol)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol
+        )
         _ = try await client.prepareTransaction(to: recipient,
                                                 amount: Amount(100, in: .MOB),
                                                 fee: IntegrationTestFixtures.fee)
@@ -168,8 +170,10 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     ) async throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
         let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(accountKey: accountKey,
-                                                                                         transportProtocol: transportProtocol)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol
+        )
         let transaction = try await client.prepareTransaction(to: recipient,
                                                               amount: Amount(100, in: .MOB),
                                                               fee: IntegrationTestFixtures.fee)
@@ -201,7 +205,9 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                 _ client: MobileCoinClient,
                 _ fee: UInt64
         ) async throws {
-            let pendingTransaction = try await client.prepareTransaction(to: recipient, amount: amount, fee: fee)
+            let pendingTransaction = try await client.prepareTransaction(to: recipient,
+                                                                         amount: amount,
+                                                                         fee: fee)
 
             let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
             XCTAssertNotNil(publicKey)
@@ -277,12 +283,14 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
                     }
                 } catch {}
             }
-            try await checkBalanceChange()
-        }
+                    try await checkBalanceChange()
+                }
 
         let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(accountKey: accountKey,
-                                                                                         transportProtocol: transportProtocol)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol
+        )
         let fee = try await checkBlockVersionAndFee(client)
         let balancesBefore = try await checkBalances(client)
         try await prepareAndSubmit(client, fee)
@@ -418,7 +426,9 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
         func submitTransaction() async throws -> Transaction {
             try await client.updateBalances()
-            let transaction = try await client.prepareTransaction(to: recipient, amount: Amount(100, in: .MOB), fee: IntegrationTestFixtures.fee)
+            let transaction = try await client.prepareTransaction(to: recipient,
+                                                                  amount: Amount(100, in: .MOB),
+                                                                  fee: IntegrationTestFixtures.fee)
             try await client.submitTransaction(transaction: transaction.transaction)
             return transaction.transaction
         }
