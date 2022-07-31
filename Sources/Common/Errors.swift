@@ -20,9 +20,21 @@ extension InvalidInputError: CustomStringConvertible {
     }
 }
 
+extension InvalidInputError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum BalanceUpdateError: Error {
     case connectionError(ConnectionError)
     case fogSyncError(FogSyncError)
+}
+
+extension BalanceUpdateError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
 }
 
 public enum ConnectionError: Error {
@@ -55,6 +67,12 @@ extension ConnectionError: CustomStringConvertible {
     }
 }
 
+extension ConnectionError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum BalanceTransferEstimationFetcherError: Error {
     case feeExceedsBalance(String = String())
     case balanceOverflow(String = String())
@@ -76,6 +94,12 @@ extension BalanceTransferEstimationFetcherError: CustomStringConvertible {
     }
 }
 
+extension BalanceTransferEstimationFetcherError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum TransactionEstimationFetcherError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -94,6 +118,12 @@ extension TransactionEstimationFetcherError: CustomStringConvertible {
                 return "\(innerError)"
             }
         }()
+    }
+}
+
+extension TransactionEstimationFetcherError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
     }
 }
 
@@ -121,6 +151,12 @@ extension TransactionPreparationError: CustomStringConvertible {
     }
 }
 
+extension TransactionPreparationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum DefragTransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -142,6 +178,12 @@ extension DefragTransactionPreparationError: CustomStringConvertible {
     }
 }
 
+extension DefragTransactionPreparationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public struct SubmitTransactionError: Error {
     public let submissionError: TransactionSubmissionError
     public let consensusBlockCount: UInt64?
@@ -152,6 +194,12 @@ extension SubmitTransactionError: CustomStringConvertible {
         "Submit Transaction Error: " +
         "Consensus Block Count == \(consensusBlockCount?.description ?? "nil"), " +
         "\(submissionError)"
+    }
+}
+
+extension SubmitTransactionError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
     }
 }
 
@@ -185,6 +233,12 @@ extension TransactionSubmissionError: CustomStringConvertible {
     }
 }
 
+extension TransactionSubmissionError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 @available(*, deprecated)
 public enum BalanceTransferEstimationError: Error {
     case feeExceedsBalance(String = String())
@@ -206,6 +260,13 @@ extension BalanceTransferEstimationError: CustomStringConvertible {
 }
 
 @available(*, deprecated)
+extension BalanceTransferEstimationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+@available(*, deprecated)
 public enum TransactionEstimationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -222,6 +283,13 @@ extension TransactionEstimationError: CustomStringConvertible {
                 return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()
+    }
+}
+
+@available(*, deprecated)
+extension TransactionEstimationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
     }
 }
 
@@ -249,5 +317,26 @@ extension SecurityError: CustomStringConvertible {
         } else {
             return "Security Error Code - \(osstatus) ... see Apple Security Framework SecBase.h"
         }
+    }
+}
+
+extension SecurityError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+public struct TimedOutError: Error {
+}
+
+extension TimedOutError: CustomStringConvertible {
+    public var description: String {
+        "Timed Out"
+    }
+}
+
+extension TimedOutError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
     }
 }

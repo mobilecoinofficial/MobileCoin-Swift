@@ -43,3 +43,29 @@ func performAsync<Value1, Value2, Failure: Error>(
     body1(callback(success: { results.0 = $0 }))
     body2(callback(success: { results.1 = $0 }))
 }
+
+@available(iOS 13.0, *)
+public func withTimeout<T>(
+    seconds: TimeInterval,
+    block: @escaping @Sendable () async throws -> T
+) async throws -> T {
+    try await withThrowingTaskGroup(of: T.self) { group in
+        let deadline = Date(timeIntervalSinceNow: seconds)
+        group.addTask {
+            try await block()
+        }
+        group.addTask {
+            let interval = deadline.timeIntervalSinceNow
+            if interval > 0 {
+                try await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+            }
+            try Task.checkCancellation()
+            throw TimedOutError()
+        }
+        guard let result = try await group.next() else {
+            throw TimedOutError()
+        }
+        group.cancelAll()
+        return result
+    }
+}
