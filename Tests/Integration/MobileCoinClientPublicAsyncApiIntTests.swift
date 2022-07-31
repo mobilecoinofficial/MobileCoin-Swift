@@ -96,7 +96,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testAccountActivity() async throws {
-        try await testSupportedProtocols {
+        let description = "Updating account balance"
+        try await testSupportedProtocols(description: description) {
             try await self.accountActivity(transportProtocol: $0)
         }
     }
