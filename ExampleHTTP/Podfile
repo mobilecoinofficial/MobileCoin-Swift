@@ -60,13 +60,10 @@ post_install do |installer|
     end
   end
 
-  # Bump deployment target to 9.0 for pods that explicitly specify 8.0, since 9.0 is the minimum
-  # that Xcode 12 supports.
+  # Delete minimum deployment target of example project for Xcode 13
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      if Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']) < Gem::Version.new('9.0')
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
-      end
+      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
     end
   end
 
