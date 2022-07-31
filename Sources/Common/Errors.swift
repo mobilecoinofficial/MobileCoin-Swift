@@ -325,3 +325,18 @@ extension SecurityError: LocalizedError {
         "\(self)"
     }
 }
+
+public struct TimedOutError: Error {
+}
+
+extension TimedOutError: CustomStringConvertible {
+    public var description: String {
+        "Timed Out"
+    }
+}
+
+extension TimedOutError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
