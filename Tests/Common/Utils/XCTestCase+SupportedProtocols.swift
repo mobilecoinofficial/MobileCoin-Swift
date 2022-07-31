@@ -28,6 +28,7 @@ extension XCTestCase {
 
     @available(iOS 13.0, *)
     func testSupportedProtocols(
+                description: String,
                 timeout: Double = 80.0,
                 interval: UInt64 = 10,
                 _ testCase: @escaping (TransportProtocol) async throws -> Void
@@ -35,6 +36,8 @@ extension XCTestCase {
         let supportedProtocols = TransportProtocol.supportedProtocols
         let last = supportedProtocols.last
         for transportProtocol in supportedProtocols {
+            let description = "[\(transportProtocol.description)]:\(description)"
+            print("Testing ... \(description)")
             try await withTimeout(seconds: timeout) {
                 try await testCase(transportProtocol)
             }

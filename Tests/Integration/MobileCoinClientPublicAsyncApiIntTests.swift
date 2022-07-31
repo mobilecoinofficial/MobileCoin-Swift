@@ -11,7 +11,8 @@ import XCTest
 class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
     func testBalance() async throws {
-        try await testSupportedProtocols {
+        let description = "Updating account balance"
+        try await testSupportedProtocols(description: description) {
             try await self.balance(transportProtocol: $0)
         }
     }
@@ -28,7 +29,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testPrintBalances() async throws {
-        try await testSupportedProtocols {
+        let description = "Printing account balance"
+        try await testSupportedProtocols(description: description) {
             try await self.printBalance(transportProtocol: $0)
         }
     }
@@ -53,7 +55,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testBalances() async throws {
-        try await testSupportedProtocols {
+        let description = "Updating account balance"
+        try await testSupportedProtocols(description: description) {
             try await self.balances(transportProtocol: $0)
         }
     }
@@ -115,7 +118,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testUpdateBalance() async throws {
-        try await testSupportedProtocols {
+        let description = "Updating account balance"
+        try await testSupportedProtocols(description: description) {
             try await self.updateBalance(transportProtocol: $0)
         }
     }
@@ -133,7 +137,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testPrepareTransaction() async throws {
-        try await testSupportedProtocols {
+        let description = "Preparing transaction"
+        try await testSupportedProtocols(description: description) {
             try await self.prepareTransaction(transportProtocol: $0)
         }
     }
@@ -153,7 +158,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testSubmitTransaction() async throws {
-        try await testSupportedProtocols {
+        let description = "Submitting transaction"
+        try await testSupportedProtocols(description: description) {
             try await self.submitTransaction(transportProtocol: $0)
         }
     }
@@ -174,7 +180,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testSubmitMobUSDTransaction() async throws {
-        try await testSupportedProtocols {
+        let description = "Submitting transaction"
+        try await testSupportedProtocols(description: description) {
             try await self.submitMobUSDTransaction(transportProtocol: $0)
         }
     }
@@ -290,7 +297,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testSelfPaymentBalanceChange() async throws {
-        try await testSupportedProtocols {
+        let description = "Self payment"
+        try await testSupportedProtocols(description: description) {
             try await self.selfPaymentBalanceChange(transportProtocol: $0)
         }
     }
@@ -347,7 +355,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testSelfPaymentBalanceChangeFeeLevel() async throws {
-        try await testSupportedProtocols {
+        let description = "Self payment"
+        try await testSupportedProtocols(description: description) {
             try await self.selfPaymentBalanceChangeFeeLevel(transportProtocol: $0)
         }
     }
@@ -400,7 +409,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testTransactionStatus() async throws {
-        try await testSupportedProtocols {
+        let description = "Checking transaction status"
+        try await testSupportedProtocols(description: description) {
             try await self.transactionStatus(transportProtocol: $0)
         }
     }
@@ -461,7 +471,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testReceiptStatus() async throws {
-        try await testSupportedProtocols {
+        let description = "Checking receipt status"
+        try await testSupportedProtocols(description: description) {
             try await self.receiptStatus(transportProtocol: $0)
         }
     }
@@ -526,7 +537,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testConsensusTrustRootWorks() async throws {
-        try await testSupportedProtocols {
+        let description = "Submitting transaction"
+        try await testSupportedProtocols(description: description) {
             try await self.consensusTrustRootWorks(transportProtocol: $0)
         }
     }
@@ -558,7 +570,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testExtraConsensusTrustRootWorks() async throws {
-        try await testSupportedProtocols {
+        let description = "Submitting transaction"
+        try await testSupportedProtocols(description: description) {
             try await self.extraConsensusTrustRootWorks(transportProtocol: $0)
         }
     }
@@ -593,7 +606,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
         try XCTSkipIf(true)
 
-        try await testSupportedProtocols {
+        let description = "Submitting transaction"
+        try await testSupportedProtocols(description: description) {
             try await self.wrongConsensusTrustRootReturnsError(transportProtocol: $0)
         }
     }
