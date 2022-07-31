@@ -85,7 +85,6 @@ post_install do |installer|
 
   # Disable bitcode on test targets
   installer.pods_project.targets.each do |target|
-    next unless ['MobileCoin-Unit-IntegrationTests', 'MobileCoin-UI-PerformanceTests', 'MobileCoin-Unit-Tests', 'MobileCoin-Unit-Core-ProtocolUnitTests'].find_index(target.name) != nil
     target.build_configurations.each do |config|
       config.build_settings['ENABLE_BITCODE'] = 'NO'
     end
