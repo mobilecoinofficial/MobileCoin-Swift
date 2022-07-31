@@ -11,8 +11,8 @@ import XCTest
 class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
     func testBalance() async throws {
-        try await testSupportedProtocols { transportProtocol in
-            try await self.balance(transportProtocol: transportProtocol)
+        try await testSupportedProtocols {
+            try await self.balance(transportProtocol: $0)
         }
     }
 
