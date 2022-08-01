@@ -22,7 +22,8 @@ final class DefaultServiceProvider: ServiceProvider {
         networkConfig: NetworkConfig,
         targetQueue: DispatchQueue?,
         grpcConnectionFactory: GrpcProtocolConnectionFactory,
-        httpConnectionFactory: HttpProtocolConnectionFactory
+        httpConnectionFactory: HttpProtocolConnectionFactory,
+        seedableRng: MobileCoinSeedableRng? = nil
     ) {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
@@ -39,7 +40,8 @@ final class DefaultServiceProvider: ServiceProvider {
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rngContext: seedableRng)
         self.blockchain = BlockchainConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
@@ -49,17 +51,20 @@ final class DefaultServiceProvider: ServiceProvider {
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rngContext: seedableRng)
         self.merkleProof = FogMerkleProofConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rngContext: seedableRng)
         self.keyImage = FogKeyImageConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rngContext: seedableRng)
         self.block = FogBlockConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
