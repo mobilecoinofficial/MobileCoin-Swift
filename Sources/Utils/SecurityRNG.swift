@@ -6,7 +6,21 @@
 
 import Security
 
-func securityRNG(context: UnsafeMutableRawPointer?) -> UInt64 {
+func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
+    if let context = context {
+        return seedableRNG(context: context)
+    } else {
+        return defaultRNG()
+    }
+}
+
+private func seedableRNG(context: UnsafeMutableRawPointer) -> UInt64 {
+    // get MobileCoinChaCha20Rng from context
+    let chaCha20 = context.bindMemory(to: MobileCoinChaCha20Rng.self, capacity: 1)
+    return chaCha20.pointee.nextUInt64()
+}
+
+private func defaultRNG() -> UInt64 {
     var value: UInt64 = 0
 
     let numBytes = MemoryLayout.size(ofValue: value)
