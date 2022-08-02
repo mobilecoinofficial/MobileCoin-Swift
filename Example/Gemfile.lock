@@ -9,6 +9,9 @@ GIT
       xcpretty (~> 0.3.0)
 
 GEM
+  specs:
+
+GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.5)
