@@ -10,6 +10,7 @@ import LibMobileCoin
 
 enum TransactionBuilderError: Error {
     case invalidInput(String)
+    case invalidBlockVersion(String)
     case attestationVerificationFailed(String)
 }
 
@@ -19,6 +20,8 @@ extension TransactionBuilderError: CustomStringConvertible {
             switch self {
             case .invalidInput(let reason):
                 return "Invalid input: \(reason)"
+            case .invalidBlockVersion(let reason):
+                return "Invalid Block Version: \(reason)"
             case .attestationVerificationFailed(let reason):
                 return "Attestation verification failed: \(reason)"
             }
@@ -39,13 +42,14 @@ final class TransactionBuilder {
         fogResolver: FogResolver = FogResolver(),
         memoBuilder: TxOutMemoBuilder = DefaultMemoBuilder(),
         blockVersion: BlockVersion
-    ) {
+    ) throws {
         self.tombstoneBlockIndex = tombstoneBlockIndex
         self.memoBuilder = memoBuilder
-        self.ptr = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
+        let result: Result<OpaquePointer, TransactionBuilderError>
+        result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
             fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
                 // Safety: mc_transaction_builder_create should never return nil.
-                withMcInfallible {
+                withMcError { errorPtr in
                     mc_transaction_builder_create(
                             fee.value,
                             fee.tokenId.value,
@@ -53,10 +57,20 @@ final class TransactionBuilder {
                             fogResolverPtr,
                             memoBuilderPtr,
                             blockVersion,
-                            nil)
+                            &errorPtr)
+                }.mapError {
+                    switch $0.errorCode {
+                    case .invalidInput:
+                        return .invalidBlockVersion("\(redacting: $0.description)")
+                    default:
+                        // Safety: mc_transaction_builder_add_input should not throw
+                        // non-documented errors.
+                        logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+                    }
                 }
             }
         }
+        self.ptr = try result.get()
     }
 
     deinit {
@@ -169,12 +183,20 @@ extension TransactionBuilder {
             return .failure(.invalidInput("Input values != output values + fee"))
         }
 
-        let builder = TransactionBuilder(
-            fee: fee,
-            tombstoneBlockIndex: tombstoneBlockIndex,
-            fogResolver: fogResolver,
-            memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
-            blockVersion: blockVersion)
+        let builder: TransactionBuilder
+        do {
+            builder = try TransactionBuilder(
+                fee: fee,
+                tombstoneBlockIndex: tombstoneBlockIndex,
+                fogResolver: fogResolver,
+                memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
+                blockVersion: blockVersion)
+        } catch {
+            guard let error = error as? TransactionBuilderError else {
+                return .failure(.invalidInput("Unknown Error"))
+            }
+            return .failure(error)
+        }
 
         for input in inputs {
             if case .failure(let error) =
@@ -259,11 +281,19 @@ extension TransactionBuilder {
         blockVersion: BlockVersion,
         rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
-        let transactionBuilder = TransactionBuilder(
-            fee: Amount(value: 0, tokenId: .MOB),
-            tombstoneBlockIndex: tombstoneBlockIndex,
-            fogResolver: fogResolver,
-            blockVersion: blockVersion)
+        let transactionBuilder: TransactionBuilder
+        do {
+            transactionBuilder = try TransactionBuilder(
+                fee: Amount(value: 0, tokenId: .MOB),
+                tombstoneBlockIndex: tombstoneBlockIndex,
+                fogResolver: fogResolver,
+                blockVersion: blockVersion)
+        } catch {
+            guard let error = error as? TransactionBuilderError else {
+                return .failure(.invalidInput("Unknown Error"))
+            }
+            return .failure(error)
+        }
         return transactionBuilder.addOutput(
             publicAddress: publicAddress,
             amount: amount,
