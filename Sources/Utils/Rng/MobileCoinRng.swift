@@ -4,6 +4,6 @@
 
 import Foundation
 
-protocol MobileCoinRng {
+public protocol MobileCoinRng {
     func nextUInt64() -> UInt64
 }

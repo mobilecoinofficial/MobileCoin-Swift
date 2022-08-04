@@ -9,13 +9,15 @@ struct NetworkConfig {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol
+        transportProtocol: TransportProtocol,
+        rng: MobileCoinRng? = nil
     ) -> Result<NetworkConfig, InvalidInputError> {
         .success(NetworkConfig(
                     consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                     fogUrlLoadBalancer: fogUrlLoadBalancer,
                     attestation: attestation,
-                    transportProtocol: transportProtocol))
+                    transportProtocol: transportProtocol,
+                    rng: rng))
     }
 
     private let attestation: AttestationConfig
@@ -31,6 +33,8 @@ struct NetworkConfig {
     }
 
     var transportProtocol: TransportProtocol
+
+    var rng: MobileCoinRng?
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]
     var fogTrustRoots: [TransportProtocol: SSLCertificates] = [:]
@@ -49,12 +53,14 @@ struct NetworkConfig {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol
+        transportProtocol: TransportProtocol,
+        rng: MobileCoinRng? = nil
     ) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
         self.consensusUrlLoadBalancer = consensusUrlLoadBalancer
         self.fogUrlLoadBalancer = fogUrlLoadBalancer
+        self.rng = rng
     }
 
     func consensusConfig() -> AttestedConnectionConfig<ConsensusUrl> {

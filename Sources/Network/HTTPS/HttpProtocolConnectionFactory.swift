@@ -15,7 +15,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
         config: AttestedConnectionConfig<ConsensusUrl>,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rngContext: Any? = nil
     ) -> ConsensusHttpConnection {
         ConsensusHttpConnection(
                         config: config,
@@ -39,7 +39,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
         config: AttestedConnectionConfig<FogUrl>,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rngContext: Any? = nil
     ) -> FogViewHttpConnection {
         FogViewHttpConnection(
                 config: config,
@@ -53,7 +53,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
         config: AttestedConnectionConfig<FogUrl>,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rngContext: Any? = nil
     ) -> FogMerkleProofHttpConnection {
         FogMerkleProofHttpConnection(
                         config: config,
@@ -67,7 +67,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
         config: AttestedConnectionConfig<FogUrl>,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rngContext: Any? = nil
     ) -> FogKeyImageHttpConnection {
         FogKeyImageHttpConnection(
                         config: config,

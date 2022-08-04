@@ -32,7 +32,15 @@ public final class MobileCoinClient {
     private let serviceProvider: ServiceProvider
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
-    private let seedableRNG = MobileCoinChaCha20Rng(longSeed: 123)
+    private let rng: MobileCoinRng?
+
+    private static func createSeedableRng() -> MobileCoinSeedableRng {
+        print("********** Creating Seedable RNG")
+        return MobileCoinChaCha20Rng(longSeed: 123)
+    }
+    deinit {
+        print("********** DEINITIALIZING MOBILECOIN CLIENT!!!!")
+    }
 
     private let fogSyncChecker: FogSyncCheckable
 
@@ -51,6 +59,7 @@ public final class MobileCoinClient {
         self.txOutSelectionStrategy = config.txOutSelectionStrategy
         self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
+        self.rng = config.networkConfig.rng
 
         let grpcFactory = GrpcProtocolConnectionFactory()
         let httpFactory = HttpProtocolConnectionFactory(
@@ -61,7 +70,7 @@ public final class MobileCoinClient {
             targetQueue: serialQueue,
             grpcConnectionFactory: grpcFactory,
             httpConnectionFactory: httpFactory,
-            seedableRng: seedableRNG)
+            rng: rng)
 
         self.fogResolverManager = FogResolverManager(
             fogReportAttestation: config.networkConfig.fogReportAttestation,

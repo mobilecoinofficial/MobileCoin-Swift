@@ -86,7 +86,8 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
-            transportProtocol: transportProtocol).get()
+            transportProtocol: transportProtocol,
+            rng: MobileCoinChaCha20Rng(longSeed: 123)).get()
     }
 
     static func createMobileCoinClientConfigWithPartialValidConsensusUrls(

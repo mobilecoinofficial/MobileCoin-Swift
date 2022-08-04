@@ -14,7 +14,7 @@ extension XCTestCase {
                 interval: UInt32 = 10,
                 _ testCase: (TransportProtocol, XCTestExpectation) throws -> Void
     ) rethrows {
-        let supportedProtocols = TransportProtocol.supportedProtocols
+        let supportedProtocols = [TransportProtocol.http]// TransportProtocol.supportedProtocols
         let last = supportedProtocols.last
         try supportedProtocols.forEach { transportProtocol in
             let description = "[\(transportProtocol.description)]:\(description)"

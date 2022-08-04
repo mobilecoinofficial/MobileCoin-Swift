@@ -23,7 +23,7 @@ final class DefaultServiceProvider: ServiceProvider {
         targetQueue: DispatchQueue?,
         grpcConnectionFactory: GrpcProtocolConnectionFactory,
         httpConnectionFactory: HttpProtocolConnectionFactory,
-        seedableRng: MobileCoinSeedableRng? = nil
+        rng: MobileCoinRng? = nil
     ) {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
@@ -41,7 +41,7 @@ final class DefaultServiceProvider: ServiceProvider {
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue,
-            rngContext: seedableRng)
+            rngContext: rng)
         self.blockchain = BlockchainConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
@@ -52,19 +52,19 @@ final class DefaultServiceProvider: ServiceProvider {
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue,
-            rngContext: seedableRng)
+            rngContext: rng)
         self.merkleProof = FogMerkleProofConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue,
-            rngContext: seedableRng)
+            rngContext: rng)
         self.keyImage = FogKeyImageConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue,
-            rngContext: seedableRng)
+            rngContext: rng)
         self.block = FogBlockConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
