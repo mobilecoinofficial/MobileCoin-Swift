@@ -61,8 +61,7 @@ public final class MobileCoinClient {
             networkConfig: config.networkConfig,
             targetQueue: serialQueue,
             grpcConnectionFactory: grpcFactory,
-            httpConnectionFactory: httpFactory,
-            rng: rng)
+            httpConnectionFactory: httpFactory)
 
         self.fogResolverManager = FogResolverManager(
             fogReportAttestation: config.networkConfig.fogReportAttestation,
@@ -207,6 +206,38 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: MobileCoinRngOption.defaultRng(MobileCoinDefaultRng()),
+            targetQueue: serialQueue
+        ).prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: amount,
+            fee: fee
+        ) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        fee: UInt64,
+        rng: MobileCoinRngOption,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: rng,
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -236,6 +267,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: MobileCoinRngOption.defaultRng(MobileCoinDefaultRng()),
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -262,6 +294,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: MobileCoinRngOption.defaultRng(MobileCoinDefaultRng()),
             targetQueue: serialQueue
         ).prepareDefragmentationStepTransactions(
             toSendAmount: amount,

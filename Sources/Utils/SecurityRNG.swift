@@ -16,8 +16,17 @@ func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
 
 func seedableRNG(context: UnsafeMutableRawPointer) -> UInt64 {
     // get MobileCoinChaCha20Rng from context
-    let chaCha20 = context.bindMemory(to: MobileCoinChaCha20Rng.self, capacity: 1)
-    let val = chaCha20.pointee.nextUInt64()
+    let rngOptPtr = context.bindMemory(to: MobileCoinRngOption.self, capacity: 1)
+    let rngOpt = rngOptPtr.pointee
+
+    let val: UInt64
+    switch rngOpt {
+    case .defaultRng(let rng):
+        val = rng.nextUInt64()
+    case .seedable(let rng):
+        val = rng.nextUInt64()
+    }
+
     print("*********** seedable RNG val = \(val)")
     return val
 }

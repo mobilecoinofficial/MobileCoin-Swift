@@ -4,7 +4,7 @@
 
 import Foundation
 
-protocol MobileCoinSeedableRng: MobileCoinRng {
+public protocol MobileCoinSeedableRng: MobileCoinRng {
     var seed: UInt64 { get set }
     var wordPos: [UInt64] { get set }
 }

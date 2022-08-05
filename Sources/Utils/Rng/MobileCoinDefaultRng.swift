@@ -4,8 +4,8 @@
 
 import Foundation
 
-struct MobileCoinDefaultRng: MobileCoinRng {
-    func nextUInt64() -> UInt64 {
+public struct MobileCoinDefaultRng: MobileCoinRng {
+    public func nextUInt64() -> UInt64 {
         securityRNG()
     }
 }
