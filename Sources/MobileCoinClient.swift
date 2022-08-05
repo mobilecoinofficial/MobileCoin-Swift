@@ -34,14 +34,6 @@ public final class MobileCoinClient {
     private let metaFetcher: BlockchainMetaFetcher
     private let rng: MobileCoinRng?
 
-    private static func createSeedableRng() -> MobileCoinSeedableRng {
-        print("********** Creating Seedable RNG")
-        return MobileCoinChaCha20Rng(longSeed: 123)
-    }
-    deinit {
-        print("********** DEINITIALIZING MOBILECOIN CLIENT!!!!")
-    }
-
     private let fogSyncChecker: FogSyncCheckable
 
     static let latestBlockVersion = BlockVersion.legacy

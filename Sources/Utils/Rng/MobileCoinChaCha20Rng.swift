@@ -6,15 +6,29 @@ import Foundation
 import LibMobileCoin
 
 final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
-    private let ptr: OpaquePointer
-    var seed: UInt64
-    var wordPos: [UInt64]
+    private var ptr: OpaquePointer
+    var seed: UInt64 = 0
+    var seedBytes = Data32()
+    var wordPos = [UInt64]()
 
     init(longSeed: UInt64) {
         seed = longSeed
-        wordPos = []
         ptr = withMcInfallible {
             mc_chacha20_rng_create_with_long(longSeed)
+        }
+    }
+
+    init(bytes: Data32) {
+        seedBytes = bytes
+
+        var cc20ptr: OpaquePointer?
+        bytes.asMcBuffer { bytesBufferPtr in
+            cc20ptr = withMcInfallible {
+                mc_chacha20_rng_create_with_bytes(bytesBufferPtr)
+            }
+        }
+        ptr = withMcInfallible {
+            cc20ptr
         }
     }
 
@@ -25,9 +39,7 @@ final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
 
 extension MobileCoinChaCha20Rng: MobileCoinRng {
     func nextUInt64() -> UInt64 {
-        print("********** ChaCha20Rng seed \(seed))")
-        print("********** ChaCha20Rng = \(ptr))")
-        return mc_chacha20_rng_next_long(ptr)
+        mc_chacha20_rng_next_long(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {

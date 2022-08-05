@@ -8,7 +8,6 @@ import Security
 
 func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
     if let context = context {
-        print("********** securityRNG context = \(context)")
         return seedableRNG(context: context)
     } else {
         return defaultRNG()
@@ -17,11 +16,10 @@ func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
 
 func seedableRNG(context: UnsafeMutableRawPointer) -> UInt64 {
     // get MobileCoinChaCha20Rng from context
-    print("********** seedableRNG context = \(context)")
     let chaCha20 = context.bindMemory(to: MobileCoinChaCha20Rng.self, capacity: 1)
-    print("********** seedableRNG chaCha20 = \(chaCha20)")
-    print("********** seedableRNG chaCha20.pointee = \(chaCha20.pointee)")
-    return chaCha20.pointee.nextUInt64()
+    let val = chaCha20.pointee.nextUInt64()
+    print("*********** seedable RNG val = \(val)")
+    return val
 }
 
 func defaultRNG() -> UInt64 {
