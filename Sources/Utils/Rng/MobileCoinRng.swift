@@ -4,8 +4,8 @@
 
 import Foundation
 
+// swiftlint:disable unavailable_function
 public class MobileCoinRng {
-    @available(*, unavailable)
     public func nextUInt64() -> UInt64 {
         fatalError("Subclass must override")
     }
