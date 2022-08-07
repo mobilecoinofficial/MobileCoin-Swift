@@ -21,7 +21,7 @@ extension Account {
             metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             mixinSelectionStrategy: MixinSelectionStrategy,
-            rng: MobileCoinRngOption,
+            rng: MobileCoinRng,
             targetQueue: DispatchQueue?
         ) {
             self.serialQueue = DispatchQueue(

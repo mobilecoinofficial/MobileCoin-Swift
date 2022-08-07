@@ -4,7 +4,21 @@
 
 import Foundation
 
-public protocol MobileCoinSeedableRng: MobileCoinRng {
-    var seed: UInt64 { get set }
-    var wordPos: [UInt64] { get set }
+public class MobileCoinSeedableRng: MobileCoinRng {
+    let _seed: Data32
+
+    var seed: Data32 {
+        _seed
+    }
+
+    init(seed: Data32) {
+        self._seed = seed
+    }
+
+    var wordPos: Data {
+        fatalError("Subclass must override wordPos setter")
+    }
+//        set {
+//            fatalError("Subclass must override wordPos setter")
+//        }
 }

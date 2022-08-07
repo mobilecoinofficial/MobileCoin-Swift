@@ -4,11 +4,9 @@
 
 import Foundation
 
-public protocol MobileCoinRng {
-    func nextUInt64() -> UInt64
-}
-
-public enum MobileCoinRngOption {
-    case defaultRng(MobileCoinDefaultRng)
-    case seedable(MobileCoinSeedableRng)
+public class MobileCoinRng {
+    @available(*, unavailable)
+    public func nextUInt64() -> UInt64 {
+        fatalError("Subclass must override")
+    }
 }

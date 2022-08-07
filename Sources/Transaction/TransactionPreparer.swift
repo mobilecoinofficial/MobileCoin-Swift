@@ -13,14 +13,14 @@ struct TransactionPreparer {
     private let fogResolverManager: FogResolverManager
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
-    private let rng: MobileCoinRngOption
+    private let rng: MobileCoinRng
 
     init(
         accountKey: AccountKey,
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
-        rng: MobileCoinRngOption,
+        rng: MobileCoinRng,
         targetQueue: DispatchQueue?
     ) {
         self.serialQueue = DispatchQueue(
@@ -78,7 +78,8 @@ struct TransactionPreparer {
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
-                        blockVersion: blockVersion
+                        blockVersion: blockVersion,
+                        rng: rng
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
                 })
@@ -140,7 +141,7 @@ struct TransactionPreparer {
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
                         blockVersion: blockVersion,
-                        rngContext: rng
+                        rng: rng
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })

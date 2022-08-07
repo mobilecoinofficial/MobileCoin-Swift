@@ -1,7 +1,6 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable function_parameter_count
 // swiftlint:disable multiline_function_chains
 
 import Foundation
@@ -46,8 +45,7 @@ enum TransactionBuilderUtils {
         tombstoneBlockIndex: UInt64,
         publicAddress: PublicAddress,
         amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
 
         func ffiInner(
@@ -83,8 +81,9 @@ enum TransactionBuilderUtils {
 
         var confirmationNumberData = Data32()
         var sharedSecretData = Data32()
+        let rngFunc: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = mobileCoinRNG
         return publicAddress.withUnsafeCStructPointer { publicAddressPtr in
-            withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+            withMcRngObjCallback(rngFunc: rngFunc, rng: rng) { rngCallbackPtr in
                 // Using an in-line func for the FFI Inner to keep closure size low.
                 ffiInner(publicAddressPtr: publicAddressPtr, rngCallbackPtr: rngCallbackPtr)
             }
@@ -112,18 +111,19 @@ enum TransactionBuilderUtils {
         tombstoneBlockIndex: UInt64,
         accountKey: AccountKey,
         amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         var confirmationNumberData = Data32()
         var sharedSecretData = Data32()
+
+        let rngFunc: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = mobileCoinRNG
 
         let result: Result<Data, TransactionBuilderError> = McAccountKey.withUnsafePointer(
             viewPrivateKey: accountKey.viewPrivateKey,
             spendPrivateKey: accountKey.spendPrivateKey,
             fogInfo: accountKey.fogInfo
         ) { accountKeyPtr in
-            withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+            withMcRngObjCallback(rngFunc: rngFunc, rng: rng) { rngCallbackPtr in
                 confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
                     sharedSecretData.asMcMutableBuffer { sharedSecretPtr in
                         Data.make(withMcDataBytes: { errorPtr in
@@ -187,10 +187,11 @@ enum TransactionBuilderUtils {
 
     static func build(
         ptr: OpaquePointer,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rngFunc: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rng: MobileCoinRng
     ) -> Result<Transaction, TransactionBuilderError> {
-        withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
+
+        withMcRngObjCallback(rngFunc: rngFunc, rng: rng) { rngCallbackPtr in
             Data.make(withMcDataBytes: { errorPtr in
                 mc_transaction_builder_build(ptr, rngCallbackPtr, &errorPtr)
             }).mapError {

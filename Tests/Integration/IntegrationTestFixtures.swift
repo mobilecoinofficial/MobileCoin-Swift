@@ -86,8 +86,7 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
-            transportProtocol: transportProtocol,
-            rng: MobileCoinChaCha20Rng(longSeed: defaultRNG())).get()
+            transportProtocol: transportProtocol).get()
     }
 
     static func createMobileCoinClientConfigWithPartialValidConsensusUrls(
@@ -101,8 +100,7 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
-            transportProtocol: transportProtocol,
-            rng: MobileCoinChaCha20Rng(longSeed: defaultRNG())).get()
+            transportProtocol: transportProtocol).get()
     }
 
     static func createMobileCoinClientConfigWithPartialValidFogUrls(
@@ -116,8 +114,7 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
-            transportProtocol: transportProtocol,
-            rng: MobileCoinChaCha20Rng(longSeed: defaultRNG())).get()
+            transportProtocol: transportProtocol).get()
     }
 
     static func createMobileCoinClientWithPartialValidConsensusUrls(

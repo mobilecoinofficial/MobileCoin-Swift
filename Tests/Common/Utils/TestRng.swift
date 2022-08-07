@@ -3,8 +3,8 @@
 //
 
 // swiftlint:disable line_length
-
 import Foundation
+@testable import MobileCoin
 
 // From:
 // https://github.com/mattgallagher/CwlUtils/blob/0bfc4587d01cfc796b6c7e118fc631333dd8ab33/Sources/CwlUtils/CwlRandom.swift
@@ -38,4 +38,17 @@ func testRngCallback(context: UnsafeMutableRawPointer!) -> UInt64 {
     context.assumingMemoryBound(to: Xoshiro.self).pointee.next()
 }
 
-typealias TestRng = Xoshiro
+class MobileCoinXoshiroRng: MobileCoinRng {
+
+    let xoshiro: Xoshiro
+
+    init(seed: Xoshiro.StateType = (12345678, 87654321, 10293847, 29384756)) {
+        xoshiro = Xoshiro(seed: seed)
+    }
+
+    override func nextUInt64() -> UInt64 {
+        xoshiro.next()
+    }
+}
+
+typealias TestRng = MobileCoinXoshiroRng

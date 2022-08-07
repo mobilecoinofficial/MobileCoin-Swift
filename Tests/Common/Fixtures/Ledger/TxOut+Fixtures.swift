@@ -54,8 +54,7 @@ extension TxOut.Fixtures.Default {
             fogResolver:
                 FogResolver.Fixtures.Default(reportUrl: accountKey.fogReportUrl).fogResolver,
             blockVersion: defaultBlockVersion,
-            rng: testRngCallback,
-            rngContext: TestRng()
+            rng: TestRng()
         ).get()
     }
 

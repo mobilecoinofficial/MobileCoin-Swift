@@ -18,8 +18,7 @@ extension MobileCoinClient {
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
             fogReportAttestation: Attestation,
-            transportProtocol: TransportProtocol,
-            rng: MobileCoinRng? = nil
+            transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
             Self.make(consensusUrls: [consensusUrl],
                       consensusAttestation: consensusAttestation,
@@ -28,8 +27,7 @@ extension MobileCoinClient {
                       fogKeyImageAttestation: fogKeyImageAttestation,
                       fogMerkleProofAttestation: fogMerkleProofAttestation,
                       fogReportAttestation: fogReportAttestation,
-                      transportProtocol: transportProtocol,
-                      rng: rng)
+                      transportProtocol: transportProtocol)
         }
 
         /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
@@ -42,8 +40,7 @@ extension MobileCoinClient {
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
             fogReportAttestation: Attestation,
-            transportProtocol: TransportProtocol,
-            rng: MobileCoinRng? = nil
+            transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
 
             ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
@@ -66,8 +63,7 @@ extension MobileCoinClient {
                                 consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                                 fogUrlLoadBalancer: fogUrlLoadBalancer,
                                 attestation: attestationConfig,
-                                transportProtocol: transportProtocol,
-                                rng: rng)
+                                transportProtocol: transportProtocol)
                             return Config(networkConfig: networkConfig)
                         }
                     }

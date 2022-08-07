@@ -7,31 +7,6 @@
 import Security
 
 func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
-    if let context = context {
-        return seedableRNG(context: context)
-    } else {
-        return defaultRNG()
-    }
-}
-
-func seedableRNG(context: UnsafeMutableRawPointer) -> UInt64 {
-    // get MobileCoinChaCha20Rng from context
-    let rngOptPtr = context.bindMemory(to: MobileCoinRngOption.self, capacity: 1)
-    let rngOpt = rngOptPtr.pointee
-
-    let val: UInt64
-    switch rngOpt {
-    case .defaultRng(let rng):
-        val = rng.nextUInt64()
-    case .seedable(let rng):
-        val = rng.nextUInt64()
-    }
-
-    print("*********** seedable RNG val = \(val)")
-    return val
-}
-
-func defaultRNG() -> UInt64 {
     var value: UInt64 = 0
 
     let numBytes = MemoryLayout.size(ofValue: value)
@@ -49,4 +24,17 @@ func defaultRNG() -> UInt64 {
     }
 
     return value
+}
+
+func mobileCoinRNG(context: UnsafeMutableRawPointer?) -> UInt64 {
+    // get MobileCoinChaCha20Rng from context    
+    guard let context = context else {
+        logger.fatalError("Failed to obtain rng from context")
+    }
+
+    let rng = Unmanaged<MobileCoinRng>.fromOpaque(context).takeUnretainedValue()
+    let val = rng.nextUInt64()
+    print("*********** RNG val = \(val)")
+
+    return val
 }

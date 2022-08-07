@@ -74,8 +74,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
+        rng: MobileCoinRng
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
             inputs: inputs,
@@ -86,8 +85,7 @@ extension TransactionBuilder {
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
             blockVersion: blockVersion,
-            rng: rng,
-            rngContext: rngContext
+            rng: rng
         ).map { pendingTransaction in
             pendingTransaction.singlePayload
         }
@@ -102,8 +100,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
+        rng: MobileCoinRng
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         Math.positiveRemainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
@@ -120,8 +117,7 @@ extension TransactionBuilder {
                 tombstoneBlockIndex: tombstoneBlockIndex,
                 fogResolver: fogResolver,
                 blockVersion: blockVersion,
-                rng: rng,
-                rngContext: rngContext
+                rng: rng
             ).map { pendingTransaction in
                 pendingTransaction.singlePayload
             }
@@ -137,8 +133,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
+        rng: MobileCoinRng
     ) -> Result<PendingTransaction, TransactionBuilderError> {
         outputsAddingChangeOutput(
             inputs: inputs,
@@ -154,8 +149,7 @@ extension TransactionBuilder {
                 tombstoneBlockIndex: tombstoneBlockIndex,
                 fogResolver: fogResolver,
                 blockVersion: blockVersion,
-                rng: rng,
-                rngContext: rngContext)
+                rng: rng)
         }
     }
 
@@ -168,8 +162,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
+        rng: MobileCoinRng
     ) -> Result<PendingTransaction, TransactionBuilderError> {
         guard Math.totalOutlayCheck(for: possibleTransaction, fee: fee, inputs: inputs) else {
             return .failure(.invalidInput("Input values != output values + fee"))
@@ -194,8 +187,7 @@ extension TransactionBuilder {
             builder.addOutput(
                 publicAddress: output.recipient,
                 amount: output.amount.value,
-                rng: rng,
-                rngContext: rngContext
+                rng: rng
             )
         }
 
@@ -203,11 +195,12 @@ extension TransactionBuilder {
             blockVersion: blockVersion,
             accountKey: accountKey,
             builder: builder,
-            changeAmount: possibleTransaction.changeAmount)
+            changeAmount: possibleTransaction.changeAmount,
+            rng: rng)
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
             changeContext.flatMap { changeContext in
-                builder.build(rng: rng, rngContext: rngContext).map { transaction in
+                builder.build(rng: rng).map { transaction in
                     PendingTransaction(
                         transaction: transaction,
                         payloadTxOutContexts: payloadContexts,
@@ -222,8 +215,7 @@ extension TransactionBuilder {
         accountKey: AccountKey,
         builder: TransactionBuilder,
         changeAmount: PositiveUInt64?,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
+        rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         switch blockVersion {
         case .legacy:
@@ -232,14 +224,12 @@ extension TransactionBuilder {
             return builder.addOutput(
                 publicAddress: accountKey.publicAddress,
                 amount: changeAmount?.value ?? 0,
-                rng: rng,
-                rngContext: rngContext)
+                rng: rng)
         default:
             return builder.addChangeOutput(
                 accountKey: accountKey,
                 amount: changeAmount?.value ?? 0,
-                rng: rng,
-                rngContext: rngContext)
+                rng: rng)
         }
     }
 
@@ -248,8 +238,7 @@ extension TransactionBuilder {
         amount: UInt64,
         fogResolver: FogResolver = FogResolver(),
         blockVersion: BlockVersion,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<TxOut, TransactionBuilderError> {
         outputWithReceipt(
             publicAddress: publicAddress,
@@ -257,8 +246,7 @@ extension TransactionBuilder {
             tombstoneBlockIndex: 0,
             fogResolver: fogResolver,
             blockVersion: blockVersion,
-            rng: rng,
-            rngContext: rngContext
+            rng: rng
         ).map { $0.txOut }
     }
 
@@ -268,8 +256,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
         blockVersion: BlockVersion,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         let transactionBuilder = TransactionBuilder(
             fee: Amount(value: 0, tokenId: .MOB),
@@ -279,8 +266,7 @@ extension TransactionBuilder {
         return transactionBuilder.addOutput(
             publicAddress: publicAddress,
             amount: amount,
-            rng: rng,
-            rngContext: rngContext)
+            rng: rng)
     }
 
     private static func outputsAddingChangeOutput(
@@ -328,37 +314,32 @@ extension TransactionBuilder {
     private func addOutput(
         publicAddress: PublicAddress,
         amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         TransactionBuilderUtils.addOutput(
             ptr: ptr,
             tombstoneBlockIndex: tombstoneBlockIndex,
             publicAddress: publicAddress,
             amount: amount,
-            rng: rng,
-            rngContext: rngContext)
+            rng: rng)
     }
 
     private func addChangeOutput(
         accountKey: AccountKey,
         amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         TransactionBuilderUtils.addChangeOutput(
             ptr: ptr,
             tombstoneBlockIndex: tombstoneBlockIndex,
             accountKey: accountKey,
             amount: amount,
-            rng: rng,
-            rngContext: rngContext)
+            rng: rng)
     }
 
     private func build(
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<Transaction, TransactionBuilderError> {
-        TransactionBuilderUtils.build(ptr: ptr, rng: rng, rngContext: rngContext)
+        TransactionBuilderUtils.build(ptr: ptr, rngFunc: mobileCoinRNG, rng: rng)
     }
 }
