@@ -6,7 +6,11 @@ import Foundation
 
 final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
     let offsetParam: UInt64 = 88
-    var rng: RandomNumberGenerator = SystemRandomNumberGenerator()
+    var rng: MobileCoinRng
+
+    init(rng: MobileCoinRng = MobileCoinDefaultRng()) {
+        self.rng = rng
+    }
 
     // Selection window: [t-k, t+k] where t = real txo index, k = offsetParam
     var selectionWindowWidth: UInt64 {
@@ -70,7 +74,7 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
         // Midpoint = sourceIndex + [0, 2 * offsetParam + 1).random - offsetParam
 
         // Add up positive components of midpoint.
-        var midpoint = sourceIndex + rng.next(upperBound: selectionWindowWidth)
+        var midpoint = sourceIndex + (rng.nextUInt64() % selectionWindowWidth)
         // Safely subtract half the width of the selection window, ensuring that the lower bound of
         // the index selection window is at least 0.
         midpoint = midpoint >= 2 * offsetParam ? midpoint - offsetParam : offsetParam
@@ -86,6 +90,6 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
     }
 
     private func selectIndex(lowerBound: UInt64) -> UInt64 {
-        lowerBound + rng.next(upperBound: selectionWindowWidth)
+        lowerBound + (rng.nextUInt64() % selectionWindowWidth)
     }
 }

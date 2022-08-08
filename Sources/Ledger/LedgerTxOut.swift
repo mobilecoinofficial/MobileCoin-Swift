@@ -58,3 +58,9 @@ extension LedgerTxOut {
         self.init(partialTxOut, globalIndex: globalIndex, block: block)
     }
 }
+
+extension LedgerTxOut: CustomDebugStringConvertible {
+    var debugDescription: String {
+        "************* LedgerTxOut debug description"
+    }
+}
