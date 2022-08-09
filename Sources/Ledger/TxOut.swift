@@ -123,9 +123,3 @@ extension FogView_TxOutRecord {
         Data66(self.txOutEMemoData.data) ?? Data66()
     }
 }
-
-extension External_TxOut: CustomDebugStringConvertible {
-    var debugDescription: String {
-        "************* External_TxOut debug description"
-    }
-}

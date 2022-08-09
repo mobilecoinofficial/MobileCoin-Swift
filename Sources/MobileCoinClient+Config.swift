@@ -83,7 +83,7 @@ extension MobileCoinClient {
         public var callbackQueue: DispatchQueue?
 
         var txOutSelectionStrategy: TxOutSelectionStrategy = DefaultTxOutSelectionStrategy()
-       // var mixinSelectionStrategy: MixinSelectionStrategy = DefaultMixinSelectionStrategy()
+        var mixinSelectionStrategy: MixinSelectionStrategy = DefaultMixinSelectionStrategy()
         var fogQueryScalingStrategy: FogQueryScalingStrategy = DefaultFogQueryScalingStrategy()
         var fogSyncCheckable: FogSyncCheckable = FogSyncChecker()
 

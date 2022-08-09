@@ -53,9 +53,3 @@ struct KnownTxOut: TxOutProtocol {
 
 extension KnownTxOut: Equatable {}
 extension KnownTxOut: Hashable {}
-
-extension KnownTxOut: CustomDebugStringConvertible {
-    var debugDescription: String {
-        "************* KnownTxOut debug description"
-    }
-}

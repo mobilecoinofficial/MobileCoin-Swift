@@ -90,9 +90,3 @@ extension PartialTxOut {
         }
     }
 }
-
-extension PartialTxOut: CustomDebugStringConvertible {
-    var debugDescription: String {
-        "************* PartialTxOut debug description"
-    }
-}

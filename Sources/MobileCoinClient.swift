@@ -26,7 +26,7 @@ public final class MobileCoinClient {
     private let callbackQueue: DispatchQueue
 
     private let txOutSelectionStrategy: TxOutSelectionStrategy
-//    private let mixinSelectionStrategy: MixinSelectionStrategy
+    private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogQueryScalingStrategy: FogQueryScalingStrategy
 
     private let serviceProvider: ServiceProvider
@@ -48,7 +48,7 @@ public final class MobileCoinClient {
         self.fogSyncChecker = config.fogSyncCheckable
         self.accountLock = .init(Account(accountKey: accountKey, syncChecker: fogSyncChecker))
         self.txOutSelectionStrategy = config.txOutSelectionStrategy
-        // self.mixinSelectionStrategy = config.mixinSelectionStrategy
+        self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
         let grpcFactory = GrpcProtocolConnectionFactory()
