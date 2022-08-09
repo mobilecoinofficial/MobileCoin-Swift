@@ -31,6 +31,7 @@ class TransactionIdempotenceTests: XCTestCase {
                 }
                 client.prepareTransaction(
                     to: recipient,
+                    memoType: .unused,
                     amount: Amount(mob: 100),
                     fee: IntegrationTestFixtures.fee,
                     rng: rng2
@@ -39,21 +40,7 @@ class TransactionIdempotenceTests: XCTestCase {
                         return
                     }
 
-                    let t1 = transaction1.transaction
-                    let t2 = transaction2.transaction
-
-                    XCTAssertEqual(t1.fee, t2.fee)
-                    XCTAssertEqual(t1.inputKeyImages, t2.inputKeyImages)
-                    XCTAssertEqual(t1.inputKeyImagesTyped, t2.inputKeyImagesTyped)
-                    XCTAssertEqual(t1.outputPublicKeys, t2.outputPublicKeys)
-
-//                    XCTAssertEqual(t1.anyOutput, t2.anyOutput)
-//                    XCTAssertEqual(t1.hashValue, t2.hashValue)
-                    XCTAssertEqual(t1.outputs, t2.outputs)
-
-                    let t1Data = transaction1.transaction.serializedData.base64EncodedString()
-                    let t2Data = transaction2.transaction.serializedData.base64EncodedString()
-                    XCTAssertEqual(t1Data, t2Data)
+                    XCTAssertEqual(transaction1, transaction2)
                     expect.fulfill()
                 }
 
