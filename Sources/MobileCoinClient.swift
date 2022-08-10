@@ -279,6 +279,37 @@ public final class MobileCoinClient {
         }
     }
 
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        feeLevel: FeeLevel = .minimum,
+        rng: MobileCoinRng,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: rng,
+            targetQueue: serialQueue
+        ).prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: amount,
+            feeLevel: feeLevel
+        ) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
     public func prepareDefragmentationStepTransactions(
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
@@ -293,6 +324,32 @@ public final class MobileCoinClient {
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
             rng: MobileCoinDefaultRng(),
+            targetQueue: serialQueue
+        ).prepareDefragmentationStepTransactions(
+            toSendAmount: amount,
+            recoverableMemo: recoverableMemo,
+            feeLevel: feeLevel) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
+    public func prepareDefragmentationStepTransactions(
+        toSendAmount amount: Amount,
+        recoverableMemo: Bool = false,
+        feeLevel: FeeLevel = .minimum,
+        rng: MobileCoinRng,
+        completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
+    ) {
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: rng,
             targetQueue: serialQueue
         ).prepareDefragmentationStepTransactions(
             toSendAmount: amount,
