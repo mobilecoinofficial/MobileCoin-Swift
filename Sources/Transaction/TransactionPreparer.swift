@@ -153,10 +153,20 @@ struct TransactionPreparer {
         merkleRootBlock: UInt64? = nil,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        let inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
-            forRealTxOutIndices: inputs.map { $0.globalIndex },
-            selectionRange: ledgerTxOutCount.map { ..<$0 }
-        ).map { Array($0) }
+        var inputsMixinIndices: [[UInt64]]
+
+        if let idempotentStrategy = mixinSelectionStrategy as? IdempotentMixinSelectionStragegy {
+            inputsMixinIndices = idempotentStrategy.selectMixinIndices(
+                rng: rng,
+                forRealTxOutIndices: inputs.map { $0.globalIndex },
+                selectionRange: ledgerTxOutCount.map { ..<$0 }
+            ).map { Array($0) }
+        } else {
+            inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
+                forRealTxOutIndices: inputs.map { $0.globalIndex },
+                selectionRange: ledgerTxOutCount.map { ..<$0 }
+            ).map { Array($0) }
+        }
 
         // There's a chance that a txo we selected as a mixin is in a block that's greater than
         // the highest block of our inputs, in which case, using the highest block of our inputs

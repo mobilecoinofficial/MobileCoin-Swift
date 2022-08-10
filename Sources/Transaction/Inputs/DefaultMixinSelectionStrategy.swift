@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
+final class DefaultMixinSelectionStrategy: IdempotentMixinSelectionStragegy {
     let offsetParam: UInt64 = 88
     var rng: MobileCoinRng
 
@@ -18,6 +18,7 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
     }
 
     func selectMixinIndices(
+        rng: MobileCoinRng,
         forRealTxOutIndices realTxOutIndices: [UInt64],
         selectionRange: PartialRangeUpTo<UInt64>?,
         excludedTxOutIndices: [UInt64],
@@ -35,6 +36,7 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
 
         return realTxOutIndices.map { realTxOutIndex in
             let selectionWindowMidpoint = safeSelectMidpoint(
+                rng: rng,
                 sourceIndex: realTxOutIndex,
                 selectionRange: selectionRange)
             let selectionWindowLowerBound = selectionWindowMidpoint - offsetParam
@@ -43,7 +45,7 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
             selectedIndices.insert(realTxOutIndex)
 
             while selectedIndices.count < ringSize {
-                let selectedIndex = selectIndex(lowerBound: selectionWindowLowerBound)
+                let selectedIndex = selectIndex(rng: rng, lowerBound: selectionWindowLowerBound)
 
                 guard !excludedIndices.contains(selectedIndex) else {
                     continue
@@ -68,6 +70,7 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
     /// Ensures upper bound of index selection window is less than selectionRange.upperBound, if
     /// selectionRange is provided.
     private func safeSelectMidpoint(
+        rng: MobileCoinRng,
         sourceIndex: UInt64,
         selectionRange: PartialRangeUpTo<UInt64>?
     ) -> UInt64 {
@@ -89,7 +92,7 @@ final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
         return midpoint
     }
 
-    private func selectIndex(lowerBound: UInt64) -> UInt64 {
+    private func selectIndex(rng: MobileCoinRng, lowerBound: UInt64) -> UInt64 {
         lowerBound + (rng.nextUInt64() % selectionWindowWidth)
     }
 }
