@@ -25,15 +25,16 @@ final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
         get {
             let wordPosData = Data()
 
-            // look up how to get an UnsafePointer<McBuffer> to pass in to get wordpos
             wordPosData.asMcBuffer { buffer in
                 mc_chacha20_get_word_pos(ptr, buffer)
             }
 
             return wordPosData
         }
-        set {
-            // do nothing for now
+        set(wordpos) {
+            wordpos.asMcBuffer { bytesBufferPtr in
+                mc_chacha20_set_word_pos(ptr, bytesBufferPtr)
+            }
         }
     }
 
