@@ -2,6 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
+// swiftlint:disable unused_setter_value
 import Foundation
 
 public class MobileCoinSeedableRng: MobileCoinRng {
@@ -15,10 +16,35 @@ public class MobileCoinSeedableRng: MobileCoinRng {
         self._seed = seed
     }
 
-    var wordPos: Data {
-        fatalError("Subclass must override wordPos setter")
+    override convenience init() {
+        let bytesCount = 32
+        var randomBytes = [UInt8](repeating: 0, count: bytesCount)
+
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytesCount, &randomBytes)
+        guard status == errSecSuccess else {
+            var message = ""
+            if #available(iOS 11.3, *), let errorMessage = SecCopyErrorMessageString(status, nil) {
+                message = ", message: \(errorMessage)"
+            }
+
+            logger.fatalError("Failed to generate bytes. SecError: \(status)" + message)
+        }
+
+        guard let seedData32 = Data32(Data(randomBytes)) else {
+            // will not happen
+            logger.fatalError("Failed to generate Data32 for rng seed.")
+        }
+
+        self.init(seed: seedData32)
     }
-//        set {
-//            fatalError("Subclass must override wordPos setter")
-//        }
+
+    var wordPos: Data16 {
+        get {
+            fatalError("Subclass must override wordPos getter")
+        }
+
+        set(wordpos) {
+            fatalError("Subclass must override wordPos setter")
+        }
+    }
 }

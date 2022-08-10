@@ -21,9 +21,9 @@ final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
         super.init(seed: seed)
     }
 
-    override var wordPos: Data {
+    override var wordPos: Data16 {
         get {
-            let wordPosData = Data()
+            let wordPosData = Data16()
 
             wordPosData.asMcBuffer { buffer in
                 mc_chacha20_get_word_pos(ptr, buffer)
