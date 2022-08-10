@@ -34,7 +34,6 @@ func mobileCoinRNG(context: UnsafeMutableRawPointer?) -> UInt64 {
 
     let rng = Unmanaged<MobileCoinRng>.fromOpaque(context).takeUnretainedValue()
     let val = rng.nextUInt64()
-    print("*********** RNG val = \(val)")
 
     return val
 }
