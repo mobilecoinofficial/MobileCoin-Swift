@@ -203,7 +203,7 @@ public final class MobileCoinClient {
             fogResolverManager: fogResolverManager,
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
-            mixinSelectionStrategy: DefaultMixinSelectionStrategy(),
+            mixinSelectionStrategy: mixinSelectionStrategy,
             rng: MobileCoinDefaultRng(),
             targetQueue: serialQueue
         ).prepareTransaction(
@@ -234,7 +234,7 @@ public final class MobileCoinClient {
             fogResolverManager: fogResolverManager,
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
-            mixinSelectionStrategy: DefaultMixinSelectionStrategy(rng: rng),
+            mixinSelectionStrategy: mixinSelectionStrategy,
             rng: rng,
             targetQueue: serialQueue
         ).prepareTransaction(
@@ -264,7 +264,7 @@ public final class MobileCoinClient {
             fogResolverManager: fogResolverManager,
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
-            mixinSelectionStrategy: DefaultMixinSelectionStrategy(),
+            mixinSelectionStrategy: mixinSelectionStrategy,
             rng: MobileCoinDefaultRng(),
             targetQueue: serialQueue
         ).prepareTransaction(
@@ -291,7 +291,7 @@ public final class MobileCoinClient {
             fogResolverManager: fogResolverManager,
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
-            mixinSelectionStrategy: DefaultMixinSelectionStrategy(),
+            mixinSelectionStrategy: mixinSelectionStrategy,
             rng: MobileCoinDefaultRng(),
             targetQueue: serialQueue
         ).prepareDefragmentationStepTransactions(
