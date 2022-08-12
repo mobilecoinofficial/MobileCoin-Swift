@@ -6,11 +6,6 @@ import Foundation
 
 final class DefaultMixinSelectionStrategy: IdempotentMixinSelectionStragegy {
     let offsetParam: UInt64 = 88
-    var rng: MobileCoinRng
-
-    init(rng: MobileCoinRng = MobileCoinDefaultRng()) {
-        self.rng = rng
-    }
 
     // Selection window: [t-k, t+k] where t = real txo index, k = offsetParam
     var selectionWindowWidth: UInt64 {
