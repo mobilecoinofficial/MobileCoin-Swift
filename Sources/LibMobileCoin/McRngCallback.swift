@@ -25,14 +25,9 @@ func withMcRngCallback<T>(
     _ body: (UnsafeMutablePointer<McRngCallback>?) throws -> T
 ) rethrows -> T {
     if let rng = rng {
-        if let rngContext = rngContext {
-            var rngContext = rngContext
-            return try withUnsafeMutablePointer(to: &rngContext) { rngContextPtr in
-                var rngCallback = McRngCallback(rng: rng, context: rngContextPtr)
-                return try body(&rngCallback)
-            }
-        } else {
-            var rngCallback = McRngCallback(rng: rng, context: nil)
+        var rngContext = rngContext
+        return try withUnsafeMutablePointer(to: &rngContext) { rngContextPtr in
+            var rngCallback = McRngCallback(rng: rng, context: rngContextPtr)
             return try body(&rngCallback)
         }
     } else {
