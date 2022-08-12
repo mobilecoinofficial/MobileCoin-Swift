@@ -27,7 +27,7 @@ func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
 }
 
 func mobileCoinRNG(context: UnsafeMutableRawPointer?) -> UInt64 {
-    // get MobileCoinChaCha20Rng from context    
+    // get MobileCoinRng sub-class from context    
     guard let context = context else {
         logger.fatalError("Failed to obtain rng from context")
     }
