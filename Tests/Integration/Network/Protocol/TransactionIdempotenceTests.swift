@@ -9,8 +9,8 @@ class TransactionIdempotenceTests: XCTestCase {
 
     func testTransactionIdempotence() throws {
         let seed = Data32(repeating: 5)
-        let rng1: MobileCoinRng = MobileCoinChaCha20Rng(seed: seed)
-        let rng2: MobileCoinRng = MobileCoinChaCha20Rng(seed: seed)
+        let rng1: MobileCoinRng = MobileCoinChaCha20Rng(seed32: seed)
+        let rng2: MobileCoinRng = MobileCoinChaCha20Rng(seed32: seed)
 
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let expect = expectation(description: description)
@@ -87,7 +87,7 @@ class TransactionIdempotenceTests: XCTestCase {
                     }
 
                     // create rng w/cached state (seed + wordpos)
-                    let rng2: MobileCoinSeedableRng = MobileCoinChaCha20Rng(seed: seed)
+                    let rng2 = MobileCoinChaCha20Rng(seed: seed)
                     rng2.wordPos = wordPos
 
                     client.prepareTransaction(

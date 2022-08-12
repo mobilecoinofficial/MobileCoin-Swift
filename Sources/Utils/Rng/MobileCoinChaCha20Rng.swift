@@ -5,12 +5,13 @@
 import Foundation
 import LibMobileCoin
 
-final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
+public final class MobileCoinChaCha20Rng: MobileCoinRng {
     private var ptr: OpaquePointer
+    public let seed: Data
 
-    override init(seed: Data32) {
+    init(seed32: Data32) {
         var cc20ptr: OpaquePointer?
-        seed.asMcBuffer { bytesBufferPtr in
+        seed32.asMcBuffer { bytesBufferPtr in
             cc20ptr = withMcInfallible {
                 mc_chacha20_rng_create_with_bytes(bytesBufferPtr)
             }
@@ -18,10 +19,20 @@ final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
         ptr = withMcInfallible {
             cc20ptr
         }
-        super.init(seed: seed)
+
+        self.seed = seed32.data
+        super.init()
     }
 
-    override var wordPos: Data16 {
+    convenience init(seed: Data) {
+        let seed32: Data32 = withMcInfallibleReturningOptional {
+            Data32(seed)
+        }
+
+        self.init(seed32: seed32)
+    }
+
+    public var wordPos: Data {
         get {
             let wordPosData = Data16()
 
@@ -29,10 +40,13 @@ final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
                 mc_chacha20_get_word_pos(ptr, buffer)
             }
 
-            return wordPosData
+            return wordPosData.data
         }
-        set(wordpos) {
-            wordpos.asMcBuffer { bytesBufferPtr in
+        set(wordPos) {
+            let wordPos16 = withMcInfallibleReturningOptional( {
+                Data16(wordPos)
+            })
+            wordPos16.asMcBuffer { bytesBufferPtr in
                 mc_chacha20_set_word_pos(ptr, bytesBufferPtr)
             }
         }
@@ -42,7 +56,30 @@ final class MobileCoinChaCha20Rng: MobileCoinSeedableRng {
         mc_chacha20_rng_free(ptr)
     }
 
-    override func nextUInt64() -> UInt64 {
+    public override func nextUInt64() -> UInt64 {
         mc_chacha20_rng_next_long(ptr)
     }
+
+    convenience override init() {
+        let bytesCount = 32
+        var randomBytes = [UInt8](repeating: 0, count: bytesCount)
+
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytesCount, &randomBytes)
+        guard status == errSecSuccess else {
+            var message = ""
+            if #available(iOS 11.3, *), let errorMessage = SecCopyErrorMessageString(status, nil) {
+                message = ", message: \(errorMessage)"
+            }
+
+            logger.fatalError("Failed to generate bytes. SecError: \(status)" + message)
+        }
+
+        guard let seedData32 = Data32(Data(randomBytes)) else {
+            // will not happen
+            logger.fatalError("Failed to generate Data32 for rng seed.")
+        }
+
+        self.init(seed: seedData32.data)
+    }
+
 }
