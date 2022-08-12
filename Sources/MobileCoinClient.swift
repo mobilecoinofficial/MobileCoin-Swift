@@ -33,6 +33,7 @@ public final class MobileCoinClient {
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
 
+    private let defaultRng = MobileCoinDefaultRng()
     private let fogSyncChecker: FogSyncCheckable
 
     static let latestBlockVersion = BlockVersion.legacy
@@ -198,7 +199,7 @@ public final class MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        let rng = rng ?? MobileCoinDefaultRng()
+        let rng = rng ?? defaultRng
 
         Account.TransactionOperations(
             account: accountLock,
@@ -231,7 +232,7 @@ public final class MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        let rng = rng ?? MobileCoinDefaultRng()
+        let rng = rng ?? defaultRng
 
         Account.TransactionOperations(
             account: accountLock,
@@ -261,7 +262,8 @@ public final class MobileCoinClient {
         rng: MobileCoinRng? = nil,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
-        let rng = rng ?? MobileCoinDefaultRng()
+        let rng = rng ?? defaultRng
+
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
