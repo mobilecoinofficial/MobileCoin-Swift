@@ -27,13 +27,13 @@ func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
 }
 
 func mobileCoinRNG(context: UnsafeMutableRawPointer?) -> UInt64 {
-    // get MobileCoinRng sub-class from context    
+    // get MobileCoinRng sub-class from context
     guard let context = context else {
         logger.fatalError("Failed to obtain rng from context")
     }
 
     let rng = Unmanaged<MobileCoinRng>.fromOpaque(context).takeUnretainedValue()
-    let val = rng.nextUInt64()
+    let val = rng.next()
 
     return val
 }

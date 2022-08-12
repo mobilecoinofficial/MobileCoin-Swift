@@ -5,7 +5,7 @@
 import Foundation
 
 public class MobileCoinDefaultRng: MobileCoinRng {
-    public override func nextUInt64() -> UInt64 {
+    public override func next() -> UInt64 {
         securityRNG()
     }
 }

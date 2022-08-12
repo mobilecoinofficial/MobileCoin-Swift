@@ -56,7 +56,7 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
         mc_chacha20_rng_free(ptr)
     }
 
-    public override func nextUInt64() -> UInt64 {
+    public override func next() -> UInt64 {
         mc_chacha20_rng_next_long(ptr)
     }
 

@@ -19,9 +19,9 @@ class SeedableRngUnitTests: XCTestCase {
         XCTAssertNotNil(rng2)
         XCTAssertNotNil(rng3)
 
-        let val1 = rng1.nextUInt64()
-        let val2 = rng2.nextUInt64()
-        let val3 = rng3.nextUInt64()
+        let val1 = rng1.next()
+        let val2 = rng2.next()
+        let val3 = rng3.next()
 
         print("********** SEEDABLE RNG UNIT TESTS")
         print("********** val1 = \(val1)")

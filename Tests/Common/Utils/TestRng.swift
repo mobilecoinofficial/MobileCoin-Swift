@@ -35,7 +35,7 @@ class Xoshiro: RandomNumberGenerator {
 }
 
 func testRngCallback(context: UnsafeMutableRawPointer!) -> UInt64 {
-    context.assumingMemoryBound(to: MobileCoinXoshiroRng.self).pointee.nextUInt64()
+    context.assumingMemoryBound(to: MobileCoinXoshiroRng.self).pointee.next()
 }
 
 class MobileCoinXoshiroRng: MobileCoinRng {
@@ -46,7 +46,7 @@ class MobileCoinXoshiroRng: MobileCoinRng {
         xoshiro = Xoshiro(seed: seed)
     }
 
-    override func nextUInt64() -> UInt64 {
+    override func next() -> UInt64 {
         xoshiro.next()
     }
 }
