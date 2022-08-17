@@ -42,7 +42,7 @@ struct TransactionStatusChecker {
                 case .accepted(block: let block):
                     // Make sure we only return success if it will also be reflected in the balance,
                     // otherwise, feign ignorance.
-                    guard !(requireInBalance && (block.index >= self.account.readSync({ $0.knowableBlockCount }))) else {
+                    guard !requireInBalance || (block.index < self.account.readSync({ $0.knowableBlockCount })) else {
                         return .unknown
                     }
                     return status
