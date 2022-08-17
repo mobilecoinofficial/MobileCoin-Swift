@@ -287,6 +287,7 @@ public final class MobileCoinClient {
 
     public func status(
         of transaction: Transaction,
+        requireInBalance: Bool = true,
         completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
     ) {
         TransactionStatusChecker(
@@ -294,7 +295,7 @@ public final class MobileCoinClient {
             fogUntrustedTxOutService: serviceProvider.fogUntrustedTxOutService,
             fogKeyImageService: serviceProvider.fogKeyImageService,
             targetQueue: serialQueue
-        ).checkStatus(transaction) { result in
+        ).checkStatus(transaction, requireInBalance: requireInBalance) { result in
             self.callbackQueue.async {
                 completion(result)
             }
