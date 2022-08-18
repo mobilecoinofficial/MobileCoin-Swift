@@ -45,6 +45,7 @@ func performAsync<Value1, Value2, Failure: Error>(
 }
 
 #if swift(>=5.5)
+// swiftlint:disable multiline_parameters
 
 @available(iOS 13.0, *)
 public func withTimeout<T>(
