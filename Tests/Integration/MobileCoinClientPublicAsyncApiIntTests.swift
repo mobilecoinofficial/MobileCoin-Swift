@@ -8,6 +8,8 @@ import MobileCoin
 import XCTest
 
 #if swift(>=5.5)
+// swiftlint:disable superfluous_disable_command
+// swiftlint:disable empty_xctest_method
 
 @available(iOS 13.0, *)
 class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
