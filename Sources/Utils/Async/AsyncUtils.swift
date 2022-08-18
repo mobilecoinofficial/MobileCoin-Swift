@@ -44,6 +44,8 @@ func performAsync<Value1, Value2, Failure: Error>(
     body2(callback(success: { results.1 = $0 }))
 }
 
+#if swift(>=5.5)
+
 @available(iOS 13.0, *)
 public func withTimeout<T>(
     seconds: TimeInterval,
@@ -69,3 +71,5 @@ public func withTimeout<T>(
         return result
     }
 }
+
+#endif
