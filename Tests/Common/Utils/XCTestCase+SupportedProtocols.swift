@@ -27,6 +27,8 @@ extension XCTestCase {
     }
 
 #if swift(>=5.5)
+// swiftlint:disable superfluous_disable_command
+// swiftlint:disable multiline_parameters
 
     @available(iOS 13.0, *)
     func testSupportedProtocols(
