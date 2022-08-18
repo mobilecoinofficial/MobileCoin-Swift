@@ -52,4 +52,3 @@ extension XCTestCase {
 #endif
 
 }
-
