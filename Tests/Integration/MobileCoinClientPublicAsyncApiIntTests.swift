@@ -1,11 +1,15 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable superfluous_disable_command
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
+// swiftlint:disable empty_xctest_method
 
 import MobileCoin
 import XCTest
+
+#if swift(>=5.5)
 
 @available(iOS 13.0, *)
 class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
@@ -640,3 +644,5 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
 }
+
+#endif
