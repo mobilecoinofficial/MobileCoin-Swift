@@ -73,7 +73,7 @@ class TransactionIdempotenceTests: XCTestCase {
 
                 // cache the seed and wordpos
                 let seed = rng1.seed
-                let wordPos = rng1.wordPos
+                let wordPos = rng1.wordPos()
 
                 client.prepareTransaction(
                     to: recipient,
@@ -88,7 +88,7 @@ class TransactionIdempotenceTests: XCTestCase {
 
                     // create rng w/cached state (seed + wordpos)
                     let rng2 = MobileCoinChaCha20Rng(seed: seed)
-                    rng2.wordPos = wordPos
+                    rng2.setWordPos(wordPos)
 
                     client.prepareTransaction(
                         to: recipient,

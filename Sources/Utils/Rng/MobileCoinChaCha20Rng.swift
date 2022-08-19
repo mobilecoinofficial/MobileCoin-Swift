@@ -32,23 +32,20 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
         self.init(seed32: seed32)
     }
 
-    public var wordPos: Data {
-        get {
-            let wordPosData = Data16()
-
-            wordPosData.asMcBuffer { buffer in
-                mc_chacha20_get_word_pos(ptr, buffer)
-            }
-
-            return wordPosData.data
+    public func wordPos() -> Data {
+        let wordPosData = Data16()
+        wordPosData.asMcBuffer { buffer in
+            mc_chacha20_get_word_pos(ptr, buffer)
         }
-        set(wordPos) {
-            let wordPos16 = withMcInfallibleReturningOptional( {
-                Data16(wordPos)
-            })
-            wordPos16.asMcBuffer { bytesBufferPtr in
-                mc_chacha20_set_word_pos(ptr, bytesBufferPtr)
-            }
+        return wordPosData.data
+    }
+
+    public func setWordPos(_ wordPos: Data) {
+        let wordPos16 = withMcInfallibleReturningOptional( {
+            Data16(wordPos)
+        })
+        wordPos16.asMcBuffer { bytesBufferPtr in
+            mc_chacha20_set_word_pos(ptr, bytesBufferPtr)
         }
     }
 
