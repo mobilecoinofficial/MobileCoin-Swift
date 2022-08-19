@@ -340,6 +340,6 @@ extension TransactionBuilder {
     private func build(
         rng: MobileCoinRng
     ) -> Result<Transaction, TransactionBuilderError> {
-        TransactionBuilderUtils.build(ptr: ptr, rngFunc: mobileCoinRNG, rng: rng)
+        TransactionBuilderUtils.build(ptr: ptr, rng: rng)
     }
 }
