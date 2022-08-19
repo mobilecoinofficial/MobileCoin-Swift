@@ -24,7 +24,7 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
         super.init()
     }
 
-    convenience init(seed: Data) {
+    convenience init(seed: Data = Data.secRngGenBytes(32)) {
         let seed32: Data32 = withMcInfallibleReturningOptional {
             Data32(seed)
         }
@@ -59,27 +59,4 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
     public override func next() -> UInt64 {
         mc_chacha20_rng_next_long(ptr)
     }
-
-    convenience override init() {
-        let bytesCount = 32
-        var randomBytes = [UInt8](repeating: 0, count: bytesCount)
-
-        let status = SecRandomCopyBytes(kSecRandomDefault, bytesCount, &randomBytes)
-        guard status == errSecSuccess else {
-            var message = ""
-            if #available(iOS 11.3, *), let errorMessage = SecCopyErrorMessageString(status, nil) {
-                message = ", message: \(errorMessage)"
-            }
-
-            logger.fatalError("Failed to generate bytes. SecError: \(status)" + message)
-        }
-
-        guard let seedData32 = Data32(Data(randomBytes)) else {
-            // will not happen
-            logger.fatalError("Failed to generate Data32 for rng seed.")
-        }
-
-        self.init(seed: seedData32.data)
-    }
-
 }
