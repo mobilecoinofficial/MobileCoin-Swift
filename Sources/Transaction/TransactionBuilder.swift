@@ -52,7 +52,8 @@ final class TransactionBuilder {
                             tombstoneBlockIndex,
                             fogResolverPtr,
                             memoBuilderPtr,
-                            blockVersion)
+                            blockVersion,
+                            nil)
                 }
             }
         }

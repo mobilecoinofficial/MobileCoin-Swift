@@ -6,22 +6,37 @@ import Foundation
 import LibMobileCoin
 
 public final class MobileCoinChaCha20Rng: MobileCoinRng {
-    private var ptr: OpaquePointer
-    public let seed: Data
+    // forcing early initialization so self can be captured in the
+    // below init()...but I'm sure there's a better way to work around this
+    private var ptr = withMcInfallibleReturningOptional {
+        OpaquePointer(bitPattern: 1)
+    }
+
+    public var seed = Data()
 
     init(seed32: Data32) {
-        var cc20ptr: OpaquePointer?
+        super.init()
+
         seed32.asMcBuffer { bytesBufferPtr in
-            cc20ptr = withMcInfallible {
-                mc_chacha20_rng_create_with_bytes(bytesBufferPtr)
+            switch withMcError({ errorPtr in
+                mc_chacha20_rng_create_with_bytes(bytesBufferPtr, &errorPtr)
+            }) {
+            case .success(let cc20ptr):
+                ptr = cc20ptr
+            case .failure(let error):
+                switch error.errorCode {
+                case .panic:
+                    logger.fatalError(
+                        "LibMobileCoin panic error: \(redacting: error.description)")
+                default:
+                    // Safety: mc_chacha20_rng_create_with_bytes should not throw
+                    // non-documented errors.
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+                }
             }
-        }
-        ptr = withMcInfallible {
-            cc20ptr
         }
 
         self.seed = seed32.data
-        super.init()
     }
 
     convenience init(seed: Data = Data.secRngGenBytes(32)) {
@@ -35,7 +50,22 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
     public func wordPos() -> Data {
         let wordPosData = Data16()
         wordPosData.asMcBuffer { buffer in
-            mc_chacha20_get_word_pos(ptr, buffer)
+            switch withMcError({ errorPtr in
+                mc_chacha20_rng_get_word_pos(ptr, buffer, &errorPtr)
+            }) {
+            case .success:
+                break
+            case .failure(let error):
+                switch error.errorCode {
+                case .panic:
+                    logger.fatalError(
+                        "LibMobileCoin panic error: \(redacting: error.description)")
+                default:
+                    // Safety: mc_chacha20_rng_get_word_pos should not throw
+                    // non-documented errors.
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+                }
+            }
         }
         return wordPosData.data
     }
@@ -45,15 +75,63 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
             Data16(wordPos)
         })
         wordPos16.asMcBuffer { bytesBufferPtr in
-            mc_chacha20_set_word_pos(ptr, bytesBufferPtr)
+            switch withMcError({ errorPtr in
+                mc_chacha20_rng_set_word_pos(ptr, bytesBufferPtr, &errorPtr)
+            }) {
+            case .success:
+                break
+            case .failure(let error):
+                switch error.errorCode {
+                case .panic:
+                    logger.fatalError(
+                        "LibMobileCoin panic error: \(redacting: error.description)")
+                default:
+                    // Safety: mc_chacha20_set_word_pos should not throw
+                    // non-documented errors.
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+                }
+            }
         }
     }
 
-    deinit {
-        mc_chacha20_rng_free(ptr)
+    public override func next() -> UInt64 {
+        var next: UInt64
+
+        switch withMcError({ errorPtr in
+            mc_chacha20_rng_next_long(ptr, &errorPtr)
+        }) {
+        case .success(let nextVal):
+            next = nextVal
+        case .failure(let error):
+            switch error.errorCode {
+            case .panic:
+                logger.fatalError(
+                    "LibMobileCoin panic error: \(redacting: error.description)")
+            default:
+                // Safety: mc_chacha20_rng_free should not throw
+                // non-documented errors.
+                logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+            }
+        }
+        return next
     }
 
-    public override func next() -> UInt64 {
-        mc_chacha20_rng_next_long(ptr)
+    deinit {
+        switch withMcError({ errorPtr in
+            mc_chacha20_rng_free(ptr, &errorPtr)
+        }) {
+        case .success:
+            break
+        case .failure(let error):
+            switch error.errorCode {
+            case .panic:
+                logger.fatalError(
+                    "LibMobileCoin panic error: \(redacting: error.description)")
+            default:
+                // Safety: mc_chacha20_rng_free should not throw
+                // non-documented errors.
+                logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
+            }
+        }
     }
 }
