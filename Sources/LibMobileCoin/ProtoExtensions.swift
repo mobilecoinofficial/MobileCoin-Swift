@@ -186,3 +186,16 @@ extension FogLedger_BlockData {
         BlockMetadata(index: index, timestampStatus: timestampStatus)
     }
 }
+
+extension FogLedger_TxOutResult {
+    var timestampDate: Date? {
+        get { timestamp != UInt64.max ? Date(timeIntervalSince1970: TimeInterval(timestamp)) : nil }
+        set {
+            if let newValue = newValue {
+                timestamp = UInt64(newValue.timeIntervalSince1970)
+            } else {
+                timestamp = UInt64.max
+            }
+        }
+    }
+}
