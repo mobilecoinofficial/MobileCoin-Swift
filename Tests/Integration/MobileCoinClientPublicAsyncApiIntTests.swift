@@ -475,6 +475,68 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         try await checkStatus()
     }
 
+    func testTransactionTxOutStatus() async throws {
+        let description = "Checking transaction txOut status"
+        try await testSupportedProtocols(description: description) {
+            try await self.transactionTxOutStatus(transportProtocol: $0)
+        }
+    }
+
+    func transactionTxOutStatus(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 1,
+            using: transportProtocol)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+
+        func submitTransaction() async throws -> Transaction {
+            try await client.updateBalances()
+            let transaction = try await client.prepareTransaction(to: recipient,
+                                                                  amount: Amount(100, in: .MOB),
+                                                                  fee: IntegrationTestFixtures.fee)
+            try await client.submitTransaction(transaction: transaction.transaction)
+            return transaction.transaction
+        }
+
+        let transaction = try await submitTransaction()
+
+        var numChecksRemaining = 5
+
+        func checkStatus() async throws {
+            numChecksRemaining -= 1
+            print("Updating balance...")
+            let balance = try await client.updateBalances().mobBalance
+            print("Balance: \(balance)")
+
+            print("Checking status...")
+            let status = try await client.txOutStatus(of: transaction)
+            print("Transaction status: \(status)")
+
+            switch status {
+            case .unknown:
+                guard numChecksRemaining > 0 else {
+                    XCTFail("Failed to resolve transaction status check")
+                    return
+                }
+
+                try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                try await checkStatus()
+                return
+            case .accepted(block: let block):
+                print("Block index: \(block.index)")
+                XCTAssertGreaterThan(block.index, 0)
+
+                if let timestamp = block.timestamp {
+                    print("Block timestamp: \(timestamp)")
+                }
+            case .failed:
+                XCTFail("Transaction status check: Transaction failed")
+            }
+        }
+        try await checkStatus()
+    }
+
     func testReceiptStatus() async throws {
         let description = "Checking receipt status"
         try await testSupportedProtocols(description: description) {
