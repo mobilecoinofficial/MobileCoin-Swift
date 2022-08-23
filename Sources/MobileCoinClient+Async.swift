@@ -76,6 +76,16 @@ extension MobileCoinClient {
         }
     }
 
+    public func txOutStatus(
+        of transaction: Transaction
+    ) async throws -> TransactionStatus {
+        try await withCheckedThrowingContinuation { continuation in
+            txOutStatus(of: transaction) {
+                continuation.resume(with: $0)
+            }
+        }
+    }
+
 }
 
 #endif
