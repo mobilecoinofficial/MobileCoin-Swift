@@ -220,15 +220,15 @@ extension NetworkPreset {
     private static let legacy_v1_1_0_testNetFogReportMrEnclaveHex =
         "a4764346f91979b4906d4ce26102228efe3aba39216dec1e7d22e6b06f919f11"
 
-    // v1.2.0 Enclave Values
+    // v2.0.0 Enclave Values
     private static let testNetConsensusMrEnclaveHex =
-        "4f134dcfd9c0885956f2f9af0f05c2050d8bdee2dc63b468a640670d7adeb7f8"
+        "01746f4dd25f8623d603534425ed45833687eca2b3ba25bdd87180b9471dac28"
     private static let testNetFogViewMrEnclaveHex =
-        "719ca43abbe02f507bb91ea11ff8bc900aa86363a7d7e77b8130426fc53d8684"
+        "3d6e528ee0574ae3299915ea608b71ddd17cbe855d4f5e1c46df9b0d22b04cdb"
     private static let testNetFogLedgerMrEnclaveHex =
-        "685481b33f2846585f33506ab65649c98a4a6d1244989651fd0fcde904ebd82f"
+        "92fb35d0f603ceb5eaf2988b24a41d4a4a83f8fb9cd72e67c3bc37960d864ad6"
     private static let testNetFogReportMrEnclaveHex =
-        "8f2f3bf81f24bf493fa6d76e29e0f081815022592b1e854f95bda750aece7452"
+        "3e9bf61f3191add7b054f0e591b62f832854606f6594fd63faef1e2aedec4021"
 
     private static let devMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"

@@ -640,6 +640,87 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+    func testTransactionTxOutStatus() throws {
+        let description = "Checking transaction status"
+        try testSupportedProtocols(description: description) {
+            try transactionTxOutStatus(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func transactionTxOutStatus(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+                accountIndex: 1,
+                using: transportProtocol)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+
+        func submitTransaction(callback: @escaping (Transaction) -> Void) {
+            client.updateBalance {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                client.prepareTransaction(
+                    to: recipient,
+                    amount: 100,
+                    fee: IntegrationTestFixtures.fee
+                ) {
+                    guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
+                    else { return }
+
+                    client.submitTransaction(transaction) {
+                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                        callback(transaction)
+                    }
+                }
+            }
+        }
+
+        submitTransaction { (transaction: Transaction) in
+            var numChecksRemaining = 5
+
+            func checkStatus() {
+                numChecksRemaining -= 1
+                print("Updating balance...")
+                client.updateBalance {
+                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                    print("Balance: \(balance)")
+
+                    print("Checking status...")
+                    client.txOutStatus(of: transaction) {
+                        guard let status = $0.successOrFulfill(expectation: expect) else { return }
+                        print("Transaction status: \(status)")
+
+                        switch status {
+                        case .unknown:
+                            guard numChecksRemaining > 0 else {
+                                XCTFail("Failed to resolve transaction status check")
+                                expect.fulfill()
+                                return
+                            }
+
+                            Thread.sleep(forTimeInterval: 2)
+                            checkStatus()
+                            return
+                        case .accepted(block: let block):
+                            print("Block index: \(block.index)")
+                            XCTAssertGreaterThan(block.index, 0)
+
+                            if let timestamp = block.timestamp {
+                                print("Block timestamp: \(timestamp)")
+                            }
+                        case .failed:
+                            XCTFail("Transaction status check: Transaction failed")
+                        }
+                        expect.fulfill()
+                    }
+                }
+            }
+            checkStatus()
+        }
+    }
+
     func testReceiptStatus() throws {
         let description = "Checking receipt status"
         try testSupportedProtocols(description: description) {

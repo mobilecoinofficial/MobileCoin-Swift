@@ -292,6 +292,20 @@ public final class MobileCoinClient {
         }
     }
 
+    public func txOutStatus(
+        of transaction: Transaction,
+        completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
+    ) {
+        TransactionStatusTxOutChecker(
+            account: accountLock,
+            fogUntrustedTxOutService: serviceProvider.fogUntrustedTxOutService
+        ).checkStatus(transaction) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
     public func status(
         of transaction: Transaction,
         requireInBalance: Bool = true,
