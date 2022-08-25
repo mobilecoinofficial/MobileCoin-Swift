@@ -27,7 +27,7 @@ extension MixinSelectionStrategy {
     }
 }
 
-protocol IdempotentMixinSelectionStragegy: MixinSelectionStrategy {
+protocol CustomRNGMixinSelectionStrategy: MixinSelectionStrategy {
     func selectMixinIndices(
         rng: MobileCoinRng,
         forRealTxOutIndices realTxOutIndices: [UInt64],
@@ -37,7 +37,7 @@ protocol IdempotentMixinSelectionStragegy: MixinSelectionStrategy {
     ) -> [Set<UInt64>]
 }
 
-extension IdempotentMixinSelectionStragegy {
+extension CustomRNGMixinSelectionStrategy {
     func selectMixinIndices(
         rng: MobileCoinRng,
         forRealTxOutIndices realTxOutIndices: [UInt64],

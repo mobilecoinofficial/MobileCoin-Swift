@@ -33,7 +33,7 @@ public final class MobileCoinClient {
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
 
-    private let defaultRng = MobileCoinDefaultRng()
+    public static let defaultRng = MobileCoinDefaultRng()
     private let fogSyncChecker: FogSyncCheckable
 
     static let latestBlockVersion = BlockVersion.legacy
@@ -194,13 +194,11 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         fee: UInt64,
-        rng: MobileCoinRng? = nil,
+        rng: MobileCoinRng = defaultRng,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        let rng = rng ?? defaultRng
-
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -227,13 +225,11 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng? = nil,
+        rng: MobileCoinRng = defaultRng,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        let rng = rng ?? defaultRng
-
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -259,11 +255,9 @@ public final class MobileCoinClient {
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng? = nil,
+        rng: MobileCoinRng = defaultRng,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
-        let rng = rng ?? defaultRng
-
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,

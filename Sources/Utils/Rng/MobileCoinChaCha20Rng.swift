@@ -39,7 +39,7 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
         self.seed = seed32.data
     }
 
-    convenience init(seed: Data = Data.secRngGenBytes(32)) {
+    convenience init(seed: Data = .secRngGenBytes(32)) {
         let seed32: Data32 = withMcInfallibleReturningOptional {
             Data32(seed)
         }
@@ -117,21 +117,6 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
     }
 
     deinit {
-        switch withMcError({ errorPtr in
-            mc_chacha20_rng_free(ptr, &errorPtr)
-        }) {
-        case .success:
-            break
-        case .failure(let error):
-            switch error.errorCode {
-            case .panic:
-                logger.fatalError(
-                    "LibMobileCoin panic error: \(redacting: error.description)")
-            default:
-                // Safety: mc_chacha20_rng_free should not throw
-                // non-documented errors.
-                logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
-            }
-        }
+        mc_chacha20_rng_free(ptr)
     }
 }

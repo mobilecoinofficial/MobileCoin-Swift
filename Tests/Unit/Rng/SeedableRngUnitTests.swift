@@ -8,27 +8,23 @@ import XCTest
 class SeedableRngUnitTests: XCTestCase {
 
     func testSeedableFromSeedBytes() throws {
-        let seed1 = Data32(repeating: 5)
-        let rng1 = MobileCoinChaCha20Rng(seed32: seed1)
+        // matching seed RNGs
+        let rng1 = MobileCoinChaCha20Rng()
+        let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
 
-        let seed2 = Data32(repeating: 10)
-        let rng2 = MobileCoinChaCha20Rng(seed32: seed2)
-        let rng3 = MobileCoinChaCha20Rng(seed32: seed2)
+        // differing seed RNG
+        let rngX = MobileCoinChaCha20Rng()
 
-        XCTAssertNotNil(rng1)
-        XCTAssertNotNil(rng2)
-        XCTAssertNotNil(rng3)
+        // verify seed randomization
+        XCTAssertNotEqual(rng1.seed, rngX.seed, "RNG seeds should be differ and be random")
+        XCTAssertEqual(rng1.seed, rng2.seed, "RNG seeds should match")
+        XCTAssertNotEqual(rng1.next(), rngX.next(), "RNG values should differ w/differing seeds")
 
-        let val1 = rng1.next()
-        let val2 = rng2.next()
-        let val3 = rng3.next()
+        // bump rng2 to catch up w/rng1
+        _ = rng2.next()
 
-        print("********** SEEDABLE RNG UNIT TESTS")
-        print("********** val1 = \(val1)")
-        print("********** val2 = \(val2)")
-        print("********** val3 = \(val3)")
-
-        XCTAssertNotEqual(val1, val2)
-        XCTAssertEqual(val2, val3)
+        for _ in 1...10000 {
+            XCTAssertEqual(rng1.next(), rng2.next(), "Same-seed RNGs should gen matching values")
+        }
     }
 }

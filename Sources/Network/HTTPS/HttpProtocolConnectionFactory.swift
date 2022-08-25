@@ -13,16 +13,12 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
 
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
-        targetQueue: DispatchQueue?,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        targetQueue: DispatchQueue?
     ) -> ConsensusHttpConnection {
         ConsensusHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url),
-                        targetQueue: targetQueue,
-                        rng: rng,
-                        rngContext: rngContext)
+                        targetQueue: targetQueue)
     }
 
     func makeBlockchainService(
@@ -37,44 +33,32 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
 
     func makeFogViewService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        targetQueue: DispatchQueue?
     ) -> FogViewHttpConnection {
         FogViewHttpConnection(
                 config: config,
                 requester: RestApiRequester(requester: requester, baseUrl: config.url),
-                targetQueue: targetQueue,
-                rng: rng,
-                rngContext: rngContext)
+                targetQueue: targetQueue)
     }
 
     func makeFogMerkleProofService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        targetQueue: DispatchQueue?
     ) -> FogMerkleProofHttpConnection {
         FogMerkleProofHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url),
-                        targetQueue: targetQueue,
-                        rng: rng,
-                        rngContext: rngContext)
+                        targetQueue: targetQueue)
     }
 
     func makeFogKeyImageService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        targetQueue: DispatchQueue?
     ) -> FogKeyImageHttpConnection {
         FogKeyImageHttpConnection(
                         config: config,
                         requester: RestApiRequester(requester: requester, baseUrl: config.url),
-                        targetQueue: targetQueue,
-                        rng: rng,
-                        rngContext: rngContext)
+                        targetQueue: targetQueue)
     }
 
     func makeFogBlockService(

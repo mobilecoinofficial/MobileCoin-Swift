@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class DefaultMixinSelectionStrategy: IdempotentMixinSelectionStragegy {
+final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
     let offsetParam: UInt64 = 88
 
     // Selection window: [t-k, t+k] where t = real txo index, k = offsetParam

@@ -42,7 +42,7 @@ func withMcInfallible(_ body: () -> Bool) {
 }
 
 func withMcError<T>(_ body: (inout UnsafeMutablePointer<McError>?) -> T)
-    -> Result<(T), LibMobileCoinError>
+    -> Result<T, LibMobileCoinError>
 {
     var error: UnsafeMutablePointer<McError>?
     let value = body(&error)

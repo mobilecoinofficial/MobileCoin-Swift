@@ -22,8 +22,7 @@ final class DefaultServiceProvider: ServiceProvider {
         networkConfig: NetworkConfig,
         targetQueue: DispatchQueue?,
         grpcConnectionFactory: GrpcProtocolConnectionFactory,
-        httpConnectionFactory: HttpProtocolConnectionFactory,
-        rng: MobileCoinRng? = nil
+        httpConnectionFactory: HttpProtocolConnectionFactory
     ) {
         self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
@@ -40,8 +39,7 @@ final class DefaultServiceProvider: ServiceProvider {
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue,
-            rngContext: rng)
+            targetQueue: targetQueue)
         self.blockchain = BlockchainConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
@@ -51,20 +49,17 @@ final class DefaultServiceProvider: ServiceProvider {
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue,
-            rngContext: rng)
+            targetQueue: targetQueue)
         self.merkleProof = FogMerkleProofConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue,
-            rngContext: rng)
+            targetQueue: targetQueue)
         self.keyImage = FogKeyImageConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
-            targetQueue: targetQueue,
-            rngContext: rng)
+            targetQueue: targetQueue)
         self.block = FogBlockConnection(
             httpFactory: self.httpConnectionFactory,
             grpcFactory: self.grpcConnectionFactory,
