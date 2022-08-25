@@ -33,7 +33,7 @@ public final class MobileCoinClient {
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
 
-    public static let defaultRng = MobileCoinDefaultRng()
+    private let defaultRng = MobileCoinDefaultRng()
     private let fogSyncChecker: FogSyncCheckable
 
     static let latestBlockVersion = BlockVersion.legacy
@@ -194,7 +194,25 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         fee: UInt64,
-        rng: MobileCoinRng = defaultRng,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: amount,
+            fee: fee,
+            rng: defaultRng,
+            completion: completion)
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        fee: UInt64,
+        rng: MobileCoinRng,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
@@ -225,7 +243,25 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng = defaultRng,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: amount,
+            feeLevel: feeLevel,
+            rng: defaultRng,
+            completion: completion)
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        feeLevel: FeeLevel = .minimum,
+        rng: MobileCoinRng,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
@@ -255,7 +291,21 @@ public final class MobileCoinClient {
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng = defaultRng,
+        completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
+    ) {
+        prepareDefragmentationStepTransactions(
+            toSendAmount: amount,
+            recoverableMemo: recoverableMemo,
+            feeLevel: feeLevel,
+            rng: defaultRng,
+            completion: completion)
+    }
+
+    public func prepareDefragmentationStepTransactions(
+        toSendAmount amount: Amount,
+        recoverableMemo: Bool = false,
+        feeLevel: FeeLevel = .minimum,
+        rng: MobileCoinRng,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
         Account.TransactionOperations(
