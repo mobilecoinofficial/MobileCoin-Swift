@@ -408,7 +408,10 @@ workflows:
               xcode-version: [*default-xcode-version]
       - publish-pod-release:
           filters:
-            branches: { only: master }
+            branches: 
+              only:
+                - master
+                - release/*
       #- generate-docs:
           #filters:
             #branches: { only: master }
