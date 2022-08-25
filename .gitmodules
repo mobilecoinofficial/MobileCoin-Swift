@@ -1,4 +1,4 @@
 [submodule "Vendor/libmobilecoin-ios-artifacts"]
 	path = Vendor/libmobilecoin-ios-artifacts
-	url = https://github.com/carybakker/libmobilecoin-ios-artifacts/tree/task/idempotence
+	url = https://github.com/mobilecoinofficial/libmobilecoin-ios-artifacts.git
 	shallow = true
