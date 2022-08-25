@@ -79,7 +79,8 @@ struct TransactionSubmitter {
              .tombstoneBlockExceeded, .invalidLedgerContext, .memosNotAllowed,
              .membershipProofValidationError, .keyError, .unsortedInputs,
              .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
-             .unsortedOutputs:
+             .unsortedOutputs, .inputRulesNotAllowed, .inputRuleMissingRequiredOutput,
+             .inputRuleMaxTombstoneBlockExceeded:
             return .failure(.invalidTransaction(
                         "Error Code: \(response.result) " +
                         "(\(response.result.rawValue))"))
