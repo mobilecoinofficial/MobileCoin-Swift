@@ -155,8 +155,8 @@ struct TransactionPreparer {
     ) {
         var inputsMixinIndices: [[UInt64]]
 
-        if let idempotentStrategy = mixinSelectionStrategy as? CustomRNGMixinSelectionStrategy {
-            inputsMixinIndices = idempotentStrategy.selectMixinIndices(
+        if let customRngStrategy = mixinSelectionStrategy as? CustomRNGMixinSelectionStrategy {
+            inputsMixinIndices = customRngStrategy.selectMixinIndices(
                 rng: rng,
                 forRealTxOutIndices: inputs.map { $0.globalIndex },
                 selectionRange: ledgerTxOutCount.map { ..<$0 }
