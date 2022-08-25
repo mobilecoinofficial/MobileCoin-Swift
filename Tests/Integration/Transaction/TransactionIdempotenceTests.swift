@@ -6,6 +6,8 @@
 @testable import MobileCoin
 import XCTest
 
+#if swift(>=5.5)
+
 @available(iOS 13.0, *)
 class TransactionIdempotenceTests: XCTestCase {
 
@@ -102,3 +104,5 @@ class TransactionIdempotenceTests: XCTestCase {
         XCTAssertEqual(tx2, tx3)
     }
 }
+
+#endif
