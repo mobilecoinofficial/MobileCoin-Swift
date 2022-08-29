@@ -411,7 +411,7 @@ workflows:
             branches: 
               only:
                 - master
-                - release/*
+                - /release\/.*/
       #- generate-docs:
           #filters:
             #branches: { only: master }
