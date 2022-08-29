@@ -1,108 +1,112 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable empty_xctest_method
 
 @testable import MobileCoin
 import XCTest
 
-#if swift(>=5.5)
-
-@available(iOS 13.0, *)
 class TransactionIdempotenceTests: XCTestCase {
 
-    func testTransactionSeedIdempotenceProtocols() async throws {
-        let description = "Testing Transaction Idempotence with RNG Seed Initialization"
-        try await testSupportedProtocols(description: description) {
-            try await self.testTransactionSeedIdempotence(transportProtocol: $0)
-        }
-    }
-
-    func testTransactionSeedIdempotence(transportProtocol: TransportProtocol) async throws {
-
-        let seed = withMcInfallibleReturningOptional {
-            try? Data(randomOfLength: 32)
-        }
-
-        let seed32 = withMcInfallibleReturningOptional {
-            Data32(seed)
-        }
-
-        let rng1: MobileCoinRng = MobileCoinChaCha20Rng(seed32: seed32)
-        let rng2: MobileCoinRng = MobileCoinChaCha20Rng(seed32: seed32)
+    func testTransactionIdempotence() throws {
+        let amt = Amount(mob: 100)
+        let rng1 = MobileCoinChaCha20Rng()
+        let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
 
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: accountKey,
-            transportProtocol: transportProtocol
-        )
+        let expect = expectation(description: description)
 
-        let tx1 = try await client.prepareTransaction(
-            to: recipient,
-            amount: Amount(mob: 100),
-            fee: IntegrationTestFixtures.fee,
-            rng: rng1,
-            memoType: .unused)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            expectation: expect,
+            transportProtocol: .http)
+        { client in
+            client.prepareTransaction(
+                to: recipient,
+                memoType: .unused,
+                amount: amt,
+                fee: IntegrationTestFixtures.fee,
+                rng: rng1
+            ) { result in
+                guard let transaction1 = result.successOrFulfill(expectation: expect) else {
+                    return
+                }
+                client.prepareTransaction(
+                    to: recipient,
+                    memoType: .unused,
+                    amount: amt,
+                    fee: IntegrationTestFixtures.fee,
+                    rng: rng2
+                ) {
+                    guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
+                        return
+                    }
 
-        let tx2 = try await client.prepareTransaction(
-            to: recipient,
-            amount: Amount(mob: 100),
-            fee: IntegrationTestFixtures.fee,
-            rng: rng2,
-            memoType: .unused)
+                    XCTAssertEqual(transaction1, transaction2)
+                    expect.fulfill()
+                }
 
-        XCTAssertEqual(tx1, tx2)
-    }
-
-    func testTransactionWordPosIdempotenceProtocols() async throws {
-        let description = "Testing Transaction Idempotence with RNG Seed Initialization"
-        try await testSupportedProtocols(description: description) {
-            try await self.testTransactionWordPosIdempotence(transportProtocol: $0)
+            }
         }
+        waitForExpectations(timeout: 40)
     }
 
-    func testTransactionWordPosIdempotence(transportProtocol: TransportProtocol) async throws {
+    func testTransactionIdempotenceWithWordPos() throws {
+        let amt = Amount(mob: 100)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let rng1 = MobileCoinChaCha20Rng()
 
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: accountKey,
-            transportProtocol: transportProtocol
-        )
+        let expect = expectation(description: "testing idempotence with word pos")
 
-        // prepare first transaction to get RNG past initial wordpos
-        _ = try await client.prepareTransaction(
-            to: recipient,
-            amount: Amount(mob: 100),
-            fee: IntegrationTestFixtures.fee,
-            rng: rng1,
-            memoType: .unused)
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            expectation: expect,
+            transportProtocol: .http)
+        { client in
 
-        // capture wordpos
-        let seed = rng1.seed
-        let wordPos = rng1.wordPos()
+            client.prepareTransaction(
+                to: recipient,
+                memoType: .unused,
+                amount: amt,
+                fee: IntegrationTestFixtures.fee,
+                rng: rng1
+            ) { result in
+                guard result.successOrFulfill(expectation: expect) != nil else {
+                    return
+                }
 
-        let tx2 = try await client.prepareTransaction(
-            to: recipient,
-            amount: Amount(mob: 100),
-            fee: IntegrationTestFixtures.fee,
-            rng: rng1,
-            memoType: .unused)
+                // the seed and wordpos
+                let wordPos = rng1.wordPos()
 
-        let rng2 = MobileCoinChaCha20Rng(seed: seed)
-        rng2.setWordPos(wordPos)
+                client.prepareTransaction(
+                    to: recipient,
+                    memoType: .unused,
+                    amount: amt,
+                    fee: IntegrationTestFixtures.fee,
+                    rng: rng1
+                ) { result in
+                    guard let transaction1 = result.successOrFulfill(expectation: expect) else {
+                        return
+                    }
 
-        let tx3 = try await client.prepareTransaction(
-            to: recipient,
-            amount: Amount(mob: 100),
-            fee: IntegrationTestFixtures.fee,
-            rng: rng2,
-            memoType: .unused)
+                    // create rng w/same seed & cached wordpos state
+                    let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
+                    rng2.setWordPos(wordPos)
 
-        XCTAssertEqual(tx2, tx3)
+                    client.prepareTransaction(
+                        to: recipient,
+                        memoType: .unused,
+                        amount: amt,
+                        fee: IntegrationTestFixtures.fee,
+                        rng: rng2
+                    ) {
+                        guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
+                            return
+                        }
+
+                        XCTAssertEqual(transaction1, transaction2)
+                        expect.fulfill()
+                    }
+                }
+            }
+        }
+        waitForExpectations(timeout: 40)
     }
 }
-
-#endif
