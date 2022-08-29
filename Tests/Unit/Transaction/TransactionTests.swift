@@ -72,6 +72,20 @@ class TransactionTests: XCTestCase {
         }
     }
 
+    func testFutureBlockVersionFailure() throws {
+        let fixture = try Transaction.Fixtures.BuildTx()
+        XCTAssertFailure(TransactionBuilder.build(
+            inputs: fixture.inputs,
+            accountKey: fixture.accountKey,
+            outputs: fixture.outputs,
+            memoType: .unused,
+            fee: fixture.fee,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fogResolver: fixture.fogResolver,
+            blockVersion: .versionMax,
+            rng: TestRng()))
+    }
+
     func testExactChangeCreatesChangeOutput() throws {
         let fixture = try Transaction.Fixtures.ExactChange()
 
