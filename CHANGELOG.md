@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2022-0829
+
+### Added
+
+- Transaction Idempotence Support
+- TransactionStatusChecker for simpler and quicker transactions tatus
+- Async/Await API wrappers for MobileCoinClient
+- New `submitTransaction` method that always returns the conensus block count
+
 ## [1.2.2-pre2] - 2022-07-13
 
 ### Added
