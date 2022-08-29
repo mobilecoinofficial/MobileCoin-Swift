@@ -82,7 +82,8 @@ class TransactionTests: XCTestCase {
             fee: fixture.fee,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
-            blockVersion: .versionMax))
+            blockVersion: .versionMax,
+            rng: TestRng()))
     }
 
     func testExactChangeCreatesChangeOutput() throws {
