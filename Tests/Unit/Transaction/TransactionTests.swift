@@ -18,7 +18,8 @@ class TransactionTests: XCTestCase {
             fee: fixture.fee,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
-            blockVersion: fixture.blockVersion))
+            blockVersion: fixture.blockVersion,
+            rng: TestRng()))
     }
 
     func testLegacyBlockVersion() throws {
@@ -31,7 +32,8 @@ class TransactionTests: XCTestCase {
             fee: fixture.fee,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
-            blockVersion: .legacy).get()
+            blockVersion: .legacy,
+            rng: TestRng()).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
@@ -55,7 +57,8 @@ class TransactionTests: XCTestCase {
             fee: fixture.fee,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
-            blockVersion: .minRTHEnabled).get()
+            blockVersion: .minRTHEnabled,
+            rng: TestRng()).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
@@ -69,6 +72,20 @@ class TransactionTests: XCTestCase {
         }
     }
 
+    func testFutureBlockVersionFailure() throws {
+        let fixture = try Transaction.Fixtures.BuildTx()
+        XCTAssertFailure(TransactionBuilder.build(
+            inputs: fixture.inputs,
+            accountKey: fixture.accountKey,
+            outputs: fixture.outputs,
+            memoType: .unused,
+            fee: fixture.fee,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fogResolver: fixture.fogResolver,
+            blockVersion: .versionMax,
+            rng: TestRng()))
+    }
+
     func testExactChangeCreatesChangeOutput() throws {
         let fixture = try Transaction.Fixtures.ExactChange()
 
@@ -80,7 +97,8 @@ class TransactionTests: XCTestCase {
             fee: fixture.fee,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
-            blockVersion: .minRTHEnabled).get()
+            blockVersion: .minRTHEnabled,
+            rng: TestRng()).get()
 
         XCTAssertNotNil(txOutContext.changeTxOutContext)
     }

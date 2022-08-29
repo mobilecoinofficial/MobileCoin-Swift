@@ -21,6 +21,7 @@ extension Account {
             metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             mixinSelectionStrategy: MixinSelectionStrategy,
+            rng: MobileCoinRng,
             targetQueue: DispatchQueue?
         ) {
             self.serialQueue = DispatchQueue(
@@ -34,6 +35,7 @@ extension Account {
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
+                rng: rng,
                 targetQueue: targetQueue)
         }
 

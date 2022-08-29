@@ -53,8 +53,7 @@ extension Receipt.Fixtures.Default {
             amount: value,
             tombstoneBlockIndex: 100,
             blockVersion: defaultBlockVersion,
-            rng: testRngCallback,
-            rngContext: TestRng()
+            rng: TestRng()
         ).get().receipt
     }
 

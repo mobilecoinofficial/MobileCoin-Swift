@@ -43,6 +43,24 @@ extension MobileCoinClient {
         }
     }
 
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        amount: Amount,
+        fee: UInt64,
+        rng: MobileCoinRng,
+        memoType: MemoType = .recoverable
+    ) async throws -> PendingSinglePayloadTransaction {
+        try await withCheckedThrowingContinuation { continuation in
+            prepareTransaction(to: recipient,
+                               memoType: memoType,
+                               amount: amount,
+                               fee: fee,
+                               rng: rng) {
+                continuation.resume(with: $0)
+            }
+        }
+    }
+
     @discardableResult
     public func submitTransaction(
         transaction: Transaction

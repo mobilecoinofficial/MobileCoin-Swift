@@ -33,6 +33,7 @@ public final class MobileCoinClient {
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
 
+    private let defaultRng = MobileCoinDefaultRng()
     private let fogSyncChecker: FogSyncCheckable
 
     static let latestBlockVersion = BlockVersion.legacy
@@ -197,6 +198,25 @@ public final class MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
+        prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: amount,
+            fee: fee,
+            rng: defaultRng,
+            completion: completion)
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        fee: UInt64,
+        rng: MobileCoinRng,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -204,6 +224,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: rng,
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -226,6 +247,25 @@ public final class MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
+        prepareTransaction(
+            to: recipient,
+            memoType: memoType,
+            amount: amount,
+            feeLevel: feeLevel,
+            rng: defaultRng,
+            completion: completion)
+    }
+
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        feeLevel: FeeLevel = .minimum,
+        rng: MobileCoinRng,
+        completion: @escaping (
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -233,6 +273,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: rng,
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -252,6 +293,21 @@ public final class MobileCoinClient {
         feeLevel: FeeLevel = .minimum,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
+        prepareDefragmentationStepTransactions(
+            toSendAmount: amount,
+            recoverableMemo: recoverableMemo,
+            feeLevel: feeLevel,
+            rng: defaultRng,
+            completion: completion)
+    }
+
+    public func prepareDefragmentationStepTransactions(
+        toSendAmount amount: Amount,
+        recoverableMemo: Bool = false,
+        feeLevel: FeeLevel = .minimum,
+        rng: MobileCoinRng,
+        completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
+    ) {
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -259,6 +315,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: rng,
             targetQueue: serialQueue
         ).prepareDefragmentationStepTransactions(
             toSendAmount: amount,
