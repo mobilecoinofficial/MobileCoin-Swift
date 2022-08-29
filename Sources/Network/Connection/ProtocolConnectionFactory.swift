@@ -17,7 +17,9 @@ protocol ProtocolConnectionFactory {
 
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> ConsensusServiceProvider
 
     func makeBlockchainService(
@@ -27,17 +29,23 @@ protocol ProtocolConnectionFactory {
 
     func makeFogViewService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> FogViewServiceProvider
 
     func makeFogMerkleProofService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> FogMerkleProofServiceProvider
 
     func makeFogKeyImageService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> FogKeyImageServiceProvider
 
     func makeFogBlockService(
@@ -60,7 +68,9 @@ protocol ProtocolConnectionFactory {
 extension ProtocolConnectionFactory {
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> EmptyConsensusService {
         EmptyConsensusService()
     }
@@ -74,21 +84,27 @@ extension ProtocolConnectionFactory {
 
     func makeFogViewService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> EmptyFogViewService {
         EmptyFogViewService()
     }
 
     func makeFogMerkleProofService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> EmptyFogMerkleProofService {
         EmptyFogMerkleProofService()
     }
 
     func makeFogKeyImageService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> EmptyFogKeyImageService {
         EmptyFogKeyImageService()
     }

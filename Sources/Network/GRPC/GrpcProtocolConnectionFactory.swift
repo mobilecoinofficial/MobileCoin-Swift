@@ -10,12 +10,16 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> ConsensusGrpcConnection {
         ConsensusGrpcConnection(
                 config: config,
                 channelManager: channelManager,
-                targetQueue: targetQueue)
+                targetQueue: targetQueue,
+                rng: rng,
+                rngContext: rngContext)
     }
 
     func makeBlockchainService(
@@ -30,32 +34,44 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 
     func makeFogViewService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> FogViewGrpcConnection {
         FogViewGrpcConnection(
             config: config,
             channelManager: channelManager,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rng: rng,
+            rngContext: rngContext)
     }
 
     func makeFogMerkleProofService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> FogMerkleProofGrpcConnection {
         FogMerkleProofGrpcConnection(
             config: config,
             channelManager: channelManager,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rng: rng,
+            rngContext: rngContext)
     }
 
     func makeFogKeyImageService(
         config: AttestedConnectionConfig<FogUrl>,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
     ) -> FogKeyImageGrpcConnection {
         FogKeyImageGrpcConnection(
             config: config,
             channelManager: channelManager,
-            targetQueue: targetQueue)
+            targetQueue: targetQueue,
+            rng: rng,
+            rngContext: rngContext)
     }
 
     func makeFogBlockService(

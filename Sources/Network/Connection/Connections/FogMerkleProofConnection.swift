@@ -15,17 +15,23 @@ final class FogMerkleProofConnection: Connection<
     private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
+    private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
+    private let rngContext: Any?
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
         grpcFactory: GrpcProtocolConnectionFactory,
         config: NetworkConfig,
-        targetQueue: DispatchQueue?
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
+        rngContext: Any? = nil
     ) {
         self.httpFactory = httpFactory
         self.grpcFactory = grpcFactory
         self.config = config
         self.targetQueue = targetQueue
+        self.rng = rng
+        self.rngContext = rngContext
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
@@ -36,12 +42,16 @@ final class FogMerkleProofConnection: Connection<
                         grpcService:
                             grpcFactory.makeFogMerkleProofService(
                                 config: rotatedConfig,
-                                targetQueue: targetQueue))
+                                targetQueue: targetQueue,
+                                rng: rng,
+                                rngContext: rngContext))
                 case .http:
                     return .http(httpService:
                             httpFactory.makeFogMerkleProofService(
                                 config: rotatedConfig,
-                                targetQueue: targetQueue))
+                                targetQueue: targetQueue,
+                                rng: rng,
+                                rngContext: rngContext))
                 }
             },
             transportProtocolOption: config.fogMerkleProofConfig().transportProtocolOption,
