@@ -39,7 +39,7 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
         self.seed = seed32.data
     }
 
-    convenience init(seed: Data = .secRngGenBytes(32)) {
+    public convenience init(seed: Data = .secRngGenBytes(32)) {
         let seed32: Data32 = withMcInfallibleReturningOptional {
             Data32(seed)
         }
