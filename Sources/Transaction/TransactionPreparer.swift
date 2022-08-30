@@ -13,12 +13,14 @@ struct TransactionPreparer {
     private let fogResolverManager: FogResolverManager
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
+    private let rng: MobileCoinRng
 
     init(
         accountKey: AccountKey,
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
+        rng: MobileCoinRng,
         targetQueue: DispatchQueue?
     ) {
         self.serialQueue = DispatchQueue(
@@ -31,6 +33,7 @@ struct TransactionPreparer {
         self.fogMerkleProofFetcher = FogMerkleProofFetcher(
             fogMerkleProofService: fogMerkleProofService,
             targetQueue: targetQueue)
+        self.rng = rng
     }
 
     func prepareSelfAddressedTransaction(
@@ -75,7 +78,8 @@ struct TransactionPreparer {
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
-                        blockVersion: blockVersion
+                        blockVersion: blockVersion,
+                        rng: rng
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
                 })
@@ -136,7 +140,8 @@ struct TransactionPreparer {
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
-                        blockVersion: blockVersion
+                        blockVersion: blockVersion,
+                        rng: rng
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })
@@ -148,10 +153,20 @@ struct TransactionPreparer {
         merkleRootBlock: UInt64? = nil,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        let inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
-            forRealTxOutIndices: inputs.map { $0.globalIndex },
-            selectionRange: ledgerTxOutCount.map { ..<$0 }
-        ).map { Array($0) }
+        var inputsMixinIndices: [[UInt64]]
+
+        if let customRngStrategy = mixinSelectionStrategy as? CustomRNGMixinSelectionStrategy {
+            inputsMixinIndices = customRngStrategy.selectMixinIndices(
+                rng: rng,
+                forRealTxOutIndices: inputs.map { $0.globalIndex },
+                selectionRange: ledgerTxOutCount.map { ..<$0 }
+            ).map { Array($0) }
+        } else {
+            inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
+                forRealTxOutIndices: inputs.map { $0.globalIndex },
+                selectionRange: ledgerTxOutCount.map { ..<$0 }
+            ).map { Array($0) }
+        }
 
         // There's a chance that a txo we selected as a mixin is in a block that's greater than
         // the highest block of our inputs, in which case, using the highest block of our inputs

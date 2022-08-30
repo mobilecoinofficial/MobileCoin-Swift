@@ -34,3 +34,4 @@ public struct PendingSinglePayloadTransaction {
 }
 
 extension PendingTransaction: Equatable, Hashable {}
+extension PendingSinglePayloadTransaction: Equatable {}

@@ -20,7 +20,8 @@ class TxOutMemoIntegrationTests: XCTestCase {
             fee: txFixture.fee,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
             fogResolver: txFixture.fogResolver,
-            blockVersion: txFixture.blockVersion))
+            blockVersion: txFixture.blockVersion,
+            rng: TestRng()))
     }
 
     func testTransactionWithSenderMemo() throws {
@@ -71,7 +72,8 @@ class TxOutMemoIntegrationTests: XCTestCase {
             fee: txFixture.fee,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
             fogResolver: txFixture.fogResolver,
-            blockVersion: txFixture.blockVersion))
+            blockVersion: txFixture.blockVersion,
+            rng: TestRng()))
     }
 
     func testTransactionWithSenderWithPaymentRequestMemo() throws {
