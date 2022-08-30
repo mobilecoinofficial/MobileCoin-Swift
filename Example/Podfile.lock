@@ -19,32 +19,32 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.6.0)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin/Core (1.2.2):
+  - LibMobileCoin/Core (2.0.0):
     - gRPC-Swift
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (1.2.4)
-  - MobileCoin/Core (1.2.4):
+  - MobileCoin (2.0.1)
+  - MobileCoin/Core (2.0.1):
     - gRPC-Swift (= 1.0.0)
-    - LibMobileCoin/Core (= 1.2.2)
+    - LibMobileCoin/Core (= 2.0.0)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.40.0)
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.40.0)
     - SwiftProtobuf
-  - MobileCoin/Core/ProtocolUnitTests (1.2.4):
+  - MobileCoin/Core/ProtocolUnitTests (2.0.1):
     - gRPC-Swift (= 1.0.0)
-    - LibMobileCoin/Core (= 1.2.2)
+    - LibMobileCoin/Core (= 2.0.0)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.40.0)
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.40.0)
     - SwiftProtobuf
-  - MobileCoin/IntegrationTests (1.2.4)
-  - MobileCoin/PerformanceTests (1.2.4)
-  - MobileCoin/Tests (1.2.4)
+  - MobileCoin/IntegrationTests (2.0.1)
+  - MobileCoin/PerformanceTests (2.0.1)
+  - MobileCoin/Tests (2.0.1)
   - SwiftLint (0.47.1)
   - SwiftNIO (2.40.0):
     - _NIODataStructures (= 2.40.0)
@@ -222,9 +222,9 @@ SPEC CHECKSUMS:
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   gRPC-Swift: 77154009a019e97f8c4bd8f2bb75fe9726801157
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 860cbd565a4839cb8be784465100d9f09ac419aa
+  LibMobileCoin: d1fbf7951d365e4fdc959ca3badc55261f756237
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: 66058555f1f237e882f4abd2039717cfab115bc5
+  MobileCoin: 47e75054fe94367dda123796b8f5b3b908008f7f
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftNIO: 829958aab300642625091f82fc2f49cb7cf4ef24
   SwiftNIOConcurrencyHelpers: 697370136789b1074e4535eaae75cbd7f900370e
@@ -241,6 +241,6 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 0b2b407819d82eb63af558c5396e33c945759503
   SwiftProtobuf: 6ef3f0e422ef90d6605ca20b21a94f6c1324d6b3
 
-PODFILE CHECKSUM: b901c42df0c163cb0d69005f4c41e9cd0f744189
+PODFILE CHECKSUM: 6bddbe73790bbe6270eaaa8354b72570dee1374a
 
 COCOAPODS: 1.11.3

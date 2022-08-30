@@ -176,7 +176,8 @@ extension TransactionBuilder.Fixtures {
                         fee: fixture.fee,
                         tombstoneBlockIndex: fixture.tombstoneBlockIndex,
                         fogResolver: fixture.fogResolver,
-                        blockVersion: blockVersion)).transaction
+                        blockVersion: blockVersion,
+                        rng: TestRng())).transaction
     }
 
 }
