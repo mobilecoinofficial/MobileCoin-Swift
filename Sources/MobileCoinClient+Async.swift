@@ -6,7 +6,7 @@ import Foundation
 
 #if swift(>=5.5)
 
-@available(iOSApplicationExtension 15.0.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension MobileCoinClient {
 
     @discardableResult
