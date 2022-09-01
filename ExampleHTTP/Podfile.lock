@@ -46,7 +46,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 0762d612b8a320c04540d3d39a67a68f6fbb876e
+  LibMobileCoin: 8c5f745d141e6e619dc73d79abe7bf828dfc4362
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   MobileCoin: 5d9704ffa492f0eb9feb936841ff7b435156e9f8
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
