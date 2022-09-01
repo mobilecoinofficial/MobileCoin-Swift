@@ -494,7 +494,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.CONSENSUS_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334"]))
+                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
         }
     }
 
@@ -511,7 +511,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_VIEW_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334"]))
+                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
         }
     }
 
@@ -528,7 +528,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_LEDGER_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334"]))
+                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
         }
     }
 
@@ -545,7 +545,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_REPORT_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334"]))
+                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
         }
     }
 
@@ -554,7 +554,7 @@ extension NetworkPreset {
             try mrEnclaveHex.map({
                 try XCTUnwrapSuccess(Attestation.MrEnclave.make(
                         mrEnclave: try XCTUnwrap(Data(hexEncoded: $0)),
-                        allowedHardeningAdvisories: ["INTEL-SA-00334"]))
+                        allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
             })
         )
     }
