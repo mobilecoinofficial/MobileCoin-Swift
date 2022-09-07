@@ -28,7 +28,7 @@ extension Attestation.Fixtures.Default {
             mrSigner: try XCTUnwrap(Data32(base64Encoded: Self.mrSignerB64)),
             productId: productId,
             minimumSecurityVersion: 0,
-            allowedHardeningAdvisories: ["INTEL-SA-00334"])
+            allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"])
     }
 
     private static let mrSignerB64 = "fuXinXRiP9vG+/FFS+bzuwuGwSNmt7R4rRM1PkTehBE="
