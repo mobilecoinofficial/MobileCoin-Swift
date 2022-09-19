@@ -189,6 +189,36 @@ public final class MobileCoinClient {
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
     }
 
+    /*
+    public func createSignedContingentInput(
+        recipient: PublicAddress,
+        amountToSpend: Amount,
+        amountToReceive: Amount,
+        completion: @escaping (
+            Result<SignedContingentInput, SignedContingentInputCreationError>
+        ) -> Void
+    ) {
+        Account.SCIOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rng: defaultRng,
+            targetQueue: serialQueue
+        ).createSignedContingentInput(
+            to: recipient,
+            amountToSpend: amountToSpend,
+            amountToReceive: amountToReceive
+        ) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+    */
+    
     public func prepareTransaction(
         to recipient: PublicAddress,
         memoType: MemoType = .recoverable,

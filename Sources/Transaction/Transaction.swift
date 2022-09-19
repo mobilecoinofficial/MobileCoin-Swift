@@ -83,6 +83,12 @@ public struct Transaction {
     }
 }
 
+public func compareIdempotently(_ lhs: Transaction) -> Bool {
+    self.inputKeyImages == lhs.inputKeyImages &&
+    self.outputs == lhs.outputs &&
+    self.proto.compareIdempotently(lhs.proto)
+}
+
 extension Transaction: Equatable {}
 extension Transaction: Hashable {}
 
@@ -126,4 +132,26 @@ extension External_Tx {
     init(_ transaction: Transaction) {
         self = transaction.proto
     }
+}
+
+extension External_Tx {
+    public func compareIdempotently(_ lhs: External_Tx) -> Bool {
+        self.signature == lhs.signature &&
+        self.prefix.compareIdempotently(lhs.prefix)
+    }
+}
+
+
+extension External_TxPrefix {
+
+
+    public func compareIdempotently(_ lhs: External_TxPrefix) -> Bool {
+        // Ignore the fee because its dynamic over time
+        // Ignore the tombstoneBlock because its dynamic over time
+        self.inputs == lhs.inputs &&
+        self.outputs == lhs.outputs &&
+        self.feeTokenID == lhs.feeTokenID
+    }
+
+
 }

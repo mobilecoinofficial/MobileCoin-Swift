@@ -127,6 +127,33 @@ extension TransactionEstimationFetcherError: LocalizedError {
     }
 }
 
+public enum SignedContingentInputCreationError: Error {
+    case invalidInput(String)
+    case insufficientBalance(String = String())
+    case connectionError(ConnectionError)
+}
+
+extension SignedContingentInputCreationError: CustomStringConvertible {
+    public var description: String {
+        "SignedContingentInput creation error: " + {
+            switch self {
+            case .invalidInput(let reason):
+                return "Invalid input: \(reason)"
+            case .insufficientBalance(let reason):
+                return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .connectionError(let innerError):
+                return "\(innerError)"
+            }
+        }()
+    }
+}
+
+extension SignedContingentInputCreationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum TransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
