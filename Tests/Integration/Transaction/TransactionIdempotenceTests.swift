@@ -33,7 +33,7 @@ class TransactionIdempotenceTests: XCTestCase {
         let amt = Amount(mob: 100)
         let rngSeed = MobileCoinChaCha20Rng().rngSeed
 
-        func submitTransaction(rngSeed: RngSeed, callback: @escaping (Transaction) -> Void) {
+        func submitTransaction(rngSeed: RngSeed, expectFailure: Bool, callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -77,7 +77,7 @@ class TransactionIdempotenceTests: XCTestCase {
             }
         }
 
-        submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
+        submitTransaction(rngSeed: rngSeed, expectFailure: false) { (transaction: Transaction) in
             var numChecksRemaining = 10
 
             func checkStatus() {
