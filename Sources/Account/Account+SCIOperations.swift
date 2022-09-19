@@ -1,18 +1,19 @@
 //
-//  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
+//  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
 // swiftlint:disable closure_body_length function_body_length multiline_arguments
 
+/*
 import Foundation
 
 extension Account {
-    struct TransactionOperations {
+    struct SCIOperations {
         private let serialQueue: DispatchQueue
         private let account: ReadWriteDispatchLock<Account>
         private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
-        private let transactionPreparer: TransactionPreparer
+        private let signedContingentInputPreparer: SignedContingentInputPreparer
 
         init(
             account: ReadWriteDispatchLock<Account>,
@@ -21,7 +22,7 @@ extension Account {
             metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             mixinSelectionStrategy: MixinSelectionStrategy,
-            rngSeed: RngSeed,
+            rng: MobileCoinRng,
             targetQueue: DispatchQueue?
         ) {
             self.serialQueue = DispatchQueue(
@@ -30,16 +31,16 @@ extension Account {
             self.account = account
             self.metaFetcher = metaFetcher
             self.txOutSelector = TxOutSelector(txOutSelectionStrategy: txOutSelectionStrategy)
-            self.transactionPreparer = TransactionPreparer(
+            self.signedContingentInputPreparer = SignedContingentInputPreparer(
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
-                rngSeed: rngSeed,
+                rng: rng,
                 targetQueue: targetQueue)
         }
         
-        func createSignedContingentInput(
+        func prepareSignedContingentInput(
             to recipient: PublicAddress,
             amountToSpend: Amount,
             amountToReceive: Amount,
@@ -114,9 +115,8 @@ extension Account {
                 return
             }
 
-            let (unspentTxOuts, ledgerBlockCount) = account.readSync {
-                    ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount)
-            }
+            let (unspentTxOuts, ledgerBlockCount) =
+            account.readSync { ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount) }
             logger.info(
                 "Preparing transaction with provided fee... recipient: \(redacting: recipient), " +
                     "amount: \(redacting: amount), fee: \(redacting: fee), unspentTxOutValues: " +
@@ -145,7 +145,7 @@ extension Account {
                                     })
                                 """,
                             logFunction: false)
-                        var tombstoneBlockIndex = ledgerBlockCount + 50
+                        let tombstoneBlockIndex = ledgerBlockCount + 50
                         transactionPreparer.prepareTransaction(
                             inputs: txOutsToSpend,
                             recipient: recipient,
@@ -339,3 +339,5 @@ extension Account {
         }
     }
 }
+
+*/
