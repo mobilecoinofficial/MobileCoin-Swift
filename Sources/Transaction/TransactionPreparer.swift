@@ -14,14 +14,14 @@ struct TransactionPreparer {
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
     private let localRng: MobileCoinRng
-    private let rngSeed: Data32
+    private let rngSeed: RngSeed
 
     init(
         accountKey: AccountKey,
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
-        rngSeed: Data32,
+        rngSeed: RngSeed,
         targetQueue: DispatchQueue?
     ) {
         self.serialQueue = DispatchQueue(
@@ -157,18 +157,10 @@ struct TransactionPreparer {
     ) {
         var inputsMixinIndices: [[UInt64]]
 
-        if let customRngStrategy = mixinSelectionStrategy as? CustomRNGMixinSelectionStrategy {
-            inputsMixinIndices = customRngStrategy.selectMixinIndices(
-                rng: localRng,
-                forRealTxOutIndices: inputs.map { $0.globalIndex },
-                selectionRange: ledgerTxOutCount.map { ..<$0 }
-            ).map { Array($0) }
-        } else {
-            inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
-                forRealTxOutIndices: inputs.map { $0.globalIndex },
-                selectionRange: ledgerTxOutCount.map { ..<$0 }
-            ).map { Array($0) }
-        }
+        inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
+            forRealTxOutIndices: inputs.map { $0.globalIndex },
+            selectionRange: ledgerTxOutCount.map { ..<$0 }
+        ).map { Array($0) }
 
         // There's a chance that a txo we selected as a mixin is in a block that's greater than
         // the highest block of our inputs, in which case, using the highest block of our inputs

@@ -47,7 +47,7 @@ extension MobileCoinClient {
         to recipient: PublicAddress,
         amount: Amount,
         fee: UInt64,
-        rngSeed: Data,
+        rngSeed: RngSeed,
         memoType: MemoType = .recoverable
     ) async throws -> PendingSinglePayloadTransaction {
         try await withCheckedThrowingContinuation { continuation in

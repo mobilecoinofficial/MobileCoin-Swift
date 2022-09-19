@@ -219,7 +219,7 @@ extension MobileCoinClient {
             memoType: MemoType = .recoverable,
             amount: Amount,
             fee: UInt64,
-            rngSeed: Data,
+            rngSeed: RngSeed,
             completion: @escaping (
                 Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
@@ -238,7 +238,7 @@ extension MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = rng.generateData32Seed()?.data else {
+        guard let rngSeed = rng.generateRngSeed() else {
             completion(.failure(
                 TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
             return
@@ -262,7 +262,7 @@ extension MobileCoinClient {
             memoType: MemoType = .recoverable,
             amount: Amount,
             feeLevel: FeeLevel = .minimum,
-            rngSeed: Data,
+            rngSeed: RngSeed,
             completion: @escaping (
                 Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
@@ -281,9 +281,9 @@ extension MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = rng.generateData32Seed()?.data else {
+        guard let rngSeed = rng.generateRngSeed() else {
             completion(.failure(
-                TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
+                TransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
             return
         }
         prepareTransaction(
@@ -334,7 +334,7 @@ extension MobileCoinClient {
             toSendAmount amount: Amount,
             recoverableMemo: Bool = false,
             feeLevel: FeeLevel = .minimum,
-            rngSeed: Data,
+            rngSeed: RngSeed,
             completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
         ) {
         ```
@@ -348,10 +348,10 @@ extension MobileCoinClient {
         rng: MobileCoinRng,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
-        guard let rngSeed = rng.generateData32Seed()?.data else {
+        guard let rngSeed = rng.generateRngSeed() else {
             completion(.failure(
                 DefragTransactionPreparationError.invalidInput(
-                    "Could not create 32 byte RNG seed")))
+                    "Could not create 32-byte RNG seed")))
             return
         }
         prepareDefragmentationStepTransactions(

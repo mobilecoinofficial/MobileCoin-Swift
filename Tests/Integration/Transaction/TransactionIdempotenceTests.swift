@@ -31,9 +31,9 @@ class TransactionIdempotenceTests: XCTestCase {
                 using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
         let amt = Amount(mob: 100)
-        let rngSeed = try XCTUnwrap(Data32(MobileCoinChaCha20Rng().seed))
+        let rngSeed = MobileCoinChaCha20Rng().rngSeed
 
-        func submitTransaction(rngSeed: Data32, callback: @escaping (Transaction) -> Void) {
+        func submitTransaction(rngSeed: RngSeed, callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -42,7 +42,7 @@ class TransactionIdempotenceTests: XCTestCase {
                     memoType: .unused,
                     amount: amt,
                     fee: IntegrationTestFixtures.fee,
-                    rngSeed: rngSeed.data
+                    rngSeed: rngSeed
                 ) { result in
                     guard let transaction = result.successOrFulfill(expectation: expect) else {
                         return
@@ -160,7 +160,7 @@ class TransactionIdempotenceTests: XCTestCase {
 
     func testTransactionIdempotence() throws {
         let amt = Amount(mob: 100)
-        let rngSeed = try XCTUnwrap(Data32(MobileCoinChaCha20Rng().seed))
+        let rngSeed = MobileCoinChaCha20Rng().rngSeed
 
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let expect = expectation(description: description)
@@ -174,7 +174,7 @@ class TransactionIdempotenceTests: XCTestCase {
                 memoType: .unused,
                 amount: amt,
                 fee: IntegrationTestFixtures.fee,
-                rngSeed: rngSeed.data
+                rngSeed: rngSeed
             ) { result in
                 guard let transaction1 = result.successOrFulfill(expectation: expect) else {
                     return
@@ -184,7 +184,7 @@ class TransactionIdempotenceTests: XCTestCase {
                     memoType: .unused,
                     amount: amt,
                     fee: IntegrationTestFixtures.fee,
-                    rngSeed: rngSeed.data
+                    rngSeed: rngSeed
                 ) {
                     guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
                         return

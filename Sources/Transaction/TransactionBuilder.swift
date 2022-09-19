@@ -89,7 +89,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rngSeed: Data32
+        rngSeed: RngSeed
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
             inputs: inputs,
@@ -115,7 +115,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rngSeed: Data32
+        rngSeed: RngSeed
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         Math.positiveRemainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
@@ -148,7 +148,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rngSeed: Data32
+        rngSeed: RngSeed
     ) -> Result<PendingTransaction, TransactionBuilderError> {
         outputsAddingChangeOutput(
             inputs: inputs,
@@ -177,7 +177,7 @@ extension TransactionBuilder {
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
         blockVersion: BlockVersion,
-        rngSeed: Data32
+        rngSeed: RngSeed
     ) -> Result<PendingTransaction, TransactionBuilderError> {
         guard Math.totalOutlayCheck(for: possibleTransaction, fee: fee, inputs: inputs) else {
             return .failure(.invalidInput("Input values != output values + fee"))
@@ -206,7 +206,7 @@ extension TransactionBuilder {
             }
         }
 
-        let seededRng = MobileCoinChaCha20Rng(seed32: rngSeed)
+        let seededRng = MobileCoinChaCha20Rng(rngSeed: rngSeed)
 
         let payloadContexts = possibleTransaction.outputs.map { output in
             builder.addOutput(

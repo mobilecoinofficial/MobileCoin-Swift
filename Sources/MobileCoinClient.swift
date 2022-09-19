@@ -203,7 +203,7 @@ public final class MobileCoinClient {
             memoType: memoType,
             amount: amount,
             fee: fee,
-            rngSeed: .secRngGenBytes(32),
+            rngSeed: RngSeed(),
             completion: completion)
     }
 
@@ -212,16 +212,11 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         fee: UInt64,
-        rngSeed: Data,
+        rngSeed: RngSeed,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = Data32(rngSeed) else {
-            completion(.failure(
-                TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
-            return
-        }
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -257,7 +252,7 @@ public final class MobileCoinClient {
             memoType: memoType,
             amount: amount,
             feeLevel: feeLevel,
-            rngSeed: .secRngGenBytes(32),
+            rngSeed: RngSeed(),
             completion: completion)
     }
 
@@ -266,16 +261,11 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
-        rngSeed: Data,
+        rngSeed: RngSeed,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = Data32(rngSeed) else {
-            completion(.failure(
-                TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
-            return
-        }
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -307,7 +297,7 @@ public final class MobileCoinClient {
             toSendAmount: amount,
             recoverableMemo: recoverableMemo,
             feeLevel: feeLevel,
-            rngSeed: .secRngGenBytes(32),
+            rngSeed: RngSeed(),
             completion: completion)
     }
 
@@ -315,15 +305,9 @@ public final class MobileCoinClient {
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
-        rngSeed: Data,
+        rngSeed: RngSeed,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
-        guard let rngSeed = Data32(rngSeed) else {
-            completion(.failure(
-                DefragTransactionPreparationError.invalidInput(
-                    "Could not create 32 byte RNG seed")))
-            return
-        }
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
