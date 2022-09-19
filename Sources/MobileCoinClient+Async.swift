@@ -47,7 +47,7 @@ extension MobileCoinClient {
         to recipient: PublicAddress,
         amount: Amount,
         fee: UInt64,
-        rng: MobileCoinRng,
+        rngSeed: Data,
         memoType: MemoType = .recoverable
     ) async throws -> PendingSinglePayloadTransaction {
         try await withCheckedThrowingContinuation { continuation in
@@ -55,7 +55,7 @@ extension MobileCoinClient {
                                memoType: memoType,
                                amount: amount,
                                fee: fee,
-                               rng: rng) {
+                               rngSeed: rngSeed) {
                 continuation.resume(with: $0)
             }
         }

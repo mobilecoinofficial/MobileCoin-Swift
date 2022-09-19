@@ -4,6 +4,7 @@
 
 // swiftlint:disable multiline_function_chains
 // swiftlint:disable function_default_parameter_at_end
+// swiftlint:disable force_unwrapping todo
 
 import Foundation
 
@@ -203,7 +204,7 @@ public final class MobileCoinClient {
             memoType: memoType,
             amount: amount,
             fee: fee,
-            rng: defaultRng,
+            rngSeed: .secRngGenBytes(32),
             completion: completion)
     }
 
@@ -212,7 +213,7 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         fee: UInt64,
-        rng: MobileCoinRng,
+        rngSeed: Data,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
@@ -224,7 +225,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
-            rng: rng,
+            rngSeed: Data32(rngSeed)!, // TODO
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -252,7 +253,7 @@ public final class MobileCoinClient {
             memoType: memoType,
             amount: amount,
             feeLevel: feeLevel,
-            rng: defaultRng,
+            rngSeed: .secRngGenBytes(32),
             completion: completion)
     }
 
@@ -261,7 +262,7 @@ public final class MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng,
+        rngSeed: Data,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
@@ -273,7 +274,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
-            rng: rng,
+            rngSeed: Data32(rngSeed)!, // TODO
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -297,7 +298,7 @@ public final class MobileCoinClient {
             toSendAmount: amount,
             recoverableMemo: recoverableMemo,
             feeLevel: feeLevel,
-            rng: defaultRng,
+            rngSeed: .secRngGenBytes(32),
             completion: completion)
     }
 
@@ -305,7 +306,7 @@ public final class MobileCoinClient {
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng,
+        rngSeed: Data,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
         Account.TransactionOperations(
@@ -315,7 +316,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
-            rng: rng,
+            rngSeed: Data32(rngSeed)!, // TODO
             targetQueue: serialQueue
         ).prepareDefragmentationStepTransactions(
             toSendAmount: amount,

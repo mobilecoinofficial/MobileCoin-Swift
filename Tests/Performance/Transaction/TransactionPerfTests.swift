@@ -20,7 +20,7 @@ class TransactionPerfTests: PerformanceTestCase {
                 tombstoneBlockIndex: fixture.tombstoneBlockIndex,
                 fogResolver: fixture.fogResolver,
                 blockVersion: BlockVersion.legacy,
-                rng: TestRng()))
+                rngSeed: testRngSeed()))
         }
     }
 

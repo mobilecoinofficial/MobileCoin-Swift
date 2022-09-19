@@ -19,7 +19,7 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: fixture.blockVersion,
-            rng: TestRng()))
+            rngSeed: testRngSeed()))
     }
 
     func testLegacyBlockVersion() throws {
@@ -33,7 +33,7 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .legacy,
-            rng: TestRng()).get()
+            rngSeed: testRngSeed()).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
@@ -58,7 +58,7 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .minRTHEnabled,
-            rng: TestRng()).get()
+            rngSeed: testRngSeed()).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
@@ -83,7 +83,7 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .versionMax,
-            rng: TestRng()))
+            rngSeed: testRngSeed()))
     }
 
     func testExactChangeCreatesChangeOutput() throws {
@@ -98,7 +98,7 @@ class TransactionTests: XCTestCase {
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
             fogResolver: fixture.fogResolver,
             blockVersion: .minRTHEnabled,
-            rng: TestRng()).get()
+            rngSeed: testRngSeed()).get()
 
         XCTAssertNotNil(txOutContext.changeTxOutContext)
     }

@@ -52,3 +52,8 @@ class MobileCoinXoshiroRng: MobileCoinRng {
 }
 
 typealias TestRng = MobileCoinXoshiroRng
+
+func testRngSeed() -> Data32 {
+    var next = MobileCoinXoshiroRng().next()
+    return Data32(Data(bytes: &next, count: MemoryLayout<UInt32>.size))!
+}
