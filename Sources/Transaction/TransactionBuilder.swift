@@ -212,7 +212,7 @@ extension TransactionBuilder {
             builder.addOutput(
                 publicAddress: output.recipient,
                 amount: output.amount.value,
-                rng: localRng
+                rng: rng
             )
         }
 
@@ -225,7 +225,7 @@ extension TransactionBuilder {
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
             changeContext.flatMap { changeContext in
-                builder.build(rng: rng).map { transaction in
+                builder.build(rng: localRng).map { transaction in
                     PendingTransaction(
                         transaction: transaction,
                         payloadTxOutContexts: payloadContexts,
