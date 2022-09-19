@@ -4,7 +4,6 @@
 
 // swiftlint:disable multiline_function_chains
 // swiftlint:disable function_default_parameter_at_end
-// swiftlint:disable force_unwrapping todo
 
 import Foundation
 
@@ -218,6 +217,11 @@ public final class MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
+        guard let rngSeed = Data32(rngSeed) else {
+            completion(.failure(
+                TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
+            return
+        }
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -225,7 +229,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
-            rngSeed: Data32(rngSeed)!, // TODO
+            rngSeed: rngSeed,
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -267,6 +271,11 @@ public final class MobileCoinClient {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
+        guard let rngSeed = Data32(rngSeed) else {
+            completion(.failure(
+                TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
+            return
+        }
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -274,7 +283,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
-            rngSeed: Data32(rngSeed)!, // TODO
+            rngSeed: rngSeed,
             targetQueue: serialQueue
         ).prepareTransaction(
             to: recipient,
@@ -309,6 +318,12 @@ public final class MobileCoinClient {
         rngSeed: Data,
         completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
     ) {
+        guard let rngSeed = Data32(rngSeed) else {
+            completion(.failure(
+                DefragTransactionPreparationError.invalidInput(
+                    "Could not create 32 byte RNG seed")))
+            return
+        }
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,
@@ -316,7 +331,7 @@ public final class MobileCoinClient {
             metaFetcher: metaFetcher,
             txOutSelectionStrategy: txOutSelectionStrategy,
             mixinSelectionStrategy: mixinSelectionStrategy,
-            rngSeed: Data32(rngSeed)!, // TODO
+            rngSeed: rngSeed,
             targetQueue: serialQueue
         ).prepareDefragmentationStepTransactions(
             toSendAmount: amount,
