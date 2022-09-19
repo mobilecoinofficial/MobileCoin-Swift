@@ -34,7 +34,7 @@ class TransactionIdempotenceTests: XCTestCase {
         let rng1 = MobileCoinChaCha20Rng()
         let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
 
-        func submitTransaction(rng: MobileCoinRng, callback: @escaping (Transaction) -> Void) {
+        func submitTransaction(rng: MobileCoinRng, expectFailure: Bool, callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -50,16 +50,36 @@ class TransactionIdempotenceTests: XCTestCase {
                     }
 
                     client.submitTransaction(transaction.transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        callback(transaction.transaction)
+                        switch $0 {
+                        case .success:
+                            guard !expectFailure else {
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                                return
+                            }
+                            callback(transaction.transaction)
+                        case .failure(let error):
+                            guard expectFailure else {
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                                return
+                            }
+                            
+                            switch error {
+                            case .outputAlreadyExists:
+                                expect.fulfill()
+                            default:
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                            }
+                        }
                     }
                 }
             }
         }
 
-        submitTransaction(rng: rng1) { (transaction: Transaction) in
-            var numChecksRemaining = 5
+        submitTransaction(rng: rng1, expectFailure: false) { (transaction: Transaction) in
+            var numChecksRemaining = 10
 
             func checkStatus() {
                 numChecksRemaining -= 1
@@ -91,10 +111,9 @@ class TransactionIdempotenceTests: XCTestCase {
                             if let timestamp = block.timestamp {
                                 print("Block timestamp: \(timestamp)")
                             }
-
-                            print("Sleeping 10s")
-                            Thread.sleep(forTimeInterval: 10)
                             
+                            print("Sleeping 20s")
+                            sleep(20)
                             print("Updating balance...")
                             client.updateBalance {
                                 guard let balance = $0.successOrFulfill(expectation: expect) else { return }
@@ -102,8 +121,8 @@ class TransactionIdempotenceTests: XCTestCase {
 
                                 print("Checking status...")
 
-                                submitTransaction(rng: rng2) { (transaction: Transaction) in
-                                    var numChecksRemaining = 5
+                                submitTransaction(rng: rng2, expectFailure: true) { (transaction: Transaction) in
+                                    var numChecksRemaining = 10
 
                                     func checkStatus() {
                                         numChecksRemaining -= 1
