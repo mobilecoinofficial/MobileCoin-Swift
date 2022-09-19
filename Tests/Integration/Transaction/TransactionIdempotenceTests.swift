@@ -1,7 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable line_length todo
+// swiftlint:disable line_length
 
 @testable import MobileCoin
 import XCTest
@@ -31,10 +31,9 @@ class TransactionIdempotenceTests: XCTestCase {
                 using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
         let amt = Amount(mob: 100)
-        let rng = MobileCoinChaCha20Rng()
-        let rngSeed = Data32(rng.seed)! // TODO
+        let rngSeed = MobileCoinChaCha20Rng().seed
 
-        func submitTransaction(rngSeed: Data32, callback: @escaping (Transaction) -> Void) {
+        func submitTransaction(rngSeed: D, callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -43,7 +42,7 @@ class TransactionIdempotenceTests: XCTestCase {
                     memoType: .unused,
                     amount: amt,
                     fee: IntegrationTestFixtures.fee,
-                    rngSeed: rngSeed.data
+                    rng: rng
                 ) { result in
                     guard let transaction = result.successOrFulfill(expectation: expect) else {
                         return
@@ -58,7 +57,7 @@ class TransactionIdempotenceTests: XCTestCase {
             }
         }
 
-        submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
+        submitTransaction(rng: rng1) { (transaction: Transaction) in
             var numChecksRemaining = 5
 
             func checkStatus() {
@@ -95,64 +94,51 @@ class TransactionIdempotenceTests: XCTestCase {
                             client.updateBalance {
                                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
-                                client.prepareTransaction(
-                                    to: recipient,
-                                    memoType: .unused,
-                                    amount: amt,
-                                    fee: IntegrationTestFixtures.fee,
-                                    rngSeed: rngSeed.data
-                                ) { result in
-                                    guard let transaction1 = result.successOrFulfill(expectation: expect) else {
-                                        return
-                                    }
+                                submitTransaction(rng: rng2) { (transaction: Transaction) in
+                                    var numChecksRemaining = 5
 
-                                    submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
-                                        var numChecksRemaining = 5
+                                    func checkStatus() {
+                                        numChecksRemaining -= 1
+                                        print("Updating balance...")
+                                        client.updateBalance {
+                                            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                                            print("Balance: \(balance)")
 
-                                        func checkStatus() {
-                                            numChecksRemaining -= 1
-                                            print("Updating balance...")
-                                            client.updateBalance {
-                                                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                                                print("Balance: \(balance)")
+                                            print("Checking status...")
+                                            client.txOutStatus(of: transaction) {
+                                                guard let status = $0.successOrFulfill(expectation: expect) else { return }
+                                                print("Transaction status: \(status)")
 
-                                                print("Checking status...")
-                                                client.txOutStatus(of: transaction) {
-                                                    guard let status = $0.successOrFulfill(expectation: expect) else { return }
-                                                    print("Transaction status: \(status)")
-
-                                                    switch status {
-                                                    case .unknown:
-                                                        guard numChecksRemaining > 0 else {
-                                                            XCTFail("Failed to resolve transaction status check")
-                                                            expect.fulfill()
-                                                            return
-                                                        }
-
-                                                        Thread.sleep(forTimeInterval: 2)
-                                                        checkStatus()
-                                                        return
-                                                    case .accepted(block: let block):
-                                                        print("Block index: \(block.index)")
-                                                        XCTAssertGreaterThan(block.index, 0)
-
-                                                        if let timestamp = block.timestamp {
-                                                            print("Block timestamp: \(timestamp)")
-                                                        }
-                                                        XCTFail("Transaction status check: Idempotence failed - second transaction was successful")
-                                                        expect.fulfill()
-                                                        return
-                                                    case .failed:
-                                                        // the transaction SHOULD fail - fall through to fulfill expectation without failure
+                                                switch status {
+                                                case .unknown:
+                                                    guard numChecksRemaining > 0 else {
+                                                        XCTFail("Failed to resolve transaction status check")
                                                         expect.fulfill()
                                                         return
                                                     }
+
+                                                    Thread.sleep(forTimeInterval: 2)
+                                                    checkStatus()
+                                                    return
+                                                case .accepted(block: let block):
+                                                    print("Block index: \(block.index)")
+                                                    XCTAssertGreaterThan(block.index, 0)
+
+                                                    if let timestamp = block.timestamp {
+                                                        print("Block timestamp: \(timestamp)")
+                                                    }
+                                                    XCTFail("Transaction status check: Idempotence failed - second transaction was successful")
+                                                    expect.fulfill()
+                                                    return
+                                                case .failed:
+                                                    // the transaction SHOULD fail - fall through to fulfill expectation without failure
+                                                    expect.fulfill()
+                                                    return
                                                 }
                                             }
                                         }
-                                        checkStatus()
                                     }
-
+                                    checkStatus()
                                 }
                             }
                         case .failed:
@@ -165,106 +151,106 @@ class TransactionIdempotenceTests: XCTestCase {
         }
     }
 
-//    func testTransactionIdempotence() throws {
-//        let amt = Amount(mob: 100)
-//        let rng1 = MobileCoinChaCha20Rng()
-//        let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
-//
-//        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-//        let expect = expectation(description: description)
-//
-//        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-//            expectation: expect,
-//            transportProtocol: .http)
-//        { client in
-//            client.prepareTransaction(
-//                to: recipient,
-//                memoType: .unused,
-//                amount: amt,
-//                fee: IntegrationTestFixtures.fee,
-//                rng: rng1
-//            ) { result in
-//                guard let transaction1 = result.successOrFulfill(expectation: expect) else {
-//                    return
-//                }
-//                client.prepareTransaction(
-//                    to: recipient,
-//                    memoType: .unused,
-//                    amount: amt,
-//                    fee: IntegrationTestFixtures.fee,
-//                    rng: rng2
-//                ) {
-//                    guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
-//                        return
-//                    }
-//
-//                    XCTAssertEqual(transaction1, transaction2)
-//                    expect.fulfill()
-//                }
-//
-//            }
-//        }
-//        waitForExpectations(timeout: 40)
-//    }
-//
-//    func testTransactionIdempotenceWithWordPos() throws {
-//        let amt = Amount(mob: 100)
-//        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-//        let rng1 = MobileCoinChaCha20Rng()
-//
-//        let expect = expectation(description: "testing idempotence with word pos")
-//
-//        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-//            expectation: expect,
-//            transportProtocol: .http)
-//        { client in
-//
-//            client.prepareTransaction(
-//                to: recipient,
-//                memoType: .unused,
-//                amount: amt,
-//                fee: IntegrationTestFixtures.fee,
-//                rng: rng1
-//            ) { result in
-//                guard result.successOrFulfill(expectation: expect) != nil else {
-//                    return
-//                }
-//
-//                // the seed and wordpos
-//                let wordPos = rng1.wordPos()
-//
-//                client.prepareTransaction(
-//                    to: recipient,
-//                    memoType: .unused,
-//                    amount: amt,
-//                    fee: IntegrationTestFixtures.fee,
-//                    rng: rng1
-//                ) { result in
-//                    guard let transaction1 = result.successOrFulfill(expectation: expect) else {
-//                        return
-//                    }
-//
-//                    // create rng w/same seed & cached wordpos state
-//                    let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
-//                    rng2.setWordPos(wordPos)
-//
-//                    client.prepareTransaction(
-//                        to: recipient,
-//                        memoType: .unused,
-//                        amount: amt,
-//                        fee: IntegrationTestFixtures.fee,
-//                        rng: rng2
-//                    ) {
-//                        guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
-//                            return
-//                        }
-//
-//                        XCTAssertEqual(transaction1, transaction2)
-//                        expect.fulfill()
-//                    }
-//                }
-//            }
-//        }
-//        waitForExpectations(timeout: 40)
-//    }
+    func testTransactionIdempotence() throws {
+        let amt = Amount(mob: 100)
+        let rng1 = MobileCoinChaCha20Rng()
+        let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
+
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
+        let expect = expectation(description: description)
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            expectation: expect,
+            transportProtocol: .http)
+        { client in
+            client.prepareTransaction(
+                to: recipient,
+                memoType: .unused,
+                amount: amt,
+                fee: IntegrationTestFixtures.fee,
+                rng: rng1
+            ) { result in
+                guard let transaction1 = result.successOrFulfill(expectation: expect) else {
+                    return
+                }
+                client.prepareTransaction(
+                    to: recipient,
+                    memoType: .unused,
+                    amount: amt,
+                    fee: IntegrationTestFixtures.fee,
+                    rng: rng2
+                ) {
+                    guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
+                        return
+                    }
+
+                    XCTAssertEqual(transaction1, transaction2)
+                    expect.fulfill()
+                }
+
+            }
+        }
+        waitForExpectations(timeout: 40)
+    }
+
+    func testTransactionIdempotenceWithWordPos() throws {
+        let amt = Amount(mob: 100)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
+        let rng1 = MobileCoinChaCha20Rng()
+
+        let expect = expectation(description: "testing idempotence with word pos")
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            expectation: expect,
+            transportProtocol: .http)
+        { client in
+
+            client.prepareTransaction(
+                to: recipient,
+                memoType: .unused,
+                amount: amt,
+                fee: IntegrationTestFixtures.fee,
+                rng: rng1
+            ) { result in
+                guard result.successOrFulfill(expectation: expect) != nil else {
+                    return
+                }
+
+                // the seed and wordpos
+                let wordPos = rng1.wordPos()
+
+                client.prepareTransaction(
+                    to: recipient,
+                    memoType: .unused,
+                    amount: amt,
+                    fee: IntegrationTestFixtures.fee,
+                    rng: rng1
+                ) { result in
+                    guard let transaction1 = result.successOrFulfill(expectation: expect) else {
+                        return
+                    }
+
+                    // create rng w/same seed & cached wordpos state
+                    let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
+                    rng2.setWordPos(wordPos)
+
+                    client.prepareTransaction(
+                        to: recipient,
+                        memoType: .unused,
+                        amount: amt,
+                        fee: IntegrationTestFixtures.fee,
+                        rng: rng2
+                    ) {
+                        guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
+                            return
+                        }
+
+                        XCTAssertEqual(transaction1, transaction2)
+                        expect.fulfill()
+                    }
+                }
+            }
+        }
+        waitForExpectations(timeout: 40)
+    }
 }
