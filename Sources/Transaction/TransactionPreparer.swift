@@ -13,7 +13,8 @@ struct TransactionPreparer {
     private let fogResolverManager: FogResolverManager
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
-    private let rng: MobileCoinRng
+    private let localRng: MobileCoinRng
+    private let transRng: MobileCoinRng
 
     init(
         accountKey: AccountKey,
@@ -33,7 +34,8 @@ struct TransactionPreparer {
         self.fogMerkleProofFetcher = FogMerkleProofFetcher(
             fogMerkleProofService: fogMerkleProofService,
             targetQueue: targetQueue)
-        self.rng = rng
+        self.transRng = rng
+        self.localRng = MobileCoinDefaultRng()
     }
 
     func prepareSelfAddressedTransaction(
@@ -79,7 +81,7 @@ struct TransactionPreparer {
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
                         blockVersion: blockVersion,
-                        rng: rng
+                        rng: transRng
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
                 })
@@ -141,7 +143,7 @@ struct TransactionPreparer {
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
                         blockVersion: blockVersion,
-                        rng: rng
+                        rng: transRng
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })
@@ -157,7 +159,7 @@ struct TransactionPreparer {
 
         if let customRngStrategy = mixinSelectionStrategy as? CustomRNGMixinSelectionStrategy {
             inputsMixinIndices = customRngStrategy.selectMixinIndices(
-                rng: rng,
+                rng: localRng,
                 forRealTxOutIndices: inputs.map { $0.globalIndex },
                 selectionRange: ledgerTxOutCount.map { ..<$0 }
             ).map { Array($0) }

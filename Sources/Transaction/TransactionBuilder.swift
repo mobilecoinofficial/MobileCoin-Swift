@@ -205,12 +205,14 @@ extension TransactionBuilder {
                 return .failure(error)
             }
         }
+        
+        let localRng = MobileCoinDefaultRng()
 
         let payloadContexts = possibleTransaction.outputs.map { output in
             builder.addOutput(
                 publicAddress: output.recipient,
                 amount: output.amount.value,
-                rng: rng
+                rng: localRng
             )
         }
 
@@ -219,7 +221,7 @@ extension TransactionBuilder {
             accountKey: accountKey,
             builder: builder,
             changeAmount: possibleTransaction.changeAmount,
-            rng: rng)
+            rng: localRng)
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
             changeContext.flatMap { changeContext in

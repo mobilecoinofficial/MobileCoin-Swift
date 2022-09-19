@@ -7,20 +7,20 @@ import XCTest
 
 class TransactionIdempotenceTests: XCTestCase {
 
-    func testIdempotenceFailure() throws {
-        let description = "Updating account balance"
-        try testSupportedProtocols(description: description) {
-            try idempotenceFailure(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-
 //    func testIdempotenceFailure() throws {
 //        let description = "Updating account balance"
-//        let expect = expectation(description: description)
-//        try idempotenceFailure(transportProtocol: .http, expectation: expect)
-//        waitForExpectations(timeout: 100.0)
+//        try testSupportedProtocols(description: description) {
+//            try idempotenceFailure(transportProtocol: $0, expectation: $1)
+//        }
 //    }
+
+
+    func testIdempotenceFailure() throws {
+        let description = "Updating account balance"
+        let expect = expectation(description: description)
+        try idempotenceFailure(transportProtocol: .http, expectation: expect)
+        waitForExpectations(timeout: 1000.0)
+    }
 
     func idempotenceFailure(
         transportProtocol: TransportProtocol,
