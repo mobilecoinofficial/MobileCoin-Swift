@@ -49,16 +49,36 @@ class TransactionIdempotenceTests: XCTestCase {
                     }
 
                     client.submitTransaction(transaction.transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                        switch $0 {
+                        case .success:
+                            guard !expectFailure else {
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                                return
+                            }
+                            callback(transaction.transaction)
+                        case .failure(let error):
+                            guard expectFailure else {
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                                return
+                            }
 
-                        callback(transaction.transaction)
+                            switch error {
+                            case .outputAlreadyExists:
+                                expect.fulfill()
+                            default:
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                            }
+                        }
                     }
                 }
             }
         }
 
         submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
-            var numChecksRemaining = 5
+            var numChecksRemaining = 10
 
             func checkStatus() {
                 numChecksRemaining -= 1
@@ -91,9 +111,8 @@ class TransactionIdempotenceTests: XCTestCase {
                                 print("Block timestamp: \(timestamp)")
                             }
 
-                            print("Sleeping 10s")
-                            Thread.sleep(forTimeInterval: 10)
-
+                            print("Sleeping 20s")
+                            sleep(20)
                             print("Updating balance...")
                             client.updateBalance {
                                 guard let balance = $0.successOrFulfill(expectation: expect) else { return }
@@ -101,8 +120,8 @@ class TransactionIdempotenceTests: XCTestCase {
 
                                 print("Checking status...")
 
-                                submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
-                                    var numChecksRemaining = 5
+                                submitTransaction(rngSeed: rngSeed, expectFailure: true) { (transaction: Transaction) in
+                                    var numChecksRemaining = 10
 
                                     func checkStatus() {
                                         numChecksRemaining -= 1
