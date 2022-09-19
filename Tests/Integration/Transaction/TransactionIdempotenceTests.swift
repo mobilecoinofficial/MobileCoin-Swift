@@ -92,8 +92,15 @@ class TransactionIdempotenceTests: XCTestCase {
                                 print("Block timestamp: \(timestamp)")
                             }
 
+                            print("Sleeping 40s")
+                            Thread.sleep(forTimeInterval: 60)
+                            
+                            print("Updating balance...")
                             client.updateBalance {
-                                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                                print("Balance: \(balance)")
+
+                                print("Checking status...")
 
                                 submitTransaction(rng: rng2) { (transaction: Transaction) in
                                     var numChecksRemaining = 5
