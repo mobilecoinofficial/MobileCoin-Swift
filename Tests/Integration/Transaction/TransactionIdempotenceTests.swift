@@ -92,8 +92,8 @@ class TransactionIdempotenceTests: XCTestCase {
                                 print("Block timestamp: \(timestamp)")
                             }
 
-                            print("Sleeping 40s")
-                            Thread.sleep(forTimeInterval: 60)
+                            print("Sleeping 10s")
+                            Thread.sleep(forTimeInterval: 10)
                             
                             print("Updating balance...")
                             client.updateBalance {

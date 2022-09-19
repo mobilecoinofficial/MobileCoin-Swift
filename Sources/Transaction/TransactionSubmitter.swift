@@ -90,7 +90,7 @@ struct TransactionSubmitter {
             return .failure(.tombstoneBlockTooFar())
         case .missingMemo:
             return .failure(.missingMemo("Missing memo"))
-        case .containsSpentKeyImage, .containsExistingOutputPublicKey:
+        case .containsSpentKeyImage:
             // This exact Tx might have already been submitted (and succeeded), or else the
             // inputs were already spent by another Tx.
             //
@@ -103,6 +103,8 @@ struct TransactionSubmitter {
             // decide how they want to proceed. Note: performing a Transaction status check
             // can help disambiguate the situation.
             return .failure(.inputsAlreadySpent())
+        case .containsExistingOutputPublicKey:
+            return .failure(.outputAlreadyExists())
         case .ledger:
             return .failure(.connectionError(
                 .invalidServerResponse("Consensus.proposeTx returned ledger error")))
