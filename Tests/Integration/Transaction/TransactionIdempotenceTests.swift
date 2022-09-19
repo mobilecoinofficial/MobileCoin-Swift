@@ -31,9 +31,10 @@ class TransactionIdempotenceTests: XCTestCase {
                 using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
         let amt = Amount(mob: 100)
-        let rngSeed = MobileCoinChaCha20Rng().seed
+        let rng1 = MobileCoinChaCha20Rng()
+        let rng2 = MobileCoinChaCha20Rng(seed: rng1.seed)
 
-        func submitTransaction(rngSeed: D, callback: @escaping (Transaction) -> Void) {
+        func submitTransaction(rng: MobileCoinRng, callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -91,8 +92,15 @@ class TransactionIdempotenceTests: XCTestCase {
                                 print("Block timestamp: \(timestamp)")
                             }
 
+                            print("Sleeping 10s")
+                            Thread.sleep(forTimeInterval: 10)
+
+                            print("Updating balance...")
                             client.updateBalance {
-                                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                                print("Balance: \(balance)")
+
+                                print("Checking status...")
 
                                 submitTransaction(rng: rng2) { (transaction: Transaction) in
                                     var numChecksRemaining = 5
