@@ -33,7 +33,7 @@ class TransactionIdempotenceTests: XCTestCase {
         let amt = Amount(mob: 100)
         let rngSeed = try XCTUnwrap(Data32(MobileCoinChaCha20Rng().seed))
 
-        func submitTransaction(rngSeed: Data32, callback: @escaping (Transaction) -> Void) {
+        func submitTransaction(rngSeed: Data32, expectFailure: Bool, callback: @escaping (Transaction) -> Void) {
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -49,16 +49,36 @@ class TransactionIdempotenceTests: XCTestCase {
                     }
 
                     client.submitTransaction(transaction.transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                        switch $0 {
+                        case .success:
+                            guard !expectFailure else {
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                                return
+                            }
+                            callback(transaction.transaction)
+                        case .failure(let error):
+                            guard expectFailure else {
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                                return
+                            }
 
-                        callback(transaction.transaction)
+                            switch error {
+                            case .outputAlreadyExists:
+                                expect.fulfill()
+                            default:
+                                XCTAssertFalse(true)
+                                expect.fulfill()
+                            }
+                        }
                     }
                 }
             }
         }
 
-        submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
-            var numChecksRemaining = 5
+        submitTransaction(rngSeed: rngSeed, expectFailure: false) { (transaction: Transaction) in
+            var numChecksRemaining = 10
 
             func checkStatus() {
                 numChecksRemaining -= 1
@@ -101,8 +121,8 @@ class TransactionIdempotenceTests: XCTestCase {
 
                                 print("Checking status...")
 
-                                submitTransaction(rngSeed: rngSeed) { (transaction: Transaction) in
-                                    var numChecksRemaining = 5
+                                submitTransaction(rngSeed: rngSeed, expectFailure: true) { (transaction: Transaction) in
+                                    var numChecksRemaining = 10
 
                                     func checkStatus() {
                                         numChecksRemaining -= 1
