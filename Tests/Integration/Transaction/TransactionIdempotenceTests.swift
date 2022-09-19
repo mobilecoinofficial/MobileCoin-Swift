@@ -95,64 +95,51 @@ class TransactionIdempotenceTests: XCTestCase {
                             client.updateBalance {
                                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
-                                client.prepareTransaction(
-                                    to: recipient,
-                                    memoType: .unused,
-                                    amount: amt,
-                                    fee: IntegrationTestFixtures.fee,
-                                    rng: rng2
-                                ) { result in
-                                    guard let transaction1 = result.successOrFulfill(expectation: expect) else {
-                                        return
-                                    }
+                                submitTransaction(rng: rng2) { (transaction: Transaction) in
+                                    var numChecksRemaining = 5
 
-                                    submitTransaction(rng: rng2) { (transaction: Transaction) in
-                                        var numChecksRemaining = 5
+                                    func checkStatus() {
+                                        numChecksRemaining -= 1
+                                        print("Updating balance...")
+                                        client.updateBalance {
+                                            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+                                            print("Balance: \(balance)")
 
-                                        func checkStatus() {
-                                            numChecksRemaining -= 1
-                                            print("Updating balance...")
-                                            client.updateBalance {
-                                                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                                                print("Balance: \(balance)")
+                                            print("Checking status...")
+                                            client.txOutStatus(of: transaction) {
+                                                guard let status = $0.successOrFulfill(expectation: expect) else { return }
+                                                print("Transaction status: \(status)")
 
-                                                print("Checking status...")
-                                                client.txOutStatus(of: transaction) {
-                                                    guard let status = $0.successOrFulfill(expectation: expect) else { return }
-                                                    print("Transaction status: \(status)")
-
-                                                    switch status {
-                                                    case .unknown:
-                                                        guard numChecksRemaining > 0 else {
-                                                            XCTFail("Failed to resolve transaction status check")
-                                                            expect.fulfill()
-                                                            return
-                                                        }
-
-                                                        Thread.sleep(forTimeInterval: 2)
-                                                        checkStatus()
-                                                        return
-                                                    case .accepted(block: let block):
-                                                        print("Block index: \(block.index)")
-                                                        XCTAssertGreaterThan(block.index, 0)
-
-                                                        if let timestamp = block.timestamp {
-                                                            print("Block timestamp: \(timestamp)")
-                                                        }
-                                                        XCTFail("Transaction status check: Idempotence failed - second transaction was successful")
-                                                        expect.fulfill()
-                                                        return
-                                                    case .failed:
-                                                        // the transaction SHOULD fail - fall through to fulfill expectation without failure
+                                                switch status {
+                                                case .unknown:
+                                                    guard numChecksRemaining > 0 else {
+                                                        XCTFail("Failed to resolve transaction status check")
                                                         expect.fulfill()
                                                         return
                                                     }
+
+                                                    Thread.sleep(forTimeInterval: 2)
+                                                    checkStatus()
+                                                    return
+                                                case .accepted(block: let block):
+                                                    print("Block index: \(block.index)")
+                                                    XCTAssertGreaterThan(block.index, 0)
+
+                                                    if let timestamp = block.timestamp {
+                                                        print("Block timestamp: \(timestamp)")
+                                                    }
+                                                    XCTFail("Transaction status check: Idempotence failed - second transaction was successful")
+                                                    expect.fulfill()
+                                                    return
+                                                case .failed:
+                                                    // the transaction SHOULD fail - fall through to fulfill expectation without failure
+                                                    expect.fulfill()
+                                                    return
                                                 }
                                             }
                                         }
-                                        checkStatus()
                                     }
-
+                                    checkStatus()
                                 }
                             }
                         case .failed:
