@@ -7,7 +7,6 @@ import XCTest
 
 enum IdempotenceTestError: Error {
     case testError(String = String())
-    case transactionSubmissionError(TransactionSubmissionError)
 }
 
 class TransactionIdempotenceTests: XCTestCase {
@@ -65,8 +64,8 @@ class TransactionIdempotenceTests: XCTestCase {
             checkStatus()
         }
 
-        func submitStandardTransaction(
-            completion: @escaping (Result<UInt64, IdempotenceTestError>) -> Void
+        func submitTransaction(
+            completion: @escaping (Result<Transaction, SubmitTransactionError>) -> Void
         ) {
             let amt = Amount(mob: 100)
 
@@ -80,46 +79,44 @@ class TransactionIdempotenceTests: XCTestCase {
                     fee: IntegrationTestFixtures.fee,
                     rngSeed: rngSeed
                 ) { result in
-                    guard let transaction = result.successOrFulfill(expectation: expect) else {
+                    guard let payload = result.successOrFulfill(expectation: expect) else {
                         return
                     }
 
-                    client.submitTransaction(transaction.transaction) {
-                        switch $0 {
-                        case .success:
-                            waitForTransaction(
-                                transaction: transaction.transaction,
-                                completion: completion)
-                        case .failure(let error):
-                            completion(.failure(.transactionSubmissionError(error)))
-                        }
-                    }
+                    let transaction = payload.transaction
+                    client.submitTransaction(transaction: transaction, completion: { result in
+                        completion(result.map({ _ in transaction }))
+                    })
                 }
             }
         }
 
-        submitStandardTransaction { result in
-            guard result.successOrFulfill(expectation: expect) != nil else { return }
-
-            // give things a chance to update so we don't get 'Inputs already spent' error
-            Thread.sleep(forTimeInterval: 5)
-
-            submitStandardTransaction {
-                guard let error = $0.failureOrFulfill(expectation: expect) else { return }
-
-                switch error {
-                case .testError(let msg):
-                    XCTFail(msg)
-                case .transactionSubmissionError(let transSubError):
-                    switch transSubError {
-                    case .outputAlreadyExists:
-                        expect.fulfill()
-                    default:
-                        XCTFail(transSubError.localizedDescription)
-                        expect.fulfill()
-                    }
-                }
+        submitTransaction { result in
+            guard let transaction = try? XCTUnwrapSuccess(result) else {
+                XCTFail("Initial transaction submission failed")
+                return
             }
+
+            waitForTransaction(
+                transaction: transaction,
+                completion: { _ in
+                    guard result.successOrFulfill(expectation: expect) != nil else { return }
+
+                    // give things a chance to update so we don't get 'Inputs already spent' error
+                    Thread.sleep(forTimeInterval: 5)
+
+                    submitTransaction {
+                        guard let error = $0.failureOrFulfill(expectation: expect) else { return }
+
+                        switch error.submissionError {
+                        case .outputAlreadyExists:
+                            expect.fulfill()
+                        default:
+                            XCTFail(error.localizedDescription)
+                            expect.fulfill()
+                        }
+                    }
+                })
         }
     }
 
@@ -138,11 +135,10 @@ class TransactionIdempotenceTests: XCTestCase {
         let rngSeed = RngSeed()
 
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let expect = expectation(description: description)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
             expectation: expect,
-            transportProtocol: .http)
+            transportProtocol: transportProtocol)
         { client in
             client.prepareTransaction(
                 to: recipient,
@@ -173,7 +169,6 @@ class TransactionIdempotenceTests: XCTestCase {
 
             }
         }
-        waitForExpectations(timeout: 40)
     }
 
 }
