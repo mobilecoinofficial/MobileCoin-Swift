@@ -294,7 +294,7 @@ jobs:
       - install-example-gems
       - install-example-pods:
           xcode-version: << parameters.xcode-version >>
-      - run: make lint-locally-podspec
+      - run: make lint-podspec
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
