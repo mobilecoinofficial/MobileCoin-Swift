@@ -21,7 +21,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
             fogResolver: txFixture.fogResolver,
             blockVersion: txFixture.blockVersion,
-            rng: TestRng()))
+            rngSeed: testRngSeed()))
     }
 
     func testTransactionWithSenderMemo() throws {
@@ -73,7 +73,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
             fogResolver: txFixture.fogResolver,
             blockVersion: txFixture.blockVersion,
-            rng: TestRng()))
+            rngSeed: testRngSeed()))
     }
 
     func testTransactionWithSenderWithPaymentRequestMemo() throws {

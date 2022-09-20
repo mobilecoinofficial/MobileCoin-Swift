@@ -52,3 +52,10 @@ class MobileCoinXoshiroRng: MobileCoinRng {
 }
 
 typealias TestRng = MobileCoinXoshiroRng
+
+func testRngSeed() -> RngSeed {
+    guard let rngSeed = MobileCoinXoshiroRng().generateRngSeed() else {
+        fatalError("Generating an RNG Seed from our Test RNG should not fail.")
+    }
+    return rngSeed
+}

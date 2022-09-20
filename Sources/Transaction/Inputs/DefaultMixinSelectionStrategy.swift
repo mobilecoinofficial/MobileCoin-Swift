@@ -4,8 +4,9 @@
 
 import Foundation
 
-final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
+final class DefaultMixinSelectionStrategy: MixinSelectionStrategy {
     let offsetParam: UInt64 = 88
+    var rng: RandomNumberGenerator = SystemRandomNumberGenerator()
 
     // Selection window: [t-k, t+k] where t = real txo index, k = offsetParam
     var selectionWindowWidth: UInt64 {
@@ -13,7 +14,6 @@ final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
     }
 
     func selectMixinIndices(
-        rng: MobileCoinRng,
         forRealTxOutIndices realTxOutIndices: [UInt64],
         selectionRange: PartialRangeUpTo<UInt64>?,
         excludedTxOutIndices: [UInt64],
@@ -31,7 +31,6 @@ final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
 
         return realTxOutIndices.map { realTxOutIndex in
             let selectionWindowMidpoint = safeSelectMidpoint(
-                rng: rng,
                 sourceIndex: realTxOutIndex,
                 selectionRange: selectionRange)
             let selectionWindowLowerBound = selectionWindowMidpoint - offsetParam
@@ -40,7 +39,7 @@ final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
             selectedIndices.insert(realTxOutIndex)
 
             while selectedIndices.count < ringSize {
-                let selectedIndex = selectIndex(rng: rng, lowerBound: selectionWindowLowerBound)
+                let selectedIndex = selectIndex(lowerBound: selectionWindowLowerBound)
 
                 guard !excludedIndices.contains(selectedIndex) else {
                     continue
@@ -65,14 +64,13 @@ final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
     /// Ensures upper bound of index selection window is less than selectionRange.upperBound, if
     /// selectionRange is provided.
     private func safeSelectMidpoint(
-        rng: MobileCoinRng,
         sourceIndex: UInt64,
         selectionRange: PartialRangeUpTo<UInt64>?
     ) -> UInt64 {
         // Midpoint = sourceIndex + [0, 2 * offsetParam + 1).random - offsetParam
 
         // Add up positive components of midpoint.
-        var midpoint = sourceIndex + (rng.next() % selectionWindowWidth)
+        var midpoint = sourceIndex + rng.next(upperBound: selectionWindowWidth)
         // Safely subtract half the width of the selection window, ensuring that the lower bound of
         // the index selection window is at least 0.
         midpoint = midpoint >= 2 * offsetParam ? midpoint - offsetParam : offsetParam
@@ -87,7 +85,7 @@ final class DefaultMixinSelectionStrategy: CustomRNGMixinSelectionStrategy {
         return midpoint
     }
 
-    private func selectIndex(rng: MobileCoinRng, lowerBound: UInt64) -> UInt64 {
-        lowerBound + (rng.next() % selectionWindowWidth)
+    private func selectIndex(lowerBound: UInt64) -> UInt64 {
+        lowerBound + rng.next(upperBound: selectionWindowWidth)
     }
 }
