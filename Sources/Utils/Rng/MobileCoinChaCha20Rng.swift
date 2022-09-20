@@ -5,15 +5,14 @@
 import Foundation
 import LibMobileCoin
 
-@available(*, deprecated, message:
-    """
-    Full access to the RNG class is no longer neccessary for repeatable transaction creation.
-
-    Consumers that previously used MobileCoinChaCha20Rng should switch to public APIs that now only
-    require an `RngSeed`.
-
-    `RngSeed` is a wrapper around 32-bytes of Data which seeds the Transaction Builder's RNG.
-    """)
+//
+//    Full access to the RNG class is no longer neccessary for repeatable transaction creation.
+//
+//    Consumers that previously used MobileCoinChaCha20Rng should switch to public APIs that now
+//    only require an `RngSeed`.
+//
+//    `RngSeed` is a wrapper around 32-bytes of Data which seeds the Transaction Builder's RNG.
+//
 public final class MobileCoinChaCha20Rng: MobileCoinRng {
     // forcing early initialization so self can be captured in the
     // below init()...but I'm sure there's a better way to work around this
