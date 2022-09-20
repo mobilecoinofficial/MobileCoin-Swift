@@ -13,7 +13,7 @@ public class MobileCoinRng: RandomNumberGenerator {
 
 extension MobileCoinRng {
     func generateRngSeed() -> RngSeed? {
-        RngSeed(Array([0...4])
+        RngSeed(Array(0..<4)
             .map { _ in
                 self.next()
             }
