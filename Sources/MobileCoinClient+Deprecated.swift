@@ -326,8 +326,7 @@ extension MobileCoinClient {
 
     @available(*, deprecated, message:
         """
-        Use the new `prepareDefragmentationStepTransactions(...)` that accepts an `Amount` as an
-        input parameter.
+        Use the new `prepareDefragmentationStepTransactions(...)` that accepts a 32-byte rngSeed
 
         ```
         public func prepareDefragmentationStepTransactions(
@@ -339,7 +338,7 @@ extension MobileCoinClient {
         ) {
         ```
 
-        this function prepares transactions assuming assuming the default TokenId == .MOB
+        this function creates a 32-byte seed by combining the data from 4 calls to rng.next()
         """)
     public func prepareDefragmentationStepTransactions(
         toSendAmount value: UInt64,
