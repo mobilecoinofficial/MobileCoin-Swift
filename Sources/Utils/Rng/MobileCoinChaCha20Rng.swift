@@ -133,7 +133,6 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
                 logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
             }
         }
-        logger.debug("CHACHA20 value: \(next)")
         return next
     }
 
