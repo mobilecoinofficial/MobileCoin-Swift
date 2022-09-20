@@ -23,8 +23,8 @@ PODS:
     - gRPC-Swift
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (1.3.0-pre0)
-  - MobileCoin/Core (1.3.0-pre0):
+  - MobileCoin (1.3.0-pre1)
+  - MobileCoin/Core (1.3.0-pre1):
     - gRPC-Swift (= 1.0.0)
     - LibMobileCoin/Core (= 1.3.0-pre0)
     - Logging (~> 1.4)
@@ -33,7 +33,7 @@ PODS:
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.40.0)
     - SwiftProtobuf
-  - MobileCoin/Core/ProtocolUnitTests (1.3.0-pre0):
+  - MobileCoin/Core/ProtocolUnitTests (1.3.0-pre1):
     - gRPC-Swift (= 1.0.0)
     - LibMobileCoin/Core (= 1.3.0-pre0)
     - Logging (~> 1.4)
@@ -42,9 +42,9 @@ PODS:
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.40.0)
     - SwiftProtobuf
-  - MobileCoin/IntegrationTests (1.3.0-pre0)
-  - MobileCoin/PerformanceTests (1.3.0-pre0)
-  - MobileCoin/Tests (1.3.0-pre0)
+  - MobileCoin/IntegrationTests (1.3.0-pre1)
+  - MobileCoin/PerformanceTests (1.3.0-pre1)
+  - MobileCoin/Tests (1.3.0-pre1)
   - SwiftLint (0.47.1)
   - SwiftNIO (2.40.0):
     - _NIODataStructures (= 2.40.0)
@@ -224,7 +224,7 @@ SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
   LibMobileCoin: 8c5f745d141e6e619dc73d79abe7bf828dfc4362
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: 5d9704ffa492f0eb9feb936841ff7b435156e9f8
+  MobileCoin: 05da66d085c4515d03e6ec2b8f28d7446b9b2de7
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftNIO: 829958aab300642625091f82fc2f49cb7cf4ef24
   SwiftNIOConcurrencyHelpers: 697370136789b1074e4535eaae75cbd7f900370e
