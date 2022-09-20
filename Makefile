@@ -115,6 +115,11 @@ lint-locally-podspec:
 	cd Example; bundle exec pod repo update;
 	bundle exec pod lib lint MobileCoin.podspec --skip-tests --allow-warnings
 
+.PHONY: lint-locally-strict-podspec
+lint-locally-strict-podspec:
+	cd Example; bundle exec pod repo update;
+	bundle exec pod lib lint MobileCoin.podspec --skip-tests
+
 .PHONY: lint-podspec
 lint-podspec:
 	cd Example; bundle exec pod repo update;
