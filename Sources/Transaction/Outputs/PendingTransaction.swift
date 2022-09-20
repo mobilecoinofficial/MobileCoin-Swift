@@ -37,7 +37,7 @@ extension PendingTransaction: Equatable, Hashable {}
 extension PendingSinglePayloadTransaction: Equatable {}
 
 extension PendingSinglePayloadTransaction {
-    func isIdempotent(_ lhs: PendingSinglePayloadTransaction) -> Bool {
+    func isIdempotent(with lhs: PendingSinglePayloadTransaction) -> Bool {
         Self.areIdempotent(self, lhs)
     }
 
@@ -50,7 +50,7 @@ extension PendingSinglePayloadTransaction {
 }
 
 extension PendingTransaction {
-    func isIdempotent(_ lhs: PendingTransaction) -> Bool {
+    func isIdempotent(with lhs: PendingTransaction) -> Bool {
         Self.areIdempotent(self, lhs)
     }
 
