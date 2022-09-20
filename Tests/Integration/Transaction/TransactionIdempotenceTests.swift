@@ -123,14 +123,14 @@ class TransactionIdempotenceTests: XCTestCase {
         }
     }
 
-    func testTransactionIdempotence() throws {
+    func testStaticAccountTransactionIdempotence() throws {
         let description = "Testing transaction idempotence"
         try testSupportedProtocols(description: description) {
-            try transactionIdempotence(transportProtocol: $0, expectation: $1)
+            try staticAccountTransactionIdempotence(transportProtocol: $0, expectation: $1)
         }
     }
 
-    func transactionIdempotence(
+    func staticAccountTransactionIdempotence(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
@@ -165,7 +165,9 @@ class TransactionIdempotenceTests: XCTestCase {
                         return
                     }
 
-                    XCTAssertEqual(transaction1, transaction2)
+                    XCTAssertTrue(PendingSinglePayloadTransaction.areIdempotent(
+                        transaction1,
+                        transaction2))
                     expect.fulfill()
                 }
 
