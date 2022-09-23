@@ -77,7 +77,7 @@ class TransactionIdempotenceTests: XCTestCase {
                     memoType: .unused,
                     amount: amt,
                     fee: IntegrationTestFixtures.fee,
-                    rngSeed: rngSeed
+                    rng: MobileCoinChaCha20Rng(rngSeed: rngSeed)
                 ) { result in
                     guard let payload = result.successOrFulfill(expectation: expect) else {
                         return
@@ -145,7 +145,7 @@ class TransactionIdempotenceTests: XCTestCase {
                 memoType: .unused,
                 amount: amt,
                 fee: IntegrationTestFixtures.fee,
-                rngSeed: rngSeed
+                rng: MobileCoinChaCha20Rng(rngSeed: rngSeed)
             ) { result in
                 guard let transaction1 = result.successOrFulfill(expectation: expect) else {
                     return
@@ -155,7 +155,7 @@ class TransactionIdempotenceTests: XCTestCase {
                     memoType: .unused,
                     amount: amt,
                     fee: IntegrationTestFixtures.fee,
-                    rngSeed: rngSeed
+                    rng: MobileCoinChaCha20Rng(rngSeed: rngSeed)
                 ) {
                     guard let transaction2 = $0.successOrFulfill(expectation: expect) else {
                         return

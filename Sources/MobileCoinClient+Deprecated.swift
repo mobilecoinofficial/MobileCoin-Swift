@@ -209,9 +209,10 @@ extension MobileCoinClient {
         }
     }
 
+
     @available(*, deprecated, message:
         """
-        Use the new `prepareTransaction(...)` that accepts a 32-byte rngSeed.
+        Use the `prepareTransaction(...)` that accepts a MobileCoinRng instead of RngSeed
 
         ```
         public func prepareTransaction(
@@ -219,42 +220,35 @@ extension MobileCoinClient {
             memoType: MemoType = .recoverable,
             amount: Amount,
             fee: UInt64,
-            rngSeed: RngSeed,
+            rng: MobileCoinRng,
             completion: @escaping (
                 Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
         ) {
         ```
-
-        this function creates a 32-byte seed by combining the data from 4 calls to rng.next()
         """)
     public func prepareTransaction(
         to recipient: PublicAddress,
         memoType: MemoType = .recoverable,
         amount: Amount,
         fee: UInt64,
-        rng: MobileCoinRng,
+        rngSeed: RngSeed,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = rng.generateRngSeed() else {
-            completion(.failure(
-                TransactionPreparationError.invalidInput("Could not create 32 byte RNG seed")))
-            return
-        }
         prepareTransaction(
             to: recipient,
             memoType: memoType,
             amount: amount,
             fee: fee,
-            rngSeed: rngSeed,
+            rng: MobileCoinChaCha20Rng(rngSeed:rngSeed),
             completion: completion)
     }
 
     @available(*, deprecated, message:
         """
-        Use the new `prepareTransaction(...)` that accepts a 32-byte rngSeed.
+        Use the `prepareTransaction(...)` that accepts a MobileCoinRng instead of an RngSeed
 
         ```
         public func prepareTransaction(
@@ -262,7 +256,7 @@ extension MobileCoinClient {
             memoType: MemoType = .recoverable,
             amount: Amount,
             feeLevel: FeeLevel = .minimum,
-            rngSeed: RngSeed,
+            rng: MobileCoinRng,
             completion: @escaping (
                 Result<PendingSinglePayloadTransaction, TransactionPreparationError>
             ) -> Void
@@ -276,22 +270,17 @@ extension MobileCoinClient {
         memoType: MemoType = .recoverable,
         amount: Amount,
         feeLevel: FeeLevel = .minimum,
-        rng: MobileCoinRng,
+        rngSeed: RngSeed,
         completion: @escaping (
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = rng.generateRngSeed() else {
-            completion(.failure(
-                TransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
-            return
-        }
         prepareTransaction(
             to: recipient,
             memoType: memoType,
             amount: amount,
             feeLevel: feeLevel,
-            rngSeed: rngSeed,
+            rng: MobileCoinChaCha20Rng(rngSeed:rngSeed),
             completion: completion)
     }
 
