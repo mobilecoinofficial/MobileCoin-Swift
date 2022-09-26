@@ -209,7 +209,6 @@ extension MobileCoinClient {
         }
     }
 
-
     @available(*, deprecated, message:
         """
         Use the `prepareTransaction(...)` that accepts a MobileCoinRng instead of RngSeed
@@ -242,7 +241,7 @@ extension MobileCoinClient {
             memoType: memoType,
             amount: amount,
             fee: fee,
-            rng: MobileCoinChaCha20Rng(rngSeed:rngSeed),
+            rng: MobileCoinChaCha20Rng(rngSeed: rngSeed),
             completion: completion)
     }
 
@@ -280,7 +279,7 @@ extension MobileCoinClient {
             memoType: memoType,
             amount: amount,
             feeLevel: feeLevel,
-            rng: MobileCoinChaCha20Rng(rngSeed:rngSeed),
+            rng: MobileCoinChaCha20Rng(rngSeed: rngSeed),
             completion: completion)
     }
 
