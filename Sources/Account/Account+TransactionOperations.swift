@@ -21,7 +21,7 @@ extension Account {
             metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             mixinSelectionStrategy: MixinSelectionStrategy,
-            rng: MobileCoinRng,
+            rngSeed: RngSeed,
             targetQueue: DispatchQueue?
         ) {
             self.serialQueue = DispatchQueue(
@@ -35,7 +35,7 @@ extension Account {
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
-                rng: rng,
+                rngSeed: rngSeed,
                 targetQueue: targetQueue)
         }
         
@@ -114,8 +114,9 @@ extension Account {
                 return
             }
 
-            let (unspentTxOuts, ledgerBlockCount) =
-            account.readSync { ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount) }
+            let (unspentTxOuts, ledgerBlockCount) = account.readSync {
+                    ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount)
+            }
             logger.info(
                 "Preparing transaction with provided fee... recipient: \(redacting: recipient), " +
                     "amount: \(redacting: amount), fee: \(redacting: fee), unspentTxOutValues: " +

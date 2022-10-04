@@ -177,7 +177,7 @@ extension TransactionBuilder.Fixtures {
                         tombstoneBlockIndex: fixture.tombstoneBlockIndex,
                         fogResolver: fixture.fogResolver,
                         blockVersion: blockVersion,
-                        rng: TestRng())).transaction
+                        rngSeed: testRngSeed())).transaction
     }
 
 }

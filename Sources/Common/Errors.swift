@@ -237,6 +237,7 @@ public enum TransactionSubmissionError: Error {
     case tombstoneBlockTooFar(String = String())
     case missingMemo(String = String())
     case inputsAlreadySpent(String = String())
+    case outputAlreadyExists(String = String())
 }
 
 extension TransactionSubmissionError: CustomStringConvertible {
@@ -255,6 +256,8 @@ extension TransactionSubmissionError: CustomStringConvertible {
                 return "Tombstone block too far\(!reason.isEmpty ? ": \(reason)" : "")"
             case .inputsAlreadySpent(let reason):
                 return "Inputs already spent\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .outputAlreadyExists(let reason):
+                return "Output already exists\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()
     }

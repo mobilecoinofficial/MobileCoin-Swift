@@ -5,6 +5,14 @@
 import Foundation
 import LibMobileCoin
 
+//
+//    Full access to the RNG class is no longer neccessary for repeatable transaction creation.
+//
+//    Consumers that previously used MobileCoinChaCha20Rng should switch to public APIs that now
+//    only require an `RngSeed`.
+//
+//    `RngSeed` is a wrapper around 32-bytes of Data which seeds the Transaction Builder's RNG.
+//
 public final class MobileCoinChaCha20Rng: MobileCoinRng {
     // forcing early initialization so self can be captured in the
     // below init()...but I'm sure there's a better way to work around this
@@ -13,6 +21,13 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
     }
 
     public var seed = Data()
+
+    var rngSeed: RngSeed {
+        guard let rngSeed = RngSeed(seed) else {
+            fatalError("Creating a 32-byte RNG seed from seed Data should never fail.")
+        }
+        return rngSeed
+    }
 
     init(seed32: Data32) {
         super.init()
@@ -37,6 +52,10 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
         }
 
         self.seed = seed32.data
+    }
+
+    convenience init(rngSeed: RngSeed) {
+        self.init(seed32: rngSeed.data)
     }
 
     public convenience init(seed: Data = .secRngGenBytes(32)) {
