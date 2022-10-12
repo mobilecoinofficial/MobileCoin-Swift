@@ -130,7 +130,26 @@ extension TransactionEstimationFetcherError: LocalizedError {
 public enum SignedContingentInputCreationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
+    case defragmentationRequired(String = String())
     case connectionError(ConnectionError)
+    case invalidBlockVersion(String)
+}
+
+extension SignedContingentInputCreationError {
+    static func create(
+        from transactionPreparationError: TransactionPreparationError
+    ) -> SignedContingentInputCreationError {
+        switch transactionPreparationError {
+        case .invalidInput(let reason):
+            return .invalidInput(reason)
+        case .insufficientBalance(let reason):
+            return .insufficientBalance(reason)
+        case .defragmentationRequired(let reason):
+            return .defragmentationRequired(reason)
+        case .connectionError(let innerError):
+            return .connectionError(innerError)
+        }
+    }
 }
 
 extension SignedContingentInputCreationError: CustomStringConvertible {
@@ -141,8 +160,12 @@ extension SignedContingentInputCreationError: CustomStringConvertible {
                 return "Invalid input: \(reason)"
             case .insufficientBalance(let reason):
                 return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .defragmentationRequired(let reason):
+                return "Defragmentation required\(!reason.isEmpty ? ": \(reason)" : "")"
             case .connectionError(let innerError):
                 return "\(innerError)"
+            case .invalidBlockVersion(let reason):
+                return "Invalid block version: \(reason)"
             }
         }()
     }

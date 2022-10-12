@@ -4,7 +4,6 @@
 
 // swiftlint:disable closure_body_length function_body_length multiline_arguments
 
-/*
 import Foundation
 
 extension Account {
@@ -13,7 +12,7 @@ extension Account {
         private let account: ReadWriteDispatchLock<Account>
         private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
-        private let signedContingentInputPreparer: SignedContingentInputPreparer
+        private let signedContingentInputCreator: SignedContingentInputCreator
 
         init(
             account: ReadWriteDispatchLock<Account>,
@@ -22,7 +21,7 @@ extension Account {
             metaFetcher: BlockchainMetaFetcher,
             txOutSelectionStrategy: TxOutSelectionStrategy,
             mixinSelectionStrategy: MixinSelectionStrategy,
-            rng: MobileCoinRng,
+            rngSeed: RngSeed,
             targetQueue: DispatchQueue?
         ) {
             self.serialQueue = DispatchQueue(
@@ -31,26 +30,27 @@ extension Account {
             self.account = account
             self.metaFetcher = metaFetcher
             self.txOutSelector = TxOutSelector(txOutSelectionStrategy: txOutSelectionStrategy)
-            self.signedContingentInputPreparer = SignedContingentInputPreparer(
+            self.signedContingentInputCreator = SignedContingentInputCreator(
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
-                rng: rng,
+                rngSeed: rngSeed,
                 targetQueue: targetQueue)
         }
         
-        func prepareSignedContingentInput(
+        func createSignedContingentInput(
             to recipient: PublicAddress,
-            amountToSpend: Amount,
+            memoType: MemoType,
+            amountToSend: Amount,
             amountToReceive: Amount,
             completion: @escaping (
                 Result<SignedContingentInput, SignedContingentInputCreationError>
             ) -> Void
         ) {
-            guard amountToSpend.value > 0 else {
+            guard amountToSend.value > 0 else {
                 let errorMessage = "createSignedContingentInput failure: " +
-                    "Cannot spend 0 \(amountToSpend.tokenId)"
+                    "Cannot spend 0 \(amountToSend.tokenId)"
                 logger.error(errorMessage, logFunction: false)
                 serialQueue.async {
                     completion(.failure(.invalidInput(errorMessage)))
@@ -69,61 +69,21 @@ extension Account {
             }
             
             // get all unspent txouts (getUnspentTxOuts() ?)
-            // let (unspentTxOuts, ledgerBlockCount) =
-            let (unspentTxOuts, _) =
-            account.readSync { ($0.unspentTxOuts(tokenId: amountToSpend.tokenId), $0.knowableBlockCount) }
+            let (unspentTxOuts, ledgerBlockCount) =
+            account.readSync { ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount) }
             logger.info(
                 "Creating signed contingent input to recipient: \(redacting: recipient), " +
-                    "amountToSpend: \(redacting: amountToSpend), " +
+                    "amountToSpend: \(redacting: amountToSend), " +
                     "amountToRecieve: \(redacting: amountToReceive), " +
                     "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
                 logFunction: false)
             
             // check that total available is > amount to spend
-
-            
-            // set tombstone block index
-            
-            // check fog report uri
-            
-            // find or create txout to spend for this
-            
-            // requires block version 3
-            
-            // create SCI builder
-            
-            // return scibuilder.build()
-
-        }
-
-        func prepareTransaction(
-            to recipient: PublicAddress,
-            memoType: MemoType,
-            amount: Amount,
-            fee: UInt64,
-            completion: @escaping (
-                Result<PendingSinglePayloadTransaction, TransactionPreparationError>
-            ) -> Void
-        ) {
-            guard amount.value > 0 else {
-                let errorMessage = "prepareTransactionWithFee failure: " +
-                    "Cannot spend 0 \(amount.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
-                return
-            }
-
-            let (unspentTxOuts, ledgerBlockCount) =
-            account.readSync { ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount) }
-            logger.info(
-                "Preparing transaction with provided fee... recipient: \(redacting: recipient), " +
-                    "amount: \(redacting: amount), fee: \(redacting: fee), unspentTxOutValues: " +
-                    "\(redacting: unspentTxOuts.map { $0.value })",
-                logFunction: false)
+            // - this is done by txOutSelector, which will return an error if there are not
+            //   enough funds from the unspentTxOuts
+            // - fee is zero here, because the fee will be covered by the consumer of the SCI
             switch txOutSelector
-                .selectTransactionInputs(amount: amount, fee: fee, fromTxOuts: unspentTxOuts)
+                .selectTransactionInputs(amount: amountToSend, fee: 0, fromTxOuts: unspentTxOuts)
                 .mapError({ error -> TransactionPreparationError in
                     switch error {
                     case .insufficientTxOuts:
@@ -137,27 +97,51 @@ extension Account {
                 metaFetcher.blockVersion {
                     switch $0 {
                     case .success(let blockVersion):
+                        
+                        // verify block version >= 3
+                        guard blockVersion >= 3 else {
+                            serialQueue.async {
+                                completion(.failure(.invalidBlockVersion("Block version must be > 3 for SCI support")))
+                            }
+                            return
+                        }
+                        
                         logger.info(
-                            "Transaction prepared with fee. txOutsToSpend: " +
+                            "SCI preparation selected txOutsToSpend: " +
                                 """
                                     0x\(redacting: txOutsToSpend.map {
                                         $0.publicKey.hexEncodedString()
                                     })
                                 """,
                             logFunction: false)
+
+                        // set tombstone block index
                         let tombstoneBlockIndex = ledgerBlockCount + 50
-                        transactionPreparer.prepareTransaction(
+                        
+                        signedContingentInputCreator.createSignedContingentInput(
                             inputs: txOutsToSpend,
                             recipient: recipient,
                             memoType: memoType,
-                            amount: amount,
-                            fee: Amount(fee, in: amount.tokenId),
+                            amountToSend: amountToSend,
+                            amountToReceive: amountToReceive,
                             tombstoneBlockIndex: tombstoneBlockIndex,
-                            blockVersion: blockVersion,
-                            completion: completion)
+                            blockVersion: blockVersion) { result in
+                                completion(result.mapError {
+                                    switch $0 {
+                                    case .invalidInput(let reason):
+                                        return SignedContingentInputCreationError.invalidInput(reason)
+                                    case .defragmentationRequired(let reason):
+                                        return SignedContingentInputCreationError.defragmentationRequired(reason)
+                                    case .insufficientBalance(let reason):
+                                        return SignedContingentInputCreationError.insufficientBalance(reason)
+                                    case .connectionError(let reason):
+                                        return SignedContingentInputCreationError.connectionError(reason)
+                                    }
+                                })
+                            }
                     case .failure(let error):
                         logger.info(
-                            "prepareTransactionWithFee failure: \(error)",
+                            "prepareSignedContingentInput failure: \(error)",
                             logFunction: false)
 
                         serialQueue.async {
@@ -167,177 +151,11 @@ extension Account {
                 }
 
             case .failure(let error):
-                logger.info("prepareTransactionWithFee failure: \(error)", logFunction: false)
+                logger.info("prepareSignedContingentInput failure: \(error)", logFunction: false)
                 serialQueue.async {
-                    completion(.failure(error))
-                }
-            }
-        }
-
-        func prepareTransaction(
-            to recipient: PublicAddress,
-            memoType: MemoType,
-            amount: Amount,
-            feeLevel: FeeLevel,
-            completion: @escaping (
-                Result<PendingSinglePayloadTransaction, TransactionPreparationError>
-            ) -> Void
-        ) {
-            guard amount.value > 0 else {
-                let errorMessage = "prepareTransactionWithFeeLevel failure: " +
-                    "Cannot spend 0 \(amount.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
-                return
-            }
-
-            metaFetcher.feeStrategy(for: feeLevel, tokenId: amount.tokenId) {
-                switch $0 {
-                case .success(let feeStrategy):
-                    let (unspentTxOuts, ledgerBlockCount) =
-                        self.account.readSync {
-                            ($0.unspentTxOuts(tokenId: amount.tokenId), $0.knowableBlockCount)
-                        }
-                    logger.info(
-                        "Preparing transaction with fee level... recipient: " +
-                            "\(redacting: recipient), amount: \(redacting: amount), feeLevel: " +
-                            "\(feeLevel), unspentTxOutValues: " +
-                            "\(redacting: unspentTxOuts.map { $0.value })",
-                        logFunction: false)
-                    switch self.txOutSelector
-                        .selectTransactionInputs(
-                            amount: amount,
-                            feeStrategy: feeStrategy,
-                            fromTxOuts: unspentTxOuts)
-                        .mapError({ error -> TransactionPreparationError in
-                            switch error {
-                            case .insufficientTxOuts:
-                                return .insufficientBalance()
-                            case .defragmentationRequired:
-                                return .defragmentationRequired()
-                            }
-                        })
-                    {
-                    case .success(let (inputs: inputs, fee: fee)):
-                        metaFetcher.blockVersion {
-                            switch $0 {
-                            case .success(let blockVersion):
-                                logger.info(
-                                    "Transaction prepared with fee level. fee: \(redacting: fee)",
-                                    logFunction: false)
-                                let tombstoneBlockIndex = ledgerBlockCount + 50
-                                self.transactionPreparer.prepareTransaction(
-                                    inputs: inputs,
-                                    recipient: recipient,
-                                    memoType: memoType,
-                                    amount: amount,
-                                    fee: Amount(fee, in: amount.tokenId),
-                                    tombstoneBlockIndex: tombstoneBlockIndex,
-                                    blockVersion: blockVersion,
-                                    completion: completion)
-                            case .failure(let error):
-                                logger.info(
-                                    "prepareTransactionWithFee failure: \(error)",
-                                    logFunction: false)
-
-                                serialQueue.async {
-                                    completion(.failure(.connectionError(error)))
-                                }
-                            }
-                        }
-                    case .failure(let error):
-                        logger.info(
-                            "prepareTransactionWithFeeLevel failure: \(error)",
-                            logFunction: false)
-                        completion(.failure(error))
-                    }
-                case .failure(let connectionError):
-                    logger.info("failure - error: \(connectionError)")
-                    completion(.failure(.connectionError(connectionError)))
-                }
-            }
-        }
-
-        func prepareDefragmentationStepTransactions(
-            toSendAmount amountToSend: Amount,
-            recoverableMemo: Bool,
-            feeLevel: FeeLevel,
-            completion: @escaping (Result<[Transaction], DefragTransactionPreparationError>) -> Void
-        ) {
-            guard amountToSend.value > 0 else {
-                let errorMessage =
-                    "prepareDefragmentationStepTransactions failure: " +
-                    "Cannot spend 0 \(amountToSend.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
-                return
-            }
-
-            metaFetcher.feeStrategy(for: feeLevel, tokenId: amountToSend.tokenId) {
-                switch $0 {
-                case .success(let feeStrategy):
-                    let (unspentTxOuts, ledgerBlockCount) =
-                        self.account.readSync {
-                            ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount)
-                        }
-                    logger.info(
-                        "Preparing defragmentation step transactions... amountToSend: " +
-                            "\(redacting: amountToSend), feeLevel: \(feeLevel), " +
-                            "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
-                        logFunction: false)
-                    switch self.txOutSelector.selectInputsForDefragTransactions(
-                        toSendAmount: amountToSend,
-                        feeStrategy: feeStrategy,
-                        fromTxOuts: unspentTxOuts)
-                    {
-                    case .success(let defragTxInputs):
-                        metaFetcher.blockVersion {
-                            switch $0 {
-                            case .success(let blockVersion):
-                                if !defragTxInputs.isEmpty {
-                                    logger.info(
-                                        "Preparing \(defragTxInputs.count) defrag transactions",
-                                        logFunction: false)
-                                }
-                                let tombstoneBlockIndex = ledgerBlockCount + 50
-                                defragTxInputs.mapAsync({ defragInputs, callback in
-                                    self.transactionPreparer.prepareSelfAddressedTransaction(
-                                        inputs: defragInputs.inputs,
-                                        recoverableMemo: recoverableMemo,
-                                        fee: Amount(defragInputs.fee, in: amountToSend.tokenId),
-                                        tombstoneBlockIndex: tombstoneBlockIndex,
-                                        blockVersion: blockVersion,
-                                        completion: callback)
-                                }, serialQueue: self.serialQueue, completion: completion)
-                            case .failure(let error):
-                                logger.info(
-                                    "prepareTransactionWithFee failure: \(error)",
-                                    logFunction: false)
-
-                                serialQueue.async {
-                                    completion(.failure(.connectionError(error)))
-                                }
-                            }
-                        }
-                    case .failure(let error):
-                        logger.info(
-                            "prepareDefragmentationStepTransactions failure: \(error)",
-                            logFunction: false)
-                        self.serialQueue.async {
-                            completion(.failure(.insufficientBalance()))
-                        }
-                    }
-                case .failure(let connectionError):
-                    logger.info("failure - error: \(connectionError)")
-                    completion(.failure(.connectionError(connectionError)))
+                    completion(.failure(SignedContingentInputCreationError.create(from:error)))
                 }
             }
         }
     }
 }
-
-*/

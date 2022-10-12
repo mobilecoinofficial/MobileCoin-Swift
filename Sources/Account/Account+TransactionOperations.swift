@@ -38,62 +38,7 @@ extension Account {
                 rngSeed: rngSeed,
                 targetQueue: targetQueue)
         }
-        
-        func createSignedContingentInput(
-            to recipient: PublicAddress,
-            amountToSpend: Amount,
-            amountToReceive: Amount,
-            completion: @escaping (
-                Result<SignedContingentInput, SignedContingentInputCreationError>
-            ) -> Void
-        ) {
-            guard amountToSpend.value > 0 else {
-                let errorMessage = "createSignedContingentInput failure: " +
-                    "Cannot spend 0 \(amountToSpend.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
-                return
-            }
 
-            guard amountToReceive.value > 0 else {
-                let errorMessage = "createSignedContingentInput failure: " +
-                    "Cannot receive 0 \(amountToReceive.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
-                return
-            }
-            
-            // get all unspent txouts (getUnspentTxOuts() ?)
-            // let (unspentTxOuts, ledgerBlockCount) =
-            let (unspentTxOuts, _) =
-            account.readSync { ($0.unspentTxOuts(tokenId: amountToSpend.tokenId), $0.knowableBlockCount) }
-            logger.info(
-                "Creating signed contingent input to recipient: \(redacting: recipient), " +
-                    "amountToSpend: \(redacting: amountToSpend), " +
-                    "amountToRecieve: \(redacting: amountToReceive), " +
-                    "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
-                logFunction: false)
-            
-            // check that total available is > amount to spend
-
-            
-            // set tombstone block index
-            
-            // check fog report uri
-            
-            // find or create txout to spend for this
-            
-            // requires block version 3
-            
-            // create SCI builder
-            
-            // return scibuilder.build()
-
-        }
 
         func prepareTransaction(
             to recipient: PublicAddress,
@@ -145,7 +90,7 @@ extension Account {
                                     })
                                 """,
                             logFunction: false)
-                        var tombstoneBlockIndex = ledgerBlockCount + 50
+                        let tombstoneBlockIndex = ledgerBlockCount + 50
                         transactionPreparer.prepareTransaction(
                             inputs: txOutsToSpend,
                             recipient: recipient,

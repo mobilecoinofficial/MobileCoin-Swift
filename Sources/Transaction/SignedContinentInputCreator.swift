@@ -20,7 +20,7 @@ struct SignedContingentInputCreator {
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
-        rng: MobileCoinRng,
+        rngSeed: RngSeed,
         targetQueue: DispatchQueue?
     ) {
         self.serialQueue = DispatchQueue(
@@ -33,40 +33,49 @@ struct SignedContingentInputCreator {
         self.fogMerkleProofFetcher = FogMerkleProofFetcher(
             fogMerkleProofService: fogMerkleProofService,
             targetQueue: targetQueue)
-        self.rng = rng
+        self.rng = MobileCoinChaCha20Rng(rngSeed: rngSeed)
     }
 
     func createSignedContingentInput(
         inputs: [KnownTxOut],
         recipient: PublicAddress,
         memoType: MemoType,
-        amount: Amount,
-        fee: Amount,
+        amountToSend: Amount,
+        amountToReceive: Amount,
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
-            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
+            Result<SignedContingentInput, TransactionPreparationError>
         ) -> Void
     ) {
-        guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amount.tokenId)"
+        guard amountToSend.value > 0, let positiveValue = PositiveUInt64(amountToSend.value) else {
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amountToSend.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
                 completion(.failure(.invalidInput(errorMessage)))
             }
             return
         }
+
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee.value])
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value])
         else {
             logger.warning(
                 "Insufficient balance to prepare transaction: sum of inputs: " +
-                    "\(redacting: inputs.map { $0.value }) < amount: \(redacting: amount) + fee: " +
-                    "\(redacting: fee)",
+                    "\(redacting: inputs.map { $0.value }) < amount: \(redacting: amountToSend)",
                 logFunction: false)
             serialQueue.async {
                 completion(.failure(.insufficientBalance()))
+            }
+            return
+        }
+
+        guard amountToReceive.value > 0 else {
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amountToReceive.tokenId)"
+            logger.error(errorMessage, logFunction: false)
+            serialQueue.async {
+                completion(.failure(.invalidInput(errorMessage)))
             }
             return
         }
@@ -81,17 +90,16 @@ struct SignedContingentInputCreator {
         }, completion: {
             completion($0.mapError { .connectionError($0) }
                 .flatMap { fogResolver, preparedInputs in
-                    TransactionBuilder.build(
+                    SignedContingentInputBuilder.build(
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
-                        to: recipient,
                         memoType: memoType,
-                        amount: positiveValue,
-                        fee: fee,
+                        amountToSend: amountToSend,
+                        amountToReceive: amountToReceive,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
                         blockVersion: blockVersion,
-                        rng: rng
+                        rng: self.rng
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })
@@ -103,20 +111,10 @@ struct SignedContingentInputCreator {
         merkleRootBlock: UInt64? = nil,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        var inputsMixinIndices: [[UInt64]]
-
-        if let customRngStrategy = mixinSelectionStrategy as? CustomRNGMixinSelectionStrategy {
-            inputsMixinIndices = customRngStrategy.selectMixinIndices(
-                rng: rng,
+        let inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
                 forRealTxOutIndices: inputs.map { $0.globalIndex },
                 selectionRange: ledgerTxOutCount.map { ..<$0 }
             ).map { Array($0) }
-        } else {
-            inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
-                forRealTxOutIndices: inputs.map { $0.globalIndex },
-                selectionRange: ledgerTxOutCount.map { ..<$0 }
-            ).map { Array($0) }
-        }
 
         // There's a chance that a txo we selected as a mixin is in a block that's greater than
         // the highest block of our inputs, in which case, using the highest block of our inputs
