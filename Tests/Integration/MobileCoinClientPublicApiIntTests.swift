@@ -413,6 +413,36 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+    func testCreateSignedContingentInput() throws {
+        let description = "Creating signed contingent input"
+        try testSupportedProtocols(description: description) {
+            try prepareTransaction(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func createSignedContingentInput(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol)
+        { client in
+            client.createSignedContingentInput(
+                recipient: recipient,
+                amountToSpend: Amount(1, in: .MOB),
+                amountToReceive: Amount(10, in: .MOBUSD)
+            ) {
+                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                print("Signed contingent input creation successful")
+                expect.fulfill()
+            }
+        }
+    }
+
     func testSelfPaymentBalanceChange() throws {
         let description = "Self payment"
         try testSupportedProtocols(description: description) {
