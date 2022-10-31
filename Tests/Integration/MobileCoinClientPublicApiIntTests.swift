@@ -45,7 +45,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        try Array(0...9).forEach({ index in
+        try Array(0...7).forEach({ index in
             let key = try IntegrationTestFixtures.createAccountKey(accountIndex: index)
 
             let client = try IntegrationTestFixtures.createMobileCoinClient(
@@ -416,7 +416,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func testCreateSignedContingentInput() throws {
         let description = "Creating signed contingent input"
         try testSupportedProtocols(description: description) {
-            try prepareTransaction(transportProtocol: $0, expectation: $1)
+            try createSignedContingentInput(transportProtocol: $0, expectation: $1)
         }
     }
 
@@ -424,6 +424,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
+        let amountToSend = Amount(1, in: .MOB)
+        let amountToReceive = Amount(10, in: .MOBUSD)
+
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
@@ -432,10 +435,13 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         { client in
             client.createSignedContingentInput(
                 recipient: recipient,
-                amountToSpend: Amount(1, in: .MOB),
-                amountToReceive: Amount(10, in: .MOBUSD)
+                amountToSpend: amountToSend,
+                amountToReceive: amountToReceive
             ) {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                guard let sci = $0.successOrFulfill(expectation: expect) else { return
+                }
+
+                XCTAssertEqual(sci.incomeAmount, amountToSend)
 
                 print("Signed contingent input creation successful")
                 expect.fulfill()

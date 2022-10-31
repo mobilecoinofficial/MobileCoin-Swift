@@ -222,7 +222,7 @@ public final class MobileCoinClient {
             }
         }
     }
-    
+
     public func prepareTransaction(
         to recipient: PublicAddress,
         memoType: MemoType = .recoverable,
@@ -364,6 +364,36 @@ public final class MobileCoinClient {
         ).prepareDefragmentationStepTransactions(
             toSendAmount: amount,
             recoverableMemo: recoverableMemo,
+            feeLevel: feeLevel) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+    }
+
+    public func prepareTransaction(
+        presignedInput: SignedContingentInput,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<[Transaction], PresignedInputTransactionPreparationError>) -> Void
+    ) {
+        guard let rngSeed = defaultRng.generateRngSeed() else {
+            completion(.failure(
+                PresignedInputTransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
+            return
+        }
+        
+        Account.TransactionOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rngSeed: rngSeed,
+            targetQueue: serialQueue
+        ).preparePresignedInputTransaction(
+            presignedInput: presignedInput,
+            memoType: .recoverable,
             feeLevel: feeLevel) { result in
             self.callbackQueue.async {
                 completion(result)

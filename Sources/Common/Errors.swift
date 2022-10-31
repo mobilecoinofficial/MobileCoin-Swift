@@ -234,6 +234,40 @@ extension DefragTransactionPreparationError: LocalizedError {
     }
 }
 
+public enum PresignedInputTransactionPreparationError: Error {
+    case invalidInput(String)
+    case insufficientBalance(String = String())
+    case defragmentationRequired(String = String())
+    case connectionError(ConnectionError)
+    case invalidBlockVersion(String = String())
+}
+
+extension PresignedInputTransactionPreparationError: CustomStringConvertible {
+    public var description: String {
+        "Transaction preparation error: " + {
+            switch self {
+            case .invalidInput(let reason):
+                return "Invalid input: \(reason)"
+            case .insufficientBalance(let reason):
+                return "Insufficient balance\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .defragmentationRequired(let reason):
+                return "Defragmentation required\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .connectionError(let innerError):
+                return "\(innerError)"
+            case .invalidBlockVersion(let reason):
+                return "Invalid block version: \(reason)"
+            }
+        }()
+    }
+}
+
+extension PresignedInputTransactionPreparationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+
 public struct SubmitTransactionError: Error {
     public let submissionError: TransactionSubmissionError
     public let consensusBlockCount: UInt64?

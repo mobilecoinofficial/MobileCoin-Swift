@@ -8,8 +8,11 @@ import LibMobileCoin
 public struct SignedContingentInput {
     fileprivate let proto: External_SignedContingentInput
 
-//    let inputKeyImagesTyped: Set<KeyImage>
-//    let outputs: Set<TxOut>
+    let requiredOutputAmounts: [Amount]
+    let pseudoOutputAmount: Amount
+    let changeAmount: Amount
+    let rewardAmount: Amount
+    let requiredAmount: Amount
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
@@ -18,11 +21,13 @@ public struct SignedContingentInput {
                 "\(redacting: serializedData.base64EncodedString())")
             return nil
         }
+
         guard let signedContingentInput = SignedContingentInput(proto) else {
             logger.warning("Input data is not a valid SignedContingentInput. serializedData: " +
                 "\(redacting: serializedData.base64EncodedString())")
             return nil
         }
+
         self = signedContingentInput
     }
 
@@ -30,42 +35,23 @@ public struct SignedContingentInput {
         proto.serializedDataInfallible
     }
 
-//    var anyInputKeyImage: KeyImage {
-//        guard let inputKeyImage = inputKeyImagesTyped.first else {
-//            // Safety: Transaction is guaranteed to have at least 1 input.
-//            logger.fatalError("Transaction contains 0 inputs.")
-//        }
-//        return inputKeyImage
-//    }
+    public var incomeAmount: Amount {
+        Amount(mob: 0)
+    }
 
-//    /// Key images of the `TxOut`'s being spent as the inputs to this `Transaction`.
-//    public var inputKeyImages: Set<Data> {
-//        Set(inputKeyImagesTyped.map { $0.data })
-//    }
+    public var totalOutlays: [Amount] {
+        [Amount]()
+    }
 
-//    var anyOutput: TxOut {
-//        guard let output = outputs.first else {
-//            // Safety: Transaction is guaranteed to have at least 1 output.
-//            logger.fatalError("Transaction contains 0 outputs.")
-//        }
-//        return output
-//    }
+    public var isValid: Bool {
+        true
+    }
 
-//    /// Public keys of the `TxOut`'s being created as the outputs from this `Transaction`.
-//    public var outputPublicKeys: Set<Data> {
-//        Set(outputs.map { $0.publicKey.data })
-//    }
-
-//    /// Fee paid to the MobileCoin Foundation for this transaction.
-//    public var fee: UInt64 {
-//        proto.prefix.fee
-//    }
-
-//    /// Block index at which this transaction will no longer be considered valid for inclusion in
-//    /// the ledger by the consensus network.
-//    public var tombstoneBlockIndex: UInt64 {
-//        proto.prefix.tombstoneBlock
-//    }
+    /// Block index at which this sci will no longer be considered valid for inclusion in
+    /// the ledger by the consensus network.
+    public var tombstoneBlockIndex: UInt64 {
+        proto.txIn.inputRules.maxTombstoneBlock
+    }
 
     enum AcceptedStatus {
         case notAccepted(knownToBeNotAcceptedTotalBlockCount: UInt64)
@@ -89,37 +75,21 @@ extension SignedContingentInput: Hashable {}
 
 extension SignedContingentInput {
     init?(_ proto: External_SignedContingentInput) {
-//        guard proto.prefix.inputs.count > 0 && proto.prefix.outputs.count > 0 else {
-//            logger.warning("External_Tx doesn't contain at least 1 input and 1 output")
-//            return nil
-//        }
-//        guard proto.prefix.inputs.count == proto.signature.ringSignatures.count else {
-//            logger.warning("External_Tx input count is not equal to ring signature count")
-//            return nil
-//        }
         self.proto = proto
+        self.requiredOutputAmounts = proto.requiredOutputAmounts.map { Amount($0) }
+        self.pseudoOutputAmount = Amount(proto.pseudoOutputAmount)
 
-//        var keyImages: [KeyImage] = []
-//        for ringSignature in proto.signature.ringSignatures {
-//            guard let keyImage = KeyImage(ringSignature.keyImage) else {
-//                logger.warning("External_Tx contains an invalid KeyImage")
-//                return nil
-//            }
-//            keyImages.append(keyImage)
-//        }
-//        self.inputKeyImagesTyped = Set(keyImages)
-//
-//        var outputs: [TxOut] = []
-//        for output in proto.prefix.outputs {
-//            switch TxOut.make(output) {
-//            case .success(let txOut):
-//                outputs.append(txOut)
-//            case .failure(let error):
-//                logger.warning("External_Tx contains an invalid output. error: \(error)")
-//                return nil
-//            }
-//        }
-//        self.outputs = Set(outputs)
+        // change amount:
+        //  - find first required output amount with token id = pseudo amount token id and use
+        //    that as the required change amount
+        let changeTokenId = self.pseudoOutputAmount.tokenId
+        self.changeAmount = requiredOutputAmounts.first(where: { $0.tokenId == changeTokenId }) ??
+            Amount(0, in: changeTokenId )
+
+        self.rewardAmount = Amount(pseudoOutputAmount.value - changeAmount.value, in: changeTokenId)
+
+        self.requiredAmount = requiredOutputAmounts.first(where: { $0.tokenId != changeTokenId }) ??
+        Amount(0, in: changeTokenId)
     }
 }
 

@@ -282,5 +282,15 @@ extension Account {
                 }
             }
         }
+
+        func preparePresignedInputTransaction(
+            presignedInput: SignedContingentInput,
+            memoType: MemoType,
+            feeLevel: FeeLevel,
+            completion: @escaping (Result<[Transaction], PresignedInputTransactionPreparationError>) -> Void
+        ) {
+            completion(.failure(.invalidInput("Not Implemented  ")))
+        }
+
     }
 }
