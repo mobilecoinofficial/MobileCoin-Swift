@@ -191,7 +191,7 @@ public final class MobileCoinClient {
 
     public func createSignedContingentInput(
         recipient: PublicAddress,
-        amountToSpend: Amount,
+        amountToSend: Amount,
         amountToReceive: Amount,
         completion: @escaping (
             Result<SignedContingentInput, SignedContingentInputCreationError>
@@ -199,7 +199,7 @@ public final class MobileCoinClient {
     ) {
         guard let rngSeed = defaultRng.generateRngSeed() else {
             completion(.failure(
-                SignedContingentInputCreationError.invalidInput("Could not create 32-byte RNG seed")))
+                SignedContingentInputCreationError.invalidInput("Couldn't create 32byte RNG seed")))
             return
         }
         Account.SCIOperations(
@@ -213,8 +213,8 @@ public final class MobileCoinClient {
             targetQueue: serialQueue
         ).createSignedContingentInput(
             to: recipient,
-            memoType: MemoType.unused, // TODO: What should we pass here?
-            amountToSend: amountToSpend,
+            memoType: MemoType.recoverable,
+            amountToSend: amountToSend,
             amountToReceive: amountToReceive
         ) { result in
             self.callbackQueue.async {
@@ -374,14 +374,16 @@ public final class MobileCoinClient {
     public func prepareTransaction(
         presignedInput: SignedContingentInput,
         feeLevel: FeeLevel = .minimum,
-        completion: @escaping (Result<[Transaction], PresignedInputTransactionPreparationError>) -> Void
+        completion: @escaping (Result<PendingTransaction, TransactionPreparationError>)
+        -> Void
     ) {
         guard let rngSeed = defaultRng.generateRngSeed() else {
             completion(.failure(
-                PresignedInputTransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
+                TransactionPreparationError.invalidInput(
+                    "Could not create 32-byte RNG seed")))
             return
         }
-        
+
         Account.TransactionOperations(
             account: accountLock,
             fogMerkleProofService: serviceProvider.fogMerkleProofService,

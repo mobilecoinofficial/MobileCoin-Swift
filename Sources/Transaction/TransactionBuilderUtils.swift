@@ -40,6 +40,30 @@ enum TransactionBuilderUtils {
         }
     }
 
+    static func addSignedContingentInput(
+        ptr: OpaquePointer,
+        signedContingentInput: SignedContingentInput
+    ) -> Result<(), TransactionBuilderError> {
+        let sciData = signedContingentInput.serializedData
+        return sciData.asMcBuffer { sciDataPtr in
+            withMcError { errorPtr in
+                mc_transaction_builder_add_presigned_input(
+                    ptr,
+                    sciDataPtr,
+                    &errorPtr)
+            }.mapError { //(error:LibMobileCoinError) -> Result<(), TransactionBuilderError> in
+                switch $0.errorCode {
+                case .invalidInput:
+                    return .invalidInput("\(redacting: $0.description)")
+                default:
+                    // Safety: mc_transaction_builder_add_presigned_input should not throw
+                    // non-documented errors.
+                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+                }
+            }
+        }
+    }
+
     static func addOutput(
         ptr: OpaquePointer,
         tombstoneBlockIndex: UInt64,
@@ -157,7 +181,7 @@ enum TransactionBuilderUtils {
             result: result)
     }
     // swiftlint:enable closure_body_length
-
+    
     private static func renderTxOutContext(
         confirmationNumberData: Data32,
         sharedSecretData: Data32,

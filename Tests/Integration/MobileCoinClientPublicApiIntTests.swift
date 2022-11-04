@@ -435,13 +435,13 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         { client in
             client.createSignedContingentInput(
                 recipient: recipient,
-                amountToSpend: amountToSend,
+                amountToSend: amountToSend,
                 amountToReceive: amountToReceive
             ) {
                 guard let sci = $0.successOrFulfill(expectation: expect) else { return
                 }
 
-                XCTAssertEqual(sci.incomeAmount, amountToSend)
+                XCTAssertEqual(sci.rewardAmount, amountToSend)
 
                 print("Signed contingent input creation successful")
                 expect.fulfill()

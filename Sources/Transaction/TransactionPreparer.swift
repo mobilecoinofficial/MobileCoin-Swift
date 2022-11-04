@@ -149,6 +149,66 @@ struct TransactionPreparer {
         })
     }
 
+    func preparePresignedInputTransaction(
+        presignedInput: SignedContingentInput,
+        inputs: [KnownTxOut],
+        memoType: MemoType,
+        amount: Amount,
+        fee: Amount,
+        tombstoneBlockIndex: UInt64,
+        blockVersion: BlockVersion,
+        completion: @escaping (
+            Result<PendingTransaction, TransactionPreparationError>
+        ) -> Void
+    ) {
+        guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {
+            let errorMessage = "preparePresignedInputTransaction error: Cannot spend 0 " +
+                "\(amount.tokenId)"
+            logger.error(errorMessage, logFunction: false)
+            serialQueue.async {
+                completion(.failure(.invalidInput(errorMessage)))
+            }
+            return
+        }
+        guard UInt64.safeCompare(
+                sumOfValues: inputs.map { $0.value },
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee.value])
+        else {
+            logger.warning(
+                "Insufficient balance to prepare transaction: sum of inputs: " +
+                    "\(redacting: inputs.map { $0.value }) < amount: \(redacting: amount) + fee: " +
+                    "\(redacting: fee)",
+                logFunction: false)
+            serialQueue.async {
+                completion(.failure(.insufficientBalance()))
+            }
+            return
+        }
+        performAsync(body1: { callback in
+            fogResolverManager.fogResolver(
+                addresses: [selfPaymentAddress],
+                desiredMinPubkeyExpiry: tombstoneBlockIndex,
+                completion: callback)
+        }, body2: { callback in
+            prepareInputs(inputs: inputs, completion: callback)
+        }, completion: {
+            completion($0.mapError { .connectionError($0) }
+                .flatMap { fogResolver, preparedInputs in
+                    TransactionBuilder.build(
+                        inputs: preparedInputs,
+                        accountKey: self.accountKey,
+                        presignedInput: presignedInput,
+                        memoType: memoType,
+                        fee: fee,
+                        tombstoneBlockIndex: tombstoneBlockIndex,
+                        fogResolver: fogResolver,
+                        blockVersion: blockVersion,
+                        rngSeed: rngSeed
+                    ).mapError { .invalidInput(String(describing: $0)) }
+                })
+        })
+    }
+
     private func prepareInputs(
         inputs: [KnownTxOut],
         ledgerTxOutCount: UInt64? = nil,

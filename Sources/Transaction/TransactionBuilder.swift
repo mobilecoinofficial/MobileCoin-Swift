@@ -235,6 +235,88 @@ extension TransactionBuilder {
         }
     }
 
+    static func build(
+        inputs: [PreparedTxInput],
+        accountKey: AccountKey,
+        presignedInput: SignedContingentInput,
+        memoType: MemoType,
+        fee: Amount,
+        tombstoneBlockIndex: UInt64,
+        fogResolver: FogResolver,
+        blockVersion: BlockVersion,
+        rngSeed: RngSeed
+    ) -> Result<PendingTransaction, TransactionBuilderError> {
+        
+// update to be based on accounting for SCI instead of possibleTransaction
+//        guard Math.totalOutlayCheck(for: possibleTransaction, fee: fee, inputs: inputs) else {
+//            return .failure(.invalidInput("Input values != output values + fee"))
+//        }
+
+        let builder: TransactionBuilder
+        do {
+            builder = try TransactionBuilder(
+                fee: fee,
+                tombstoneBlockIndex: tombstoneBlockIndex,
+                fogResolver: fogResolver,
+                memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
+                blockVersion: blockVersion)
+        } catch {
+            guard let error = error as? TransactionBuilderError else {
+                return .failure(.invalidInput("Unknown Error"))
+            }
+            return .failure(error)
+        }
+
+        var totalTxSentValue: UInt64 = 0
+        for input in inputs {
+            if case .failure(let error) =
+                builder.addInput(preparedTxInput: input, accountKey: accountKey)
+            {
+                return .failure(error)
+            }
+            totalTxSentValue += input.knownTxOut.value
+        }
+
+        let seededRng = MobileCoinChaCha20Rng(rngSeed: rngSeed)
+
+        // add SCI
+        if case .failure(let error) =
+            builder.addSignedContingentInput(signedContingentInput: presignedInput)
+        {
+            return .failure(error)
+        }
+
+        // cheating a bit - reusing the Math.positiveRemainingAmount to subtract off required amt
+        var changeContext = Math.positiveRemainingAmount(
+            inputValues: inputs.map { $0.knownTxOut.value },
+            fee: presignedInput.requiredAmount
+        ).map { changeAmount in
+            TransactionBuilder.changeContext(
+                blockVersion: blockVersion,
+                accountKey: accountKey,
+                builder: builder,
+                changeAmount: changeAmount,
+                rng: seededRng)
+        }
+        
+        PossibleTransaction(outputs, PositiveUInt64(changeContext.changeAmount))
+
+        
+        
+        return payloadContexts.collectResult().flatMap { payloadContexts in
+            changeContext.flatMap { changeContext in
+                builder.build(rng: seededRng).map { transaction in
+                    PendingTransaction(
+                        transaction: transaction,
+                        payloadTxOutContexts: payloadContexts,
+                        changeTxOutContext: changeContext)
+                }
+            }
+        }
+
+        
+    }
+
     private static func changeContext(
         blockVersion: BlockVersion,
         accountKey: AccountKey,
@@ -368,6 +450,14 @@ extension TransactionBuilder {
             accountKey: accountKey,
             amount: amount,
             rng: rng)
+    }
+
+    private func addSignedContingentInput(
+        signedContingentInput: SignedContingentInput
+    ) -> Result<(), TransactionBuilderError> {
+        TransactionBuilderUtils.addSignedContingentInput(
+            ptr: ptr,
+            signedContingentInput: signedContingentInput)
     }
 
     private func build(

@@ -8,17 +8,17 @@ import LibMobileCoin
 public struct SignedContingentInput {
     fileprivate let proto: External_SignedContingentInput
 
-    let requiredOutputAmounts: [Amount]
-    let pseudoOutputAmount: Amount
-    let changeAmount: Amount
-    let rewardAmount: Amount
-    let requiredAmount: Amount
+    public let requiredOutputAmounts: [Amount]
+    public let pseudoOutputAmount: Amount
+    public let changeAmount: Amount
+    public let rewardAmount: Amount
+    public let requiredAmount: Amount
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
         guard let proto = try? External_SignedContingentInput(serializedData: serializedData) else {
-            logger.warning("External_SignedContingentInput deserialization failed. serializedData: " +
-                "\(redacting: serializedData.base64EncodedString())")
+            logger.warning("External_SignedContingentInput deserialization failed. " +
+                "serializedData: \(redacting: serializedData.base64EncodedString())")
             return nil
         }
 
@@ -35,14 +35,6 @@ public struct SignedContingentInput {
         proto.serializedDataInfallible
     }
 
-    public var incomeAmount: Amount {
-        Amount(mob: 0)
-    }
-
-    public var totalOutlays: [Amount] {
-        [Amount]()
-    }
-
     public var isValid: Bool {
         true
     }
@@ -51,6 +43,10 @@ public struct SignedContingentInput {
     /// the ledger by the consensus network.
     public var tombstoneBlockIndex: UInt64 {
         proto.txIn.inputRules.maxTombstoneBlock
+    }
+
+    public var feeTokenId: TokenId {
+        rewardAmount.tokenId
     }
 
     enum AcceptedStatus {

@@ -39,7 +39,6 @@ extension Account {
                 targetQueue: targetQueue)
         }
 
-
         func prepareTransaction(
             to recipient: PublicAddress,
             memoType: MemoType,
@@ -287,9 +286,95 @@ extension Account {
             presignedInput: SignedContingentInput,
             memoType: MemoType,
             feeLevel: FeeLevel,
-            completion: @escaping (Result<[Transaction], PresignedInputTransactionPreparationError>) -> Void
+            completion: @escaping (Result<PendingTransaction, TransactionPreparationError>)
+            -> Void
         ) {
-            completion(.failure(.invalidInput("Not Implemented  ")))
+            // check 'is valid' on the sci (need to implement)
+
+            // check block version
+
+            // check fee amount < receive amount
+
+            let amountToSend = presignedInput.requiredAmount
+            let amountToReceive = presignedInput.rewardAmount
+            let feeTokenId = amountToReceive.tokenId
+
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: feeTokenId) {
+                switch $0 {
+                case .success(let feeStrategy):
+
+                    let (unspentTxOuts, ledgerBlockCount) =
+                        self.account.readSync {
+                            ($0.unspentTxOuts(tokenId: feeTokenId), $0.knowableBlockCount)
+                        }
+
+                    if ledgerBlockCount > presignedInput.tombstoneBlockIndex {
+                        completion(.failure(.invalidInput("Presigned Input Expired.")))
+                    }
+
+                    logger.info(
+                        "Preparing pre-signed input transaction with fee level...feeLevel: " +
+                            "\(feeLevel), unspentTxOutValues: " +
+                            "\(redacting: unspentTxOuts.map { $0.value })",
+                        logFunction: false)
+
+                    // need to look up details of fee strategy / how it works
+
+                    switch self.txOutSelector
+                        .selectTransactionInput(
+                            amount: amountToSend,
+                            feeStrategy: feeStrategy,
+                            fromTxOuts: unspentTxOuts)
+                        .mapError({ error -> TransactionPreparationError in
+                            switch error {
+                            case .insufficientTxOuts:
+                                return .insufficientBalance()
+                            case .defragmentationRequired:
+                                return .defragmentationRequired()
+                            }
+                        })
+                    {
+                    case .success(let (inputs: inputs, fee: fee)):
+                        metaFetcher.blockVersion {
+                            switch $0 {
+                            case .success(let blockVersion):
+                                logger.info(
+                                    "Transaction with presigned input prepared with fee level. " +
+                                        "fee: \(redacting: fee)",
+                                    logFunction: false)
+                                let tombstoneBlockIndex =
+                                    min(ledgerBlockCount + 50, presignedInput.tombstoneBlockIndex)
+
+                                self.transactionPreparer.preparePresignedInputTransaction(
+                                    presignedInput: presignedInput,
+                                    inputs: inputs,
+                                    memoType: memoType,
+                                    amount: amountToSend,
+                                    fee: Amount(fee, in: presignedInput.feeTokenId),
+                                    tombstoneBlockIndex: tombstoneBlockIndex,
+                                    blockVersion: blockVersion,
+                                    completion: completion)
+                            case .failure(let error):
+                                logger.info(
+                                    "preparePresignedInputTransaction failure: \(error)",
+                                    logFunction: false)
+
+                                serialQueue.async {
+                                    completion(.failure(.connectionError(error)))
+                                }
+                            }
+                        }
+                    case .failure(let error):
+                        logger.info(
+                            "preparePresignedInputTransaction failure: \(error)",
+                            logFunction: false)
+                        completion(.failure(error))
+                    }
+                case .failure(let connectionError):
+                    logger.info("failure - error: \(connectionError)")
+                    completion(.failure(.connectionError(connectionError)))
+                }
+            }
         }
 
     }

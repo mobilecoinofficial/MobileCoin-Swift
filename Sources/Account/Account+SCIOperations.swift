@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable closure_body_length function_body_length multiline_arguments
+// swiftlint:disable closure_body_length function_body_length
 
 import Foundation
 
@@ -38,7 +38,7 @@ extension Account {
                 rngSeed: rngSeed,
                 targetQueue: targetQueue)
         }
-        
+
         func createSignedContingentInput(
             to recipient: PublicAddress,
             memoType: MemoType,
@@ -67,17 +67,19 @@ extension Account {
                 }
                 return
             }
-            
+
             // get all unspent txouts (getUnspentTxOuts() ?)
             let (unspentTxOuts, ledgerBlockCount) =
-            account.readSync { ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount) }
+            account.readSync {
+                ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount)
+            }
             logger.info(
                 "Creating signed contingent input to recipient: \(redacting: recipient), " +
                     "amountToSpend: \(redacting: amountToSend), " +
                     "amountToRecieve: \(redacting: amountToReceive), " +
                     "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
                 logFunction: false)
-            
+
             // check that total available is > amount to spend
             // - this is done by txOutSelector, which will return an error if there are not
             //   enough funds from the unspentTxOuts
@@ -97,15 +99,16 @@ extension Account {
                 metaFetcher.blockVersion {
                     switch $0 {
                     case .success(let blockVersion):
-                        
+
                         // verify block version >= 3
                         guard blockVersion >= 3 else {
                             serialQueue.async {
-                                completion(.failure(.invalidBlockVersion("Block version must be > 3 for SCI support")))
+                                completion(.failure(.invalidBlockVersion(
+                                    "Block version must be > 3 for SCI support")))
                             }
                             return
                         }
-                        
+
                         logger.info(
                             "SCI preparation selected txOutsToSpend: " +
                                 """
@@ -117,7 +120,7 @@ extension Account {
 
                         // set tombstone block index
                         let tombstoneBlockIndex = ledgerBlockCount + 50
-                        
+
                         signedContingentInputCreator.createSignedContingentInput(
                             inputs: txOutsToSpend,
                             recipient: recipient,
@@ -127,18 +130,20 @@ extension Account {
                             tombstoneBlockIndex: tombstoneBlockIndex,
                             blockVersion: blockVersion) { result in
                                 completion(result.mapError {
+                                    let error: SignedContingentInputCreationError
                                     switch $0 {
                                     case .invalidInput(let reason):
-                                        return SignedContingentInputCreationError.invalidInput(reason)
+                                        error = .invalidInput(reason)
                                     case .defragmentationRequired(let reason):
-                                        return SignedContingentInputCreationError.defragmentationRequired(reason)
+                                        error = .defragmentationRequired(reason)
                                     case .insufficientBalance(let reason):
-                                        return SignedContingentInputCreationError.insufficientBalance(reason)
+                                        error = .insufficientBalance(reason)
                                     case .connectionError(let reason):
-                                        return SignedContingentInputCreationError.connectionError(reason)
+                                        error = .connectionError(reason)
                                     }
+                                    return error
                                 })
-                            }
+                        }
                     case .failure(let error):
                         logger.info(
                             "prepareSignedContingentInput failure: \(error)",
@@ -153,7 +158,7 @@ extension Account {
             case .failure(let error):
                 logger.info("prepareSignedContingentInput failure: \(error)", logFunction: false)
                 serialQueue.async {
-                    completion(.failure(SignedContingentInputCreationError.create(from:error)))
+                    completion(.failure(SignedContingentInputCreationError.create(from: error)))
                 }
             }
         }
