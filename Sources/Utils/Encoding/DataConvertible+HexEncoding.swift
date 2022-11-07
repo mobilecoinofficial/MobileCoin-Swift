@@ -22,4 +22,3 @@ extension Data {
         HexEncoding.hexEncodedString(fromData: self)
     }
 }
-
