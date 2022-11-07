@@ -184,6 +184,9 @@ struct TransactionPreparer {
             }
             return
         }
+        
+        // create change output for required amount to get SCI input
+        
         performAsync(body1: { callback in
             fogResolverManager.fogResolver(
                 addresses: [selfPaymentAddress],
@@ -197,13 +200,14 @@ struct TransactionPreparer {
                     TransactionBuilder.build(
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
-                        presignedInput: presignedInput,
+                        outputs: [], // required output for SCI payment
                         memoType: memoType,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
                         fogResolver: fogResolver,
                         blockVersion: blockVersion,
-                        rngSeed: rngSeed
+                        rngSeed: rngSeed,
+                        presignedInput: presignedInput
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })

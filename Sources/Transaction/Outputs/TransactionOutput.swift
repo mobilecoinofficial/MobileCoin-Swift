@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct TransactionOutput {
+public struct TransactionOutput {
     let recipient: PublicAddress
     let amount: PositiveUInt64
 }
