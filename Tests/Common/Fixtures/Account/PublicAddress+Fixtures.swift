@@ -33,10 +33,10 @@ extension PublicAddress.Fixtures {
             self.accountKey = accountKeyFixture.accountKey
             self.publicAddress = accountKey.publicAddress
             self.fogReportUrl = accountKeyFixture.fogReportUrl
-            self.addressHashHex = try XCTUnwrap(self.publicAddress.addressHash?.hexEncodedString())
+            self.addressHashHex = try XCTUnwrap(
+                accountKey.publicAddress.addressHash?.hexEncodedString())
             self.addressHashBase64 = try XCTUnwrap(
-                self.publicAddress.addressHash?.base64EncodedString()
-            )
+                accountKey.publicAddress.addressHash?.base64EncodedString())
         }
     }
 }
