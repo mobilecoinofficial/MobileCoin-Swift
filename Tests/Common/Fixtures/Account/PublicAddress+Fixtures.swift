@@ -25,12 +25,16 @@ extension PublicAddress.Fixtures {
 
         let accountKey: AccountKey
         let fogReportUrl: String
+        let addressHash: Data
+        var addressHashHex: String { addressHash.hexEncodedString() }
+        var addressHashBase64: String { addressHash.base64EncodedString() }
 
         init(accountIndex: UInt8 = 0) throws {
             let accountKeyFixture = try AccountKey.Fixtures.Default(accountIndex: accountIndex)
             self.accountKey = accountKeyFixture.accountKey
             self.publicAddress = accountKey.publicAddress
             self.fogReportUrl = accountKeyFixture.fogReportUrl
+            self.addressHash = try XCTUnwrap(accountKeyFixture.accountKey.publicAddress.addressHash)
         }
     }
 }
