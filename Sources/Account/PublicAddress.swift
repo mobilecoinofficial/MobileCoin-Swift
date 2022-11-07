@@ -58,7 +58,7 @@ public struct PublicAddress {
 
     public var fogReportUrlString: String? { fogInfo?.reportUrlString }
 
-    public var addressHash: String? { calculateAddressHash()?.hex }
+    public var addressHash: Data? { calculateAddressHash()?.data }
 
     var fogReportUrl: FogUrl? { fogInfo?.reportUrl }
     var fogReportId: String? { fogInfo?.reportId }
