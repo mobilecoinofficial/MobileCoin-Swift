@@ -44,4 +44,16 @@ class PublicAddressPublicApiTests: XCTestCase {
         XCTAssertEqual(publicAddress.fogReportUrlString, fixture.fogReportUrl)
     }
 
+    func testAddressHashHex() throws {
+        let fixture = try PublicAddress.Fixtures.Default()
+        let publicAddress = fixture.publicAddress
+        XCTAssertEqual(publicAddress.addressHash?.hexEncodedString(), fixture.addressHashHex)
+    }
+
+    func testAddressHashBase64() throws {
+        let fixture = try PublicAddress.Fixtures.Default()
+        let publicAddress = fixture.publicAddress
+        XCTAssertEqual(publicAddress.addressHash?.base64EncodedString(), fixture.addressHashBase64)
+    }
+
 }
