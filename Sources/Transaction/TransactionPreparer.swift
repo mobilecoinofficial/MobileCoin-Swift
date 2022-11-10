@@ -73,14 +73,15 @@ struct TransactionPreparer {
             completion($0.mapError { .connectionError($0) }
                 .flatMap { fogResolver, preparedInputs in
                     TransactionBuilder.build(
+                        context: TransactionBuilder.Context(
+                            accountKey: accountKey,
+                            blockVersion: blockVersion,
+                            fogResolver: fogResolver,
+                            memoType: recoverableMemo ? .recoverable : .unused,
+                            tombstoneBlockIndex: tombstoneBlockIndex,
+                            fee: fee),
                         inputs: preparedInputs,
-                        accountKey: self.accountKey,
                         sendingAllTo: self.selfPaymentAddress,
-                        memoType: recoverableMemo ? .recoverable : .unused,
-                        fee: fee,
-                        tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver,
-                        blockVersion: blockVersion,
                         rngSeed: rngSeed
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
@@ -134,15 +135,16 @@ struct TransactionPreparer {
             completion($0.mapError { .connectionError($0) }
                 .flatMap { fogResolver, preparedInputs in
                     TransactionBuilder.build(
+                        context: TransactionBuilder.Context(
+                            accountKey: self.accountKey,
+                            blockVersion: blockVersion,
+                            fogResolver: fogResolver,
+                            memoType: memoType,
+                            tombstoneBlockIndex: tombstoneBlockIndex,
+                            fee: fee),
                         inputs: preparedInputs,
-                        accountKey: self.accountKey,
                         to: recipient,
-                        memoType: memoType,
                         amount: positiveValue,
-                        fee: fee,
-                        tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver,
-                        blockVersion: blockVersion,
                         rngSeed: rngSeed
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
@@ -184,9 +186,9 @@ struct TransactionPreparer {
             }
             return
         }
-        
+
         // create change output for required amount to get SCI input
-        
+
         performAsync(body1: { callback in
             fogResolverManager.fogResolver(
                 addresses: [selfPaymentAddress],
@@ -198,14 +200,15 @@ struct TransactionPreparer {
             completion($0.mapError { .connectionError($0) }
                 .flatMap { fogResolver, preparedInputs in
                     TransactionBuilder.build(
+                        context: TransactionBuilder.Context(
+                            accountKey: self.accountKey,
+                            blockVersion: blockVersion,
+                            fogResolver: fogResolver,
+                            memoType: memoType,
+                            tombstoneBlockIndex: tombstoneBlockIndex,
+                            fee: fee),
                         inputs: preparedInputs,
-                        accountKey: self.accountKey,
                         outputs: [], // required output for SCI payment
-                        memoType: memoType,
-                        fee: fee,
-                        tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver,
-                        blockVersion: blockVersion,
                         rngSeed: rngSeed,
                         presignedInput: presignedInput
                     ).mapError { .invalidInput(String(describing: $0)) }

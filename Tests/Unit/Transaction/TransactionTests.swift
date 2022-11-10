@@ -10,29 +10,33 @@ class TransactionTests: XCTestCase {
 
     func testBuildWorks() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
-        XCTAssertSuccess(TransactionBuilder.build(
-            inputs: fixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
-            outputs: fixture.outputs,
-            memoType: .unused,
-            fee: fixture.fee,
-            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fogResolver: fixture.fogResolver,
             blockVersion: fixture.blockVersion,
+            fogResolver: fixture.fogResolver,
+            memoType: .unused,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
+        XCTAssertSuccess(TransactionBuilder.build(
+            context: context,
+            inputs: fixture.inputs,
+            outputs: fixture.outputs,
             rngSeed: testRngSeed()))
     }
 
     func testLegacyBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
-        let txOutContext = try TransactionBuilder.build(
-            inputs: fixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
-            outputs: fixture.outputs,
-            memoType: .unused,
-            fee: fixture.fee,
-            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fogResolver: fixture.fogResolver,
             blockVersion: .legacy,
+            fogResolver: fixture.fogResolver,
+            memoType: .unused,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
+        let txOutContext = try TransactionBuilder.build(
+            context: context,
+            inputs: fixture.inputs,
+            outputs: fixture.outputs,
             rngSeed: testRngSeed()).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
@@ -49,15 +53,17 @@ class TransactionTests: XCTestCase {
 
     func testRTHBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
-        let txOutContext = try TransactionBuilder.build(
-            inputs: fixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
-            outputs: fixture.outputs,
-            memoType: .unused,
-            fee: fixture.fee,
-            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fogResolver: fixture.fogResolver,
             blockVersion: .minRTHEnabled,
+            fogResolver: fixture.fogResolver,
+            memoType: .unused,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
+        let txOutContext = try TransactionBuilder.build(
+            context: context,
+            inputs: fixture.inputs,
+            outputs: fixture.outputs,
             rngSeed: testRngSeed()).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
@@ -74,30 +80,33 @@ class TransactionTests: XCTestCase {
 
     func testFutureBlockVersionFailure() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
-        XCTAssertFailure(TransactionBuilder.build(
-            inputs: fixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
-            outputs: fixture.outputs,
-            memoType: .unused,
-            fee: fixture.fee,
-            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fogResolver: fixture.fogResolver,
             blockVersion: .versionMax,
+            fogResolver: fixture.fogResolver,
+            memoType: .unused,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
+        XCTAssertFailure(TransactionBuilder.build(
+            context: context,
+            inputs: fixture.inputs,
+            outputs: fixture.outputs,
             rngSeed: testRngSeed()))
     }
 
     func testExactChangeCreatesChangeOutput() throws {
         let fixture = try Transaction.Fixtures.ExactChange()
-
-        let txOutContext = try TransactionBuilder.build(
-            inputs: fixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
-            outputs: fixture.outputs,
-            memoType: .unused,
-            fee: fixture.fee,
-            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fogResolver: fixture.fogResolver,
             blockVersion: .minRTHEnabled,
+            fogResolver: fixture.fogResolver,
+            memoType: .unused,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
+        let txOutContext = try TransactionBuilder.build(
+            context: context,
+            inputs: fixture.inputs,
+            outputs: fixture.outputs,
             rngSeed: testRngSeed()).get()
 
         XCTAssertNotNil(txOutContext.changeTxOutContext)

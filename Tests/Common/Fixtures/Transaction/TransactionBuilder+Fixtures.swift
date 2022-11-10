@@ -167,16 +167,18 @@ extension TransactionBuilder.Fixtures {
         blockVersion: BlockVersion = .minRTHEnabled
     ) throws -> Transaction {
         let fixture = try Transaction.Fixtures.TxOutMemo()
+        let context = TransactionBuilder.Context(
+            accountKey: fixture.senderAccountKey,
+            blockVersion: blockVersion,
+            fogResolver: fixture.fogResolver,
+            memoType: memoType,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
         return try XCTUnwrapSuccess(TransactionBuilder.build(
+                        context: context,
                         inputs: fixture.inputs,
-                        accountKey: fixture.senderAccountKey,
                         to: fixture.recipientAccountKey.publicAddress,
-                        memoType: memoType,
                         amount: fixture.amount,
-                        fee: fixture.fee,
-                        tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                        fogResolver: fixture.fogResolver,
-                        blockVersion: blockVersion,
                         rngSeed: testRngSeed())).transaction
     }
 

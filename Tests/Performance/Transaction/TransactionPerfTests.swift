@@ -9,17 +9,18 @@ class TransactionPerfTests: PerformanceTestCase {
 
     func testPerformanceBuild() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
-
+        let context = TransactionBuilder.Context(
+            accountKey: fixture.accountKey,
+            blockVersion: BlockVersion.legacy,
+            fogResolver: fixture.fogResolver,
+            memoType: .unused,
+            tombstoneBlockIndex: fixture.tombstoneBlockIndex,
+            fee: fixture.fee)
         measure {
             XCTAssertSuccess(TransactionBuilder.build(
+                context: context,
                 inputs: fixture.inputs,
-                accountKey: fixture.accountKey,
                 outputs: fixture.outputs,
-                memoType: .unused,
-                fee: fixture.fee,
-                tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                fogResolver: fixture.fogResolver,
-                blockVersion: BlockVersion.legacy,
                 rngSeed: testRngSeed()))
         }
     }
