@@ -8,7 +8,7 @@ public struct PendingTransaction {
     public let transaction: Transaction
     public let payloadTxOutContexts: [TxOutContext]
     public var changeTxOutContext: TxOutContext
-    public var presignedInputIncomeTxOutputs: [TransactionOutput]
+    public var presignedInputIncomeTxOutContexts: [TxOutContext]
 
     public var receipts: [Receipt] {
         (payloadTxOutContexts + [changeTxOutContext]).map({
@@ -22,13 +22,13 @@ public struct PendingTransaction {
             payloadTxOutContext: payloadTxOutContexts[0],
             changeTxOutContext: changeTxOutContext)
     }
-    
+
     var presignedPayload: PendingPresignedInputPayloadTransaction {
         PendingPresignedInputPayloadTransaction(
             transaction: transaction,
             payloadTxOutContext: payloadTxOutContexts[0],
             changeTxOutContext: changeTxOutContext,
-            presignedInputIncomeTxOutput: presignedInputIncomeTxOutputs[0])
+            presignedInputIncomeTxOutContext: presignedInputIncomeTxOutContexts[0])
     }
 }
 
@@ -46,7 +46,7 @@ public struct PendingPresignedInputPayloadTransaction {
     public let transaction: Transaction
     public let payloadTxOutContext: TxOutContext
     public var changeTxOutContext: TxOutContext
-    public var presignedInputIncomeTxOutput: TransactionOutput
+    public var presignedInputIncomeTxOutContext: TxOutContext
 
     public var receipt: Receipt {
         payloadTxOutContext.receipt

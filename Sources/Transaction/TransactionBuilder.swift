@@ -209,39 +209,29 @@ extension TransactionBuilder {
             changeAmount: possibleTransaction.changeAmount,
             rng: seededRng)
 
-        // if presignedInput...
-        //
-        // 1.) add presignedInput to transaction (easy)
-        //
-        // 2.) add output for payment to self as income from presignedInput
-        //     (reference payloadContexts and builder.addOutput code block at line 217-223)
-
-        // TODO: add ability to specify token ID for the reward amount, which is expected
-        // to be different than the token ID for the required amount.
-        var presignedIncomeTxOutputs = [TransactionOutput]()
+        var presignedIncomeTxOutContexts = [TxOutContext]()
         if let presignedInput = presignedInput {
-            let incomeTxOut = TransactionOutput(
-                context.accountKey.publicAddress,
-                presignedInput.rewardAmount)
-            presignedIncomeTxOutputs.append(incomeTxOut)
+            // add SCI
             if case .failure(let error) =
                 builder.addSignedContingentInput(signedContingentInput: presignedInput) {
                 return .failure(error)
             }
-            
-            Math.positiveRemainingAmount(
+
+            // amount is reward amount minus fee
+            _ = Math.positiveRemainingAmount(
                 inputAmounts: [presignedInput.rewardAmount],
                 fee: context.fee
-            )
-            .map { remainingAmount in
+            ).map { netIncomeAmount in
                 // add reward output from SCI
-                // amount is reward amount minus fee
                 builder.addOutput(
                     publicAddress: context.accountKey.publicAddress,
-                    amount: remainingAmount,
-                    rng: seededRng)
+                    amount: netIncomeAmount,
+                    rng: seededRng
+                ).map { incomeTxOutContext in
+                    presignedIncomeTxOutContexts.append(incomeTxOutContext)
+                }
             }
-
+            
         }
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
@@ -251,7 +241,7 @@ extension TransactionBuilder {
                         transaction: transaction,
                         payloadTxOutContexts: payloadContexts,
                         changeTxOutContext: changeContext,
-                        presignedInputIncomeTxOutputs: presignedIncomeTxOutputs)
+                        presignedInputIncomeTxOutContexts: presignedIncomeTxOutContexts)
                 }
             }
         }
