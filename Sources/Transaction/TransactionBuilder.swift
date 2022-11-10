@@ -164,7 +164,10 @@ extension TransactionBuilder {
         possibleTransaction: PossibleTransaction,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
-        guard Math.totalOutlayCheck(for: possibleTransaction, fee: context.fee, inputs: inputs) else {
+        guard Math.totalOutlayCheck(
+                for: possibleTransaction,
+                fee: context.fee,
+                inputs: inputs) else {
             return .failure(.invalidInput("Input values != output values + fee"))
         }
 
@@ -186,8 +189,7 @@ extension TransactionBuilder {
 
         for input in inputs {
             if case .failure(let error) =
-                builder.addInput(preparedTxInput: input, accountKey: context.accountKey)
-            {
+                builder.addInput(preparedTxInput: input, accountKey: context.accountKey) {
                 return .failure(error)
             }
         }
@@ -217,21 +219,20 @@ extension TransactionBuilder {
                 return .failure(error)
             }
 
-            // amount is reward amount minus fee
+            // net reward amount is reward amount minus fee
             _ = Math.positiveRemainingAmount(
                 inputAmounts: [presignedInput.rewardAmount],
                 fee: context.fee
-            ).map { netIncomeAmount in
+            ).map { netRewardAmount in
                 // add reward output from SCI
                 builder.addOutput(
                     publicAddress: context.accountKey.publicAddress,
-                    amount: netIncomeAmount,
+                    amount: netRewardAmount,
                     rng: seededRng
                 ).map { incomeTxOutContext in
                     presignedIncomeTxOutContexts.append(incomeTxOutContext)
                 }
             }
-            
         }
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
