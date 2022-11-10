@@ -15,13 +15,13 @@ class TransactionPerfTests: PerformanceTestCase {
             fogResolver: fixture.fogResolver,
             memoType: .unused,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
         measure {
             XCTAssertSuccess(TransactionBuilder.build(
                 context: context,
                 inputs: fixture.inputs,
-                outputs: fixture.outputs,
-                rngSeed: testRngSeed()))
+                outputs: fixture.outputs))
         }
     }
 

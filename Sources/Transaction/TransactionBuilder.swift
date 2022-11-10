@@ -44,6 +44,7 @@ final class TransactionBuilder {
         let memoType: MemoType
         let tombstoneBlockIndex: UInt64
         let fee: Amount
+        let rngSeed: RngSeed
     }
 
     private struct InnerContext {
@@ -98,14 +99,12 @@ extension TransactionBuilder {
         inputs: [PreparedTxInput],
         to recipient: PublicAddress,
         amount: PositiveUInt64,
-        rngSeed: RngSeed,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
             context: context,
             inputs: inputs,
             outputs: [TransactionOutput(recipient, amount)],
-            rngSeed: rngSeed,
             presignedInput: presignedInput
         ).map { pendingTransaction in
             pendingTransaction.singlePayload
@@ -115,8 +114,7 @@ extension TransactionBuilder {
     static func build(
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
-        sendingAllTo recipient: PublicAddress,
-        rngSeed: RngSeed
+        sendingAllTo recipient: PublicAddress
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         Math.positiveRemainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
@@ -128,7 +126,6 @@ extension TransactionBuilder {
                 context: context,
                 inputs: inputs,
                 possibleTransaction: possibleTransaction,
-                rngSeed: rngSeed,
                 presignedInput: nil
             ).map { pendingTransaction in
                 pendingTransaction.singlePayload
@@ -140,7 +137,6 @@ extension TransactionBuilder {
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
         outputs: [TransactionOutput],
-        rngSeed: RngSeed,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
         outputsAddingChangeOutput(
@@ -152,7 +148,6 @@ extension TransactionBuilder {
                 context: context,
                 inputs: inputs,
                 possibleTransaction: buildingTransaction,
-                rngSeed: rngSeed,
                 presignedInput: presignedInput)
         }
     }
@@ -161,7 +156,6 @@ extension TransactionBuilder {
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
         possibleTransaction: PossibleTransaction,
-        rngSeed: RngSeed,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
         guard Math.totalOutlayCheck(for: possibleTransaction, fee: context.fee, inputs: inputs) else {
@@ -192,7 +186,7 @@ extension TransactionBuilder {
             }
         }
 
-        let seededRng = MobileCoinChaCha20Rng(rngSeed: rngSeed)
+        let seededRng = MobileCoinChaCha20Rng(rngSeed: context.rngSeed)
 
         let payloadContexts = possibleTransaction.outputs.map { output in
             builder.addOutput(

@@ -10,34 +10,38 @@ class TransactionTests: XCTestCase {
 
     func testBuildWorks() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
+
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: fixture.blockVersion,
             fogResolver: fixture.fogResolver,
             memoType: .unused,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
+
         XCTAssertSuccess(TransactionBuilder.build(
             context: context,
             inputs: fixture.inputs,
-            outputs: fixture.outputs,
-            rngSeed: testRngSeed()))
+            outputs: fixture.outputs))
     }
 
     func testLegacyBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
+
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: .legacy,
             fogResolver: fixture.fogResolver,
             memoType: .unused,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
+
         let txOutContext = try TransactionBuilder.build(
             context: context,
             inputs: fixture.inputs,
-            outputs: fixture.outputs,
-            rngSeed: testRngSeed()).get()
+            outputs: fixture.outputs).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
@@ -53,18 +57,20 @@ class TransactionTests: XCTestCase {
 
     func testRTHBlockVersion() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
+
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: .minRTHEnabled,
             fogResolver: fixture.fogResolver,
             memoType: .unused,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
+
         let txOutContext = try TransactionBuilder.build(
             context: context,
             inputs: fixture.inputs,
-            outputs: fixture.outputs,
-            rngSeed: testRngSeed()).get()
+            outputs: fixture.outputs).get()
 
         let txOut = txOutContext.changeTxOutContext.txOut
         let accountKey = fixture.accountKey
@@ -80,34 +86,38 @@ class TransactionTests: XCTestCase {
 
     func testFutureBlockVersionFailure() throws {
         let fixture = try Transaction.Fixtures.BuildTx()
+
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: .versionMax,
             fogResolver: fixture.fogResolver,
             memoType: .unused,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
+
         XCTAssertFailure(TransactionBuilder.build(
             context: context,
             inputs: fixture.inputs,
-            outputs: fixture.outputs,
-            rngSeed: testRngSeed()))
+            outputs: fixture.outputs))
     }
 
     func testExactChangeCreatesChangeOutput() throws {
         let fixture = try Transaction.Fixtures.ExactChange()
+
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: .minRTHEnabled,
             fogResolver: fixture.fogResolver,
             memoType: .unused,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
+
         let txOutContext = try TransactionBuilder.build(
             context: context,
             inputs: fixture.inputs,
-            outputs: fixture.outputs,
-            rngSeed: testRngSeed()).get()
+            outputs: fixture.outputs).get()
 
         XCTAssertNotNil(txOutContext.changeTxOutContext)
     }

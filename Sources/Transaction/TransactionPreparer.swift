@@ -79,10 +79,10 @@ struct TransactionPreparer {
                             fogResolver: fogResolver,
                             memoType: recoverableMemo ? .recoverable : .unused,
                             tombstoneBlockIndex: tombstoneBlockIndex,
-                            fee: fee),
+                            fee: fee,
+                            rngSeed: rngSeed),
                         inputs: preparedInputs,
-                        sendingAllTo: self.selfPaymentAddress,
-                        rngSeed: rngSeed
+                        sendingAllTo: self.selfPaymentAddress
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
                 })
@@ -141,11 +141,12 @@ struct TransactionPreparer {
                             fogResolver: fogResolver,
                             memoType: memoType,
                             tombstoneBlockIndex: tombstoneBlockIndex,
-                            fee: fee),
+                            fee: fee,
+                            rngSeed: rngSeed
+                            ),
                         inputs: preparedInputs,
                         to: recipient,
-                        amount: positiveValue,
-                        rngSeed: rngSeed
+                        amount: positiveValue
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })
@@ -206,10 +207,10 @@ struct TransactionPreparer {
                             fogResolver: fogResolver,
                             memoType: memoType,
                             tombstoneBlockIndex: tombstoneBlockIndex,
-                            fee: fee),
+                            fee: fee,
+                            rngSeed: rngSeed),
                         inputs: preparedInputs,
                         outputs: [], // required output for SCI payment
-                        rngSeed: rngSeed,
                         presignedInput: presignedInput
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })

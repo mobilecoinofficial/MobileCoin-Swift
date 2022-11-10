@@ -17,14 +17,14 @@ class TxOutMemoIntegrationTests: XCTestCase {
             fogResolver: txFixture.fogResolver,
             memoType: .recoverable,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fee: txFixture.fee)
+            fee: txFixture.fee,
+            rngSeed: testRngSeed())
 
         XCTAssertSuccess(TransactionBuilder.build(
             context: context,
             inputs: txFixture.inputs,
             to: txFixture.recipientAccountKey.publicAddress,
-            amount: txFixture.amount,
-            rngSeed: testRngSeed()))
+            amount: txFixture.amount))
     }
 
     func testTransactionWithSenderMemo() throws {
@@ -71,14 +71,14 @@ class TxOutMemoIntegrationTests: XCTestCase {
             fogResolver: txFixture.fogResolver,
             memoType: fixture.memoType,
             tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fee: txFixture.fee)
+            fee: txFixture.fee,
+            rngSeed: testRngSeed())
 
         XCTAssertSuccess(TransactionBuilder.build(
             context: context,
             inputs: txFixture.inputs,
             to: txFixture.recipientAccountKey.publicAddress,
-            amount: txFixture.amount,
-            rngSeed: testRngSeed()))
+            amount: txFixture.amount))
     }
 
     func testTransactionWithSenderWithPaymentRequestMemo() throws {

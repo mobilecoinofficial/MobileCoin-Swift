@@ -173,13 +173,13 @@ extension TransactionBuilder.Fixtures {
             fogResolver: fixture.fogResolver,
             memoType: memoType,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee)
+            fee: fixture.fee,
+            rngSeed: testRngSeed())
         return try XCTUnwrapSuccess(TransactionBuilder.build(
                         context: context,
                         inputs: fixture.inputs,
                         to: fixture.recipientAccountKey.publicAddress,
-                        amount: fixture.amount,
-                        rngSeed: testRngSeed())).transaction
+                        amount: fixture.amount)).transaction
     }
 
 }
