@@ -101,6 +101,12 @@ struct TransactionPreparer {
             Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
+        guard let tokenId = inputs.first?.amount.tokenId else {
+            serialQueue.async {
+                completion(.failure(.invalidInput("prepareTransaction error: No inputs available")))
+            }
+            return
+        }
         guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {
             let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amount.tokenId)"
             logger.error(errorMessage, logFunction: false)
@@ -146,7 +152,7 @@ struct TransactionPreparer {
                             ),
                         inputs: preparedInputs,
                         to: recipient,
-                        amount: positiveValue
+                        amount: Amount(positiveValue.value, in: tokenId)
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })

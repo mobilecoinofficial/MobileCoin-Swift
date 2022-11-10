@@ -68,7 +68,7 @@ enum TransactionBuilderUtils {
         ptr: OpaquePointer,
         tombstoneBlockIndex: UInt64,
         publicAddress: PublicAddress,
-        amount: UInt64,
+        amount: Amount,
         rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
 
@@ -81,7 +81,8 @@ enum TransactionBuilderUtils {
                     Data.make(withMcDataBytes: { errorPtr in
                         mc_transaction_builder_add_output(
                             ptr,
-                            amount,
+                            amount.value,
+                            amount.tokenId.value,
                             publicAddressPtr,
                             rngCallbackPtr,
                             confirmationNumberPtr,
@@ -133,7 +134,7 @@ enum TransactionBuilderUtils {
         ptr: OpaquePointer,
         tombstoneBlockIndex: UInt64,
         accountKey: AccountKey,
-        amount: UInt64,
+        amount: Amount,
         rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         var confirmationNumberData = Data32()
@@ -151,7 +152,8 @@ enum TransactionBuilderUtils {
                             mc_transaction_builder_add_change_output(
                                 accountKeyPtr,
                                 ptr,
-                                amount,
+                                amount.value,
+                                amount.tokenId.value,
                                 rngCallbackPtr,
                                 confirmationNumberPtr,
                                 sharedSecretPtr,

@@ -20,6 +20,7 @@ extension Receipt.Fixtures {
         let txOutPublicKey: RistrettoPublic
         var txOutPublicKeyData: Data { txOutPublicKey.data }
         let value = Self.value
+        let tokenId = Self.tokenId
         var txTombstoneBlockIndex = Self.txTombstoneBlockIndex
 
         let wrongAccountKey: AccountKey
@@ -50,7 +51,7 @@ extension Receipt.Fixtures.Default {
         let accountKey = self.accountKey()
         return try TransactionBuilder.outputWithReceipt(
             publicAddress: accountKey.publicAddress,
-            amount: value,
+            amount: Amount(value, in: tokenId),
             tombstoneBlockIndex: 100,
             blockVersion: defaultBlockVersion,
             rng: TestRng()
@@ -65,6 +66,7 @@ extension Receipt.Fixtures.Default {
     fileprivate static let txOutPublicKeyBase64Encoded =
         "BF8KR3dl0gxGFdIa+LvY3ZwOO1zkDQu908KBMwFZfkk="
     fileprivate static let value: UInt64 = 10
+    fileprivate static let tokenId = TokenId.MOB
     fileprivate static let txTombstoneBlockIndex: UInt64 = 100
 
 }

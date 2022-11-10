@@ -419,11 +419,11 @@ extension Transaction.Fixtures.BuildTx {
         [
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(10))
+                amount: Amount(10, in: .MOB)
             ),
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 2).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(2499979999999990))
+                amount: Amount(2499979999999990, in: .MOB)
             ),
         ]
     }
@@ -447,12 +447,13 @@ extension Transaction.Fixtures.ExactChange {
     fileprivate static func outputs() throws
         -> [TransactionOutput]
     {
-        [
+        let posAmt = try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
+        let output =
             TransactionOutput(
                 recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
-                amount: try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
-            ),
-        ]
+                amount: Amount(posAmt.value, in: .MOB)
+            )
+        return [output]
     }
 
 }

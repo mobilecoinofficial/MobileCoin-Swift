@@ -6,13 +6,13 @@ import Foundation
 
 public struct TransactionOutput {
     let recipient: PublicAddress
-    let amount: PositiveUInt64
+    let amount: Amount
 }
 
 extension TransactionOutput: Equatable, Hashable {}
 
 extension TransactionOutput {
-    init(_ recipient: PublicAddress, _ amount: PositiveUInt64) {
+    init(_ recipient: PublicAddress, _ amount: Amount) {
         self.recipient = recipient
         self.amount = amount
     }

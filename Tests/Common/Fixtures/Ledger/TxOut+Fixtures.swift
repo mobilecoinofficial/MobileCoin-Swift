@@ -19,6 +19,7 @@ extension TxOut.Fixtures {
         let recipientAccountKey: AccountKey
         let keyImage: KeyImage
         let value = Self.value
+        let tokenId = Self.tokenId
 
         let wrongAccountKey: AccountKey
 
@@ -50,7 +51,7 @@ extension TxOut.Fixtures.Default {
     fileprivate static func txOut(accountKey: AccountKey) throws -> TxOut {
         try TransactionBuilder.output(
             publicAddress: accountKey.publicAddress,
-            amount: value,
+            amount: Amount(value, in: tokenId),
             fogResolver:
                 FogResolver.Fixtures.Default(reportUrl: accountKey.fogReportUrl).fogResolver,
             blockVersion: defaultBlockVersion,
@@ -68,6 +69,7 @@ extension TxOut.Fixtures.Default {
 
     fileprivate static let keyImageBase64Encoded = "6LmUstevIcLo0k6lcyXTBaRjdm9ktKqg/VnX2ivayA4="
     fileprivate static let value: UInt64 = 2_499_990_000_000_000
+    fileprivate static let tokenId = TokenId.MOB
 
 }
 

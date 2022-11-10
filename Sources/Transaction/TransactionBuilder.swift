@@ -98,7 +98,7 @@ extension TransactionBuilder {
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
         to recipient: PublicAddress,
-        amount: PositiveUInt64,
+        amount: Amount,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
@@ -116,11 +116,17 @@ extension TransactionBuilder {
         inputs: [PreparedTxInput],
         sendingAllTo recipient: PublicAddress
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
-        Math.positiveRemainingAmount(
+        guard let tokenId = inputs.first?.knownTxOut.amount.tokenId else {
+            return .failure(.invalidInput("No inputs to send"))
+        }
+        return Math.remainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
+            outputValues: [],
             fee: context.fee
         ).map { outputAmount in
-            PossibleTransaction([TransactionOutput(recipient, outputAmount)], nil)
+            let amountToSend = Amount(outputAmount, in: tokenId)
+            let changeAmount = Amount(0, in: tokenId)
+            return PossibleTransaction([TransactionOutput(recipient, amountToSend)], changeAmount)
         }.flatMap { possibleTransaction in
             build(
                 context: context,
@@ -191,7 +197,7 @@ extension TransactionBuilder {
         let payloadContexts = possibleTransaction.outputs.map { output in
             builder.addOutput(
                 publicAddress: output.recipient,
-                amount: output.amount.value,
+                amount: output.amount,
                 rng: seededRng
             )
         }
@@ -214,15 +220,28 @@ extension TransactionBuilder {
         // to be different than the token ID for the required amount.
         var presignedIncomeTxOutputs = [TransactionOutput]()
         if let presignedInput = presignedInput {
-            if let rewardAmount = PositiveUInt64(presignedInput.rewardAmount.value) {
-                let incomeTxOut = TransactionOutput(context.accountKey.publicAddress, rewardAmount)
-                presignedIncomeTxOutputs.append(incomeTxOut)
-            }
+            let incomeTxOut = TransactionOutput(
+                context.accountKey.publicAddress,
+                presignedInput.rewardAmount)
+            presignedIncomeTxOutputs.append(incomeTxOut)
             if case .failure(let error) =
-                builder.addSignedContingentInput(signedContingentInput: presignedInput)
-            {
+                builder.addSignedContingentInput(signedContingentInput: presignedInput) {
                 return .failure(error)
             }
+            
+            Math.positiveRemainingAmount(
+                inputAmounts: [presignedInput.rewardAmount],
+                fee: context.fee
+            )
+            .map { remainingAmount in
+                // add reward output from SCI
+                // amount is reward amount minus fee
+                builder.addOutput(
+                    publicAddress: context.accountKey.publicAddress,
+                    amount: remainingAmount,
+                    rng: seededRng)
+            }
+
         }
 
         return payloadContexts.collectResult().flatMap { payloadContexts in
@@ -242,7 +261,7 @@ extension TransactionBuilder {
         blockVersion: BlockVersion,
         accountKey: AccountKey,
         builder: TransactionBuilder,
-        changeAmount: PositiveUInt64?,
+        changeAmount: Amount,
         rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         switch blockVersion {
@@ -251,19 +270,19 @@ extension TransactionBuilder {
             // on the new change subaddress (max - 1), so we will emulate legacy behavior.
             return builder.addOutput(
                 publicAddress: accountKey.publicAddress,
-                amount: changeAmount?.value ?? 0,
+                amount: changeAmount,
                 rng: rng)
         default:
             return builder.addChangeOutput(
                 accountKey: accountKey,
-                amount: changeAmount?.value ?? 0,
+                amount: changeAmount,
                 rng: rng)
         }
     }
 
     static func output(
         publicAddress: PublicAddress,
-        amount: UInt64,
+        amount: Amount,
         fogResolver: FogResolver = FogResolver(),
         blockVersion: BlockVersion,
         rng: MobileCoinRng
@@ -280,7 +299,7 @@ extension TransactionBuilder {
 
     static func outputWithReceipt(
         publicAddress: PublicAddress,
-        amount: UInt64,
+        amount: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
         blockVersion: BlockVersion,
@@ -316,8 +335,12 @@ extension TransactionBuilder {
             outputValues: outputs.map { $0.amount.value },
             fee: fee
         )
-        .map { remainingAmount in
-            PossibleTransaction(outputs, PositiveUInt64(remainingAmount))
+        .map { changeValue in
+            if let posChangeValue = PositiveUInt64(changeValue) {
+                return PossibleTransaction(outputs, Amount(posChangeValue.value, in: fee.tokenId))
+            } else {
+                return PossibleTransaction(outputs, Amount(0, in: fee.tokenId))
+            }
         }
     }
 }
@@ -350,7 +373,7 @@ extension TransactionBuilder {
 
     private func addOutput(
         publicAddress: PublicAddress,
-        amount: UInt64,
+        amount: Amount,
         rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         TransactionBuilderUtils.addOutput(
@@ -363,7 +386,7 @@ extension TransactionBuilder {
 
     private func addChangeOutput(
         accountKey: AccountKey,
-        amount: UInt64,
+        amount: Amount,
         rng: MobileCoinRng
     ) -> Result<TxOutContext, TransactionBuilderError> {
         TransactionBuilderUtils.addChangeOutput(
