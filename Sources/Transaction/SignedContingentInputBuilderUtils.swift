@@ -7,7 +7,7 @@ import Foundation
 import LibMobileCoin
 
 enum SignedContingentInputBuilderUtils {
-    
+
     static func addRequiredOutput(
         ptr: OpaquePointer,
         publicAddress: PublicAddress,
@@ -37,8 +37,8 @@ enum SignedContingentInputBuilderUtils {
                     case .attestationVerificationFailed:
                         return .attestationVerificationFailed("\(redacting: $0.description)")
                     default:
-                        // Safety: mc_signed_contingent_input_builder_add_required_output should not throw
-                        // non-documented errors.
+                        // Safety: mc_signed_contingent_input_builder_add_required_output should not
+                        // throw non-documented errors.
                         logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
                     }
                 }
@@ -52,17 +52,16 @@ enum SignedContingentInputBuilderUtils {
             }
         }.map { txOutData in
             guard let txOut = TxOut(serializedData: txOutData) else {
-                // Safety: mc_signed_contingent_input_builder_add_required_output should always return valid data on
-                // success.
-                logger.fatalError("mc_signed_contingent_input_builder_add_required_output returned invalid data: " +
-                    "\(redacting: txOutData.base64EncodedString())")
+                // Safety: mc_signed_contingent_input_builder_add_required_output should always
+                // return valid data on success.
+                logger.fatalError("mc_signed_contingent_input_builder_add_required_output " +
+                    "returned invalid data: \(redacting: txOutData.base64EncodedString())")
             }
 
             return txOut
         }
     }
 
-    // swiftlint:disable closure_body_length
     static func addRequiredChangeOutput(
         ptr: OpaquePointer,
         accountKey: AccountKey,
@@ -96,8 +95,8 @@ enum SignedContingentInputBuilderUtils {
                             return .attestationVerificationFailed(
                                 "\(redacting: $0.description)")
                         default:
-                            // Safety: mc_signed_contingent_input_builder_add_required_change_output should not throw
-                            // non-documented errors.
+                            // Safety: mc_signed_contingent_input_builder_add_required_change_output
+                            // should not throw non-documented errors.
                             logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
                         }
                     }
@@ -107,10 +106,10 @@ enum SignedContingentInputBuilderUtils {
 
         return result.map { txOutData in
             guard let txOut = TxOut(serializedData: txOutData) else {
-                // Safety: mc_signed_contingent_input_builder_add_required_change_output should always return valid data on
-                // success.
-                logger.fatalError("mc_signed_contingent_input_builder_add_required_change_output returned invalid data: " +
-                    "\(redacting: txOutData.base64EncodedString())")
+                // Safety: mc_signed_contingent_input_builder_add_required_change_output should
+                // always return valid data on success.
+                logger.fatalError("mc_signed_contingent_input_builder_add_required_change_output " +
+                    "returned invalid data: \(redacting: txOutData.base64EncodedString())")
             }
 
             return txOut
@@ -155,15 +154,17 @@ enum SignedContingentInputBuilderUtils {
                 case .invalidInput:
                     return .invalidInput("\(redacting: $0.description)")
                 default:
-                    // Safety: mc_signed_contingent_input_builder_build should not throw non-documented errors.
+                    // Safety: mc_signed_contingent_input_builder_build should not throw
+                    // non-documented errors.
                     logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
                 }
             }
         }.map { sciBytes in
             guard let sci = SignedContingentInput(serializedData: sciBytes) else {
-                // Safety: mc_signed_contingent_input_builder_build should always return valid data on success.
-                logger.fatalError("mc_signed_contingent_input_builder_build returned invalid data: " +
-                    "\(redacting: sciBytes.base64EncodedString())")
+                // Safety: mc_signed_contingent_input_builder_build should always return valid data
+                // on success.
+                logger.fatalError("mc_signed_contingent_input_builder_build returned invalid " +
+                    "data: \(redacting: sciBytes.base64EncodedString())")
             }
             return sci
         }

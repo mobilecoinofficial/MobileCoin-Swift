@@ -25,7 +25,7 @@ enum NetworkPreset {
 
     /// Latest internal master
     case master
-    
+
     case masterDev
 
     /// Dynamic preset that can be configured at runtime
@@ -144,7 +144,8 @@ extension NetworkPreset {
         case .testNet:
             return .testNet
 
-        case .alpha, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
+        case .alpha, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran,
+             .dynamic:
             return .devNetwork
         }
     }
@@ -589,7 +590,8 @@ extension NetworkPreset {
         switch self {
         case .mainNet, .testNet:
             return false
-        case .alpha, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
+        case .alpha, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran,
+             .dynamic:
             return false
         }
     }
@@ -733,7 +735,8 @@ extension NetworkPreset {
         case .testNet:
             return []
 
-        case .alpha, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran, .dynamic:
+        case .alpha, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran,
+             .dynamic:
             return Self.devNetworkTestAccountPrivateKeysHex
         }
     }

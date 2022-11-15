@@ -51,7 +51,7 @@ enum TransactionBuilderUtils {
                     ptr,
                     sciDataPtr,
                     &errorPtr)
-            }.mapError { //(error:LibMobileCoinError) -> Result<(), TransactionBuilderError> in
+            }.mapError {
                 switch $0.errorCode {
                 case .invalidInput:
                     return .invalidInput("\(redacting: $0.description)")
@@ -183,7 +183,6 @@ enum TransactionBuilderUtils {
             result: result)
     }
     // swiftlint:enable closure_body_length
-    
     private static func renderTxOutContext(
         confirmationNumberData: Data32,
         sharedSecretData: Data32,

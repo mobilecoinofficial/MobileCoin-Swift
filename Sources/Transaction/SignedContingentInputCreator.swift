@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable function_parameter_count multiline_function_chains
+// swiftlint:disable function_parameter_count multiline_function_chains function_body_length
 
 import Foundation
 
@@ -49,7 +49,8 @@ struct SignedContingentInputCreator {
         ) -> Void
     ) {
         guard amountToSend.value > 0, let positiveValue = PositiveUInt64(amountToSend.value) else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amountToSend.tokenId)"
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 " +
+                "\(amountToSend.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
                 completion(.failure(.invalidInput(errorMessage)))
@@ -72,7 +73,8 @@ struct SignedContingentInputCreator {
         }
 
         guard amountToReceive.value > 0 else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amountToReceive.tokenId)"
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 " +
+                "\(amountToReceive.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
                 completion(.failure(.invalidInput(errorMessage)))

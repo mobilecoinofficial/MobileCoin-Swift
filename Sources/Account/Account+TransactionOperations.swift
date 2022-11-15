@@ -337,7 +337,7 @@ extension Account {
                                     "Transaction with presigned input prepared with fee level. " +
                                         "fee: \(redacting: fee)",
                                     logFunction: false)
-                                
+
                                 let tombstoneBlockIndex =
                                     min(ledgerBlockCount + 50, presignedInput.tombstoneBlockIndex)
 

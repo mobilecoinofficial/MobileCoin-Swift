@@ -77,11 +77,11 @@ extension TransactionBuilder.Math {
         guard inputTokenIdValues.count == 1 else {
             return .failure(.invalidInput("Amounts must be of same tokenId"))
         }
-        
+
         guard let tokenIdValue = inputTokenIdValues.first, fee.tokenId.value == tokenIdValue else {
             return .failure(.invalidInput("Amounts and fee must be of same tokenId"))
         }
-        
+
         guard let tokenId = inputAmounts.first?.tokenId else {
             return .failure(.invalidInput("There must be at least one input"))
         }

@@ -234,7 +234,7 @@ extension DefragTransactionPreparationError: LocalizedError {
     }
 }
 
-public enum PresignedInputTransactionPreparationError: Error {
+public enum SCITransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
     case defragmentationRequired(String = String())
@@ -242,7 +242,7 @@ public enum PresignedInputTransactionPreparationError: Error {
     case invalidBlockVersion(String = String())
 }
 
-extension PresignedInputTransactionPreparationError: CustomStringConvertible {
+extension SCITransactionPreparationError: CustomStringConvertible {
     public var description: String {
         "Transaction preparation error: " + {
             switch self {
@@ -261,12 +261,11 @@ extension PresignedInputTransactionPreparationError: CustomStringConvertible {
     }
 }
 
-extension PresignedInputTransactionPreparationError: LocalizedError {
+extension SCITransactionPreparationError: LocalizedError {
     public var errorDescription: String? {
         "\(self)"
     }
 }
-
 
 public struct SubmitTransactionError: Error {
     public let submissionError: TransactionSubmissionError

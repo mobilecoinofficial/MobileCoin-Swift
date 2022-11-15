@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable function_parameter_count multiline_function_chains
+// swiftlint:disable function_parameter_count multiline_function_chains function_body_length
 
 import Foundation
 

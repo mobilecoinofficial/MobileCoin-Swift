@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable closure_body_length function_body_length
+// swiftlint:disable closure_body_length function_body_length cyclomatic_complexity
 
 import Foundation
 
