@@ -3,7 +3,7 @@
 //
 
 // swiftlint:disable function_parameter_count function_default_parameter_at_end
-// swiftlint:disable multiline_function_chains
+// swiftlint:disable closure_body_length
 
 import Foundation
 import LibMobileCoin
@@ -48,7 +48,7 @@ final class SignedContingentInputBuilder {
         self.tombstoneBlockIndex = tombstoneBlockIndex
         self.memoBuilder = memoBuilder
         let result: Result<OpaquePointer, TransactionBuilderError>
-        
+
         let ring = McTransactionBuilderRing(ring: preparedTxInput.ring)
 
         result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
@@ -76,7 +76,8 @@ final class SignedContingentInputBuilder {
                                 default:
                                     // Safety: mc_transaction_builder_add_input should not throw
                                     // non-documented errors.
-                                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+                                    logger.fatalError("Unhandled LibMobileCoin error: " +
+                                        "\(redacting: $0)")
                                 }
                             }
                         }
@@ -113,7 +114,7 @@ extension SignedContingentInputBuilder {
         guard let spendPrivateKey = accountKey.privateKeys(for: subaddressIndex)?.spendKey else {
             return .failure(.invalidInput("Tx subaddress index out of bounds"))
         }
-        
+
         do {
             builder = try SignedContingentInputBuilder(
                 tombstoneBlockIndex: tombstoneBlockIndex,
@@ -130,24 +131,25 @@ extension SignedContingentInputBuilder {
             return .failure(error)
         }
 
-        // TODO: Check return value
-        // add required output
-        _ = builder.addRequiredOutput(
+        if case .failure(let error) = builder.addRequiredOutput(
             publicAddress: accountKey.publicAddress,
             amount: amountToReceive,
-            rng: rng)
-        
+            rng: rng) {
+            return .failure(error)
+        }
+
         // add required change output
         let changeValue = input.knownTxOut.amount.value - amountToSend.value
         if changeValue > 0 {
-            // TODO: Check return value
-            _ = builder.addRequiredChangeOutput(
+            if case .failure(let error) = builder.addRequiredChangeOutput(
                 accountKey: accountKey,
                 amount: Amount(value: changeValue, tokenId: amountToSend.tokenId),
-                rng: rng)
+                rng: rng) {
+                return .failure(error)
+            }
         }
-        
-        return builder.build(rng:rng)
+
+        return builder.build(rng: rng)
     }
 }
 
@@ -182,4 +184,3 @@ extension SignedContingentInputBuilder {
         SignedContingentInputBuilderUtils.build(ptr: ptr, rng: rng)
     }
 }
-

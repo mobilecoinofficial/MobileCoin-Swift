@@ -289,12 +289,6 @@ extension Account {
             completion: @escaping (Result<PendingTransaction, TransactionPreparationError>)
             -> Void
         ) {
-            // check 'is valid' on the sci (need to implement)
-
-            // check block version
-
-            // check fee amount < receive amount
-
             let amountToSend = presignedInput.requiredAmount
             let amountToReceive = presignedInput.rewardAmount
             let feeTokenId = amountToReceive.tokenId
@@ -309,7 +303,10 @@ extension Account {
                         }
 
                     if ledgerBlockCount > presignedInput.tombstoneBlockIndex {
-                        completion(.failure(.invalidInput("Presigned Input Expired.")))
+                        serialQueue.async {
+                            completion(.failure(.invalidInput("Presigned Input Expired.")))
+                        }
+                        return
                     }
 
                     logger.info(
@@ -317,8 +314,6 @@ extension Account {
                             "\(feeLevel), unspentTxOutValues: " +
                             "\(redacting: unspentTxOuts.map { $0.value })",
                         logFunction: false)
-
-                    // need to look up details of fee strategy / how it works
 
                     switch self.txOutSelector
                         .selectTransactionInput(
@@ -342,6 +337,7 @@ extension Account {
                                     "Transaction with presigned input prepared with fee level. " +
                                         "fee: \(redacting: fee)",
                                     logFunction: false)
+                                
                                 let tombstoneBlockIndex =
                                     min(ledgerBlockCount + 50, presignedInput.tombstoneBlockIndex)
 
@@ -368,7 +364,9 @@ extension Account {
                         logger.info(
                             "preparePresignedInputTransaction failure: \(error)",
                             logFunction: false)
-                        completion(.failure(error))
+                        serialQueue.async {
+                            completion(.failure(error))
+                        }
                     }
                 case .failure(let connectionError):
                     logger.info("failure - error: \(connectionError)")

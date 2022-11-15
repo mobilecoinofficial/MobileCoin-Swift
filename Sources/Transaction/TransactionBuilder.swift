@@ -3,7 +3,7 @@
 //
 
 // swiftlint:disable function_default_parameter_at_end
-// swiftlint:disable multiline_function_chains
+// swiftlint:disable multiline_function_chains function_body_length
 
 import Foundation
 import LibMobileCoin

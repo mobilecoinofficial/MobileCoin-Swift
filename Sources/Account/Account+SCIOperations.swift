@@ -80,10 +80,7 @@ extension Account {
                     "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
                 logFunction: false)
 
-            // check that total available is > amount to spend
-            // - this is done by txOutSelector, which will return an error if there are not
-            //   enough funds from the unspentTxOuts
-            // - fee is zero here, because the fee will be covered by the consumer of the SCI
+            // fee is zero here, because the fee will be covered by the consumer of the SCI
             switch txOutSelector
                 .selectTransactionInputs(amount: amountToSend, fee: 0, fromTxOuts: unspentTxOuts)
                 .mapError({ error -> TransactionPreparationError in
@@ -118,7 +115,6 @@ extension Account {
                                 """,
                             logFunction: false)
 
-                        // set tombstone block index
                         let tombstoneBlockIndex = ledgerBlockCount + 50
 
                         signedContingentInputCreator.createSignedContingentInput(
