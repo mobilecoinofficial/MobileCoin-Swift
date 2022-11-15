@@ -57,7 +57,8 @@ final class SignedContingentInputBuilder {
                     subaddressSpendPrivateKey.asMcBuffer { subaddressSpendPrivateKeyPtr in
                         ring.withUnsafeOpaquePointer { ringPtr in
 
-                            // Safety: mc_transaction_builder_create should never return nil.
+                            // Safety: mc_signed_contingent_input_builder_create should never
+                            //         return nil.
                             withMcError { errorPtr in
                                 mc_signed_contingent_input_builder_create(
                                     blockVersion,
@@ -74,8 +75,8 @@ final class SignedContingentInputBuilder {
                                 case .invalidInput:
                                     return .invalidBlockVersion("\(redacting: $0.description)")
                                 default:
-                                    // Safety: mc_transaction_builder_add_input should not throw
-                                    // non-documented errors.
+                                    // Safety: mc_signed_contingent_input_builder_create should not
+                                    //         throw non-documented errors.
                                     logger.fatalError("Unhandled LibMobileCoin error: " +
                                         "\(redacting: $0)")
                                 }
