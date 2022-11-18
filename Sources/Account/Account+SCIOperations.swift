@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable closure_body_length function_body_length cyclomatic_complexity
+// swiftlint:disable closure_body_length function_body_length
 
 import Foundation
 
@@ -83,14 +83,6 @@ extension Account {
             // fee is zero here, because the fee will be covered by the consumer of the SCI
             switch txOutSelector
                 .selectTransactionInputs(amount: amountToSend, fee: 0, fromTxOuts: unspentTxOuts)
-                .mapError({ error -> TransactionPreparationError in
-                    switch error {
-                    case .insufficientTxOuts:
-                        return .insufficientBalance()
-                    case .defragmentationRequired:
-                        return .defragmentationRequired()
-                    }
-                })
             {
             case .success(let txOutsToSpend):
                 metaFetcher.blockVersion {

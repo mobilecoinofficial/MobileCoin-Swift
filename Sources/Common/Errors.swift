@@ -150,6 +150,17 @@ extension SignedContingentInputCreationError {
             return .connectionError(innerError)
         }
     }
+
+    static func create(
+        from transactionInputSelectionError: TransactionInputSelectionError
+    ) -> SignedContingentInputCreationError {
+        switch transactionInputSelectionError {
+        case .insufficientTxOuts(let reason):
+            return .insufficientBalance(reason)
+        case .defragmentationRequired(let reason):
+            return .defragmentationRequired(reason)
+        }
+    }
 }
 
 extension SignedContingentInputCreationError: CustomStringConvertible {
