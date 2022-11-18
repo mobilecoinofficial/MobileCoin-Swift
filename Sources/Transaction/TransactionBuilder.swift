@@ -76,7 +76,7 @@ final class TransactionBuilder {
                 }.mapError {
                     switch $0.errorCode {
                     case .invalidInput:
-                        return .invalidBlockVersion("\(redacting: $0.description)")
+                        return .invalidInput("\(redacting: $0.description)")
                     default:
                         // Safety: mc_transaction_builder_add_input should not throw
                         // non-documented errors.
