@@ -45,7 +45,7 @@ struct SignedContingentInputCreator {
         tombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
-            Result<SignedContingentInput, TransactionPreparationError>
+            Result<SignedContingentInput, SignedContingentInputCreationError>
         ) -> Void
     ) {
         guard amountToSend.value > 0, let positiveValue = PositiveUInt64(amountToSend.value) else {

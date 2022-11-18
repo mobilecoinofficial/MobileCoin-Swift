@@ -2,8 +2,6 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable closure_body_length function_body_length
-
 import Foundation
 
 extension Account {
@@ -39,6 +37,65 @@ extension Account {
                 targetQueue: targetQueue)
         }
 
+        private func verifyBlockVersion(
+            _ blockVersion: BlockVersion,
+            _ completion: @escaping (
+                Result<SignedContingentInput, SignedContingentInputCreationError>) -> Void
+        ) -> Bool {
+            // verify block version >= 3
+            guard blockVersion >= 3 else {
+                serialQueue.async {
+                    completion(.failure(.invalidBlockVersion(
+                        "Block version must be > 3 for SCI support")))
+                }
+                return false
+            }
+            return true
+        }
+
+        private func verifyAmountIsNonZero(
+            _ amount: Amount,
+            _ actionDescription: String,
+            _ completion: @escaping (
+                Result<SignedContingentInput, SignedContingentInputCreationError>) -> Void
+        ) -> Bool {
+            guard amount.value > 0 else {
+                let errorMessage = "createSignedContingentInput failure: " +
+                    "Cannot \(actionDescription) 0 \(amount.tokenId)"
+                logger.error(errorMessage, logFunction: false)
+                serialQueue.async {
+                    completion(.failure(.invalidInput(errorMessage)))
+                }
+                return false
+            }
+            return true
+        }
+
+        private func logTxOuts(_ txOuts: [KnownTxOut], _ message: String) {
+            logger.info(
+                "\(message): " +
+                    """
+                        0x\(redacting: txOuts.map {
+                            $0.publicKey.hexEncodedString()
+                        })
+                    """,
+                logFunction: false)
+        }
+
+        private func logUnspentTxOuts(
+            _ recipient: PublicAddress,
+            _ amountToSend: Amount,
+            _ amountToReceive: Amount,
+            _ txOuts: [KnownTxOut]
+        ) {
+            logger.info(
+                "Creating signed contingent input to recipient: \(redacting: recipient), " +
+                    "amountToSend: \(redacting: amountToSend), " +
+                    "amountToRecieve: \(redacting: amountToReceive), " +
+                    "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
+                logFunction: false)
+        }
+
         func createSignedContingentInput(
             to recipient: PublicAddress,
             memoType: MemoType,
@@ -48,37 +105,22 @@ extension Account {
                 Result<SignedContingentInput, SignedContingentInputCreationError>
             ) -> Void
         ) {
-            guard amountToSend.value > 0 else {
-                let errorMessage = "createSignedContingentInput failure: " +
-                    "Cannot spend 0 \(amountToSend.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
+            let functionName = "createSignedContingentInput"
+
+            guard verifyAmountIsNonZero(amountToSend, "send", completion) else {
                 return
             }
 
-            guard amountToReceive.value > 0 else {
-                let errorMessage = "createSignedContingentInput failure: " +
-                    "Cannot receive 0 \(amountToReceive.tokenId)"
-                logger.error(errorMessage, logFunction: false)
-                serialQueue.async {
-                    completion(.failure(.invalidInput(errorMessage)))
-                }
+            guard verifyAmountIsNonZero(amountToReceive, "receive", completion) else {
                 return
             }
 
-            // get all unspent txouts (getUnspentTxOuts() ?)
+            // get all unspent txOuts
             let (unspentTxOuts, ledgerBlockCount) =
             account.readSync {
                 ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount)
             }
-            logger.info(
-                "Creating signed contingent input to recipient: \(redacting: recipient), " +
-                    "amountToSpend: \(redacting: amountToSend), " +
-                    "amountToRecieve: \(redacting: amountToReceive), " +
-                    "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
-                logFunction: false)
+            logUnspentTxOuts(recipient, amountToSend, amountToReceive, unspentTxOuts)
 
             // fee is zero here, because the fee will be covered by the consumer of the SCI
             switch txOutSelector
@@ -89,25 +131,11 @@ extension Account {
                     switch $0 {
                     case .success(let blockVersion):
 
-                        // verify block version >= 3
-                        guard blockVersion >= 3 else {
-                            serialQueue.async {
-                                completion(.failure(.invalidBlockVersion(
-                                    "Block version must be > 3 for SCI support")))
-                            }
+                        guard verifyBlockVersion(blockVersion, completion) else {
                             return
                         }
 
-                        logger.info(
-                            "SCI preparation selected txOutsToSpend: " +
-                                """
-                                    0x\(redacting: txOutsToSpend.map {
-                                        $0.publicKey.hexEncodedString()
-                                    })
-                                """,
-                            logFunction: false)
-
-                        let tombstoneBlockIndex = ledgerBlockCount + 50
+                        logTxOuts(txOutsToSpend, "SCI preparation selected txOutsToSpend")
 
                         signedContingentInputCreator.createSignedContingentInput(
                             inputs: txOutsToSpend,
@@ -115,27 +143,14 @@ extension Account {
                             memoType: memoType,
                             amountToSend: amountToSend,
                             amountToReceive: amountToReceive,
-                            tombstoneBlockIndex: tombstoneBlockIndex,
+                            tombstoneBlockIndex: ledgerBlockCount + 50,
                             blockVersion: blockVersion) { result in
-                                completion(result.mapError {
-                                    let error: SignedContingentInputCreationError
-                                    switch $0 {
-                                    case .invalidInput(let reason):
-                                        error = .invalidInput(reason)
-                                    case .defragmentationRequired(let reason):
-                                        error = .defragmentationRequired(reason)
-                                    case .insufficientBalance(let reason):
-                                        error = .insufficientBalance(reason)
-                                    case .connectionError(let reason):
-                                        error = .connectionError(reason)
-                                    }
-                                    return error
-                                })
+                            serialQueue.async {
+                                completion(result)
+                            }
                         }
                     case .failure(let error):
-                        logger.info(
-                            "prepareSignedContingentInput failure: \(error)",
-                            logFunction: false)
+                        logger.info("\(functionName) failure: \(error)", logFunction: false)
 
                         serialQueue.async {
                             completion(.failure(.connectionError(error)))
@@ -144,7 +159,7 @@ extension Account {
                 }
 
             case .failure(let error):
-                logger.info("prepareSignedContingentInput failure: \(error)", logFunction: false)
+                logger.info("\(functionName) failure: \(error)", logFunction: false)
                 serialQueue.async {
                     completion(.failure(SignedContingentInputCreationError.create(from: error)))
                 }
