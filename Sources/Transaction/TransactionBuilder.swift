@@ -37,7 +37,7 @@ final class TransactionBuilder {
 
     private let memoBuilder: TxOutMemoBuilder
 
-    internal struct Context {
+    struct Context {
         let accountKey: AccountKey
         let blockVersion: BlockVersion
         let fogResolver: FogResolver
