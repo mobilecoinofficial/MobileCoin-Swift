@@ -10,7 +10,7 @@ import LibMobileCoin
 
 enum SignedContingentInputBuilderError: Error {
     case invalidInput(String)
-    case invalidBlockVersion(String)
+    case requiresBlockVersion3(String)
     case attestationVerificationFailed(String)
 }
 
@@ -20,7 +20,7 @@ extension SignedContingentInputBuilderError: CustomStringConvertible {
             switch self {
             case .invalidInput(let reason):
                 return "Invalid input: \(reason)"
-            case .invalidBlockVersion(let reason):
+            case .requiresBlockVersion3(let reason):
                 return "Invalid Block Version: \(reason)"
             case .attestationVerificationFailed(let reason):
                 return "Attestation verification failed: \(reason)"
@@ -73,7 +73,7 @@ final class SignedContingentInputBuilder {
                             }.mapError {
                                 switch $0.errorCode {
                                 case .invalidInput:
-                                    return .invalidBlockVersion("\(redacting: $0.description)")
+                                    return .invalidInput("\(redacting: $0.description)")
                                 default:
                                     // Safety: mc_signed_contingent_input_builder_create should not
                                     //         throw non-documented errors.

@@ -132,7 +132,7 @@ public enum SignedContingentInputCreationError: Error {
     case insufficientBalance(String = String())
     case defragmentationRequired(String = String())
     case connectionError(ConnectionError)
-    case invalidBlockVersion(String)
+    case requiresBlockVersion3(String)
 }
 
 extension SignedContingentInputCreationError {
@@ -175,7 +175,7 @@ extension SignedContingentInputCreationError: CustomStringConvertible {
                 return "Defragmentation required\(!reason.isEmpty ? ": \(reason)" : "")"
             case .connectionError(let innerError):
                 return "\(innerError)"
-            case .invalidBlockVersion(let reason):
+            case .requiresBlockVersion3(let reason):
                 return "Invalid block version: \(reason)"
             }
         }()
@@ -250,7 +250,7 @@ public enum SCITransactionPreparationError: Error {
     case insufficientBalance(String = String())
     case defragmentationRequired(String = String())
     case connectionError(ConnectionError)
-    case invalidBlockVersion(String = String())
+    case requiresBlockVersion3(String = String())
 }
 
 extension SCITransactionPreparationError: CustomStringConvertible {
@@ -265,7 +265,7 @@ extension SCITransactionPreparationError: CustomStringConvertible {
                 return "Defragmentation required\(!reason.isEmpty ? ": \(reason)" : "")"
             case .connectionError(let innerError):
                 return "\(innerError)"
-            case .invalidBlockVersion(let reason):
+            case .requiresBlockVersion3(let reason):
                 return "Invalid block version: \(reason)"
             }
         }()

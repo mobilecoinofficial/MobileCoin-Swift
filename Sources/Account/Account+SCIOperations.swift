@@ -45,7 +45,7 @@ extension Account {
             // verify block version >= 3
             guard blockVersion >= 3 else {
                 serialQueue.async {
-                    completion(.failure(.invalidBlockVersion(
+                    completion(.failure(.requiresBlockVersion3(
                         "Block version must be > 3 for SCI support")))
                 }
                 return false
