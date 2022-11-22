@@ -207,7 +207,12 @@ private final class FfiAttestAke {
     func authEnd(authResponseData: Data, attestationVerifier: AttestationVerifier)
         -> Result<(), AttestAkeError>
     {
-        authResponseData.asMcBuffer { bytesPtr in
+        let authResponseDataBase64 = authResponseData.base64EncodedString()
+        print("authResponseData base64: \(authResponseDataBase64)")
+        print("attestationVerifier base64: \(attestationVerifier.description)")
+
+//        let x = attestationVerifier.
+        return authResponseData.asMcBuffer { bytesPtr in
             attestationVerifier.withUnsafeOpaquePointer { attestationVerifierPtr in
                 withMcError { errorPtr in
                     mc_attest_ake_process_auth_response(
