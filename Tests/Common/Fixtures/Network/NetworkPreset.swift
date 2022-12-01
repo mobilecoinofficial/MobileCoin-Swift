@@ -221,14 +221,24 @@ extension NetworkPreset {
         "a4764346f91979b4906d4ce26102228efe3aba39216dec1e7d22e6b06f919f11"
 
     // v2.0.0 Enclave Values
-    private static let testNetConsensusMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetConsensusMrEnclaveHex =
         "01746f4dd25f8623d603534425ed45833687eca2b3ba25bdd87180b9471dac28"
-    private static let testNetFogViewMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetFogViewMrEnclaveHex =
         "3d6e528ee0574ae3299915ea608b71ddd17cbe855d4f5e1c46df9b0d22b04cdb"
-    private static let testNetFogLedgerMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetFogLedgerMrEnclaveHex =
         "92fb35d0f603ceb5eaf2988b24a41d4a4a83f8fb9cd72e67c3bc37960d864ad6"
-    private static let testNetFogReportMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetFogReportMrEnclaveHex =
         "3e9bf61f3191add7b054f0e591b62f832854606f6594fd63faef1e2aedec4021"
+
+    // v3.0.0 Enclave Values
+    private static let testNetConsensusMrEnclaveHex =
+        "5fe2b72fe5f01c269de0a3678728e7e97d823a953b053e43fbf934f439d290e6"
+    private static let testNetFogViewMrEnclaveHex =
+        "be1d711887530929fbc06ef8b77b618db15e9cd1dd0265559ea45f60a532ee52"
+    private static let testNetFogLedgerMrEnclaveHex =
+        "d5159ba907066384fae65842b5311f853b028c5ee4594f3b38dfc02acddf6fe3"
+    private static let testNetFogReportMrEnclaveHex =
+        "d901b5c4960f49871a848fd157c7c0b03351253d65bb839698ddd5df138ad7b6"
 
     private static let devMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
@@ -411,6 +421,11 @@ extension NetworkPreset {
          "5ce48390a4b805f321abaf4aa5960773fa9c6ad34ed2d4bfe0155c5df01aab0f"),
     ]
 
+    private static let allowedHardeiningAdvisories = [
+        "INTEL-SA-00334",
+        "INTEL-SA-00615",
+        "INTEL-SA-00657",
+    ]
 }
 
 extension NetworkPreset {
@@ -488,13 +503,14 @@ extension NetworkPreset {
         case .testNet:
             return try defaultAttestation(mrEnclaveHex:
                                             Self.legacy_v1_1_0_testNetConsensusMrEnclaveHex,
+                                            Self.legacy_v2_0_0_testNetConsensusMrEnclaveHex,
                                             Self.testNetConsensusMrEnclaveHex)
         case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.CONSENSUS_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -511,7 +527,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_VIEW_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -528,7 +544,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_LEDGER_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -545,7 +561,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_REPORT_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -553,8 +569,8 @@ extension NetworkPreset {
         Attestation(mrEnclaves:
             try mrEnclaveHex.map({
                 try XCTUnwrapSuccess(Attestation.MrEnclave.make(
-                        mrEnclave: try XCTUnwrap(Data(hexEncoded: $0)),
-                        allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                    mrEnclave: try XCTUnwrap(Data(hexEncoded: $0)),
+                    allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
             })
         )
     }

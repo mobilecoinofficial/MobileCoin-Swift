@@ -80,7 +80,9 @@ struct TransactionSubmitter {
              .membershipProofValidationError, .keyError, .unsortedInputs,
              .tokenNotYetConfigured, .missingMaskedTokenID, .maskedTokenIDNotAllowed,
              .unsortedOutputs, .inputRulesNotAllowed, .inputRuleMissingRequiredOutput,
-             .inputRuleMaxTombstoneBlockExceeded:
+             .inputRuleMaxTombstoneBlockExceeded, .unknownMaskedAmountVersion,
+             .inputRulePartialFill, .inputRuleInvalidAmountSharedSecret, .inputRuleTxOutConversion,
+             .inputRuleAmount, .feeMapDigestMismatch:
             return .failure(.invalidTransaction(
                         "Error Code: \(response.result) " +
                         "(\(response.result.rawValue))"))
@@ -105,7 +107,7 @@ struct TransactionSubmitter {
             return .failure(.inputsAlreadySpent())
         case .containsExistingOutputPublicKey:
             return .failure(.outputAlreadyExists())
-        case .ledger:
+        case .ledger, .ledgerTxOutIndexOutOfBounds:
             return .failure(.connectionError(
                 .invalidServerResponse("Consensus.proposeTx returned ledger error")))
         case .UNRECOGNIZED(let resultCode):
