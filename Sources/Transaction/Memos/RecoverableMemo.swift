@@ -7,7 +7,10 @@ import Foundation
 public enum RecoveredMemo {
     case sender(SenderMemo)
     case destination(DestinationMemo)
+    case destinationWithPaymentRequest(DestinationWithPaymentRequestMemo)
+    case destinationWithPaymentIntent(DestinationWithPaymentIntentMemo)
     case senderWithPaymentRequest(SenderWithPaymentRequestMemo)
+    case senderWithPaymentIntent(SenderWithPaymentIntentMemo)
 }
 
 extension RecoveredMemo: Equatable { }
@@ -17,7 +20,13 @@ extension RecoveredMemo {
         switch self {
         case let .senderWithPaymentRequest(memo):
             return memo.addressHash
+        case let .senderWithPaymentIntent(memo):
+            return memo.addressHash
         case let .sender(memo):
+            return memo.addressHash
+        case let .destinationWithPaymentRequest(memo):
+            return memo.addressHash
+        case let .destinationWithPaymentIntent(memo):
             return memo.addressHash
         case let .destination(memo):
             return memo.addressHash
@@ -30,7 +39,10 @@ enum RecoverableMemo {
     case unused
     case sender(RecoverableSenderMemo)
     case destination(RecoverableDestinationMemo)
+    case destinationWithPaymentRequest(RecoverableDestinationWithPaymentRequestMemo)
+    case destinationWithPaymentIntent(RecoverableDestinationWithPaymentIntentMemo)
     case senderWithPaymentRequest(RecoverableSenderWithPaymentRequestMemo)
+    case senderWithPaymentIntent(RecoverableSenderWithPaymentIntentMemo)
 
     init(decryptedMemo data: Data66, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         guard let memoData = Data64(data[2...]) else {
@@ -45,6 +57,12 @@ enum RecoverableMemo {
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .senderWithPaymentRequest(memo)
+        case Types.SENDER_WITH_PAYMENT_INTENT:
+            let memo = RecoverableSenderWithPaymentIntentMemo(
+                memoData,
+                accountKey: accountKey,
+                txOutPublicKey: txOutKeys.publicKey)
+            self = .senderWithPaymentIntent(memo)
         case Types.SENDER:
             let memo = RecoverableSenderMemo(
                 memoData,
@@ -57,6 +75,18 @@ enum RecoverableMemo {
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destination(memo)
+        case Types.DESTINATION_WITH_PAYMENT_INTENT:
+            let memo = RecoverableDestinationWithPaymentIntentMemo(
+                memoData,
+                accountKey: accountKey,
+                txOutKeys: txOutKeys)
+            self = .destinationWithPaymentIntent(memo)
+        case Types.DESTINATION_WITH_PAYMENT_REQUEST:
+            let memo = RecoverableDestinationWithPaymentRequestMemo(
+                memoData,
+                accountKey: accountKey,
+                txOutKeys: txOutKeys)
+            self = .destinationWithPaymentRequest(memo)
         case Types.UNUSED:
             self = .unused
         default:
@@ -68,15 +98,19 @@ enum RecoverableMemo {
     enum Types {
         static let SENDER = "0100"
         static let SENDER_WITH_PAYMENT_REQUEST = "0101"
+        static let SENDER_WITH_PAYMENT_INTENT = "0102"
         static let DESTINATION = "0200"
+        static let DESTINATION_WITH_PAYMENT_REQUEST = "0203"
+        static let DESTINATION_WITH_PAYMENT_INTENT = "0204"
         static let UNUSED = "0000"
     }
 
     var isAuthenticatedSenderMemo: Bool {
         switch self {
-        case .notset, .unused, .destination:
+        case .notset, .unused, .destination, .destinationWithPaymentIntent,
+             .destinationWithPaymentRequest:
             return false
-        case .sender, .senderWithPaymentRequest:
+        case .sender, .senderWithPaymentRequest, .senderWithPaymentIntent:
             return true
         }
     }
@@ -91,6 +125,12 @@ extension RecoverableMemo {
         case let .destination(recoverable):
             guard let memo = recoverable.recover() else { return nil }
             return .destination(memo)
+        case let .destinationWithPaymentIntent(recoverable):
+            guard let memo = recoverable.recover() else { return nil }
+            return .destinationWithPaymentIntent(memo)
+        case let .destinationWithPaymentRequest(recoverable):
+            guard let memo = recoverable.recover() else { return nil }
+            return .destinationWithPaymentRequest(memo)
         case let .sender(recoverable):
             guard let memo = recoverable.recover(senderPublicAddress: publicAddress)
             else { return nil }
@@ -99,6 +139,10 @@ extension RecoverableMemo {
             guard let memo = recoverable.recover(senderPublicAddress: publicAddress)
             else { return nil }
             return .senderWithPaymentRequest(memo)
+        case let .senderWithPaymentIntent(recoverable):
+            guard let memo = recoverable.recover(senderPublicAddress: publicAddress)
+            else { return nil }
+            return .senderWithPaymentIntent(memo)
         }
     }
 }
@@ -140,7 +184,29 @@ extension RecoverableMemo {
                 return (memo: .destination(recoveredMemo), contact: nil)
             }
             return (memo: .destination(recoveredMemo), contact: matchingContact)
-        case .sender, .senderWithPaymentRequest:
+        case let .destinationWithPaymentIntent(memo):
+            guard let recoveredMemo = memo.recover() else {
+                return (memo: nil, contact: nil)
+            }
+            guard let matchingContact = contacts.first(where: {
+                    $0.publicAddress.calculateAddressHash() == recoveredMemo.addressHash
+                })
+            else {
+                return (memo: .destinationWithPaymentIntent(recoveredMemo), contact: nil)
+            }
+            return (memo: .destinationWithPaymentIntent(recoveredMemo), contact: matchingContact)
+        case let .destinationWithPaymentRequest(memo):
+            guard let recoveredMemo = memo.recover() else {
+                return (memo: nil, contact: nil)
+            }
+            guard let matchingContact = contacts.first(where: {
+                    $0.publicAddress.calculateAddressHash() == recoveredMemo.addressHash
+                })
+            else {
+                return (memo: .destinationWithPaymentRequest(recoveredMemo), contact: nil)
+            }
+            return (memo: .destinationWithPaymentRequest(recoveredMemo), contact: matchingContact)
+        case .sender, .senderWithPaymentRequest, .senderWithPaymentIntent:
             return contacts.compactMap { contact in
                 guard let memo = self.recover(publicAddress: contact.publicAddress)
                 else {
