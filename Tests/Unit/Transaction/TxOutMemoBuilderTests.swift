@@ -27,4 +27,13 @@ class TxOutMemoBuilderTests: XCTestCase {
                 accountKey: fixture.accountKey))
     }
 
+    func testcreateSenderPaymentIntentAndDestinationMemoBuilder() throws {
+        let fixture = try AccountKey.Fixtures.Default()
+        let paymentIntentId: UInt64 = 1
+        XCTAssertNotNil(
+            TxOutMemoBuilder.createRecoverablePaymentIntentMemoBuilder(
+                paymentIntentId: paymentIntentId,
+                accountKey: fixture.accountKey))
+    }
+
 }

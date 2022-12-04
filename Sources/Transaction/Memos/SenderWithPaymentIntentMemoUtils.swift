@@ -23,7 +23,7 @@ enum SenderWithPaymentIntentMemoUtils {
                 txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
                     var matches = false
                     let result = withMcError { errorPtr in
-                        mc_memo_sender_with_payment_request_memo_is_valid(
+                        mc_memo_sender_with_payment_intent_memo_is_valid(
                             memoDataPtr,
                             publicAddressPtr,
                             receipientViewPrivateKeyPtr,
@@ -42,7 +42,7 @@ enum SenderWithPaymentIntentMemoUtils {
                             logger.warning("error: \(redacting: error)")
                             return false
                         default:
-                            // Safety: mc_memo_sender_with_payment_request_memo_is_valid
+                            // Safety: mc_memo_sender_with_payment_intent_memo_is_valid
                             // should not throw non-documented errors.
                             logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                             return false
@@ -64,7 +64,7 @@ enum SenderWithPaymentIntentMemoUtils {
     ) -> AddressHash {
         let bytes: Data16 = memoData.asMcBuffer { memoDataPtr in
             switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
-                mc_memo_sender_with_payment_request_memo_get_address_hash(
+                mc_memo_sender_with_payment_intent_memo_get_address_hash(
                     memoDataPtr,
                     bufferPtr,
                     &errorPtr)
@@ -76,12 +76,12 @@ enum SenderWithPaymentIntentMemoUtils {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
                     // happen if arguments to
-                    // mc_memo_sender_with_payment_request_memo_get_address_hash are
+                    // mc_memo_sender_with_payment_intent_memo_get_address_hash are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return Data16()
                 default:
-                    // Safety: mc_memo_sender_with_payment_request_memo_get_address_hash
+                    // Safety: mc_memo_sender_with_payment_intent_memo_get_address_hash
                     // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return Data16()
@@ -101,7 +101,7 @@ enum SenderWithPaymentIntentMemoUtils {
             receipientPublicAddress.viewPublicKeyTyped.asMcBuffer { viewPublicKeyPtr in
                 txOutPublicKey.asMcBuffer { txOutPublicKeyPtr in
                     switch Data64.make(withMcMutableBuffer: { bufferPtr, errorPtr in
-                        mc_memo_sender_with_payment_request_memo_create(
+                        mc_memo_sender_with_payment_intent_memo_create(
                             senderAccountKeyPtr,
                             viewPublicKeyPtr,
                             txOutPublicKeyPtr,
@@ -135,16 +135,16 @@ enum SenderWithPaymentIntentMemoUtils {
         memoData: Data64
     ) -> UInt64? {
         memoData.asMcBuffer { memoDataPtr in
-            var out_payment_request_id: UInt64 = 0
+            var out_payment_intent_id: UInt64 = 0
             let result = withMcError { errorPtr in
-                mc_memo_sender_with_payment_request_memo_get_payment_request_id(
+                mc_memo_sender_with_payment_intent_memo_get_payment_intent_id(
                     memoDataPtr,
-                    &out_payment_request_id,
+                    &out_payment_intent_id,
                     &errorPtr)
             }
             switch result {
             case .success:
-                return out_payment_request_id
+                return out_payment_intent_id
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
@@ -153,7 +153,7 @@ enum SenderWithPaymentIntentMemoUtils {
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_memo_sender_with_payment_request_memo_get_payment_request_id
+                    // Safety: mc_memo_sender_with_payment_intent_memo_get_payment_intent_id
                     // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil

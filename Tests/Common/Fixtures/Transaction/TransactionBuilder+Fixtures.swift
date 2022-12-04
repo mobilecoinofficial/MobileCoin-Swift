@@ -84,6 +84,46 @@ extension TransactionBuilder.Fixtures {
         }
     }
 
+    struct SenderWithPaymentIntentAndDestination {
+        let paymentIntentId: UInt64
+        let txFixture: Transaction.Fixtures.TxOutMemo
+        let senderPublicAddress: PublicAddress
+        let recipeintPublicAddress: PublicAddress
+        let receivedTxOut: KnownTxOut
+        let sentTxOut: KnownTxOut
+        let memoType: MemoType
+        let fee: Amount
+        let totalOutlay: UInt64
+
+        static let Fixtures = TransactionBuilder.Fixtures.self
+
+        init() throws {
+            self.memoType = try Self.getMemoType()
+            self.txFixture = try Transaction.Fixtures.TxOutMemo()
+            self.senderPublicAddress = txFixture.senderAccountKey.publicAddress
+            self.recipeintPublicAddress = txFixture.recipientAccountKey.publicAddress
+            self.paymentIntentId = Self.paymentIntentId
+            self.fee = txFixture.fee
+            self.totalOutlay = txFixture.totalOutlay
+            self.receivedTxOut = try
+                        Self.Fixtures.getOwnedOutput(
+                            accountKey: txFixture.recipientAccountKey,
+                            transaction: try Self.Fixtures.getTransaction(memoType: memoType))
+            self.sentTxOut = try
+                        Self.Fixtures.getOwnedOutput(
+                            accountKey: txFixture.senderAccountKey,
+                            transaction: try Self.Fixtures.getTransaction(memoType: memoType))
+        }
+
+        static let paymentIntentId: UInt64 = 401
+
+        static func getMemoType() throws -> MemoType {
+            .customPaymentIntent(
+                    sender: try Transaction.Fixtures.TxOutMemo().senderAccountKey,
+                    id: paymentIntentId)
+        }
+    }
+
     struct SenderAndDestinationBlockVersionOne {
         let txFixture: Transaction.Fixtures.TxOutMemo
         let receivedTxOut: KnownTxOut
