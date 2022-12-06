@@ -12,8 +12,8 @@ public struct DestinationMemo {
     let memoData64: Data64
     let addressHash: AddressHash
     let numRecipients: PositiveUInt8
-    let fee: UInt64
-    let totalOutlay: UInt64
+    public let fee: UInt64
+    public let totalOutlay: UInt64
 }
 
 extension DestinationMemo: Equatable, Hashable { }
