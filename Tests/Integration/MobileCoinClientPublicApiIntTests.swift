@@ -415,7 +415,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func testRecoverTransactions() throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasRecoverableTestTransactions)
-        
+
         let description = "Recovering transactions"
         try testSupportedProtocols(description: description) {
             try recoverTransaction(transportProtocol: $0, expectation: $1)
@@ -441,13 +441,13 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 XCTFail("Expected some historical transactions on testNet")
                 return
             }
-            
+
             let recovered = historicalTransacitions.filter({ $0.contact != nil })
             guard !recovered.isEmpty else {
                 XCTFail("Expected some recovered transactions on testNet")
                 return
             }
-            
+
             // Test for presence of each RTH memo type
             var destinationWithPaymentIntent = false
             var destinationWithPaymentRequest = false
@@ -455,7 +455,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             var senderWithPaymentIntent = false
             var senderWithPaymentRequest = false
             var sender = false
-            
+
             recovered.forEach({
                 switch $0.memo {
                 case .destinationWithPaymentIntent(let memo):
@@ -499,7 +499,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     return
                 }
             })
-            
+
             guard
                 sender,
                 destination,
@@ -511,7 +511,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 XCTFail("Expected all recovered transaction types on testNet")
                 return
             }
-            
+
             expect.fulfill()
         }
     }

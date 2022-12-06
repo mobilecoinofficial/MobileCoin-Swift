@@ -52,7 +52,7 @@ class TxOutMemoParserTests: XCTestCase {
             return
         }
     }
-    
+
     func testSenderWithPaymentRequestMemoPayloadParse() throws {
         let fixture = try TxOutMemoParser.Fixtures.DefaultSenderWithPaymentRequestMemo()
         let txOutMemo = TxOutMemoParser.parse(
@@ -104,5 +104,5 @@ class TxOutMemoParserTests: XCTestCase {
             return
         }
     }
-    
+
 }

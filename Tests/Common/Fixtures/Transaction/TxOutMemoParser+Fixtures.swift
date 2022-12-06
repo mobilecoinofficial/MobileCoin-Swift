@@ -116,7 +116,7 @@ extension TxOutMemoParser.Fixtures {
             self.payload = try Self.getPayload()
         }
     }
-    
+
     struct DefaultSenderWithPaymentIntentMemo {
         let txOut: TxOut
         let payload: Data
