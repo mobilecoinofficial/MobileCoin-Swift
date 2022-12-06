@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable type_name
 
 import Foundation
 
@@ -40,10 +41,13 @@ struct RecoverableDestinationWithPaymentRequestMemo {
                 txOutPublicKey: txOutPublicKey,
                 txOutTargetKey: txOutTargetKey,
                 accountKey: accountKey),
-            let numberOfRecipients = DestinationWithPaymentRequestMemoUtils.getNumberOfRecipients(memoData: memoData),
+            let numberOfRecipients = DestinationWithPaymentRequestMemoUtils.getNumberOfRecipients(
+                memoData: memoData),
             let fee = DestinationWithPaymentRequestMemoUtils.getFee(memoData: memoData),
-            let totalOutlay = DestinationWithPaymentRequestMemoUtils.getTotalOutlay(memoData: memoData),
-            let paymentRequestId = DestinationWithPaymentRequestMemoUtils.getPaymentRequestId(memoData: memoData)
+            let totalOutlay = DestinationWithPaymentRequestMemoUtils.getTotalOutlay(
+                memoData: memoData),
+            let paymentRequestId = DestinationWithPaymentRequestMemoUtils.getPaymentRequestId(
+                memoData: memoData)
         else {
             logger.debug("Memo did not validate")
             return nil

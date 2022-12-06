@@ -34,6 +34,7 @@ extension RecoveredMemo {
     }
 }
 
+// swiftlint:disable function_body_length
 enum RecoverableMemo {
     case notset
     case unused
@@ -116,7 +117,9 @@ enum RecoverableMemo {
     }
 
 }
+// swiftlint:enable function_body_length
 
+// swiftlint:disable cyclomatic_complexity
 extension RecoverableMemo {
     func recover(publicAddress: PublicAddress? = nil) -> RecoveredMemo? {
         switch self {
@@ -149,6 +152,7 @@ extension RecoverableMemo {
         }
     }
 }
+// swiftlint:enable cyclomatic_complexity
 
 extension RecoverableMemo: Hashable { }
 

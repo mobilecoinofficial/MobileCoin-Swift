@@ -35,13 +35,15 @@ enum DestinationWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_destination_with_payment_request_memo_get_address_hash are
+                    // happen if arguments to
+                    // mc_memo_destination_with_payment_request_memo_get_address_hash are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return Data16()
                 default:
-                    // Safety: mc_memo_destination_with_payment_request_memo_get_address_hash should not throw
-                    // non-documented errors.
+                    // Safety:
+                    // mc_memo_destination_with_payment_request_memo_get_address_hash
+                    // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return Data16()
                 }
@@ -72,8 +74,9 @@ enum DestinationWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_destination_with_payment_request_memo_create are
-                    // supplied incorrectly.
+                    // happen if arguments to
+                    // mc_memo_destination_with_payment_request_memo_create
+                    // are supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
@@ -104,12 +107,14 @@ enum DestinationWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_destination_with_payment_request_memo_get_fee are
+                    // happen if arguments to
+                    // mc_memo_destination_with_payment_request_memo_get_fee are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_memo_destination_with_payment_request_memo_get_fee should not throw
+                    // Safety:
+                    // mc_memo_destination_with_payment_request_memo_get_fee should not throw
                     // non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
@@ -136,13 +141,15 @@ enum DestinationWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_destination_with_payment_request_memo_get_total_outlay are
+                    // happen if arguments to
+                    // mc_memo_destination_with_payment_request_memo_get_total_outlay are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_memo_destination_with_payment_request_memo_get_total_outlay should not throw
-                    // non-documented errors.
+                    // Safety:
+                    // mc_memo_destination_with_payment_request_memo_get_total_outlay
+                    // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }
@@ -169,13 +176,15 @@ enum DestinationWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only happen
-                    // if arguments to  mc_memo_destination_with_payment_request_memo_get_number_of_recipients are
+                    // if arguments t0
+                    // mc_memo_destination_with_payment_request_memo_get_number_of_recipients are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_memo_destination_with_payment_request_memo_get_number_of_recipients should not throw
-                    // non-documented errors.
+                    // Safety:
+                    // mc_memo_destination_with_payment_request_memo_get_number_of_recipients
+                    // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }
@@ -201,13 +210,15 @@ enum DestinationWithPaymentRequestMemoUtils {
                 switch error.errorCode {
                 case .invalidInput:
                     // Safety: This condition indicates a programming error and can only
-                    // happen if arguments to mc_memo_destination_with_payment_request_memo_get_payment_request_id are
+                    // happen if arguments to
+                    // mc_memo_destination_with_payment_request_memo_get_payment_request_id are
                     // supplied incorrectly.
                     logger.warning("error: \(redacting: error)")
                     return nil
                 default:
-                    // Safety: mc_memo_destination_with_payment_request_memo_get_payment_request_id should not throw
-                    // non-documented errors.
+                    // Safety:
+                    // mc_memo_destination_with_payment_request_memo_get_payment_request_id
+                    // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return nil
                 }
