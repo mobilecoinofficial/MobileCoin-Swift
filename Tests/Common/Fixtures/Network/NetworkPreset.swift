@@ -579,6 +579,15 @@ extension NetworkPreset {
         try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
     }
 
+    var hasRecoverableTestTransactions: Bool {
+        switch self {
+        case .testNet:
+            return true
+        default:
+            return false
+        }
+    }
+
     var consensusRequiresCredentials: Bool {
         switch self {
         case .mainNet, .testNet:
