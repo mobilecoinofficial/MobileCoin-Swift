@@ -18,8 +18,7 @@ struct LedgerTxOut: TxOutProtocol {
 
     var encryptedMemo: Data66 { txOut.encryptedMemo }
     var commitment: Data32 { txOut.commitment }
-    var maskedValue: UInt64 { txOut.maskedValue }
-    var maskedTokenId: Data { txOut.maskedTokenId }
+    var maskedAmount: MaskedAmount { txOut.maskedAmount }
     var targetKey: RistrettoPublic { txOut.targetKey }
     var publicKey: RistrettoPublic { txOut.publicKey }
 

@@ -73,28 +73,28 @@ enum TxOutUtils {
         }
     }
 
-    static func reconstructCommitment(
-        maskedValue: UInt64,
-        publicKey: RistrettoPublic,
-        viewPrivateKey: RistrettoPrivate
-    ) -> Data32? {
-        reconstructCommitment(maskedValue: maskedValue,
-                              maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
-                              publicKey: publicKey, viewPrivateKey: viewPrivateKey)
-    }
+//    static func reconstructCommitment(
+//        maskedValue: UInt64,
+//        publicKey: RistrettoPublic,
+//        viewPrivateKey: RistrettoPrivate
+//    ) -> Data32? {
+//        reconstructCommitment(maskedValue: maskedValue,
+//                              maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
+//                              publicKey: publicKey, viewPrivateKey: viewPrivateKey)
+//    }
 
     static func reconstructCommitment(
-        maskedValue: UInt64,
-        maskedTokenId: Data,
+        maskedAmount: MaskedAmount,
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> Data32? {
-        maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
+        maskedAmount.maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
             publicKey.asMcBuffer { publicKeyBufferPtr in
                 viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
                     var mcAmount = McTxOutMaskedAmount(
-                        masked_value: maskedValue,
-                        masked_token_id: maskedTokenIdBufferPtr)
+                        masked_value: maskedAmount.maskedAmount,
+                        masked_token_id: maskedTokenIdBufferPtr,
+                        version: maskedAmount.version)
                     switch Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                         mc_tx_out_reconstruct_commitment(
                             &mcAmount,
@@ -241,34 +241,34 @@ enum TxOutUtils {
         }
     }
 
-    /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
-    ///     does not own `TxOut` or because `TxOut` values are incongruent.
-    static func value(
-        maskedValue: UInt64,
-        publicKey: RistrettoPublic,
-        viewPrivateKey: RistrettoPrivate
-    ) -> UInt64? {
-        amount(maskedValue: maskedValue,
-               maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
-               publicKey: publicKey,
-               viewPrivateKey: viewPrivateKey)?.value
-    }
+//    /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
+//    ///     does not own `TxOut` or because `TxOut` values are incongruent.
+//    static func value(
+//        maskedValue: UInt64,
+//        publicKey: RistrettoPublic,
+//        viewPrivateKey: RistrettoPrivate
+//    ) -> UInt64? {
+//        amount(maskedValue: maskedValue,
+//               maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
+//               publicKey: publicKey,
+//               viewPrivateKey: viewPrivateKey)?.value
+//    }
 
     /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.
     static func amount(
-        maskedValue: UInt64,
-        maskedTokenId: Data,
+        maskedAmount: MaskedAmount,
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> Amount? {
         var mcTxOutAmount = McTxOutAmount()
-        return maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
+        return maskedAmount.maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
             publicKey.asMcBuffer { publicKeyPtr in
                 viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
                     var mcMaskedAmount = McTxOutMaskedAmount(
-                        masked_value: maskedValue,
-                        masked_token_id: maskedTokenIdBufferPtr)
+                        masked_value: maskedAmount.maskedAmount,
+                        masked_token_id: maskedTokenIdBufferPtr,
+                        version: maskedAmount.version)
                     switch withMcError({ errorPtr in
                         mc_tx_out_get_amount(
                             &mcMaskedAmount,
