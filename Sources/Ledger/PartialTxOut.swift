@@ -32,10 +32,10 @@ extension PartialTxOut {
 extension PartialTxOut {
     init?(_ txOut: External_TxOut) {
         guard
-            let commitment = Data32(txOut.maskedAmount.commitment.data),
+            let commitment = Data32(txOut.maskedAmountV1.commitment.data),
             let targetKey = RistrettoPublic(txOut.targetKey.data),
             let publicKey = RistrettoPublic(txOut.publicKey.data),
-            [0, 4, 8].contains(txOut.maskedAmount.maskedTokenID.count)
+            [0, 4, 8].contains(txOut.maskedAmountV1.maskedTokenID.count)
         else {
             return nil
         }
@@ -43,8 +43,8 @@ extension PartialTxOut {
         self.init(
             encryptedMemo: txOut.encryptedMemo,
             commitment: commitment,
-            maskedValue: txOut.maskedAmount.maskedValue,
-            maskedTokenId: txOut.maskedAmount.maskedTokenID,
+            maskedValue: txOut.maskedAmountV1.maskedValue,
+            maskedTokenId: txOut.maskedAmountV1.maskedTokenID,
             targetKey: targetKey,
             publicKey: publicKey)
     }
@@ -53,10 +53,10 @@ extension PartialTxOut {
         guard
             let targetKey = RistrettoPublic(txOutRecord.txOutTargetKeyData),
             let publicKey = RistrettoPublic(txOutRecord.txOutPublicKeyData),
-            [0, 4, 8].contains(txOutRecord.txOutAmountMaskedTokenID.count),
+            [0, 4, 8].contains(txOutRecord.txOutAmountMaskedV1TokenID.count),
             let commitment = TxOutUtils.reconstructCommitment(
                                           maskedValue: txOutRecord.txOutAmountMaskedValue,
-                                          maskedTokenId: txOutRecord.txOutAmountMaskedTokenID,
+                                          maskedTokenId: txOutRecord.txOutAmountMaskedV1TokenID,
                                           publicKey: publicKey,
                                           viewPrivateKey: viewKey),
             Self.isCrc32Matching(commitment, txOutRecord: txOutRecord)
@@ -68,7 +68,7 @@ extension PartialTxOut {
             encryptedMemo: txOutRecord.encryptedMemo,
             commitment: commitment,
             maskedValue: txOutRecord.txOutAmountMaskedValue,
-            maskedTokenId: txOutRecord.txOutAmountMaskedTokenID,
+            maskedTokenId: txOutRecord.txOutAmountMaskedV1TokenID,
             targetKey: targetKey,
             publicKey: publicKey)
     }

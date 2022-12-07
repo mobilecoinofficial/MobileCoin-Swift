@@ -86,7 +86,7 @@ extension FogView_TxOutRecord {
         self.init()
         self.txOutAmountCommitmentData = txOut.commitment.data
         self.txOutAmountMaskedValue = txOut.maskedValue
-        self.txOutAmountMaskedTokenID = txOut.maskedTokenId
+        self.txOutAmountMaskedV1TokenID = txOut.maskedTokenId
         self.txOutTargetKeyData = txOut.targetKey.data
         self.txOutPublicKeyData = txOut.publicKey.data
         self.txOutEMemoData = txOut.encryptedMemo.data
