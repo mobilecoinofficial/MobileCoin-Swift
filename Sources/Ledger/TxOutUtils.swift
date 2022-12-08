@@ -72,16 +72,6 @@ enum TxOutUtils {
         }
     }
 
-//    static func reconstructCommitment(
-//        maskedValue: UInt64,
-//        publicKey: RistrettoPublic,
-//        viewPrivateKey: RistrettoPrivate
-//    ) -> Data32? {
-//        reconstructCommitment(maskedValue: maskedValue,
-//                              maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
-//                              publicKey: publicKey, viewPrivateKey: viewPrivateKey)
-//    }
-
     static func reconstructCommitment(
         maskedAmount: MaskedAmount,
         publicKey: RistrettoPublic,
