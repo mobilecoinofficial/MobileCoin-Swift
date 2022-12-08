@@ -5,12 +5,12 @@
 import Foundation
 import LibMobileCoin
 
-class MaskedAmount {
+struct MaskedAmount {
     var maskedAmount: UInt64
     var maskedTokenId: Data
     var version: McMaskedAmountVersion
 
-    public init(_ maskedAmount: UInt64, maskedTokenId: Data, version: McMaskedAmountVersion) {
+    init(_ maskedAmount: UInt64, maskedTokenId: Data, version: McMaskedAmountVersion) {
         self.maskedAmount = maskedAmount
         self.maskedTokenId = maskedTokenId
         self.version = version
@@ -24,10 +24,10 @@ extension MaskedAmount: CustomStringConvertible {
 }
 
 extension MaskedAmount: Equatable {
-    static func ==(lhs: MaskedAmount, rhs: MaskedAmount) -> Bool {
-        return lhs.maskedAmount == rhs.maskedAmount
-            && lhs.maskedTokenId == rhs.maskedTokenId
-            && lhs.version == rhs.version
+    static func == (lhs: MaskedAmount, rhs: MaskedAmount) -> Bool {
+        lhs.maskedAmount == rhs.maskedAmount &&
+        lhs.maskedTokenId == rhs.maskedTokenId &&
+        lhs.version == rhs.version
     }
 }
 

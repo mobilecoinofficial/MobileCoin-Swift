@@ -1,8 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-
-// swiftlint:disable closure_body_length multiline_arguments
+// swiftlint:disable closure_body_length
 
 import Foundation
 import LibMobileCoin
@@ -240,19 +239,6 @@ enum TxOutUtils {
             }
         }
     }
-
-//    /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
-//    ///     does not own `TxOut` or because `TxOut` values are incongruent.
-//    static func value(
-//        maskedValue: UInt64,
-//        publicKey: RistrettoPublic,
-//        viewPrivateKey: RistrettoPrivate
-//    ) -> UInt64? {
-//        amount(maskedValue: maskedValue,
-//               maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
-//               publicKey: publicKey,
-//               viewPrivateKey: viewPrivateKey)?.value
-//    }
 
     /// - Returns: `nil` when `viewPrivateKey` cannot unmask value, either because `viewPrivateKey`
     ///     does not own `TxOut` or because `TxOut` values are incongruent.

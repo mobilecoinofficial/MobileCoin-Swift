@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable function_body_length
 
 import Foundation
 import LibMobileCoin
@@ -56,7 +57,7 @@ extension TxOut: Hashable {}
 
 extension TxOut {
     static func make(_ proto: External_TxOut) -> Result<TxOut, InvalidInputError> {
-        
+
         var commitment: Data32
         var maskedAmount: MaskedAmount
         switch proto.maskedAmount {
