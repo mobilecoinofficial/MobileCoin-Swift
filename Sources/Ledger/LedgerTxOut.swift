@@ -56,25 +56,25 @@ extension LedgerTxOut {
 
 extension LedgerTxOut {
     init?(_ fogTxOutRecordBytes: Data, viewKey: RistrettoPrivate) {
-        if
-            let txOutRecord = try? FogView_TxOutRecordLegacy(contiguousBytes: fogTxOutRecordBytes),
-            let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey)
-        {
+        let legacy_txOutRecord = try? FogView_TxOutRecordLegacy(contiguousBytes: fogTxOutRecordBytes)
+        let txOutRecord = try? FogView_TxOutRecord(contiguousBytes: fogTxOutRecordBytes)
+        
+        switch (legacy_txOutRecord, txOutRecord) {
+        case (.some(let txOutRecord), nil):
+            guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else { return nil }
             let globalIndex = txOutRecord.txOutGlobalIndex
             let block = BlockMetadata(
                 index: txOutRecord.blockIndex,
                 timestamp: txOutRecord.timestampDate)
             self.init(partialTxOut, globalIndex: globalIndex, block: block)
-        } else if
-            let txOutRecord = try? FogView_TxOutRecord(contiguousBytes: fogTxOutRecordBytes),
-            let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey){
-            
+        case (nil, .some(let txOutRecord)):
+            guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else { return nil }
             let globalIndex = txOutRecord.txOutGlobalIndex
             let block = BlockMetadata(
                 index: txOutRecord.blockIndex,
                 timestamp: txOutRecord.timestampDate)
             self.init(partialTxOut, globalIndex: globalIndex, block: block)
-        } else {
+        default:
             return nil
         }
     }
