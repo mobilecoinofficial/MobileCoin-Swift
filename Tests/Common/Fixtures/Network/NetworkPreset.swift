@@ -66,7 +66,7 @@ extension DynamicNetworkConfig {
 
     enum AlphaDevelopment {
         static let user = ""
-        static let namespace = "alpha"
+        static let namespace = "mc-sci-test"
         static let environment = "development"
         static let fogAuthoritySpkiB64Encoded = dynamicFogAuthoritySpki
 
