@@ -39,9 +39,6 @@ struct TxOut: TxOutProtocol {
     }
 
     var commitment: Data32 { maskedAmount.commitment }
-    var maskedValue: UInt64 { maskedAmount.maskedValue }
-    var maskedTokenId: Data { maskedAmount.maskedTokenId }
-    var maskedAmountVersion: MaskedAmount.Version { maskedAmount.version }
     
     var serializedData: Data {
         proto.serializedDataInfallible
@@ -61,7 +58,6 @@ extension TxOut: Hashable {}
 
 extension TxOut {
     static func make(_ proto: External_TxOut) -> Result<TxOut, InvalidInputError> {
-        // TODO - handle lack of V1 or V2 and revert to "legacy" ?
         guard
             let maskedAmountProto = proto.maskedAmount,
             let maskedAmount = MaskedAmount(maskedAmountProto) else {
