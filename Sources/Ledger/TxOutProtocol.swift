@@ -8,9 +8,6 @@ import LibMobileCoin
 protocol TxOutProtocol {
     var encryptedMemo: Data66 { get }
     var commitment: Data32 { get }
-    var maskedValue: UInt64 { get }
-    var maskedTokenId: Data { get }
-    var maskedAmountVersion: MaskedAmount.Version { get } // TODO needed ?
     var maskedAmount: MaskedAmount { get }
     var targetKey: RistrettoPublic { get }
     var publicKey: RistrettoPublic { get }
