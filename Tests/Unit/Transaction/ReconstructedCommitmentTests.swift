@@ -17,16 +17,17 @@ class ReconstructedCommitmentTests: XCTestCase {
     func testReconstructCommitment() throws {
         let fixture = try Transaction.Fixtures.Commitment()
         let txOutRecord = fixture.txOutRecord
-        let maskedAmount = MaskedAmount(
-            txOutRecord.txOutAmountMaskedValue,
-            maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
-            version: V1)
         let viewKey = fixture.viewKey
-        guard let publicKey = RistrettoPublic(txOutRecord.txOutPublicKeyData),
-              let commitment = TxOutUtils.reconstructCommitment(
-                                                    maskedAmount: maskedAmount,
-                                                    publicKey: publicKey,
-                                                    viewPrivateKey: viewKey) else {
+        
+        guard
+            let publicKey = RistrettoPublic(txOutRecord.txOutPublicKeyData),
+            let commitment = TxOutUtils.reconstructCommitment(
+                maskedValue: txOutRecord.txOutAmountMaskedValue,
+                maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
+                maskedAmountVersion: .v1,
+                publicKey: publicKey,
+                viewPrivateKey: viewKey)
+        else {
             XCTFail("Unable to reconstruct commitment")
             return
         }

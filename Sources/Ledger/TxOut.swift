@@ -11,11 +11,10 @@ struct TxOut: TxOutProtocol {
 
     fileprivate let proto: External_TxOut
 
-    let commitment: Data32
     let targetKey: RistrettoPublic
     let publicKey: RistrettoPublic
     let eMemo: Data66
-    public let maskedAmount: MaskedAmount
+    let maskedAmount: MaskedAmount
 
     /// - Returns: `nil` when the input is not deserializable.
     init?(serializedData: Data) {
@@ -39,6 +38,11 @@ struct TxOut: TxOutProtocol {
         }
     }
 
+    var commitment: Data32 { maskedAmount.commitment }
+    var maskedValue: UInt64 { maskedAmount.maskedValue }
+    var maskedTokenId: Data { maskedAmount.maskedTokenId }
+    var maskedAmountVersion: MaskedAmount.Version { maskedAmount.version }
+    
     var serializedData: Data {
         proto.serializedDataInfallible
     }
@@ -57,29 +61,13 @@ extension TxOut: Hashable {}
 
 extension TxOut {
     static func make(_ proto: External_TxOut) -> Result<TxOut, InvalidInputError> {
-
-        var commitment: Data32
-        var maskedAmount: MaskedAmount
-        switch proto.maskedAmount {
-        case .maskedAmountV1(let m):
-            maskedAmount = MaskedAmount(m.maskedValue, maskedTokenId: m.maskedTokenID, version: V1)
-            guard let commitmentV1 = Data32(proto.maskedAmountV1.commitment.data) else {
-                return .failure(
-                    InvalidInputError("Failed parsing External_TxOut: invalid commitment format"))
-            }
-            commitment = commitmentV1
-        case .maskedAmountV2(let m):
-            maskedAmount = MaskedAmount(m.maskedValue, maskedTokenId: m.maskedTokenID, version: V2)
-            guard let commitmentV2 = Data32(proto.maskedAmountV2.commitment.data) else {
-                return .failure(
-                    InvalidInputError("Failed parsing External_TxOut: invalid commitment format"))
-            }
-            commitment = commitmentV2
-        case .none:
+        // TODO - handle lack of V1 or V2 and revert to "legacy" ?
+        guard
+            let maskedAmountProto = proto.maskedAmount,
+            let maskedAmount = MaskedAmount(maskedAmountProto) else {
             return .failure(
-                InvalidInputError("Failed parsing External_TxOut: invalid masked amount version"))
+                InvalidInputError("Failed parsing External_TxOut: invalid maskedAmount format"))
         }
-
         guard let targetKey = RistrettoPublic(proto.targetKey.data) else {
             return .failure(
                 InvalidInputError("Failed parsing External_TxOut: invalid target key format"))
@@ -104,7 +92,6 @@ extension TxOut {
         return .success(
             TxOut(
                 proto: proto,
-                commitment: commitment,
                 maskedAmount: maskedAmount,
                 targetKey: targetKey,
                 publicKey: publicKey,
@@ -113,14 +100,12 @@ extension TxOut {
 
     private init(
         proto: External_TxOut,
-        commitment: Data32,
         maskedAmount: MaskedAmount,
         targetKey: RistrettoPublic,
         publicKey: RistrettoPublic,
         eMemo: Data66
     ) {
         self.proto = proto
-        self.commitment = commitment
         self.maskedAmount = maskedAmount
         self.targetKey = targetKey
         self.publicKey = publicKey
@@ -141,6 +126,12 @@ extension External_TxOut {
 }
 
 extension FogView_TxOutRecord {
+    var encryptedMemo: Data66 {
+        Data66(self.txOutEMemoData.data) ?? Data66()
+    }
+}
+
+extension FogView_TxOutRecordLegacy {
     var encryptedMemo: Data66 {
         Data66(self.txOutEMemoData.data) ?? Data66()
     }

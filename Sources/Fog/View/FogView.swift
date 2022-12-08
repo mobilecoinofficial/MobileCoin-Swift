@@ -193,6 +193,14 @@ extension LedgerTxOut {
         -> Result<LedgerTxOut, ConnectionError>
     {
         guard let ledgerTxOut = LedgerTxOut(txOutRecord, viewKey: viewKey) else {
+            
+            guard let ledgerTxOut = LedgerTxOut(txOutRecord, viewKey: viewKey) else {
+                let errorMessage = "Invalid TxOut returned from Fog View. TxOutRecord: " +
+                    "\(redacting: txOutRecord.serializedDataInfallible.base64EncodedString())"
+                logger.error(errorMessage)
+                return .failure(.invalidServerResponse(errorMessage))
+            }
+            
             let errorMessage = "Invalid TxOut returned from Fog View. TxOutRecord: " +
                 "\(redacting: txOutRecord.serializedDataInfallible.base64EncodedString())"
             logger.error(errorMessage)

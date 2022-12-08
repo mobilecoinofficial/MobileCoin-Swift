@@ -21,7 +21,6 @@ import LibMobileCoin
 /// party sent them a particular `TxOut`.
 public struct Receipt {
     let txOutPublicKeyTyped: RistrettoPublic
-    let commitment: Data32
     let maskedAmount: MaskedAmount
     let confirmationNumber: TxOutConfirmationNumber
 
@@ -35,7 +34,6 @@ public struct Receipt {
         tombstoneBlockIndex: UInt64
     ) {
         self.txOutPublicKeyTyped = txOut.publicKey
-        self.commitment = txOut.commitment
         self.maskedAmount = txOut.maskedAmount
         self.confirmationNumber = confirmationNumber
         self.txTombstoneBlockIndex = tombstoneBlockIndex
@@ -53,6 +51,8 @@ public struct Receipt {
         self.init(proto)
     }
 
+    var commitment: Data32 { maskedAmount.commitment }
+    
     public var serializedData: Data {
         let proto = External_Receipt(self)
         return proto.serializedDataInfallible
@@ -151,25 +151,10 @@ extension Receipt: Hashable {}
 
 extension Receipt {
     init?(_ proto: External_Receipt) {
-        let commitmentData: Data
-        let maskedAmount: MaskedAmount
-        switch proto.maskedAmount {
-        case .maskedAmountV1(let m):
-            maskedAmount = MaskedAmount(m.maskedValue, maskedTokenId: m.maskedTokenID, version: V1)
-            commitmentData = proto.maskedAmountV1.commitment.data
-        case .maskedAmountV2(let m):
-            maskedAmount = MaskedAmount(m.maskedValue, maskedTokenId: m.maskedTokenID, version: V2)
-            commitmentData = proto.maskedAmountV2.commitment.data
-        case .none:
-            logger.warning(
-                "Failed to initialize Receipt with External_Receipt. serialized proto: " +
-                    "\(redacting: proto.serializedDataInfallible.base64EncodedString())",
-                logFunction: false)
-            return nil
-        }
 
         guard let txOutPublicKey = RistrettoPublic(proto.publicKey.data),
-              let commitment = Data32(commitmentData),
+              let maskedAmountProto = proto.maskedAmount,
+              let maskedAmount = MaskedAmount(maskedAmountProto),
               let confirmationNumber = TxOutConfirmationNumber(proto.confirmation)
         else {
             logger.warning(
@@ -180,7 +165,6 @@ extension Receipt {
         }
 
         self.txOutPublicKeyTyped = txOutPublicKey
-        self.commitment = commitment
         self.maskedAmount = maskedAmount
         self.confirmationNumber = confirmationNumber
         self.txTombstoneBlockIndex = proto.tombstoneBlock
@@ -195,19 +179,14 @@ extension External_Receipt {
         self.tombstoneBlock = receipt.txTombstoneBlockIndex
 
         switch receipt.maskedAmount.version {
-        case V1:
+        case .v1:
             self.maskedAmountV1.commitment = External_CompressedRistretto(receipt.commitment)
-            self.maskedAmountV1.maskedValue = receipt.maskedAmount.maskedAmount
+            self.maskedAmountV1.maskedValue = receipt.maskedAmount.maskedValue
             self.maskedAmountV1.maskedTokenID = receipt.maskedAmount.maskedTokenId
-        case V2:
+        case .v2:
             self.maskedAmountV2.commitment = External_CompressedRistretto(receipt.commitment)
-            self.maskedAmountV2.maskedValue = receipt.maskedAmount.maskedAmount
-            self.maskedAmountV2.maskedTokenID = receipt.maskedAmount.maskedTokenId
-        default:
-            self.maskedAmountV2.commitment = External_CompressedRistretto(receipt.commitment)
-            self.maskedAmountV2.maskedValue = receipt.maskedAmount.maskedAmount
+            self.maskedAmountV2.maskedValue = receipt.maskedAmount.maskedValue
             self.maskedAmountV2.maskedTokenID = receipt.maskedAmount.maskedTokenId
         }
-
     }
 }

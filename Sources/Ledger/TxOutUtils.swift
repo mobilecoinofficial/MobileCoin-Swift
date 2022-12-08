@@ -87,13 +87,28 @@ enum TxOutUtils {
         publicKey: RistrettoPublic,
         viewPrivateKey: RistrettoPrivate
     ) -> Data32? {
-        maskedAmount.maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
+        reconstructCommitment(
+            maskedValue: maskedAmount.maskedValue,
+            maskedTokenId: maskedAmount.maskedTokenId,
+            maskedAmountVersion: maskedAmount.version,
+            publicKey: publicKey,
+            viewPrivateKey: viewPrivateKey)
+    }
+    
+    static func reconstructCommitment(
+        maskedValue: UInt64,
+        maskedTokenId: Data,
+        maskedAmountVersion: MaskedAmount.Version,
+        publicKey: RistrettoPublic,
+        viewPrivateKey: RistrettoPrivate
+    ) -> Data32? {
+        maskedTokenId.asMcBuffer { maskedTokenIdBufferPtr in
             publicKey.asMcBuffer { publicKeyBufferPtr in
                 viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
                     var mcAmount = McTxOutMaskedAmount(
-                        masked_value: maskedAmount.maskedAmount,
+                        masked_value: maskedValue,
                         masked_token_id: maskedTokenIdBufferPtr,
-                        version: maskedAmount.version)
+                        version: maskedAmountVersion.libmobilecoin_version)
                     switch Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                         mc_tx_out_reconstruct_commitment(
                             &mcAmount,
@@ -252,9 +267,9 @@ enum TxOutUtils {
             publicKey.asMcBuffer { publicKeyPtr in
                 viewPrivateKey.asMcBuffer { viewKeyBufferPtr in
                     var mcMaskedAmount = McTxOutMaskedAmount(
-                        masked_value: maskedAmount.maskedAmount,
+                        masked_value: maskedAmount.maskedValue,
                         masked_token_id: maskedTokenIdBufferPtr,
-                        version: maskedAmount.version)
+                        version: maskedAmount.libmobilecoin_version)
                     switch withMcError({ errorPtr in
                         mc_tx_out_get_amount(
                             &mcMaskedAmount,

@@ -8,6 +8,9 @@ import LibMobileCoin
 protocol TxOutProtocol {
     var encryptedMemo: Data66 { get }
     var commitment: Data32 { get }
+    var maskedValue: UInt64 { get }
+    var maskedTokenId: Data { get }
+    var maskedAmountVersion: MaskedAmount.Version { get } // TODO needed ?
     var maskedAmount: MaskedAmount { get }
     var targetKey: RistrettoPublic { get }
     var publicKey: RistrettoPublic { get }
@@ -44,6 +47,7 @@ extension TxOutProtocol {
     /// - Returns: `nil` when `accountKey` cannot unmask the amoount, either because `accountKey`
     ///     does not own `TxOut` or because ` TxOut` amounts are incongruent.
     func amount(accountKey: AccountKey) -> Amount? {
+        // TODO - needs changes
         TxOutUtils.amount(
             maskedAmount: maskedAmount,
             publicKey: publicKey,
@@ -83,17 +87,15 @@ extension FogView_TxOutRecord {
     init(_ txOut: TxOutProtocol) {
         self.init()
         self.txOutAmountCommitmentData = txOut.commitment.data
-        self.txOutAmountMaskedValue = txOut.maskedAmount.maskedAmount
+        self.txOutAmountMaskedValue = txOut.maskedAmount.maskedValue
         self.txOutTargetKeyData = txOut.targetKey.data
         self.txOutPublicKeyData = txOut.publicKey.data
         self.txOutEMemoData = txOut.encryptedMemo.data
 
         switch txOut.maskedAmount.version {
-        case V1:
+        case .v1:
             self.txOutAmountMaskedV1TokenID = txOut.maskedAmount.maskedTokenId
-        case V2:
-            self.txOutAmountMaskedV2TokenID = txOut.maskedAmount.maskedTokenId
-        default:
+        case .v2:
             self.txOutAmountMaskedV2TokenID = txOut.maskedAmount.maskedTokenId
         }
     }
