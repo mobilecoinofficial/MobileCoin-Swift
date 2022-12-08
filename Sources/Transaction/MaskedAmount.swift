@@ -24,8 +24,10 @@ struct MaskedAmount {
 extension MaskedAmount.Version {
     var libmobilecoin_version: McMaskedAmountVersion {
         switch self {
-        case .v1: return V1
-        case .v2: return V2
+        case .v1:
+            return V1
+        case .v2:
+            return V2
         }
     }
 }

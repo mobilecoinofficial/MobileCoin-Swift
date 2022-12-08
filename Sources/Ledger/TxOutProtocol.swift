@@ -44,7 +44,6 @@ extension TxOutProtocol {
     /// - Returns: `nil` when `accountKey` cannot unmask the amoount, either because `accountKey`
     ///     does not own `TxOut` or because ` TxOut` amounts are incongruent.
     func amount(accountKey: AccountKey) -> Amount? {
-        // TODO - needs changes
         TxOutUtils.amount(
             maskedAmount: maskedAmount,
             publicKey: publicKey,

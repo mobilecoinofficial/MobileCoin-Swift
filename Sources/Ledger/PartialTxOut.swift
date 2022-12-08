@@ -101,14 +101,20 @@ extension PartialTxOut {
             publicKey: publicKey)
     }
 
-    static func isCrc32Matching(_ reconstructed: Data32, txOutRecord: FogView_TxOutRecordLegacy) -> Bool {
+    static func isCrc32Matching(
+            _ reconstructed: Data32,
+            txOutRecord: FogView_TxOutRecordLegacy
+    ) -> Bool {
         isCrc32Matching(
             reconstructed,
             commitmentData: txOutRecord.txOutAmountCommitmentData,
             commitmentDataCrc32: txOutRecord.txOutAmountCommitmentDataCrc32)
     }
 
-    static func isCrc32Matching(_ reconstructed: Data32, txOutRecord: FogView_TxOutRecord) -> Bool {
+    static func isCrc32Matching(
+            _ reconstructed: Data32,
+            txOutRecord: FogView_TxOutRecord
+    ) -> Bool {
         isCrc32Matching(
             reconstructed,
             commitmentData: txOutRecord.txOutAmountCommitmentData,

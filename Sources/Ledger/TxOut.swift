@@ -1,7 +1,6 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable function_body_length
 
 import Foundation
 import LibMobileCoin
