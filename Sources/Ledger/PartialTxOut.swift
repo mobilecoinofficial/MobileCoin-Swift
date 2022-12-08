@@ -11,9 +11,6 @@ struct PartialTxOut: TxOutProtocol {
     let targetKey: RistrettoPublic
     let publicKey: RistrettoPublic
     var commitment: Data32 { maskedAmount.commitment }
-    var maskedValue: UInt64 { maskedAmount.maskedValue }
-    var maskedTokenId: Data { maskedAmount.maskedTokenId }
-    var maskedAmountVersion: MaskedAmount.Version { maskedAmount.version }
 }
 
 extension PartialTxOut: Equatable {}
