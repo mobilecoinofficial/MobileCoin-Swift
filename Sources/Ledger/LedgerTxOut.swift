@@ -41,7 +41,7 @@ extension LedgerTxOut {
             timestamp: txOutRecord.timestampDate)
         self.init(partialTxOut, globalIndex: globalIndex, block: block)
     }
-    
+
     init?(_ txOutRecord: FogView_TxOutRecordLegacy, viewKey: RistrettoPrivate) {
         guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else {
             return nil
@@ -58,7 +58,7 @@ extension LedgerTxOut {
     init?(_ fogTxOutRecordBytes: Data, viewKey: RistrettoPrivate) {
         let legacy_txOutRecord = try? FogView_TxOutRecordLegacy(contiguousBytes: fogTxOutRecordBytes)
         let txOutRecord = try? FogView_TxOutRecord(contiguousBytes: fogTxOutRecordBytes)
-        
+
         switch (legacy_txOutRecord, txOutRecord) {
         case (.some(let txOutRecord), nil):
             guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else { return nil }

@@ -18,7 +18,7 @@ class ReconstructedCommitmentTests: XCTestCase {
         let fixture = try Transaction.Fixtures.Commitment()
         let txOutRecord = fixture.txOutRecord
         let viewKey = fixture.viewKey
-        
+
         guard
             let publicKey = RistrettoPublic(txOutRecord.txOutPublicKeyData),
             let commitment = TxOutUtils.reconstructCommitment(

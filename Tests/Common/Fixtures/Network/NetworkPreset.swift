@@ -127,7 +127,7 @@ extension DynamicNetworkConfig {
         S9VWqHB73Q+OyIVvIbKYcSc2w/aSuFKGSA==
         """,
     ]
-    
+
     static func trustRootsBytes() -> [Data] {
         do {
             return try Self.developmentNetworkTrustRootsB64.map {
@@ -636,7 +636,7 @@ extension NetworkPreset {
             return config.trustRootsBytes
         }
     }
-        
+
     static func trustRootsBytes() throws -> [Data] {
         try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
     }
@@ -676,7 +676,6 @@ extension NetworkPreset {
         case .alpha, .master, .build, .demo, .diogenes, .drakeley, .eran:
             return true
         case .dynamic:
-            // TODO - Verify this is correct
             return false
         }
     }

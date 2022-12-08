@@ -39,7 +39,7 @@ struct TxOut: TxOutProtocol {
     }
 
     var commitment: Data32 { maskedAmount.commitment }
-    
+
     var serializedData: Data {
         proto.serializedDataInfallible
     }

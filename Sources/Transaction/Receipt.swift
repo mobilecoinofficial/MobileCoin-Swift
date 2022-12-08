@@ -52,7 +52,7 @@ public struct Receipt {
     }
 
     var commitment: Data32 { maskedAmount.commitment }
-    
+
     public var serializedData: Data {
         let proto = External_Receipt(self)
         return proto.serializedDataInfallible

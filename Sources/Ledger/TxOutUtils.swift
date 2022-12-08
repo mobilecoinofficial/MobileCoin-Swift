@@ -94,7 +94,7 @@ enum TxOutUtils {
             publicKey: publicKey,
             viewPrivateKey: viewPrivateKey)
     }
-    
+
     static func reconstructCommitment(
         maskedValue: UInt64,
         maskedTokenId: Data,

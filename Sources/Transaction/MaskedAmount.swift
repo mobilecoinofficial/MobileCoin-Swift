@@ -10,12 +10,12 @@ struct MaskedAmount {
         case v1
         case v2
     }
-    
+
     let maskedValue: UInt64
     let maskedTokenId: Data
     let commitment: Data32
     let version: Version
-    
+
     var libmobilecoin_version: McMaskedAmountVersion {
         version.libmobilecoin_version
     }
@@ -102,4 +102,3 @@ extension MaskedAmount: Hashable, Equatable, CustomStringConvertible {
         "version \(version) \n"
     }
 }
-
