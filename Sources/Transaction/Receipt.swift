@@ -66,7 +66,8 @@ public struct Receipt {
     func matchesTxOut(_ txOut: TxOutProtocol) -> Bool {
         txOutPublicKeyTyped == txOut.publicKey
             && commitment == txOut.commitment
-            // TODO - verify with core-eng that commitment is sufficient
+            // TODO - verify with core-eng that commitment is sufficient, 
+            // remove after confirmation
     }
 
     func validateConfirmationNumber(accountKey: AccountKey) -> Bool {
