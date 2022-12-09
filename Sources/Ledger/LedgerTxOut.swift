@@ -54,20 +54,23 @@ extension LedgerTxOut {
     }
 }
 
+// swiftlint:disable todo
 extension LedgerTxOut {
     init?(_ fogTxOutRecordBytes: Data, viewKey: RistrettoPrivate) {
-        let legacy_txOutRecord = try? FogView_TxOutRecordLegacy(contiguousBytes: fogTxOutRecordBytes)
+        let legacy_txOutRecord = try? FogView_TxOutRecordLegacy(
+                contiguousBytes: fogTxOutRecordBytes)
         let txOutRecord = try? FogView_TxOutRecord(contiguousBytes: fogTxOutRecordBytes)
 
+        // TODO - Temporary fix for serialized data, find workaround and remove legacy proto
         switch (legacy_txOutRecord, txOutRecord) {
-        case (.some(let txOutRecord), nil):
+        case (.some(let txOutRecord), _):
             guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else { return nil }
             let globalIndex = txOutRecord.txOutGlobalIndex
             let block = BlockMetadata(
                 index: txOutRecord.blockIndex,
                 timestamp: txOutRecord.timestampDate)
             self.init(partialTxOut, globalIndex: globalIndex, block: block)
-        case (nil, .some(let txOutRecord)):
+        case (_, .some(let txOutRecord)):
             guard let partialTxOut = PartialTxOut(txOutRecord, viewKey: viewKey) else { return nil }
             let globalIndex = txOutRecord.txOutGlobalIndex
             let block = BlockMetadata(
@@ -79,3 +82,4 @@ extension LedgerTxOut {
         }
     }
 }
+// swiftlint:enable todo
