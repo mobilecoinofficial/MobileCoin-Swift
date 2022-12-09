@@ -20,7 +20,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
             guard let metaCache = $0.successOrFulfill(expectation: expect)
             else { return }
 
-            XCTAssertEqual(metaCache.minimumFees[.MOB], 10_000_000_000)
+            XCTAssertEqual(metaCache.minimumFees[.MOB], 4_000_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)
