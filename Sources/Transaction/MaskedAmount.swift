@@ -92,8 +92,10 @@ extension MaskedAmount {
 extension MaskedAmount.Version: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .v1: return "Version 1"
-        case .v2: return "Version 2"
+        case .v1:
+            return "Version 1"
+        case .v2:
+            return "Version 2"
         }
     }
 }
