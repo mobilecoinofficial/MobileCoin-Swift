@@ -9,7 +9,7 @@
 @testable import MobileCoin
 import XCTest
 
-private let minFee: UInt64 = 10_000_000_000
+private let minFee: UInt64 = 4_000_000_000
 
 class DefaultTxOutSelectionStrategyTests: XCTestCase {
 

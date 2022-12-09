@@ -101,6 +101,19 @@ extension FogView_TxOutRecord {
     }
 }
 
+extension FogView_TxOutRecordLegacy {
+    var timestampDate: Date? {
+        get { timestamp != UInt64.max ? Date(timeIntervalSince1970: TimeInterval(timestamp)) : nil }
+        set {
+            if let newValue = newValue {
+                timestamp = UInt64(newValue.timeIntervalSince1970)
+            } else {
+                timestamp = UInt64.max
+            }
+        }
+    }
+}
+
 // MARK: - Fog Ledger
 
 extension FogLedger_OutputResult {
