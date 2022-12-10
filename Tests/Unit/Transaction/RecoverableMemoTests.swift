@@ -56,4 +56,21 @@ class RecoverableMemoTests: XCTestCase {
         XCTAssertEqual(authenticatedSenderMemoTxOuts.count, 0)
     }
 
+    func testUnauthenticatedSenderMemos() throws {
+        let fixture = try RecoverableMemo.Fixtures.Many()
+        let results = MobileCoinClient.recoverTransactions(
+            fixture.onesTxOuts,
+            contacts: fixture.badContacts)
+
+        // Check that all unauthenticated sender memos results were returned
+        let unauthenticatedSenderMemoTxOuts = results.filter {
+            $0.txOut.recoverableMemo.isAuthenticatedSenderMemo
+        }
+        .filter {
+            $0.unauthenticatedMemo != nil
+        }
+        
+        XCTAssertGreaterThan((unauthenticatedSenderMemoTxOuts.count), 0)
+    }
+
 }

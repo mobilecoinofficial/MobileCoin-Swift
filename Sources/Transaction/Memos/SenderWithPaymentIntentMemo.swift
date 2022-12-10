@@ -51,6 +51,20 @@ struct RecoverableSenderWithPaymentIntentMemo {
             addressHash: addressHash,
             paymentIntentId: paymentIntentId)
     }
+    
+    func unauthenticatedMemo() -> SenderWithPaymentIntentMemo? {
+        let paymentIntId = SenderWithPaymentIntentMemoUtils.getPaymentIntentId(memoData: memoData)
+        guard let paymentIntentId = paymentIntId else {
+            logger.debug("Unable to get payment intent id")
+            return nil
+        }
+
+        let addressHash = SenderWithPaymentIntentMemoUtils.getAddressHash(memoData: memoData)
+        return SenderWithPaymentIntentMemo(
+            memoData64: memoData,
+            addressHash: addressHash,
+            paymentIntentId: paymentIntentId)
+    }
 }
 
 extension RecoverableSenderWithPaymentIntentMemo: Hashable { }

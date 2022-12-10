@@ -13,6 +13,8 @@ extension Transaction.Fixtures {
     struct TxOutMemo {
         let senderAccountKey: AccountKey
         let recipientAccountKey: AccountKey
+        let senderAccountKeyNoFog: AccountKey
+        let recipientAccountKeyNoFog: AccountKey
 
         let inputs: [PreparedTxInput]
         let txOuts: [TxOut]
@@ -36,6 +38,8 @@ extension Transaction.Fixtures {
             self.membershipProofs = try Self.txOutMembershipProofs()
             self.senderAccountKey = try Self.senderAccountKey()
             self.recipientAccountKey = try Self.recipientAccountKey()
+            self.senderAccountKeyNoFog = try Self.senderAccountKey()
+            self.recipientAccountKeyNoFog = try Self.recipientAccountKey()
             self.fogResolver = try Self.fogResolver()
             self.globalIndex = Self.globalIndex
             self.blockMetadata = Self.blockMetadata

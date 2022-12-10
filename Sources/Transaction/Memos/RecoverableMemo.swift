@@ -34,6 +34,27 @@ extension RecoveredMemo {
     }
 }
 
+public enum UnauthenticatedSenderMemo {
+    case sender(SenderMemo)
+    case senderWithPaymentRequest(SenderWithPaymentRequestMemo)
+    case senderWithPaymentIntent(SenderWithPaymentIntentMemo)
+}
+
+extension UnauthenticatedSenderMemo: Equatable { }
+
+extension UnauthenticatedSenderMemo {
+    var addressHash: AddressHash {
+        switch self {
+        case let .senderWithPaymentRequest(memo):
+            return memo.addressHash
+        case let .senderWithPaymentIntent(memo):
+            return memo.addressHash
+        case let .sender(memo):
+            return memo.addressHash
+        }
+    }
+}
+
 // swiftlint:disable function_body_length
 enum RecoverableMemo {
     case notset
@@ -154,6 +175,32 @@ extension RecoverableMemo {
 }
 // swiftlint:enable cyclomatic_complexity
 
+extension RecoverableMemo {
+    func unauthenticatedSenderMemo() -> UnauthenticatedSenderMemo? {
+        switch self {
+        case .notset, .unused:
+            return nil
+        case .destination, .destinationWithPaymentIntent, .destinationWithPaymentRequest:
+            assertionFailure(
+                "This should not be called on destination memos because ..." +
+                "Unauthenticated in this context means the txOut is not owned by the account")
+            return nil
+        case let .sender(recoverable):
+            guard let memo = recoverable.unauthenticatedMemo()
+            else { return nil }
+            return .sender(memo)
+        case let .senderWithPaymentRequest(recoverable):
+            guard let memo = recoverable.unauthenticatedMemo()
+            else { return nil }
+            return .senderWithPaymentRequest(memo)
+        case let .senderWithPaymentIntent(recoverable):
+            guard let memo = recoverable.unauthenticatedMemo()
+            else { return nil }
+            return .senderWithPaymentIntent(memo)
+        }
+    }
+}
+
 extension RecoverableMemo: Hashable { }
 
 extension RecoverableMemo: Equatable {
@@ -176,32 +223,46 @@ extension RecoverableMemo: Equatable {
 }
 
 extension RecoverableMemo {
+    typealias RecoverResult = (
+        memo: RecoveredMemo?,
+        unauthenticated: UnauthenticatedSenderMemo?,
+        contact: PublicAddressProvider?
+    )
+    
     func recover<Contact: PublicAddressProvider>(
         contacts: Set<Contact>
-    ) -> (memo: RecoveredMemo?, contact: Contact?) {
+    ) -> RecoverResult {
         switch self {
         case .destination, .destinationWithPaymentIntent, .destinationWithPaymentRequest:
             guard let recoveredMemo = self.recover() else {
-                return (memo: nil, contact: nil)
+                return (memo: nil, unauthenticated: nil, contact: nil)
             }
             guard let matchingContact = contacts.first(where: {
                     $0.publicAddress.calculateAddressHash() == recoveredMemo.addressHash
                 })
             else {
-                return (memo: recoveredMemo, contact: nil)
+                return (memo: recoveredMemo, unauthenticated: nil, contact: nil)
             }
-            return (memo: recoveredMemo, contact: matchingContact)
+            return (memo: recoveredMemo, unauthenticated: nil, contact: matchingContact)
         case .sender, .senderWithPaymentRequest, .senderWithPaymentIntent:
-            return contacts.compactMap { contact in
+            let recovered = contacts.compactMap { contact -> RecoverResult? in
                 guard let memo = self.recover(publicAddress: contact.publicAddress)
                 else {
                     return nil
                 }
-                return (memo: memo, contact: contact)
+                return (memo: memo, unauthenticated:nil, contact: contact)
             }
-            .first ?? (memo: nil, contact: nil)
+            .first
+            
+            guard let recovered = recovered else {
+                guard let unauthenticated = self.unauthenticatedSenderMemo() else {
+                    return (memo: nil, unauthenticated: nil, contact: nil)
+                }
+                return (memo: nil, unauthenticated: unauthenticated, contact: nil)
+            }
+            return recovered
         case .notset, .unused:
-            return (memo: nil, contact: nil)
+            return (memo: nil, unauthenticated:nil, contact: nil)
         }
     }
 }
