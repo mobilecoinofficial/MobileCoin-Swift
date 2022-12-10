@@ -471,6 +471,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 expectation: expect,
                 transportProtocol: transportProtocol)
         { sciCreatorClient in
+            // TODO: create API that does not take recipient, where recipient defaults to
+            // creators public address
             sciCreatorClient.createSignedContingentInput(
                 recipient: recipient,
                 amountToSend: amountToSend,
@@ -485,18 +487,21 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                             transportProtocol: transportProtocol)
                     { sciConsumerClient in
                         sciConsumerClient.prepareTransaction(presignedInput: sci) {
+                            // TODO: fix this.. compiler could not infer type - so had to add explicitly
                             (result: Result<PendingTransaction, TransactionPreparationError>)
                             -> Void in
 
                             switch result {
                             case .success(let pendingTransaction):
                                 sciConsumerClient.submitTransaction(pendingTransaction.transaction) {
-                                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                                    guard $0.successOrFulfill(expectation: expect) != nil else {
+                                        return
+                                    }
 
                                     print("Transaction submission successful")
                                     expect.fulfill()
                                 }
-                            case .failure(_):
+                            case .failure:
                                 return
                             }
                         }
