@@ -4,18 +4,18 @@
 
 import Foundation
 
-public struct SenderWithPaymentRequestMemo {
+public struct SenderWithPaymentIntentMemo {
     public var memoData: Data { memoData64.data }
     public var addressHashHex: String { addressHash.hex }
 
     let memoData64: Data64
     let addressHash: AddressHash
-    public let paymentRequestId: UInt64
+    public let paymentIntentId: UInt64
 }
 
-extension SenderWithPaymentRequestMemo: Equatable, Hashable { }
+extension SenderWithPaymentIntentMemo: Equatable, Hashable { }
 
-struct RecoverableSenderWithPaymentRequestMemo {
+struct RecoverableSenderWithPaymentIntentMemo {
     let memoData: Data64
     let addressHash: AddressHash
     let txOutPublicKey: RistrettoPublic
@@ -23,13 +23,13 @@ struct RecoverableSenderWithPaymentRequestMemo {
 
     init(_ memoData: Data64, accountKey: AccountKey, txOutPublicKey: RistrettoPublic) {
         self.memoData = memoData
-        self.addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
+        self.addressHash = SenderWithPaymentIntentMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey
         self.txOutPublicKey = txOutPublicKey
     }
 
-    func recover(senderPublicAddress: PublicAddress) -> SenderWithPaymentRequestMemo? {
-        guard SenderWithPaymentRequestMemoUtils.isValid(
+    func recover(senderPublicAddress: PublicAddress) -> SenderWithPaymentIntentMemo? {
+        guard SenderWithPaymentIntentMemoUtils.isValid(
             memoData: memoData,
             senderPublicAddress: senderPublicAddress,
             receipientViewPrivateKey: accountKey.subaddressViewPrivateKey,
@@ -39,23 +39,23 @@ struct RecoverableSenderWithPaymentRequestMemo {
             return nil
         }
 
-        let paymentReqId = SenderWithPaymentRequestMemoUtils.getPaymentRequestId(memoData: memoData)
-        guard let paymentRequestId = paymentReqId else {
-            logger.debug("Unable to get payment request id")
+        let paymentIntId = SenderWithPaymentIntentMemoUtils.getPaymentIntentId(memoData: memoData)
+        guard let paymentIntentId = paymentIntId else {
+            logger.debug("Unable to get payment intent id")
             return nil
         }
 
-        let addressHash = SenderWithPaymentRequestMemoUtils.getAddressHash(memoData: memoData)
-        return SenderWithPaymentRequestMemo(
+        let addressHash = SenderWithPaymentIntentMemoUtils.getAddressHash(memoData: memoData)
+        return SenderWithPaymentIntentMemo(
             memoData64: memoData,
             addressHash: addressHash,
-            paymentRequestId: paymentRequestId)
+            paymentIntentId: paymentIntentId)
     }
 }
 
-extension RecoverableSenderWithPaymentRequestMemo: Hashable { }
+extension RecoverableSenderWithPaymentIntentMemo: Hashable { }
 
-extension RecoverableSenderWithPaymentRequestMemo: Equatable {
+extension RecoverableSenderWithPaymentIntentMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.memoData == rhs.memoData
     }

@@ -43,17 +43,20 @@ struct DynamicNetworkConfig {
     let namespace: String
     let environment: String
     let fogAuthoritySpkiB64Encoded: String
+    let trustRootsBytes: [Data]
 
     init(
         namespace: String,
         environment: String,
         fogAuthoritySpkiB64Encoded: String,
-        user: String = ""
+        user: String = "",
+        trustRootsBytes: [Data] = Self.trustRootsBytes()
     ) {
         self.user = user
         self.namespace = namespace
         self.environment = environment
         self.fogAuthoritySpkiB64Encoded = fogAuthoritySpkiB64Encoded
+        self.trustRootsBytes = trustRootsBytes
     }
 }
 
@@ -71,13 +74,70 @@ extension DynamicNetworkConfig {
         static let namespace = "alpha"
         static let environment = "development"
         static let fogAuthoritySpkiB64Encoded = dynamicFogAuthoritySpki
+        static let trustRootsBytes: [Data] = DynamicNetworkConfig.trustRootsBytes()
 
         static func make() -> DynamicNetworkConfig {
             DynamicNetworkConfig(
                 namespace: Self.namespace,
                 environment: Self.environment,
                 fogAuthoritySpkiB64Encoded: Self.fogAuthoritySpkiB64Encoded,
-                user: Self.user)
+                user: Self.user,
+                trustRootsBytes: Self.trustRootsBytes)
+        }
+    }
+}
+
+extension DynamicNetworkConfig {
+    static var developmentNetworkTrustRootsB64 = [
+        """
+        MIIG1TCCBL2gAwIBAgIQbFWr29AHksedBwzYEZ7WvzANBgkqhkiG9w0BAQwFADCB\
+        iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl\
+        cnNleSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNV\
+        BAMTJVVTRVJUcnVzdCBSU0EgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMjAw\
+        MTMwMDAwMDAwWhcNMzAwMTI5MjM1OTU5WjBLMQswCQYDVQQGEwJBVDEQMA4GA1UE\
+        ChMHWmVyb1NTTDEqMCgGA1UEAxMhWmVyb1NTTCBSU0EgRG9tYWluIFNlY3VyZSBT\
+        aXRlIENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAhmlzfqO1Mdgj\
+        4W3dpBPTVBX1AuvcAyG1fl0dUnw/MeueCWzRWTheZ35LVo91kLI3DDVaZKW+TBAs\
+        JBjEbYmMwcWSTWYCg5334SF0+ctDAsFxsX+rTDh9kSrG/4mp6OShubLaEIUJiZo4\
+        t873TuSd0Wj5DWt3DtpAG8T35l/v+xrN8ub8PSSoX5Vkgw+jWf4KQtNvUFLDq8mF\
+        WhUnPL6jHAADXpvs4lTNYwOtx9yQtbpxwSt7QJY1+ICrmRJB6BuKRt/jfDJF9Jsc\
+        RQVlHIxQdKAJl7oaVnXgDkqtk2qddd3kCDXd74gv813G91z7CjsGyJ93oJIlNS3U\
+        gFbD6V54JMgZ3rSmotYbz98oZxX7MKbtCm1aJ/q+hTv2YK1yMxrnfcieKmOYBbFD\
+        hnW5O6RMA703dBK92j6XRN2EttLkQuujZgy+jXRKtaWMIlkNkWJmOiHmErQngHvt\
+        iNkIcjJumq1ddFX4iaTI40a6zgvIBtxFeDs2RfcaH73er7ctNUUqgQT5rFgJhMmF\
+        x76rQgB5OZUkodb5k2ex7P+Gu4J86bS15094UuYcV09hVeknmTh5Ex9CBKipLS2W\
+        2wKBakf+aVYnNCU6S0nASqt2xrZpGC1v7v6DhuepyyJtn3qSV2PoBiU5Sql+aARp\
+        wUibQMGm44gjyNDqDlVp+ShLQlUH9x8CAwEAAaOCAXUwggFxMB8GA1UdIwQYMBaA\
+        FFN5v1qqK0rPVIDh2JvAnfKyA2bLMB0GA1UdDgQWBBTI2XhootkZaNU9ct5fCj7c\
+        tYaGpjAOBgNVHQ8BAf8EBAMCAYYwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHSUE\
+        FjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwIgYDVR0gBBswGTANBgsrBgEEAbIxAQIC\
+        TjAIBgZngQwBAgEwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2VydHJ1\
+        c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYG\
+        CCsGAQUFBwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3Qu\
+        Y29tL1VTRVJUcnVzdFJTQUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRw\
+        Oi8vb2NzcC51c2VydHJ1c3QuY29tMA0GCSqGSIb3DQEBDAUAA4ICAQAVDwoIzQDV\
+        ercT0eYqZjBNJ8VNWwVFlQOtZERqn5iWnEVaLZZdzxlbvz2Fx0ExUNuUEgYkIVM4\
+        YocKkCQ7hO5noicoq/DrEYH5IuNcuW1I8JJZ9DLuB1fYvIHlZ2JG46iNbVKA3ygA\
+        Ez86RvDQlt2C494qqPVItRjrz9YlJEGT0DrttyApq0YLFDzf+Z1pkMhh7c+7fXeJ\
+        qmIhfJpduKc8HEQkYQQShen426S3H0JrIAbKcBCiyYFuOhfyvuwVCFDfFvrjADjd\
+        4jX1uQXd161IyFRbm89s2Oj5oU1wDYz5sx+hoCuh6lSs+/uPuWomIq3y1GDFNafW\
+        +LsHBU16lQo5Q2yh25laQsKRgyPmMpHJ98edm6y2sHUabASmRHxvGiuwwE25aDU0\
+        2SAeepyImJ2CzB80YG7WxlynHqNhpE7xfC7PzQlLgmfEHdU+tHFeQazRQnrFkW2W\
+        kqRGIq7cKRnyypvjPMkjeiV9lRdAM9fSJvsB3svUuu1coIG1xxI1yegoGM4r5QP4\
+        RGIVvYaiI76C0djoSbQ/dkIUUXQuB8AL5jyH34g3BZaaXyvpmnV4ilppMXVAnAYG\
+        ON51WhJ6W0xNdNJwzYASZYH+tmCWI+N60Gv2NNMGHwMZ7e9bXgzUCZH5FaBFDGR5\
+        S9VWqHB73Q+OyIVvIbKYcSc2w/aSuFKGSA==
+        """,
+    ]
+
+    static func trustRootsBytes() -> [Data] {
+        do {
+            return try Self.developmentNetworkTrustRootsB64.map {
+                try XCTUnwrap(Data(base64Encoded: $0))
+            }
+        } catch {
+            assertionFailure("Invalid development trust root bytes")
+            return []
         }
     }
 }
@@ -211,15 +271,6 @@ extension NetworkPreset {
     private static let mainNetFogReportMrEnclaveHex =
         "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
 
-//    private static let mainNetConsensusMrEnclaveHex =
-//        "e66db38b8a43a33f6c1610d335a361963bb2b31e056af0dc0a895ac6c857cab9"
-//    private static let mainNetFogViewMrEnclaveHex =
-//        "ddd59da874fdf3239d5edb1ef251df07a8728c9ef63057dd0b50ade5a9ddb041"
-//    private static let mainNetFogLedgerMrEnclaveHex =
-//        "511eab36de691ded50eb08b173304194da8b9d86bfdd7102001fe6bb279c3666"
-//    private static let mainNetFogReportMrEnclaveHex =
-//        "709ab90621e3a8d9eb26ed9e2830e091beceebd55fb01c5d7c31d27e83b9b0d1"
-
     // v1.1.0 Enclave Values
     private static let legacy_v1_1_0_testNetConsensusMrEnclaveHex =
         "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
@@ -231,14 +282,24 @@ extension NetworkPreset {
         "a4764346f91979b4906d4ce26102228efe3aba39216dec1e7d22e6b06f919f11"
 
     // v2.0.0 Enclave Values
-    private static let testNetConsensusMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetConsensusMrEnclaveHex =
         "01746f4dd25f8623d603534425ed45833687eca2b3ba25bdd87180b9471dac28"
-    private static let testNetFogViewMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetFogViewMrEnclaveHex =
         "3d6e528ee0574ae3299915ea608b71ddd17cbe855d4f5e1c46df9b0d22b04cdb"
-    private static let testNetFogLedgerMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetFogLedgerMrEnclaveHex =
         "92fb35d0f603ceb5eaf2988b24a41d4a4a83f8fb9cd72e67c3bc37960d864ad6"
-    private static let testNetFogReportMrEnclaveHex =
+    private static let legacy_v2_0_0_testNetFogReportMrEnclaveHex =
         "3e9bf61f3191add7b054f0e591b62f832854606f6594fd63faef1e2aedec4021"
+
+    // v3.0.0 Enclave Values
+    private static let testNetConsensusMrEnclaveHex =
+        "5fe2b72fe5f01c269de0a3678728e7e97d823a953b053e43fbf934f439d290e6"
+    private static let testNetFogViewMrEnclaveHex =
+        "be1d711887530929fbc06ef8b77b618db15e9cd1dd0265559ea45f60a532ee52"
+    private static let testNetFogLedgerMrEnclaveHex =
+        "d5159ba907066384fae65842b5311f853b028c5ee4594f3b38dfc02acddf6fe3"
+    private static let testNetFogReportMrEnclaveHex =
+        "d901b5c4960f49871a848fd157c7c0b03351253d65bb839698ddd5df138ad7b6"
 
     private static let devMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
@@ -432,6 +493,11 @@ extension NetworkPreset {
          "5ce48390a4b805f321abaf4aa5960773fa9c6ad34ed2d4bfe0155c5df01aab0f"),
     ]
 
+    private static let allowedHardeiningAdvisories = [
+        "INTEL-SA-00334",
+        "INTEL-SA-00615",
+        "INTEL-SA-00657",
+    ]
 }
 
 extension NetworkPreset {
@@ -451,8 +517,8 @@ extension NetworkPreset {
             transportProtocol: transportProtocol).get()
 
         networkConfig.httpRequester = DefaultHttpRequester()
-        try networkConfig.setConsensusTrustRoots(Self.trustRootsBytes())
-        try networkConfig.setFogTrustRoots(Self.trustRootsBytes())
+        try networkConfig.setConsensusTrustRoots(trustRootsBytes())
+        try networkConfig.setFogTrustRoots(trustRootsBytes())
         networkConfig.consensusAuthorization = consensusCredentials
         networkConfig.fogUserAuthorization = fogUserCredentials
 
@@ -511,13 +577,14 @@ extension NetworkPreset {
         case .testNet:
             return try defaultAttestation(mrEnclaveHex:
                                             Self.legacy_v1_1_0_testNetConsensusMrEnclaveHex,
+                                            Self.legacy_v2_0_0_testNetConsensusMrEnclaveHex,
                                             Self.testNetConsensusMrEnclaveHex)
         case .devNetwork:
             return try XCTUnwrapSuccess(Attestation.make(
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.CONSENSUS_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.CONSENSUS_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -534,7 +601,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_VIEW_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_VIEW_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -551,7 +618,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_LEDGER_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_LEDGER_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -568,7 +635,7 @@ extension NetworkPreset {
                 mrSigner: try XCTUnwrap(Data(hexEncoded: Self.devMrSignerHex)),
                 productId: McConstants.FOG_REPORT_PRODUCT_ID,
                 minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
-                allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
 
@@ -576,14 +643,34 @@ extension NetworkPreset {
         Attestation(mrEnclaves:
             try mrEnclaveHex.map({
                 try XCTUnwrapSuccess(Attestation.MrEnclave.make(
-                        mrEnclave: try XCTUnwrap(Data(hexEncoded: $0)),
-                        allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]))
+                    mrEnclave: try XCTUnwrap(Data(hexEncoded: $0)),
+                    allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
             })
         )
     }
 
+    func trustRootsBytes() throws -> [Data] {
+        switch self {
+        case .mainNet, .testNet, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran:
+            return try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
+        case .alpha:
+            return DynamicNetworkConfig.trustRootsBytes()
+        case .dynamic(let config):
+            return config.trustRootsBytes
+        }
+    }
+
     static func trustRootsBytes() throws -> [Data] {
         try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
+    }
+
+    var hasRecoverableTestTransactions: Bool {
+        switch self {
+        case .testNet:
+            return true
+        default:
+            return false
+        }
     }
 
     var consensusRequiresCredentials: Bool {
@@ -613,7 +700,7 @@ extension NetworkPreset {
         case .alpha, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran:
             return true
         case .dynamic:
-            return true
+            return false
         }
     }
 

@@ -91,10 +91,12 @@ extension Transaction.Fixtures.BuildTx {
             LedgerTxOut(
                 PartialTxOut(
                     encryptedMemo: Data66(),
-                    commitment: Data32(base64Encoded:
-                        "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
-                    maskedValue: 2886556578342610519,
-                    maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
+                    maskedAmount: MaskedAmount(
+                        maskedValue: 2886556578342610519,
+                        maskedTokenId: McConstants.LEGACY_MOB_MASKED_TOKEN_ID,
+                        commitment: Data32(base64Encoded:
+                            "uImiYd/FgPnNUbRkBu5+F61QNO4DXF8NNCPIzKy/2UA=")!,
+                        version: .v1),
                     targetKey: RistrettoPublic(base64Encoded:
                         "VECBlIdhtmTFaXtlWphlqELpDL04EKMbbPWu3CoJ2UE=")!,
                     publicKey: RistrettoPublic(base64Encoded:

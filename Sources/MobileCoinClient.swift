@@ -213,7 +213,7 @@ public final class MobileCoinClient {
             targetQueue: serialQueue
         ).createSignedContingentInput(
             to: recipient,
-            memoType: MemoType.recoverable,
+            memoType: .unused,
             amountToSend: amountToSend,
             amountToReceive: amountToReceive
         ) { result in

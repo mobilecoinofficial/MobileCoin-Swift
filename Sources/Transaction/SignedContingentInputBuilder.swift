@@ -90,7 +90,7 @@ final class SignedContingentInputBuilder {
     }
 
     deinit {
-        mc_transaction_builder_free(ptr)
+        mc_signed_contingent_input_builder_free(ptr)
     }
 }
 

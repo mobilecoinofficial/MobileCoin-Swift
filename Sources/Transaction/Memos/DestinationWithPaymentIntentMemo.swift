@@ -1,10 +1,11 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable type_name
 
 import Foundation
 
-public struct DestinationMemo {
+public struct DestinationWithPaymentIntentMemo {
     public var memoData: Data { memoData64.data }
     public var addressHashHex: String { addressHash.hex }
     public var numberOfRecipients: UInt8 { numRecipients.value }
@@ -14,11 +15,12 @@ public struct DestinationMemo {
     let numRecipients: PositiveUInt8
     public let fee: UInt64
     public let totalOutlay: UInt64
+    public let paymentIntentId: UInt64
 }
 
-extension DestinationMemo: Equatable, Hashable { }
+extension DestinationWithPaymentIntentMemo: Equatable, Hashable { }
 
-struct RecoverableDestinationMemo {
+struct RecoverableDestinationWithPaymentIntentMemo {
     let memoData: Data64
     let addressHash: AddressHash
     let txOutPublicKey: RistrettoPublic
@@ -27,38 +29,43 @@ struct RecoverableDestinationMemo {
 
     init(_ memoData: Data64, accountKey: AccountKey, txOutKeys: TxOut.Keys) {
         self.memoData = memoData
-        self.addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
+        self.addressHash = DestinationWithPaymentIntentMemoUtils.getAddressHash(memoData: memoData)
         self.accountKey = accountKey
         self.txOutPublicKey = txOutKeys.publicKey
         self.txOutTargetKey = txOutKeys.targetKey
     }
 
-    func recover() -> DestinationMemo? {
+    func recover() -> DestinationWithPaymentIntentMemo? {
         guard
-            DestinationMemoUtils.isValid(
+            DestinationWithPaymentIntentMemoUtils.isValid(
                 txOutPublicKey: txOutPublicKey,
                 txOutTargetKey: txOutTargetKey,
                 accountKey: accountKey),
-            let numberOfRecipients = DestinationMemoUtils.getNumberOfRecipients(memoData: memoData),
-            let fee = DestinationMemoUtils.getFee(memoData: memoData),
-            let totalOutlay = DestinationMemoUtils.getTotalOutlay(memoData: memoData)
+            let numberOfRecipients = DestinationWithPaymentIntentMemoUtils.getNumberOfRecipients(
+                memoData: memoData),
+            let fee = DestinationWithPaymentIntentMemoUtils.getFee(memoData: memoData),
+            let totalOutlay = DestinationWithPaymentIntentMemoUtils.getTotalOutlay(
+                memoData: memoData),
+            let paymentIntentId = DestinationWithPaymentIntentMemoUtils.getPaymentIntentId(
+                memoData: memoData)
         else {
             logger.debug("Memo did not validate")
             return nil
         }
-        let addressHash = DestinationMemoUtils.getAddressHash(memoData: memoData)
-        return DestinationMemo(
+        let addressHash = DestinationWithPaymentIntentMemoUtils.getAddressHash(memoData: memoData)
+        return DestinationWithPaymentIntentMemo(
             memoData64: memoData,
             addressHash: addressHash,
             numRecipients: numberOfRecipients,
             fee: fee,
-            totalOutlay: totalOutlay)
+            totalOutlay: totalOutlay,
+            paymentIntentId: paymentIntentId)
     }
 }
 
-extension RecoverableDestinationMemo: Hashable { }
+extension RecoverableDestinationWithPaymentIntentMemo: Hashable { }
 
-extension RecoverableDestinationMemo: Equatable {
+extension RecoverableDestinationWithPaymentIntentMemo: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.memoData == rhs.memoData
     }
