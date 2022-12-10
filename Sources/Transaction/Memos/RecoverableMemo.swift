@@ -228,7 +228,7 @@ extension RecoverableMemo {
         unauthenticated: UnauthenticatedSenderMemo?,
         contact: PublicAddressProvider?
     )
-    
+
     func recover<Contact: PublicAddressProvider>(
         contacts: Set<Contact>
     ) -> RecoverResult {
@@ -253,7 +253,7 @@ extension RecoverableMemo {
                 return (memo: memo, unauthenticated:nil, contact: contact)
             }
             .first
-            
+
             guard let recovered = recovered else {
                 guard let unauthenticated = self.unauthenticatedSenderMemo() else {
                     return (memo: nil, unauthenticated: nil, contact: nil)

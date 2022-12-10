@@ -51,7 +51,7 @@ struct RecoverableSenderWithPaymentIntentMemo {
             addressHash: addressHash,
             paymentIntentId: paymentIntentId)
     }
-    
+
     func unauthenticatedMemo() -> SenderWithPaymentIntentMemo? {
         let paymentIntId = SenderWithPaymentIntentMemoUtils.getPaymentIntentId(memoData: memoData)
         guard let paymentIntentId = paymentIntId else {

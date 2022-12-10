@@ -69,7 +69,7 @@ class RecoverableMemoTests: XCTestCase {
         .filter {
             $0.unauthenticatedMemo != nil
         }
-        
+
         XCTAssertGreaterThan((unauthenticatedSenderMemoTxOuts.count), 0)
     }
 

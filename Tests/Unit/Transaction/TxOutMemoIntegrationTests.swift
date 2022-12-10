@@ -91,7 +91,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
         XCTAssertEqual(recovered.addressHash, senderPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
-        
+
         guard
             case let .senderWithPaymentRequest(recoverable) = receivedTxOut.recoverableMemo,
             let unauthenticated = recoverable.unauthenticatedMemo()
@@ -99,7 +99,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
             XCTFail("Unable to get unauthenticated memo data")
             return
         }
-        
+
         XCTAssertEqual(unauthenticated.addressHash, senderPublicAddress.calculateAddressHash())
         XCTAssertEqual(unauthenticated.paymentRequestId, fixture.paymentRequestId)
     }
