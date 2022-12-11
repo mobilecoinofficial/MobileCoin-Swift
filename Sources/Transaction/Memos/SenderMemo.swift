@@ -38,6 +38,10 @@ struct RecoverableSenderMemo {
         }
         return SenderMemo(memoData64: memoData, addressHash: addressHash)
     }
+
+    func unauthenticatedMemo() -> SenderMemo? {
+        SenderMemo(memoData64: memoData, addressHash: addressHash)
+    }
 }
 
 extension RecoverableSenderMemo: Hashable { }
