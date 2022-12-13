@@ -14,6 +14,17 @@ public struct SenderMemo {
 
 extension SenderMemo: Equatable, Hashable { }
 
+extension SenderMemo: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case addressHashHex
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(addressHashHex, forKey: .addressHashHex)
+    }
+}
+
 struct RecoverableSenderMemo {
     let memoData: Data64
     let addressHash: AddressHash
@@ -42,6 +53,7 @@ struct RecoverableSenderMemo {
     func unauthenticatedMemo() -> SenderMemo? {
         SenderMemo(memoData64: memoData, addressHash: addressHash)
     }
+    
 }
 
 extension RecoverableSenderMemo: Hashable { }
