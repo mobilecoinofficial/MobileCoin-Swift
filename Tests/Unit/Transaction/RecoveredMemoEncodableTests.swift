@@ -24,9 +24,9 @@ final class RecoveredMemoEncodableTests: XCTestCase {
         let expected: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
         ]
-        
+
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
-        
+
         guard
             let unauthenticated = recoverable.unauthenticatedMemo(),
             let unauthenticatedEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
@@ -54,11 +54,11 @@ final class RecoveredMemoEncodableTests: XCTestCase {
 
         let expected: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "paymentRequestId": recovered.paymentRequestId
+            "paymentRequestId": recovered.paymentRequestId,
         ]
-        
+
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
-        
+
         guard
             let unauthenticated = recoverable.unauthenticatedMemo(),
             let unauthenticatedEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
@@ -66,7 +66,7 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             XCTFail("Unable to get unauthenticated memo data for encodable testing")
             return
         }
-        
+
         XCTAssertEqual(unauthenticatedEncoded as NSDictionary, expected as NSDictionary)
     }
 
@@ -86,11 +86,11 @@ final class RecoveredMemoEncodableTests: XCTestCase {
 
         let expected: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "paymentIntentId": recovered.paymentIntentId
+            "paymentIntentId": recovered.paymentIntentId,
         ]
-        
+
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
-        
+
         guard
             let unauthenticated = recoverable.unauthenticatedMemo(),
             let unauthenticatedEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
@@ -98,10 +98,10 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             XCTFail("Unable to get unauthenticated memo data for encodable testing")
             return
         }
-        
+
         XCTAssertEqual(unauthenticatedEncoded as NSDictionary, expected as NSDictionary)
     }
-    
+
     func testDestinationMemoEncodable() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
         let recipientPublicAddress = fixture.recipeintPublicAddress
@@ -115,14 +115,14 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         let expected: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
             "fee": recovered.fee,
             "totalOutlay": recovered.totalOutlay,
-            "numberOfRecipients": recovered.numberOfRecipients
+            "numberOfRecipients": recovered.numberOfRecipients,
         ]
-        
+
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
     }
 
@@ -139,19 +139,19 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         let expected: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
             "fee": recovered.fee,
             "totalOutlay": recovered.totalOutlay,
             "numberOfRecipients": recovered.numberOfRecipients,
-            "paymentRequestId": recovered.paymentRequestId
-            
+            "paymentRequestId": recovered.paymentRequestId,
+
         ]
-        
+
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
     }
-    
+
     func testDestinationWithPaymentIntentMemoEncodable() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderWithPaymentIntentAndDestination()
         let recipientPublicAddress = fixture.recipeintPublicAddress
@@ -165,16 +165,16 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             XCTFail("Unable to recover memo data")
             return
         }
-        
+
         let expected: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
             "fee": recovered.fee,
             "totalOutlay": recovered.totalOutlay,
             "numberOfRecipients": recovered.numberOfRecipients,
-            "paymentIntentId": recovered.paymentIntentId
-            
+            "paymentIntentId": recovered.paymentIntentId,
+
         ]
-        
+
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
     }
 
