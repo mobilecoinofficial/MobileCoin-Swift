@@ -56,6 +56,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
 
     func testBuildTransactionWithSenderWithPaymentRequest() throws {
@@ -102,6 +103,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
         XCTAssertEqual(unauthenticated.addressHash, senderPublicAddress.calculateAddressHash())
         XCTAssertEqual(unauthenticated.paymentRequestId, fixture.paymentRequestId)
+
     }
 
     func testTransactionSenderWithPaymentRequestDestinationMemo() throws {
@@ -121,6 +123,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
 
     func testBuildTransactionWithSenderWithPaymentIntent() throws {
@@ -186,6 +189,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
         XCTAssertEqual(recovered.paymentIntentId, fixture.paymentIntentId)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
 
     func testBlockVersionOneUnusedMemo() throws {

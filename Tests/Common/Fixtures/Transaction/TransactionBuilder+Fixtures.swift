@@ -19,6 +19,7 @@ extension TransactionBuilder.Fixtures {
         let memoType: MemoType
         let fee: Amount
         let totalOutlay: UInt64
+        let numberOfRecipients: UInt8 = 1
 
         static let Fixtures = TransactionBuilder.Fixtures.self
 
@@ -54,6 +55,7 @@ extension TransactionBuilder.Fixtures {
         let memoType: MemoType
         let fee: Amount
         let totalOutlay: UInt64
+        let numberOfRecipients: UInt8 = 1
 
         static let Fixtures = TransactionBuilder.Fixtures.self
 
@@ -94,6 +96,7 @@ extension TransactionBuilder.Fixtures {
         let memoType: MemoType
         let fee: Amount
         let totalOutlay: UInt64
+        let numberOfRecipients: UInt8 = 1
 
         static let Fixtures = TransactionBuilder.Fixtures.self
 
