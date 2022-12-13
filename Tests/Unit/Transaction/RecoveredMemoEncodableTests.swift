@@ -29,13 +29,13 @@ final class RecoveredMemoEncodableTests: XCTestCase {
 
         guard
             let unauthenticated = recoverable.unauthenticatedMemo(),
-            let unauthenticatedEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
+            let unauthEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
         else {
             XCTFail("Unable to get unauthenticated memo data for encodable testing")
             return
         }
 
-        XCTAssertEqual(unauthenticatedEncoded as NSDictionary, expected as NSDictionary)
+        XCTAssertEqual(unauthEncoded as NSDictionary, expected as NSDictionary)
     }
 
     func testSenderWithPaymentRequestMemoEncodable() throws {
@@ -61,13 +61,13 @@ final class RecoveredMemoEncodableTests: XCTestCase {
 
         guard
             let unauthenticated = recoverable.unauthenticatedMemo(),
-            let unauthenticatedEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
+            let unauthEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
         else {
             XCTFail("Unable to get unauthenticated memo data for encodable testing")
             return
         }
 
-        XCTAssertEqual(unauthenticatedEncoded as NSDictionary, expected as NSDictionary)
+        XCTAssertEqual(unauthEncoded as NSDictionary, expected as NSDictionary)
     }
 
     func testSenderWithPaymentIntentMemoEncodable() throws {
@@ -93,13 +93,13 @@ final class RecoveredMemoEncodableTests: XCTestCase {
 
         guard
             let unauthenticated = recoverable.unauthenticatedMemo(),
-            let unauthenticatedEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
+            let unauthEncoded = try? DictionaryEncoder().encode(unauthenticated) as? [String: Any]
         else {
             XCTFail("Unable to get unauthenticated memo data for encodable testing")
             return
         }
 
-        XCTAssertEqual(unauthenticatedEncoded as NSDictionary, expected as NSDictionary)
+        XCTAssertEqual(unauthEncoded as NSDictionary, expected as NSDictionary)
     }
 
     func testDestinationMemoEncodable() throws {
