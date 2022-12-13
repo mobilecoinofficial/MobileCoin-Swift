@@ -169,4 +169,38 @@ enum SignedContingentInputBuilderUtils {
             return sci
         }
     }
+
+    static func signed_contingent_input_is_valid(sciData: Data) -> Bool {
+        func ffiCall(
+            sciDataPtr: UnsafePointer<McBuffer>
+        ) -> Bool {
+            let result = withMcError { errorPtr in
+                mc_signed_contingent_input_data_is_valid(
+                    sciDataPtr,
+                    &errorPtr)
+            }
+            switch result {
+            case .success:
+                return true
+            case .failure(let error):
+                switch error.errorCode {
+                case .invalidInput:
+                    // Safety: This condition indicates a programming error and can only
+                    // happen if arguments to the above FFI func are supplied incorrectly.
+                    logger.warning("error: \(redacting: error)")
+                    return false
+                default:
+                    // Safety: mc_memo_sender_with_payment_request_memo_is_valid
+                    // should not throw non-documented errors.
+                    logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
+                    return false
+                }
+            }
+        }
+
+        return sciData.asMcBuffer { sciDataPtr in
+            ffiCall(sciDataPtr: sciDataPtr)
+        }
+    }
+
 }

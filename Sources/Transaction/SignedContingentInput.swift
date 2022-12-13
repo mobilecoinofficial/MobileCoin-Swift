@@ -36,7 +36,8 @@ public struct SignedContingentInput {
     }
 
     public var isValid: Bool {
-        true
+        return SignedContingentInputBuilderUtils.signed_contingent_input_is_valid(
+            sciData: self.serializedData)
     }
 
     /// Block index at which this sci will no longer be considered valid for inclusion in

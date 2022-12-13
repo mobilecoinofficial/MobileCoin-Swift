@@ -443,7 +443,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 }
 
                 XCTAssertEqual(sci.rewardAmount, amountToSend)
-
+                XCTAssertTrue(sci.isValid)
                 print("Signed contingent input creation successful")
                 expect.fulfill()
             }
