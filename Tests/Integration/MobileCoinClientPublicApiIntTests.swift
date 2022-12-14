@@ -462,7 +462,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         expectation expect: XCTestExpectation
     ) throws {
         let amountToSend = Amount(1, in: .MOB)
-        let amountToReceive = Amount(10, in: .MOBUSD)
+        let amountToReceive = Amount(10, in: .eUSD)
 
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
