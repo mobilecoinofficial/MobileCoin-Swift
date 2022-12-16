@@ -73,43 +73,43 @@ enum RecoverableMemo {
         let typeBytes = data[..<2]
 
         switch typeBytes.hexEncodedString() {
-        case Types.SENDER_WITH_PAYMENT_REQUEST:
+        case SenderWithPaymentRequestMemo.type:
             let memo = RecoverableSenderWithPaymentRequestMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .senderWithPaymentRequest(memo)
-        case Types.SENDER_WITH_PAYMENT_INTENT:
+        case SenderWithPaymentIntentMemo.type:
             let memo = RecoverableSenderWithPaymentIntentMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .senderWithPaymentIntent(memo)
-        case Types.SENDER:
+        case SenderMemo.type:
             let memo = RecoverableSenderMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .sender(memo)
-        case Types.DESTINATION:
+        case DestinationMemo.type:
             let memo = RecoverableDestinationMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destination(memo)
-        case Types.DESTINATION_WITH_PAYMENT_INTENT:
+        case DestinationWithPaymentIntentMemo.type:
             let memo = RecoverableDestinationWithPaymentIntentMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destinationWithPaymentIntent(memo)
-        case Types.DESTINATION_WITH_PAYMENT_REQUEST:
+        case DestinationWithPaymentRequestMemo.type:
             let memo = RecoverableDestinationWithPaymentRequestMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destinationWithPaymentRequest(memo)
-        case Types.UNUSED:
+        case Self.UNUSED_TYPE:
             self = .unused
         default:
             logger.warning("Memo data type unknown")
@@ -117,15 +117,7 @@ enum RecoverableMemo {
         }
     }
 
-    enum Types {
-        static let SENDER = "0100"
-        static let SENDER_WITH_PAYMENT_REQUEST = "0101"
-        static let SENDER_WITH_PAYMENT_INTENT = "0102"
-        static let DESTINATION = "0200"
-        static let DESTINATION_WITH_PAYMENT_REQUEST = "0203"
-        static let DESTINATION_WITH_PAYMENT_INTENT = "0204"
-        static let UNUSED = "0000"
-    }
+    static let UNUSED_TYPE = "0000"
 
     var isAuthenticatedSenderMemo: Bool {
         switch self {
@@ -139,6 +131,37 @@ enum RecoverableMemo {
 
 }
 // swiftlint:enable function_body_length
+
+/// Memo Type "binary" header/prefixes and readable names
+extension SenderMemo {
+    public static let type = "0100"
+    public static let typeName = "SenderMemo"
+}
+
+extension SenderWithPaymentRequestMemo {
+    public static let type = "0101"
+    public static let typeName = "SenderWithPaymentRequestIdMemo"
+}
+
+extension SenderWithPaymentIntentMemo {
+    public static let type = "0102"
+    public static let typeName = "SenderWithPaymentIntentIdMemo"
+}
+
+extension DestinationMemo {
+    public static let type = "0200"
+    public static let typeName = "DestinationMemo"
+}
+
+extension DestinationWithPaymentRequestMemo {
+    public static let type = "0203"
+    public static let typeName = "DestinationWithPaymentRequestIdMemo"
+}
+
+extension DestinationWithPaymentIntentMemo {
+    public static let type = "0204"
+    public static let typeName = "DestinationWithPaymentIntentIdMemo"
+}
 
 // swiftlint:disable cyclomatic_complexity
 extension RecoverableMemo {

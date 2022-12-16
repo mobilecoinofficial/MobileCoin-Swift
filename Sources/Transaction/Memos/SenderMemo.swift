@@ -16,12 +16,22 @@ extension SenderMemo: Equatable, Hashable { }
 
 extension SenderMemo: Encodable {
     enum CodingKeys: String, CodingKey {
+        case typeBytes
+        case typeName
+        case data
+    }
+
+    enum DataCodingKeys: String, CodingKey {
         case addressHashHex
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(addressHashHex, forKey: .addressHashHex)
+        try container.encode(Self.type, forKey: .typeBytes)
+        try container.encode(Self.typeName, forKey: .typeName)
+
+        var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: .data)
+        try data.encode(addressHashHex, forKey: .addressHashHex)
     }
 }
 

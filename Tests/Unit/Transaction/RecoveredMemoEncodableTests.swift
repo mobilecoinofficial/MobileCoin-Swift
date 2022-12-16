@@ -21,8 +21,15 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             return
         }
 
-        let expected: [String: Any] = [
+        let data: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
+        ]
+
+        let type = SenderMemo.self
+        let expected: [String: Any] = [
+            "typeBytes": type.type,
+            "typeName": type.typeName,
+            "data": data,
         ]
 
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
@@ -52,9 +59,16 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             return
         }
 
-        let expected: [String: Any] = [
+        let data: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "paymentRequestId": recovered.paymentRequestId,
+            "paymentRequestId": String(recovered.paymentRequestId),
+        ]
+
+        let type = SenderWithPaymentRequestMemo.self
+        let expected: [String: Any] = [
+            "typeBytes": type.type,
+            "typeName": type.typeName,
+            "data": data,
         ]
 
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
@@ -84,9 +98,16 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             return
         }
 
-        let expected: [String: Any] = [
+        let data: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "paymentIntentId": recovered.paymentIntentId,
+            "paymentIntentId": String(recovered.paymentIntentId),
+        ]
+
+        let type = SenderWithPaymentIntentMemo.self
+        let expected: [String: Any] = [
+            "typeBytes": type.type,
+            "typeName": type.typeName,
+            "data": data,
         ]
 
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
@@ -116,11 +137,18 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             return
         }
 
-        let expected: [String: Any] = [
+        let data: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "fee": recovered.fee,
-            "totalOutlay": recovered.totalOutlay,
-            "numberOfRecipients": recovered.numberOfRecipients,
+            "fee": String(recovered.fee),
+            "totalOutlay": String(recovered.totalOutlay),
+            "numberOfRecipients": String(recovered.numberOfRecipients),
+        ]
+
+        let type = DestinationMemo.self
+        let expected: [String: Any] = [
+            "typeBytes": type.type,
+            "typeName": type.typeName,
+            "data": data,
         ]
 
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
@@ -140,13 +168,20 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             return
         }
 
-        let expected: [String: Any] = [
+        let data: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "fee": recovered.fee,
-            "totalOutlay": recovered.totalOutlay,
-            "numberOfRecipients": recovered.numberOfRecipients,
-            "paymentRequestId": recovered.paymentRequestId,
+            "fee": String(recovered.fee),
+            "totalOutlay": String(recovered.totalOutlay),
+            "numberOfRecipients": String(recovered.numberOfRecipients),
+            "paymentRequestId": String(recovered.paymentRequestId),
 
+        ]
+
+        let type = DestinationWithPaymentRequestMemo.self
+        let expected: [String: Any] = [
+            "typeBytes": type.type,
+            "typeName": type.typeName,
+            "data": data,
         ]
 
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
@@ -166,13 +201,20 @@ final class RecoveredMemoEncodableTests: XCTestCase {
             return
         }
 
-        let expected: [String: Any] = [
+        let data: [String: Any] = [
             "addressHashHex": recovered.addressHashHex,
-            "fee": recovered.fee,
-            "totalOutlay": recovered.totalOutlay,
-            "numberOfRecipients": recovered.numberOfRecipients,
-            "paymentIntentId": recovered.paymentIntentId,
+            "fee": String(recovered.fee),
+            "totalOutlay": String(recovered.totalOutlay),
+            "numberOfRecipients": String(recovered.numberOfRecipients),
+            "paymentIntentId": String(recovered.paymentIntentId),
 
+        ]
+
+        let type = DestinationWithPaymentIntentMemo.self
+        let expected: [String: Any] = [
+            "typeBytes": type.type,
+            "typeName": type.typeName,
+            "data": data,
         ]
 
         XCTAssertEqual(encoded as NSDictionary, expected as NSDictionary)
