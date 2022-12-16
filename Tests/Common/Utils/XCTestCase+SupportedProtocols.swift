@@ -16,12 +16,17 @@ extension XCTestCase {
     ) rethrows {
         let supportedProtocols = TransportProtocol.supportedProtocols
 
+        let last = supportedProtocols.last
         try supportedProtocols.forEach { transportProtocol in
             let description = "[\(transportProtocol.description)]:\(description)"
             print("Testing ... \(description)")
             let expect = expectation(description: description)
             try testCase(transportProtocol, expect)
             XCTWaiter().wait(for: [expect], timeout: timeout)
+
+            // Without the sleep here, we were occasionally seeing 'insufficientFunds' errors
+            // caused by tests that transact, where the change txo has not come back yet
+            sleep(transportProtocol == last ? 0 : interval)
         }
     }
 
