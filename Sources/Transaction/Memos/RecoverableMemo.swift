@@ -55,7 +55,6 @@ extension UnauthenticatedSenderMemo {
     }
 }
 
-
 // swiftlint:disable function_body_length
 enum RecoverableMemo {
     case notset
