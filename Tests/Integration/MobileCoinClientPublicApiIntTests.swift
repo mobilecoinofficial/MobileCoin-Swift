@@ -54,7 +54,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 accountKey: key,
                 transportProtocol: transportProtocol)
 
-            let expect = XCTestExpectation(description: "Retrieving balance for acct index \(index)")
+            let expect = XCTestExpectation(description: "Retrieving balance for acct idx \(index)")
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 

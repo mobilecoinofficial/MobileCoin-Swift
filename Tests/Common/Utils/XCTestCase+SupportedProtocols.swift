@@ -21,7 +21,7 @@ extension XCTestCase {
             let description = "[\(transportProtocol.description)]:\(description)"
             print("Testing ... \(description)")
             let expect = expectation(description: description)
-            try testCase(transportProtocol, expect) 
+            try testCase(transportProtocol, expect)
             XCTWaiter().wait(for: [expect], timeout: timeout)
 
             // Without the sleep here, we were occasionally seeing 'insufficientFunds' errors
