@@ -59,6 +59,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.addressHash, recipientPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
 
     func testBuildTransactionWithSenderWithPaymentRequest() throws {
@@ -96,6 +97,18 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
         XCTAssertEqual(recovered.addressHash, senderPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
+
+        guard
+            case let .senderWithPaymentRequest(recoverable) = receivedTxOut.recoverableMemo,
+            let unauthenticated = recoverable.unauthenticatedMemo()
+        else {
+            XCTFail("Unable to get unauthenticated memo data")
+            return
+        }
+
+        XCTAssertEqual(unauthenticated.addressHash, senderPublicAddress.calculateAddressHash())
+        XCTAssertEqual(unauthenticated.paymentRequestId, fixture.paymentRequestId)
+
     }
 
     func testTransactionSenderWithPaymentRequestDestinationMemo() throws {
@@ -115,6 +128,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
         XCTAssertEqual(recovered.paymentRequestId, fixture.paymentRequestId)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
 
     func testBuildTransactionWithSenderWithPaymentIntent() throws {
@@ -153,6 +167,17 @@ class TxOutMemoIntegrationTests: XCTestCase {
 
         XCTAssertEqual(recovered.addressHash, senderPublicAddress.calculateAddressHash())
         XCTAssertEqual(recovered.paymentIntentId, fixture.paymentIntentId)
+
+        guard
+            case let .senderWithPaymentIntent(recoverable) = receivedTxOut.recoverableMemo,
+            let unauthenticated = recoverable.unauthenticatedMemo()
+        else {
+            XCTFail("Unable to recover memo data")
+            return
+        }
+
+        XCTAssertEqual(unauthenticated.addressHash, senderPublicAddress.calculateAddressHash())
+        XCTAssertEqual(unauthenticated.paymentIntentId, fixture.paymentIntentId)
     }
 
     func testTransactionSenderWithPaymentIntentDestinationMemo() throws {
@@ -172,6 +197,7 @@ class TxOutMemoIntegrationTests: XCTestCase {
         XCTAssertEqual(recovered.fee, fixture.fee.value)
         XCTAssertEqual(recovered.totalOutlay, fixture.totalOutlay)
         XCTAssertEqual(recovered.paymentIntentId, fixture.paymentIntentId)
+        XCTAssertEqual(recovered.numberOfRecipients, fixture.numberOfRecipients)
     }
 
     func testBlockVersionOneUnusedMemo() throws {

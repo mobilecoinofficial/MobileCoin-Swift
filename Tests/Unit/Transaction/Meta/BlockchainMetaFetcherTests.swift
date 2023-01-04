@@ -20,14 +20,14 @@ class BlockchainMetaFetcherTests: XCTestCase {
             guard let metaCache = $0.successOrFulfill(expectation: expect)
             else { return }
 
-            XCTAssertEqual(metaCache.minimumFees[.MOB], 4_000_000_000)
+            XCTAssertEqual(metaCache.minimumFees[.MOB], 400_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)
     }
 
     func testFetchMinimumFeeWorksWithNewService() throws {
-        let blockchainService = TestBlockchainService(successWithMinimumFee: 3_000_000_000)
+        let blockchainService = TestBlockchainService(successWithMinimumFee: 300_000_000)
         let fetcher = BlockchainMetaFetcher(
             blockchainService: blockchainService,
             metaCacheTTL: 60,
@@ -38,7 +38,7 @@ class BlockchainMetaFetcherTests: XCTestCase {
             guard let metaCache = $0.successOrFulfill(expectation: expect)
             else { return }
 
-            XCTAssertEqual(metaCache.minimumFees[.MOB], 3_000_000_000)
+            XCTAssertEqual(metaCache.minimumFees[.MOB], 300_000_000)
             expect.fulfill()
         }
         waitForExpectations(timeout: 1)

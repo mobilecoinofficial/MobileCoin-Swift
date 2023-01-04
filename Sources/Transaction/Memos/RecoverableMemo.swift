@@ -34,6 +34,27 @@ extension RecoveredMemo {
     }
 }
 
+public enum UnauthenticatedSenderMemo {
+    case sender(SenderMemo)
+    case senderWithPaymentRequest(SenderWithPaymentRequestMemo)
+    case senderWithPaymentIntent(SenderWithPaymentIntentMemo)
+}
+
+extension UnauthenticatedSenderMemo: Equatable { }
+
+extension UnauthenticatedSenderMemo {
+    var addressHash: AddressHash {
+        switch self {
+        case let .senderWithPaymentRequest(memo):
+            return memo.addressHash
+        case let .senderWithPaymentIntent(memo):
+            return memo.addressHash
+        case let .sender(memo):
+            return memo.addressHash
+        }
+    }
+}
+
 // swiftlint:disable function_body_length
 enum RecoverableMemo {
     case notset
@@ -52,43 +73,43 @@ enum RecoverableMemo {
         let typeBytes = data[..<2]
 
         switch typeBytes.hexEncodedString() {
-        case Types.SENDER_WITH_PAYMENT_REQUEST:
+        case SenderWithPaymentRequestMemo.type:
             let memo = RecoverableSenderWithPaymentRequestMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .senderWithPaymentRequest(memo)
-        case Types.SENDER_WITH_PAYMENT_INTENT:
+        case SenderWithPaymentIntentMemo.type:
             let memo = RecoverableSenderWithPaymentIntentMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .senderWithPaymentIntent(memo)
-        case Types.SENDER:
+        case SenderMemo.type:
             let memo = RecoverableSenderMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutPublicKey: txOutKeys.publicKey)
             self = .sender(memo)
-        case Types.DESTINATION:
+        case DestinationMemo.type:
             let memo = RecoverableDestinationMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destination(memo)
-        case Types.DESTINATION_WITH_PAYMENT_INTENT:
+        case DestinationWithPaymentIntentMemo.type:
             let memo = RecoverableDestinationWithPaymentIntentMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destinationWithPaymentIntent(memo)
-        case Types.DESTINATION_WITH_PAYMENT_REQUEST:
+        case DestinationWithPaymentRequestMemo.type:
             let memo = RecoverableDestinationWithPaymentRequestMemo(
                 memoData,
                 accountKey: accountKey,
                 txOutKeys: txOutKeys)
             self = .destinationWithPaymentRequest(memo)
-        case Types.UNUSED:
+        case Self.UNUSED_TYPE:
             self = .unused
         default:
             logger.warning("Memo data type unknown")
@@ -96,15 +117,7 @@ enum RecoverableMemo {
         }
     }
 
-    enum Types {
-        static let SENDER = "0100"
-        static let SENDER_WITH_PAYMENT_REQUEST = "0101"
-        static let SENDER_WITH_PAYMENT_INTENT = "0102"
-        static let DESTINATION = "0200"
-        static let DESTINATION_WITH_PAYMENT_REQUEST = "0203"
-        static let DESTINATION_WITH_PAYMENT_INTENT = "0204"
-        static let UNUSED = "0000"
-    }
+    static let UNUSED_TYPE = "0000"
 
     var isAuthenticatedSenderMemo: Bool {
         switch self {
@@ -118,6 +131,37 @@ enum RecoverableMemo {
 
 }
 // swiftlint:enable function_body_length
+
+/// Memo Type "binary" header/prefixes and readable names
+extension SenderMemo {
+    public static let type = "0100"
+    public static let typeName = "SenderMemo"
+}
+
+extension SenderWithPaymentRequestMemo {
+    public static let type = "0101"
+    public static let typeName = "SenderWithPaymentRequestIdMemo"
+}
+
+extension SenderWithPaymentIntentMemo {
+    public static let type = "0102"
+    public static let typeName = "SenderWithPaymentIntentIdMemo"
+}
+
+extension DestinationMemo {
+    public static let type = "0200"
+    public static let typeName = "DestinationMemo"
+}
+
+extension DestinationWithPaymentRequestMemo {
+    public static let type = "0203"
+    public static let typeName = "DestinationWithPaymentRequestIdMemo"
+}
+
+extension DestinationWithPaymentIntentMemo {
+    public static let type = "0204"
+    public static let typeName = "DestinationWithPaymentIntentIdMemo"
+}
 
 // swiftlint:disable cyclomatic_complexity
 extension RecoverableMemo {
@@ -154,6 +198,32 @@ extension RecoverableMemo {
 }
 // swiftlint:enable cyclomatic_complexity
 
+extension RecoverableMemo {
+    func unauthenticatedSenderMemo() -> UnauthenticatedSenderMemo? {
+        switch self {
+        case .notset, .unused:
+            return nil
+        case .destination, .destinationWithPaymentIntent, .destinationWithPaymentRequest:
+            assertionFailure(
+                "This should not be called on destination memos because ..." +
+                "Unauthenticated in this context means the txOut is not owned by the account")
+            return nil
+        case let .sender(recoverable):
+            guard let memo = recoverable.unauthenticatedMemo()
+            else { return nil }
+            return .sender(memo)
+        case let .senderWithPaymentRequest(recoverable):
+            guard let memo = recoverable.unauthenticatedMemo()
+            else { return nil }
+            return .senderWithPaymentRequest(memo)
+        case let .senderWithPaymentIntent(recoverable):
+            guard let memo = recoverable.unauthenticatedMemo()
+            else { return nil }
+            return .senderWithPaymentIntent(memo)
+        }
+    }
+}
+
 extension RecoverableMemo: Hashable { }
 
 extension RecoverableMemo: Equatable {
@@ -176,32 +246,46 @@ extension RecoverableMemo: Equatable {
 }
 
 extension RecoverableMemo {
+    typealias RecoverResult = (
+        memo: RecoveredMemo?,
+        unauthenticated: UnauthenticatedSenderMemo?,
+        contact: PublicAddressProvider?
+    )
+
     func recover<Contact: PublicAddressProvider>(
         contacts: Set<Contact>
-    ) -> (memo: RecoveredMemo?, contact: Contact?) {
+    ) -> RecoverResult {
         switch self {
         case .destination, .destinationWithPaymentIntent, .destinationWithPaymentRequest:
             guard let recoveredMemo = self.recover() else {
-                return (memo: nil, contact: nil)
+                return (memo: nil, unauthenticated: nil, contact: nil)
             }
             guard let matchingContact = contacts.first(where: {
                     $0.publicAddress.calculateAddressHash() == recoveredMemo.addressHash
                 })
             else {
-                return (memo: recoveredMemo, contact: nil)
+                return (memo: recoveredMemo, unauthenticated: nil, contact: nil)
             }
-            return (memo: recoveredMemo, contact: matchingContact)
+            return (memo: recoveredMemo, unauthenticated: nil, contact: matchingContact)
         case .sender, .senderWithPaymentRequest, .senderWithPaymentIntent:
-            return contacts.compactMap { contact in
+            let recovered = contacts.compactMap { contact -> RecoverResult? in
                 guard let memo = self.recover(publicAddress: contact.publicAddress)
                 else {
                     return nil
                 }
-                return (memo: memo, contact: contact)
+                return (memo: memo, unauthenticated:nil, contact: contact)
             }
-            .first ?? (memo: nil, contact: nil)
+            .first
+
+            guard let recovered = recovered else {
+                guard let unauthenticated = self.unauthenticatedSenderMemo() else {
+                    return (memo: nil, unauthenticated: nil, contact: nil)
+                }
+                return (memo: nil, unauthenticated: unauthenticated, contact: nil)
+            }
+            return recovered
         case .notset, .unused:
-            return (memo: nil, contact: nil)
+            return (memo: nil, unauthenticated:nil, contact: nil)
         }
     }
 }

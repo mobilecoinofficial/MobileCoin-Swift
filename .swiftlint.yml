@@ -134,3 +134,6 @@ file_header:
 # Temporarily turn this into a warning until the code is fixed
 large_tuple:
   error: 6
+
+file_name:
+  excluded: ["DictionaryCodable.swift"]

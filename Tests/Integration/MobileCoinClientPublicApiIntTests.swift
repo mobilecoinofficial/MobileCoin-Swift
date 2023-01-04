@@ -45,13 +45,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        try Array(0...7).forEach({ index in
+        let numAccounts = IntegrationTestFixtures.testAccountCount
+        var balanceExpects: [XCTestExpectation] = []
+        try Array(0..<numAccounts).forEach({ index in
             let key = try IntegrationTestFixtures.createAccountKey(accountIndex: index)
 
             let client = try IntegrationTestFixtures.createMobileCoinClient(
                 accountKey: key,
                 transportProtocol: transportProtocol)
 
+            let expect = XCTestExpectation(description: "Retrieving balance for acct idx \(index)")
             client.updateBalance {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
@@ -59,13 +62,13 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     print("account index \(index) public address \(key.publicAddress)")
                     print("account index \(index) balance: \(amountPicoMob)")
                 }
-
-                if index == 9 {
-                    expect.fulfill()
-                }
             }
+
+            balanceExpects.append(expect)
         })
 
+        XCTWaiter().wait(for: balanceExpects, timeout: 40)
+        expect.fulfill()
     }
 
     func testBalances() throws {

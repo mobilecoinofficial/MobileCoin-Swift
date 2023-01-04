@@ -15,6 +15,29 @@ public struct SenderWithPaymentIntentMemo {
 
 extension SenderWithPaymentIntentMemo: Equatable, Hashable { }
 
+extension SenderWithPaymentIntentMemo: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case typeBytes
+        case typeName
+        case data
+    }
+
+    enum DataCodingKeys: String, CodingKey {
+        case addressHashHex
+        case paymentIntentId
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Self.type, forKey: .typeBytes)
+        try container.encode(Self.typeName, forKey: .typeName)
+
+        var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: .data)
+        try data.encode(addressHashHex, forKey: .addressHashHex)
+        try data.encode(String(paymentIntentId), forKey: .paymentIntentId)
+    }
+}
+
 struct RecoverableSenderWithPaymentIntentMemo {
     let memoData: Data64
     let addressHash: AddressHash
@@ -39,6 +62,20 @@ struct RecoverableSenderWithPaymentIntentMemo {
             return nil
         }
 
+        let paymentIntId = SenderWithPaymentIntentMemoUtils.getPaymentIntentId(memoData: memoData)
+        guard let paymentIntentId = paymentIntId else {
+            logger.debug("Unable to get payment intent id")
+            return nil
+        }
+
+        let addressHash = SenderWithPaymentIntentMemoUtils.getAddressHash(memoData: memoData)
+        return SenderWithPaymentIntentMemo(
+            memoData64: memoData,
+            addressHash: addressHash,
+            paymentIntentId: paymentIntentId)
+    }
+
+    func unauthenticatedMemo() -> SenderWithPaymentIntentMemo? {
         let paymentIntId = SenderWithPaymentIntentMemoUtils.getPaymentIntentId(memoData: memoData)
         guard let paymentIntentId = paymentIntId else {
             logger.debug("Unable to get payment intent id")
