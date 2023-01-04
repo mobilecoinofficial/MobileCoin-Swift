@@ -21,6 +21,16 @@ extension IntegrationTestFixtures {
         try FogUrl.make(string: network.fogReportUrl).get()
     }
 
+    static var testAccountCount: Int {
+        switch network {
+        case .dynamic:
+            return network.testAccountRootEntropies.count
+        default:
+            // the createAccountKey method will first try mnemonics, then private keys
+            return max(network.testAccountsMnemonics.count, network.testAccountsPrivateKeys.count)
+        }
+    }
+
     static func createAccountKey(accountIndex: Int = 0) throws -> AccountKey {
         let fogAuthoritySpki = try network.fogAuthoritySpki()
 
