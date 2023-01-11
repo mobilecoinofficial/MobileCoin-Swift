@@ -178,8 +178,14 @@ extension TransactionBuilder {
         possibleTransaction: PossibleTransaction,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
-        
-        // TODO: Add total outlay check
+        guard Math.totalOutlayCheck(
+                for: possibleTransaction,
+                fee: context.fee,
+                inputs: inputs,
+                presignedInput: presignedInput
+        ) else {
+            return .failure(.invalidInput("Input values != output values + fee"))
+        }
 
         let builder: TransactionBuilder
         do {

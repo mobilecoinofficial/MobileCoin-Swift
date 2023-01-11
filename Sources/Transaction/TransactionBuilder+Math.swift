@@ -13,6 +13,28 @@ extension TransactionBuilder.Math {
     static func totalOutlayCheck(
         for possibleTransaction: PossibleTransaction,
         fee: Amount,
+        inputs: [PreparedTxInput],
+        presignedInput: SignedContingentInput?
+    ) -> Bool {
+        guard let sci = presignedInput else {
+            return totalOutlayCheck(for: possibleTransaction, fee: fee, inputs: inputs)
+        }
+
+        // for SCI:
+        //
+        // - input is meant to satisfy the required amount
+        // - the required amount is an output added automatically by the sci builder in mobilecoin
+        //
+        // so, for this check, we just need to verify that:
+        // presignedInput.requiredAmount + change amount = sum(inputs)
+        return UInt64.safeCompare(
+            sumOfValues: [sci.requiredAmount.value, possibleTransaction.changeAmount.value],
+            isEqualToSumOfValues: inputs.map { $0.knownTxOut.value })
+    }
+
+    static func totalOutlayCheck(
+        for possibleTransaction: PossibleTransaction,
+        fee: Amount,
         inputs: [PreparedTxInput]
     ) -> Bool {
         let outputs = possibleTransaction.outputs
