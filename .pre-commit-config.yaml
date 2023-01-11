@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: autocorrect
+        name: autocorrect
+        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --fix"
+        language: script
+        files: \.swift$
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --strict --quiet" 
+        language: script
+        files: \.swift$

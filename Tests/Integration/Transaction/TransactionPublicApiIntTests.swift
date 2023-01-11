@@ -12,9 +12,9 @@ class TransactionPublicApiIntTests: XCTestCase {
             try serializedData(transportProtocol: transportProtocol)
         }
     }
-    
+
     func serializedData(transportProtocol: TransportProtocol) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(transportProtocol:transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         let expect = expectation(description: "Testing Transaction serialization")

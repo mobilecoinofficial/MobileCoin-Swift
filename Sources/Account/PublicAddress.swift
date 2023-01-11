@@ -58,6 +58,8 @@ public struct PublicAddress {
 
     public var fogReportUrlString: String? { fogInfo?.reportUrlString }
 
+    public var addressHash: Data? { calculateAddressHash()?.data }
+
     var fogReportUrl: FogUrl? { fogInfo?.reportUrl }
     var fogReportId: String? { fogInfo?.reportId }
     var fogAuthoritySig: Data? { fogInfo?.authoritySig }
@@ -135,6 +137,12 @@ extension External_PublicAddress {
             self.fogReportID = fogInfo.reportId
             self.fogAuthoritySig = fogInfo.authoritySig
         }
+    }
+}
+
+extension PublicAddress {
+    func calculateAddressHash() -> AddressHash? {
+        AccountKeyUtils.publicAddressShortHash(publicAddress: self)
     }
 }
 

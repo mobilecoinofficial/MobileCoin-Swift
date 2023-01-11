@@ -20,6 +20,23 @@ extension InvalidInputError: CustomStringConvertible {
     }
 }
 
+extension InvalidInputError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+public enum BalanceUpdateError: Error {
+    case connectionError(ConnectionError)
+    case fogSyncError(FogSyncError)
+}
+
+extension BalanceUpdateError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum ConnectionError: Error {
     case connectionFailure(String)
     case authorizationFailure(String)
@@ -50,6 +67,12 @@ extension ConnectionError: CustomStringConvertible {
     }
 }
 
+extension ConnectionError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum BalanceTransferEstimationFetcherError: Error {
     case feeExceedsBalance(String = String())
     case balanceOverflow(String = String())
@@ -71,6 +94,12 @@ extension BalanceTransferEstimationFetcherError: CustomStringConvertible {
     }
 }
 
+extension BalanceTransferEstimationFetcherError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum TransactionEstimationFetcherError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -89,6 +118,12 @@ extension TransactionEstimationFetcherError: CustomStringConvertible {
                 return "\(innerError)"
             }
         }()
+    }
+}
+
+extension TransactionEstimationFetcherError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
     }
 }
 
@@ -116,6 +151,12 @@ extension TransactionPreparationError: CustomStringConvertible {
     }
 }
 
+extension TransactionPreparationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum DefragTransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -137,6 +178,31 @@ extension DefragTransactionPreparationError: CustomStringConvertible {
     }
 }
 
+extension DefragTransactionPreparationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+public struct SubmitTransactionError: Error {
+    public let submissionError: TransactionSubmissionError
+    public let consensusBlockCount: UInt64?
+}
+
+extension SubmitTransactionError: CustomStringConvertible {
+    public var description: String {
+        "Submit Transaction Error: " +
+        "Consensus Block Count == \(consensusBlockCount?.description ?? "nil"), " +
+        "\(submissionError)"
+    }
+}
+
+extension SubmitTransactionError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum TransactionSubmissionError: Error {
     case connectionError(ConnectionError)
     case invalidTransaction(String = String())
@@ -144,6 +210,7 @@ public enum TransactionSubmissionError: Error {
     case tombstoneBlockTooFar(String = String())
     case missingMemo(String = String())
     case inputsAlreadySpent(String = String())
+    case outputAlreadyExists(String = String())
 }
 
 extension TransactionSubmissionError: CustomStringConvertible {
@@ -162,8 +229,16 @@ extension TransactionSubmissionError: CustomStringConvertible {
                 return "Tombstone block too far\(!reason.isEmpty ? ": \(reason)" : "")"
             case .inputsAlreadySpent(let reason):
                 return "Inputs already spent\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .outputAlreadyExists(let reason):
+                return "Output already exists\(!reason.isEmpty ? ": \(reason)" : "")"
             }
         }()
+    }
+}
+
+extension TransactionSubmissionError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
     }
 }
 
@@ -188,6 +263,13 @@ extension BalanceTransferEstimationError: CustomStringConvertible {
 }
 
 @available(*, deprecated)
+extension BalanceTransferEstimationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+@available(*, deprecated)
 public enum TransactionEstimationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())
@@ -207,6 +289,13 @@ extension TransactionEstimationError: CustomStringConvertible {
     }
 }
 
+@available(*, deprecated)
+extension TransactionEstimationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public struct SecurityError: Error {
     let status: OSStatus?
     let message: String?
@@ -219,16 +308,38 @@ public struct SecurityError: Error {
 
 extension SecurityError: CustomStringConvertible {
     static var nilPublicKey = """
-        the public key could not be extracted (this can happen if the public key algorithm is not supported).
+        the public key could not be extracted \
+        (this can happen if the public key algorithm is not supported).
     """
-    
+
     public var description: String {
         guard let osstatus = status else { return "Security Error Code - \(message ?? "Unknown")" }
         if #available(iOS 11.3, *) {
-            return "Security Error Code - \(osstatus): \(SecCopyErrorMessageString(osstatus, nil) ?? "Unknown" as CFString)"
+            return "Security Error Code - \(osstatus): " +
+                   "\(SecCopyErrorMessageString(osstatus, nil) ?? "Unknown" as CFString)"
         } else {
             return "Security Error Code - \(osstatus) ... see Apple Security Framework SecBase.h"
         }
     }
 }
 
+extension SecurityError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+public struct TimedOutError: Error {
+}
+
+extension TimedOutError: CustomStringConvertible {
+    public var description: String {
+        "Timed Out"
+    }
+}
+
+extension TimedOutError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}

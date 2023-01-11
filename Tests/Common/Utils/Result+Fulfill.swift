@@ -6,7 +6,7 @@ import XCTest
 
 extension Result {
     func successOrFulfill(
-        expectation: XCTestExpectation,
+        expectation: XCTestExpectation? = nil,
         _ message: @autoclosure () -> String = "",
         file: StaticString = #file,
         line: UInt = #line
@@ -17,7 +17,7 @@ extension Result {
         case .success(let value):
             return value
         case .failure:
-            expectation.fulfill()
+            expectation?.fulfill()
             return nil
         }
     }

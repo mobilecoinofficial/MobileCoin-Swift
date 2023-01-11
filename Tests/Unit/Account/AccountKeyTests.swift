@@ -21,6 +21,31 @@ class AccountKeyTests: XCTestCase {
             fogAuthoritySpki: fixture.fogAuthoritySpki))
     }
 
+    func testAlphaFog() throws {
+        let fixture = try AccountKey.Fixtures.AlphaFog()
+        XCTAssertSuccess(AccountKey.make(
+            entropy: fixture.rootEntropy,
+            fogReportUrl: fixture.fogReportUrl,
+            fogReportId: fixture.fogReportId,
+            fogAuthoritySpki: fixture.fogAuthoritySpki))
+
+        let accountKey = fixture.manualAccountKey
+        XCTAssertEqual(
+                accountKey.viewPrivateKey.data.hexEncodedString(),
+                fixture.viewPrivateKey.data.hexEncodedString())
+        XCTAssertEqual(
+                accountKey.spendPrivateKey.data.hexEncodedString(),
+                fixture.spendPrivateKey.data.hexEncodedString())
+
+        let fogInfo = try XCTUnwrap(accountKey.fogInfo)
+        XCTAssertEqual(fogInfo.reportUrlString, fixture.fogReportUrl)
+        XCTAssertEqual(fogInfo.reportId, fixture.fogReportId)
+        XCTAssertEqual(
+                fogInfo.authoritySpki.hexEncodedString(),
+                fixture.fogAuthoritySpki.hexEncodedString())
+        XCTAssertEqual(fogInfo.reportUrl.description, fixture.fogReportUrl)
+    }
+
     func testFromMnemonic() throws {
         let fixture = try AccountKey.Fixtures.Init()
         let accountKey = AccountKey(mnemonic: fixture.mnemonic)
@@ -88,4 +113,10 @@ class AccountKeyTests: XCTestCase {
         }
     }
 
+    func testPublicAddressHash() throws {
+        let fixture = try PublicAddress.Fixtures.Default()
+        let publicAddress = fixture.publicAddress
+        let addressHash = publicAddress.calculateAddressHash()
+        XCTAssertNotNil(addressHash)
+    }
 }

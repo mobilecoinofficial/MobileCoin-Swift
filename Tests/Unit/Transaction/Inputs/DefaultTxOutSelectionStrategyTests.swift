@@ -9,7 +9,7 @@
 @testable import MobileCoin
 import XCTest
 
-private let minFee: UInt64 = 10_000_000_000
+private let minFee: UInt64 = 400_000_000
 
 class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
@@ -148,8 +148,11 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         for (amount, fee, txOuts, maxInputs, expectedIds, file, line) in testCases {
             _ = try? {
                 let selectedIds = try XCTUnwrapSuccess(
-                    sut.selectTransactionInputs(amount: amount, fee: fee, fromTxOuts: txOuts,
-                        maxInputs: maxInputs), file: file, line: line)
+                    sut.selectTransactionInputs(amount: Amount(mob: amount),
+                                                fee: fee,
+                                                fromTxOuts: txOuts,
+                                                maxInputs: maxInputs),
+                        file: file, line: line)
                 checkSelectionIds(selectedIds: selectedIds, minTotalOutput: [amount, fee],
                     txOuts: txOuts, maxInputs: maxInputs, file: file, line: line)
                 if let expectedIds = expectedIds {
@@ -166,7 +169,10 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         ]
         for (amount, fee, txOuts) in txOutTestCases {
             XCTAssertFailure(
-                sut.selectTransactionInputs(amount: amount, fee: fee, fromTxOuts: txOuts))
+                sut.selectTransactionInputs(
+                    amount: Amount(mob: amount),
+                    fee: fee,
+                    fromTxOuts: txOuts))
         }
     }
 
@@ -190,7 +196,10 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         for (amount, fee, txOuts, maxInputs, _, file, line) in txOutTestCases {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.selectTransactionInputs(amount: amount, fee: fee, fromTxOuts: txOuts,
+                    sut.selectTransactionInputs(
+                        amount: Amount(mob: amount),
+                        fee: fee,
+                        fromTxOuts: txOuts,
                         maxInputs: maxInputs),
                     file: file, line: line)
                 if case .defragmentationRequired = error {
@@ -214,7 +223,10 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         for (amount, fee, txOuts, maxInputs, _, file, line) in txOutTestCases {
             _ = try? {
                 let error = try XCTUnwrapFailure(
-                    sut.selectTransactionInputs(amount: amount, fee: fee, fromTxOuts: txOuts,
+                    sut.selectTransactionInputs(
+                        amount: Amount(mob: amount),
+                        fee: fee,
+                        fromTxOuts: txOuts,
                         maxInputs: maxInputs),
                     file: file, line: line)
                 if case .insufficientTxOuts = error {
@@ -344,7 +356,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let (totalFee, _) = try XCTUnwrapSuccess(
                     sut.estimateTotalFee(
-                        toSendAmount: amount,
+                        toSendAmount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         txOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),
@@ -368,7 +380,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let error = try XCTUnwrapFailure(
                     sut.estimateTotalFee(
-                        toSendAmount: amount,
+                        toSendAmount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         txOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),
@@ -392,7 +404,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let (selectedIds, fee) = try XCTUnwrapSuccess(
                     sut.selectTransactionInputs(
-                        amount: amount,
+                        amount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         fromTxOuts: txOuts,
                         maxInputs: maxInputsPerTransaction),
@@ -418,7 +430,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let error = try XCTUnwrapFailure(
                     sut.selectTransactionInputs(
-                        amount: amount,
+                        amount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         fromTxOuts: txOuts,
                         maxInputs: maxInputsPerTransaction),
@@ -442,7 +454,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let error = try XCTUnwrapFailure(
                     sut.selectTransactionInputs(
-                        amount: amount,
+                        amount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         fromTxOuts: txOuts,
                         maxInputs: maxInputsPerTransaction),
@@ -465,7 +477,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let defragTxsInputs = try XCTUnwrapSuccess(
                     sut.selectInputsForDefragTransactions(
-                        toSendAmount: amount,
+                        toSendAmount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         fromTxOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),
@@ -499,7 +511,7 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
             _ = try? {
                 let error = try XCTUnwrapFailure(
                     sut.selectInputsForDefragTransactions(
-                        toSendAmount: amount,
+                        toSendAmount: Amount(mob: amount),
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         fromTxOuts: txOuts,
                         maxInputsPerTransaction: maxInputsPerTransaction),

@@ -17,7 +17,9 @@ final class FogViewHttpConnection: AttestedHttpConnection, FogViewService {
         rngContext: Any? = nil
     ) {
         self.requester = requester
-        self.client = AuthHttpCallableClientWrapper(client: FogView_FogViewAPIRestClient(), requester: self.requester)
+        self.client = AuthHttpCallableClientWrapper(
+                client: FogView_FogViewAPIRestClient(),
+                requester: self.requester)
         super.init(
             client: self.client,
             requester: self.requester,

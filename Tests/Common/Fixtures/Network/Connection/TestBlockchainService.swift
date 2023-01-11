@@ -23,6 +23,7 @@ extension TestBlockchainService {
     static func makeWithSuccess() -> TestBlockchainService {
         var response = ConsensusCommon_LastBlockInfoResponse()
         response.index = 100
+        response.networkBlockVersion = 0
         return TestBlockchainService(result: .success(response))
     }
 
@@ -30,6 +31,13 @@ extension TestBlockchainService {
         var response = ConsensusCommon_LastBlockInfoResponse()
         response.index = 100
         response.mobMinimumFee = minimumFee
+        self.init(result: .success(response))
+    }
+
+    init(successWithBlockVersion blockVersion: BlockVersion) {
+        var response = ConsensusCommon_LastBlockInfoResponse()
+        response.index = 100
+        response.networkBlockVersion = blockVersion
         self.init(result: .success(response))
     }
 }

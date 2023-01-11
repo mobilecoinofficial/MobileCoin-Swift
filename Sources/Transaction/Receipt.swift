@@ -1,5 +1,4 @@
 //
-
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
@@ -22,8 +21,7 @@ import LibMobileCoin
 /// party sent them a particular `TxOut`.
 public struct Receipt {
     let txOutPublicKeyTyped: RistrettoPublic
-    let commitment: Data32
-    let maskedValue: UInt64
+    let maskedAmount: MaskedAmount
     let confirmationNumber: TxOutConfirmationNumber
 
     /// Block index at which the transaction that produced this `Receipt` will no longer be
@@ -36,8 +34,7 @@ public struct Receipt {
         tombstoneBlockIndex: UInt64
     ) {
         self.txOutPublicKeyTyped = txOut.publicKey
-        self.commitment = txOut.commitment
-        self.maskedValue = txOut.maskedValue
+        self.maskedAmount = txOut.maskedAmount
         self.confirmationNumber = confirmationNumber
         self.txTombstoneBlockIndex = tombstoneBlockIndex
     }
@@ -54,6 +51,8 @@ public struct Receipt {
         self.init(proto)
     }
 
+    var commitment: Data32 { maskedAmount.commitment }
+
     public var serializedData: Data {
         let proto = External_Receipt(self)
         return proto.serializedDataInfallible
@@ -64,11 +63,14 @@ public struct Receipt {
         txOutPublicKeyTyped.data
     }
 
+    // swiftlint:disable todo
     func matchesTxOut(_ txOut: TxOutProtocol) -> Bool {
         txOutPublicKeyTyped == txOut.publicKey
             && commitment == txOut.commitment
-            && maskedValue == txOut.maskedValue
+            // TODO - verify with core-eng that commitment is sufficient, 
+            // remove after confirmation
     }
+    // swiftlint:enable todo
 
     func validateConfirmationNumber(accountKey: AccountKey) -> Bool {
         TxOutUtils.validateConfirmationNumber(
@@ -78,15 +80,21 @@ public struct Receipt {
     }
 
     func unmaskValue(accountKey: AccountKey) -> Result<UInt64, InvalidInputError> {
-        guard let value = TxOutUtils.value(
-            maskedValue: maskedValue,
+        unmaskAmount(accountKey: accountKey).map {
+            $0.value
+        }
+    }
+
+    func unmaskAmount(accountKey: AccountKey) -> Result<Amount, InvalidInputError> {
+        guard let amount = TxOutUtils.amount(
+            maskedAmount: maskedAmount,
             publicKey: txOutPublicKeyTyped,
             viewPrivateKey: accountKey.viewPrivateKey)
         else {
             logger.info("")
             return .failure(InvalidInputError("accountKey does not own Receipt"))
         }
-        return .success(value)
+        return .success(amount)
     }
 
     /// Validates whether or not `Receipt` is well-formed and matches `accountKey`, returning `nil`
@@ -98,21 +106,33 @@ public struct Receipt {
     /// subaddress of the `accountKey`, but not which one.
     @discardableResult
     public func validateAndUnmaskValue(accountKey: AccountKey) -> UInt64? {
+        validateAndUnmaskAmount(accountKey: accountKey)?.value
+    }
+
+    /// Validates whether or not `Receipt` is well-formed and matches `accountKey`, returning `nil`
+    /// if either of these conditions are not met. Otherwise, returns the `Amount` of the `TxOut`
+    /// represented by this `Receipt`. `Amount` is a value and a tokenId
+    ///
+    /// Note: Receipt does not provide enough information to distinguish between subaddresses of an
+    /// `accountKey`, so this function only validates that the `Receipt` was addressed to a
+    /// subaddress of the `accountKey`, but not which one.
+    @discardableResult
+    public func validateAndUnmaskAmount(accountKey: AccountKey) -> Amount? {
         guard validateConfirmationNumber(accountKey: accountKey) else {
             return nil
         }
 
-        guard let value = TxOutUtils.value(
-                maskedValue: maskedValue,
+        guard let amount = TxOutUtils.amount(
+                maskedAmount: maskedAmount,
                 publicKey: txOutPublicKeyTyped,
                 viewPrivateKey: accountKey.viewPrivateKey)
         else {
             return nil
         }
 
-        return value
+        return amount
     }
-    
+
     enum ReceivedStatus {
         case notReceived(knownToBeNotReceivedBlockCount: UInt64?)
         case received(block: BlockMetadata)
@@ -134,8 +154,10 @@ extension Receipt: Hashable {}
 
 extension Receipt {
     init?(_ proto: External_Receipt) {
+
         guard let txOutPublicKey = RistrettoPublic(proto.publicKey.data),
-              let commitment = Data32(proto.amount.commitment.data),
+              let maskedAmountProto = proto.maskedAmount,
+              let maskedAmount = MaskedAmount(maskedAmountProto),
               let confirmationNumber = TxOutConfirmationNumber(proto.confirmation)
         else {
             logger.warning(
@@ -146,8 +168,7 @@ extension Receipt {
         }
 
         self.txOutPublicKeyTyped = txOutPublicKey
-        self.commitment = commitment
-        self.maskedValue = proto.amount.maskedValue
+        self.maskedAmount = maskedAmount
         self.confirmationNumber = confirmationNumber
         self.txTombstoneBlockIndex = proto.tombstoneBlock
     }
@@ -157,9 +178,18 @@ extension External_Receipt {
     init(_ receipt: Receipt) {
         self.init()
         self.publicKey = External_CompressedRistretto(receipt.txOutPublicKey)
-        self.amount.commitment = External_CompressedRistretto(receipt.commitment)
-        self.amount.maskedValue = receipt.maskedValue
         self.confirmation = External_TxOutConfirmationNumber(receipt.confirmationNumber)
         self.tombstoneBlock = receipt.txTombstoneBlockIndex
+
+        switch receipt.maskedAmount.version {
+        case .v1:
+            self.maskedAmountV1.commitment = External_CompressedRistretto(receipt.commitment)
+            self.maskedAmountV1.maskedValue = receipt.maskedAmount.maskedValue
+            self.maskedAmountV1.maskedTokenID = receipt.maskedAmount.maskedTokenId
+        case .v2:
+            self.maskedAmountV2.commitment = External_CompressedRistretto(receipt.commitment)
+            self.maskedAmountV2.maskedValue = receipt.maskedAmount.maskedValue
+            self.maskedAmountV2.maskedTokenID = receipt.maskedAmount.maskedTokenId
+        }
     }
 }

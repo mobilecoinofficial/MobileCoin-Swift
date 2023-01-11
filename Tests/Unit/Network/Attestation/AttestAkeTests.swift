@@ -38,7 +38,9 @@ class AttestAkeTests: XCTestCase {
         let attestAkeCipher = fixture.attestAkeCipher
 
         let binding = attestAkeCipher.binding
-        XCTAssertEqual(binding.base64EncodedString(), fixture.binding.base64EncodedString())
+        XCTAssertEqual(
+            binding.base64EncodedString(),
+            AttestAke.Fixtures.BlankFirstMessage.bindingBase64)
     }
 
     func testEncrypt() throws {

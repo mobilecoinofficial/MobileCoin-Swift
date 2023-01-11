@@ -30,11 +30,16 @@ extension External_KeyImage {
     }
 }
 
-extension External_Amount {
-    init<CommitmentType: DataConvertible>(commitment: CommitmentType, maskedValue: UInt64) {
+extension External_MaskedAmount {
+    init<CommitmentType: DataConvertible>(
+        commitment: CommitmentType,
+        maskedValue: UInt64,
+        maskedTokenId: Data
+    ) {
         self.init()
         self.commitment = External_CompressedRistretto(commitment)
         self.maskedValue = maskedValue
+        self.maskedTokenID = maskedTokenId
     }
 }
 
@@ -84,6 +89,19 @@ extension FogView_TxOutSearchResult {
 }
 
 extension FogView_TxOutRecord {
+    var timestampDate: Date? {
+        get { timestamp != UInt64.max ? Date(timeIntervalSince1970: TimeInterval(timestamp)) : nil }
+        set {
+            if let newValue = newValue {
+                timestamp = UInt64(newValue.timeIntervalSince1970)
+            } else {
+                timestamp = UInt64.max
+            }
+        }
+    }
+}
+
+extension FogView_TxOutRecordLegacy {
     var timestampDate: Date? {
         get { timestamp != UInt64.max ? Date(timeIntervalSince1970: TimeInterval(timestamp)) : nil }
         set {
@@ -179,5 +197,18 @@ extension FogLedger_BlockData {
 
     var metadata: BlockMetadata {
         BlockMetadata(index: index, timestampStatus: timestampStatus)
+    }
+}
+
+extension FogLedger_TxOutResult {
+    var timestampDate: Date? {
+        get { timestamp != UInt64.max ? Date(timeIntervalSince1970: TimeInterval(timestamp)) : nil }
+        set {
+            if let newValue = newValue {
+                timestamp = UInt64(newValue.timeIntervalSince1970)
+            } else {
+                timestamp = UInt64.max
+            }
+        }
     }
 }

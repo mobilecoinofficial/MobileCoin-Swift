@@ -2,12 +2,15 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 //
+// swiftlint:disable unavailable_function
 
 class UrlLoadBalancer<MobileCoinUrlType: MobileCoinUrlProtocol> {
 
     var urlsTyped: [MobileCoinUrlType]
 
-    static func make(urls: [MobileCoinUrlType]) -> Result<UrlLoadBalancer<MobileCoinUrlType>, InvalidInputError> {
+    static func make(
+        urls: [MobileCoinUrlType]
+    ) -> Result<UrlLoadBalancer<MobileCoinUrlType>, InvalidInputError> {
         guard urls.isNotEmpty else {
             return .failure(InvalidInputError("url list cannot be empty"))
         }

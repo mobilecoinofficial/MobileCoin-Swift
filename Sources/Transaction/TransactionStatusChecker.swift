@@ -20,11 +20,15 @@ struct TransactionStatusChecker {
         self.fogUntrustedTxOutFetcher =
             FogUntrustedTxOutFetcher(fogUntrustedTxOutService: fogUntrustedTxOutService)
         self.fogKeyImageChecker =
-            FogKeyImageChecker(fogKeyImageService: fogKeyImageService, targetQueue: targetQueue)
+            FogKeyImageChecker(
+                    fogKeyImageService: fogKeyImageService,
+                    targetQueue: targetQueue,
+                    syncChecker: account.accessWithoutLocking.syncCheckerLock)
     }
 
     func checkStatus(
         _ transaction: Transaction,
+        requireInBalance: Bool = true,
         completion: @escaping (Result<TransactionStatus, ConnectionError>) -> Void
     ) {
         logger.info(
@@ -38,7 +42,8 @@ struct TransactionStatusChecker {
                 case .accepted(block: let block):
                     // Make sure we only return success if it will also be reflected in the balance,
                     // otherwise, feign ignorance.
-                    guard block.index < self.account.readSync({ $0.knowableBlockCount }) else {
+                    guard !requireInBalance ||
+                            (block.index < self.account.readSync({ $0.knowableBlockCount })) else {
                         return .unknown
                     }
                     return status

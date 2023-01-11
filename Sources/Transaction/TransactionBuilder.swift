@@ -10,6 +10,7 @@ import LibMobileCoin
 
 enum TransactionBuilderError: Error {
     case invalidInput(String)
+    case invalidBlockVersion(String)
     case attestationVerificationFailed(String)
 }
 
@@ -19,6 +20,8 @@ extension TransactionBuilderError: CustomStringConvertible {
             switch self {
             case .invalidInput(let reason):
                 return "Invalid input: \(reason)"
+            case .invalidBlockVersion(let reason):
+                return "Invalid Block Version: \(reason)"
             case .attestationVerificationFailed(let reason):
                 return "Attestation verification failed: \(reason)"
             }
@@ -27,30 +30,79 @@ extension TransactionBuilderError: CustomStringConvertible {
 }
 
 final class TransactionBuilder {
+    private let tombstoneBlockIndex: UInt64
+
+    private let ptr: OpaquePointer
+
+    private let memoBuilder: TxOutMemoBuilder
+
+    private init(
+        fee: Amount,
+        tombstoneBlockIndex: UInt64,
+        fogResolver: FogResolver = FogResolver(),
+        memoBuilder: TxOutMemoBuilder = DefaultMemoBuilder(),
+        blockVersion: BlockVersion
+    ) throws {
+        self.tombstoneBlockIndex = tombstoneBlockIndex
+        self.memoBuilder = memoBuilder
+        let result: Result<OpaquePointer, TransactionBuilderError>
+        result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
+            fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
+                // Safety: mc_transaction_builder_create should never return nil.
+                withMcError { errorPtr in
+                    mc_transaction_builder_create(
+                            fee.value,
+                            fee.tokenId.value,
+                            tombstoneBlockIndex,
+                            fogResolverPtr,
+                            memoBuilderPtr,
+                            blockVersion,
+                            &errorPtr)
+                }.mapError {
+                    switch $0.errorCode {
+                    case .invalidInput:
+                        return .invalidBlockVersion("\(redacting: $0.description)")
+                    default:
+                        // Safety: mc_transaction_builder_add_input should not throw
+                        // non-documented errors.
+                        logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+                    }
+                }
+            }
+        }
+        self.ptr = try result.get()
+    }
+
+    deinit {
+        mc_transaction_builder_free(ptr)
+    }
+}
+
+extension TransactionBuilder {
     static func build(
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
         to recipient: PublicAddress,
+        memoType: MemoType,
         amount: PositiveUInt64,
-        changeAddress: PublicAddress,
-        fee: UInt64,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipt: Receipt), TransactionBuilderError> {
+        blockVersion: BlockVersion,
+        rngSeed: RngSeed
+    ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
             inputs: inputs,
             accountKey: accountKey,
-            outputs: [(recipient, amount)],
-            changeAddress: changeAddress,
+            outputs: [TransactionOutput(recipient, amount)],
+            memoType: memoType,
             fee: fee,
             tombstoneBlockIndex: tombstoneBlockIndex,
             fogResolver: fogResolver,
-            rng: rng,
-            rngContext: rngContext
-        ).map { transaction, transactionReceipts in
-            (transaction, transactionReceipts[0])
+            blockVersion: blockVersion,
+            rngSeed: rngSeed
+        ).map { pendingTransaction in
+            pendingTransaction.singlePayload
         }
     }
 
@@ -58,79 +110,93 @@ final class TransactionBuilder {
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
         sendingAllTo recipient: PublicAddress,
-        fee: UInt64,
+        memoType: MemoType,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipt: Receipt), TransactionBuilderError> {
-        positiveRemainingAmount(inputValues: inputs.map { $0.knownTxOut.value }, fee: fee)
-            .flatMap { outputAmount in
-                build(
-                    inputs: inputs,
-                    accountKey: accountKey,
-                    outputs: [(recipient: recipient, amount: outputAmount)],
-                    fee: fee,
-                    tombstoneBlockIndex: tombstoneBlockIndex,
-                    fogResolver: fogResolver,
-                    rng: rng,
-                    rngContext: rngContext
-                ).map { transaction, transactionReceipts in
-                    (transaction, transactionReceipts[0])
-                }
-            }
-    }
-
-    static func build(
-        inputs: [PreparedTxInput],
-        accountKey: AccountKey,
-        outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
-        changeAddress: PublicAddress,
-        fee: UInt64,
-        tombstoneBlockIndex: UInt64,
-        fogResolver: FogResolver,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipts: [Receipt]), TransactionBuilderError> {
-        outputsAddingChangeOutputIfNeeded(
-            inputs: inputs,
-            outputs: outputs,
-            changeAddress: changeAddress,
+        blockVersion: BlockVersion,
+        rngSeed: RngSeed
+    ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
+        Math.positiveRemainingAmount(
+            inputValues: inputs.map { $0.knownTxOut.value },
             fee: fee
-        ).flatMap { outputs in
+        ).map { outputAmount in
+            PossibleTransaction([TransactionOutput(recipient, outputAmount)], nil)
+        }.flatMap { possibleTransaction in
             build(
                 inputs: inputs,
                 accountKey: accountKey,
-                outputs: outputs,
+                possibleTransaction: possibleTransaction,
+                memoType: memoType,
                 fee: fee,
                 tombstoneBlockIndex: tombstoneBlockIndex,
                 fogResolver: fogResolver,
-                rng: rng,
-                rngContext: rngContext)
+                blockVersion: blockVersion,
+                rngSeed: rngSeed
+            ).map { pendingTransaction in
+                pendingTransaction.singlePayload
+            }
         }
     }
 
     static func build(
         inputs: [PreparedTxInput],
         accountKey: AccountKey,
-        outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
-        fee: UInt64,
+        outputs: [TransactionOutput],
+        memoType: MemoType,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
-        rngContext: Any? = nil
-    ) -> Result<(transaction: Transaction, receipts: [Receipt]), TransactionBuilderError> {
-        guard UInt64.safeCompare(
-                sumOfValues: inputs.map { $0.knownTxOut.value },
-                isEqualToSumOfValues: outputs.map { $0.amount.value } + [fee])
-        else {
+        blockVersion: BlockVersion,
+        rngSeed: RngSeed
+    ) -> Result<PendingTransaction, TransactionBuilderError> {
+        outputsAddingChangeOutput(
+            inputs: inputs,
+            outputs: outputs,
+            fee: fee
+        ).flatMap { buildingTransaction in
+            build(
+                inputs: inputs,
+                accountKey: accountKey,
+                possibleTransaction: buildingTransaction,
+                memoType: memoType,
+                fee: fee,
+                tombstoneBlockIndex: tombstoneBlockIndex,
+                fogResolver: fogResolver,
+                blockVersion: blockVersion,
+                rngSeed: rngSeed)
+        }
+    }
+
+    static func build(
+        inputs: [PreparedTxInput],
+        accountKey: AccountKey,
+        possibleTransaction: PossibleTransaction,
+        memoType: MemoType,
+        fee: Amount,
+        tombstoneBlockIndex: UInt64,
+        fogResolver: FogResolver,
+        blockVersion: BlockVersion,
+        rngSeed: RngSeed
+    ) -> Result<PendingTransaction, TransactionBuilderError> {
+        guard Math.totalOutlayCheck(for: possibleTransaction, fee: fee, inputs: inputs) else {
             return .failure(.invalidInput("Input values != output values + fee"))
         }
 
-        let builder = TransactionBuilder(
-            fee: fee,
-            tombstoneBlockIndex: tombstoneBlockIndex,
-            fogResolver: fogResolver)
+        let builder: TransactionBuilder
+        do {
+            builder = try TransactionBuilder(
+                fee: fee,
+                tombstoneBlockIndex: tombstoneBlockIndex,
+                fogResolver: fogResolver,
+                memoBuilder: memoType.createMemoBuilder(accountKey: accountKey),
+                blockVersion: blockVersion)
+        } catch {
+            guard let error = error as? TransactionBuilderError else {
+                return .failure(.invalidInput("Unknown Error"))
+            }
+            return .failure(error)
+        }
 
         for input in inputs {
             if case .failure(let error) =
@@ -140,17 +206,55 @@ final class TransactionBuilder {
             }
         }
 
-        return outputs.map { recipient, amount in
+        let seededRng = MobileCoinChaCha20Rng(rngSeed: rngSeed)
+
+        let payloadContexts = possibleTransaction.outputs.map { output in
             builder.addOutput(
-                publicAddress: recipient,
-                amount: amount.value,
-                rng: rng,
-                rngContext: rngContext
-            ).map { $0.receipt }
-        }.collectResult().flatMap { receipts in
-            builder.build(rng: rng, rngContext: rngContext).map { transaction in
-                (transaction, receipts)
+                publicAddress: output.recipient,
+                amount: output.amount.value,
+                rng: seededRng
+            )
+        }
+
+        let changeContext = changeContext(
+            blockVersion: blockVersion,
+            accountKey: accountKey,
+            builder: builder,
+            changeAmount: possibleTransaction.changeAmount,
+            rng: seededRng)
+
+        return payloadContexts.collectResult().flatMap { payloadContexts in
+            changeContext.flatMap { changeContext in
+                builder.build(rng: seededRng).map { transaction in
+                    PendingTransaction(
+                        transaction: transaction,
+                        payloadTxOutContexts: payloadContexts,
+                        changeTxOutContext: changeContext)
+                }
             }
+        }
+    }
+
+    private static func changeContext(
+        blockVersion: BlockVersion,
+        accountKey: AccountKey,
+        builder: TransactionBuilder,
+        changeAmount: PositiveUInt64?,
+        rng: MobileCoinRng
+    ) -> Result<TxOutContext, TransactionBuilderError> {
+        switch blockVersion {
+        case .legacy:
+            // Clients built for BlockVersion == 0 (.legacy) will have trouble finding txOuts
+            // on the new change subaddress (max - 1), so we will emulate legacy behavior.
+            return builder.addOutput(
+                publicAddress: accountKey.publicAddress,
+                amount: changeAmount?.value ?? 0,
+                rng: rng)
+        default:
+            return builder.addChangeOutput(
+                accountKey: accountKey,
+                amount: changeAmount?.value ?? 0,
+                rng: rng)
         }
     }
 
@@ -158,16 +262,16 @@ final class TransactionBuilder {
         publicAddress: PublicAddress,
         amount: UInt64,
         fogResolver: FogResolver = FogResolver(),
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        blockVersion: BlockVersion,
+        rng: MobileCoinRng
     ) -> Result<TxOut, TransactionBuilderError> {
         outputWithReceipt(
             publicAddress: publicAddress,
             amount: amount,
             tombstoneBlockIndex: 0,
             fogResolver: fogResolver,
-            rng: rng,
-            rngContext: rngContext
+            blockVersion: blockVersion,
+            rng: rng
         ).map { $0.txOut }
     }
 
@@ -176,112 +280,56 @@ final class TransactionBuilder {
         amount: UInt64,
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-        let transactionBuilder = TransactionBuilder(
-            fee: 0,
-            tombstoneBlockIndex: tombstoneBlockIndex,
-            fogResolver: fogResolver)
+        blockVersion: BlockVersion,
+        rng: MobileCoinRng
+    ) -> Result<TxOutContext, TransactionBuilderError> {
+        let transactionBuilder: TransactionBuilder
+        do {
+            transactionBuilder = try TransactionBuilder(
+                fee: Amount(value: 0, tokenId: .MOB),
+                tombstoneBlockIndex: tombstoneBlockIndex,
+                fogResolver: fogResolver,
+                blockVersion: blockVersion)
+        } catch {
+            guard let error = error as? TransactionBuilderError else {
+                return .failure(.invalidInput("Unknown Error"))
+            }
+            return .failure(error)
+        }
         return transactionBuilder.addOutput(
             publicAddress: publicAddress,
             amount: amount,
-            rng: rng,
-            rngContext: rngContext)
+            rng: rng)
     }
 
-    private static func outputsAddingChangeOutputIfNeeded(
+    private static func outputsAddingChangeOutput(
         inputs: [PreparedTxInput],
-        outputs: [(recipient: PublicAddress, amount: PositiveUInt64)],
-        changeAddress: PublicAddress,
-        fee: UInt64
-    ) -> Result<[(recipient: PublicAddress, amount: PositiveUInt64)], TransactionBuilderError> {
-        remainingAmount(
+        outputs: [TransactionOutput],
+        fee: Amount
+    ) -> Result<PossibleTransaction, TransactionBuilderError> {
+        Math.remainingAmount(
             inputValues: inputs.map { $0.knownTxOut.value },
             outputValues: outputs.map { $0.amount.value },
             fee: fee
-        ).map { remainingAmount in
-            var outputArray = outputs
-            if remainingAmount > 0, let changeAmount = PositiveUInt64(remainingAmount) {
-                outputArray.append((changeAddress, changeAmount))
-            }
-            return outputArray
+        )
+        .map { remainingAmount in
+            PossibleTransaction(outputs, PositiveUInt64(remainingAmount))
         }
     }
+}
 
-    private static func remainingAmount(inputValues: [UInt64], outputValues: [UInt64], fee: UInt64)
-        -> Result<UInt64, TransactionBuilderError>
-    {
-        guard UInt64.safeCompare(
-                sumOfValues: inputValues,
-                isGreaterThanOrEqualToSumOfValues: outputValues + [fee])
-        else {
-            return .failure(.invalidInput("Total input amount < total output amount + fee"))
-        }
-
-        guard let remainingAmount = UInt64.safeSubtract(
-                sumOfValues: inputValues,
-                minusSumOfValues: outputValues + [fee])
-        else {
-            return .failure(.invalidInput("Change amount overflows UInt64"))
-        }
-
-        return .success(remainingAmount)
-    }
-
-    private static func positiveRemainingAmount(inputValues: [UInt64], fee: UInt64)
-        -> Result<PositiveUInt64, TransactionBuilderError>
-    {
-        guard UInt64.safeCompare(sumOfValues: inputValues, isGreaterThanValue: fee) else {
-            return .failure(.invalidInput("Total input amount <= fee"))
-        }
-
-        guard let remainingAmount = UInt64.safeSubtract(sumOfValues: inputValues, minusValue: fee)
-        else {
-            return .failure(.invalidInput("Change amount overflows UInt64"))
-        }
-
-        guard let positiveRemainingAmount = PositiveUInt64(remainingAmount) else {
-            // This condition should be redundant with the first check, but we throw an error
-            // anyway, rather than calling fatalError.
-            return .failure(.invalidInput("Total input amount == fee"))
-        }
-
-        return .success(positiveRemainingAmount)
-    }
-
-    private let tombstoneBlockIndex: UInt64
-
-    private let ptr: OpaquePointer
-
-    private init(
-        fee: UInt64,
-        tombstoneBlockIndex: UInt64,
-        fogResolver: FogResolver = FogResolver()
-    ) {
-        self.tombstoneBlockIndex = tombstoneBlockIndex
-        self.ptr = fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
-            // Safety: mc_transaction_builder_create should never return nil.
-            withMcInfallible {
-                mc_transaction_builder_create(fee, tombstoneBlockIndex, fogResolverPtr)
-            }
-        }
-    }
-
-    deinit {
-        mc_transaction_builder_free(ptr)
-    }
-
+extension TransactionBuilder {
     private func addInput(preparedTxInput: PreparedTxInput, accountKey: AccountKey)
         -> Result<(), TransactionBuilderError>
     {
-        guard let subaddressSpendPrivateKey = accountKey.subaddressSpendPrivateKey(index: preparedTxInput.subaddressIndex) else {
-            return .failure(TransactionBuilderError.invalidInput("Tx subaddress index out of bounds"))
+        let subaddressIndex = preparedTxInput.subaddressIndex
+        guard let spendPrivateKey = accountKey.privateKeys(for: subaddressIndex)?.spendKey else {
+            return .failure(.invalidInput("Tx subaddress index out of bounds"))
         }
         return addInput(
                 preparedTxInput: preparedTxInput,
                 viewPrivateKey: accountKey.viewPrivateKey,
-                subaddressSpendPrivateKey: subaddressSpendPrivateKey)
+                subaddressSpendPrivateKey: spendPrivateKey)
     }
 
     private func addInput(
@@ -289,140 +337,42 @@ final class TransactionBuilder {
         viewPrivateKey: RistrettoPrivate,
         subaddressSpendPrivateKey: RistrettoPrivate
     ) -> Result<(), TransactionBuilderError> {
-        let ring = McTransactionBuilderRing(ring: preparedTxInput.ring)
-        return viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
-            subaddressSpendPrivateKey.asMcBuffer { subaddressSpendPrivateKeyPtr in
-                ring.withUnsafeOpaquePointer { ringPtr in
-                    withMcError { errorPtr in
-                        mc_transaction_builder_add_input(
-                            ptr,
-                            viewPrivateKeyPtr,
-                            subaddressSpendPrivateKeyPtr,
-                            preparedTxInput.realInputIndex,
-                            ringPtr,
-                            &errorPtr)
-                    }.mapError {
-                        switch $0.errorCode {
-                        case .invalidInput:
-                            return .invalidInput("\(redacting: $0.description)")
-                        default:
-                            // Safety: mc_transaction_builder_add_input should not throw
-                            // non-documented errors.
-                            logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
-                        }
-                    }
-                }
-            }
-        }
+        TransactionBuilderUtils.addInput(
+            ptr: ptr,
+            preparedTxInput: preparedTxInput,
+            viewPrivateKey: viewPrivateKey,
+            subaddressSpendPrivateKey: subaddressSpendPrivateKey)
     }
 
     private func addOutput(
         publicAddress: PublicAddress,
         amount: UInt64,
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
-    ) -> Result<(txOut: TxOut, receipt: Receipt), TransactionBuilderError> {
-        var confirmationNumberData = Data32()
-        return publicAddress.withUnsafeCStructPointer { publicAddressPtr in
-            withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
-                confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
-                    Data.make(withMcDataBytes: { errorPtr in
-                        mc_transaction_builder_add_output(
-                            ptr,
-                            amount,
-                            publicAddressPtr,
-                            rngCallbackPtr,
-                            confirmationNumberPtr,
-                            &errorPtr)
-                    }).mapError {
-                        switch $0.errorCode {
-                        case .invalidInput:
-                            return .invalidInput("\(redacting: $0.description)")
-                        case .attestationVerificationFailed:
-                            return .attestationVerificationFailed("\(redacting: $0.description)")
-                        default:
-                            // Safety: mc_transaction_builder_add_output should not throw
-                            // non-documented errors.
-                            logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
-                        }
-                    }
-                }
-            }
-        }.map { txOutData in
-            guard let txOut = TxOut(serializedData: txOutData) else {
-                // Safety: mc_transaction_builder_add_output should always return valid data on
-                // success.
-                logger.fatalError("mc_transaction_builder_add_output returned invalid data: " +
-                    "\(redacting: txOutData.base64EncodedString())")
-            }
+        rng: MobileCoinRng
+    ) -> Result<TxOutContext, TransactionBuilderError> {
+        TransactionBuilderUtils.addOutput(
+            ptr: ptr,
+            tombstoneBlockIndex: tombstoneBlockIndex,
+            publicAddress: publicAddress,
+            amount: amount,
+            rng: rng)
+    }
 
-            let confirmationNumber = TxOutConfirmationNumber(confirmationNumberData)
-            let receipt = Receipt(
-                txOut: txOut,
-                confirmationNumber: confirmationNumber,
-                tombstoneBlockIndex: tombstoneBlockIndex)
-            return (txOut, receipt)
-        }
+    private func addChangeOutput(
+        accountKey: AccountKey,
+        amount: UInt64,
+        rng: MobileCoinRng
+    ) -> Result<TxOutContext, TransactionBuilderError> {
+        TransactionBuilderUtils.addChangeOutput(
+            ptr: ptr,
+            tombstoneBlockIndex: tombstoneBlockIndex,
+            accountKey: accountKey,
+            amount: amount,
+            rng: rng)
     }
 
     private func build(
-        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
-        rngContext: Any?
+        rng: MobileCoinRng
     ) -> Result<Transaction, TransactionBuilderError> {
-        withMcRngCallback(rng: rng, rngContext: rngContext) { rngCallbackPtr in
-            Data.make(withMcDataBytes: { errorPtr in
-                mc_transaction_builder_build(ptr, rngCallbackPtr, &errorPtr)
-            }).mapError {
-                switch $0.errorCode {
-                case .invalidInput:
-                    return .invalidInput("\(redacting: $0.description)")
-                default:
-                    // Safety: mc_transaction_builder_build should not throw non-documented errors.
-                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
-                }
-            }
-        }.map { txBytes in
-            guard let transaction = Transaction(serializedData: txBytes) else {
-                // Safety: mc_transaction_builder_build should always return valid data on success.
-                logger.fatalError("mc_transaction_builder_build returned invalid data: " +
-                    "\(redacting: txBytes.base64EncodedString())")
-            }
-            return transaction
-        }
-    }
-}
-
-private final class McTransactionBuilderRing {
-    private let ptr: OpaquePointer
-
-    init(ring: [(TxOut, TxOutMembershipProof)]) {
-        // Safety: mc_transaction_builder_ring_create should never return nil.
-        self.ptr = withMcInfallible(mc_transaction_builder_ring_create)
-
-        for (txOut, membershipProof) in ring {
-            addElement(txOut: txOut, membershipProof: membershipProof)
-        }
-    }
-
-    deinit {
-        mc_transaction_builder_ring_free(ptr)
-    }
-
-    func addElement(txOut: TxOut, membershipProof: TxOutMembershipProof) {
-        txOut.serializedData.asMcBuffer { txOutBytesPtr in
-            membershipProof.serializedData.asMcBuffer { membershipProofDataPtr in
-                // Safety: mc_transaction_builder_ring_add_element should never return nil.
-                withMcInfallible {
-                    mc_transaction_builder_ring_add_element(
-                        ptr,
-                        txOutBytesPtr,
-                        membershipProofDataPtr)
-                }
-            }
-        }
-    }
-
-    func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
-        try body(ptr)
+        TransactionBuilderUtils.build(ptr: ptr, rng: rng)
     }
 }

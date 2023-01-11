@@ -36,6 +36,8 @@ extension Receipt.Fixtures {
 
 extension Receipt.Fixtures.Default {
 
+    fileprivate static let defaultBlockVersion = BlockVersion.minRTHEnabled
+
     fileprivate static func accountKey() -> AccountKey {
         AccountKey.Fixtures.DefaultWithoutFog(accountIndex: 255).accountKey
     }
@@ -50,8 +52,8 @@ extension Receipt.Fixtures.Default {
             publicAddress: accountKey.publicAddress,
             amount: value,
             tombstoneBlockIndex: 100,
-            rng: testRngCallback,
-            rngContext: TestRng()
+            blockVersion: defaultBlockVersion,
+            rng: TestRng()
         ).get().receipt
     }
 

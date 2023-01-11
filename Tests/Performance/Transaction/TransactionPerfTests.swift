@@ -15,9 +15,12 @@ class TransactionPerfTests: PerformanceTestCase {
                 inputs: fixture.inputs,
                 accountKey: fixture.accountKey,
                 outputs: fixture.outputs,
+                memoType: .unused,
                 fee: fixture.fee,
                 tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                fogResolver: fixture.fogResolver))
+                fogResolver: fixture.fogResolver,
+                blockVersion: BlockVersion.legacy,
+                rngSeed: testRngSeed()))
         }
     }
 

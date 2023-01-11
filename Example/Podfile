@@ -1,15 +1,17 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, '10.0'
+platform :ios, '12.2'
 
 plugin 'cocoapods-repo-update'
-keep_source_code_for_prebuilt_frameworks!
 plugin 'cocoapods-keys', {
   :project => "MobileCoin",
   :keys => [
     "devNetworkAuthUsername",
     "devNetworkAuthPassword",
     "testNetTestAccountMnemonicsCommaSeparated",
+    "mobileDevTestAccountMnemonicsCommaSeparated",
+    "dynamicTestAccountSeedEntropiesCommaSeparated",
+    "dynamicFogAuthoritySpki",
   ]}
 
 use_frameworks!
@@ -26,7 +28,6 @@ target 'Example' do
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['ProtocolUnitTests']
 
-  # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin-ios-artifacts'
   pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin-ios-artifacts'
   # pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin-ios-artifacts'
   # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
@@ -59,13 +60,10 @@ post_install do |installer|
     end
   end
 
-  # Bump deployment target to 9.0 for pods that explicitly specify 8.0, since 9.0 is the minimum
-  # that Xcode 12 supports.
+  # Delete minimum deployment target of example project for Xcode 13
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      if Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']) < Gem::Version.new('9.0')
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
-      end
+      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
     end
   end
 
@@ -86,7 +84,6 @@ post_install do |installer|
 
   # Disable bitcode on test targets
   installer.pods_project.targets.each do |target|
-    next unless ['MobileCoin-Unit-IntegrationTests', 'MobileCoin-UI-PerformanceTests', 'MobileCoin-Unit-Tests', 'MobileCoin-Unit-Core-ProtocolUnitTests'].find_index(target.name) != nil
     target.build_configurations.each do |config|
       config.build_settings['ENABLE_BITCODE'] = 'NO'
     end

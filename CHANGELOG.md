@@ -5,6 +5,81 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0-pre2] - 2022-09-26
+
+- Transaction Idempotence Compatibility Sync-up with Android SDK
+
+## [1.3.0-pre1] - 2022-09-19
+
+### Changed
+
+- Transaction Idempotence Support Simplified
+
+## [2.0.2] - 2022-08-29
+
+### Changed
+
+- `@available` Minimum version for async APIs
+
+## [2.0.1] - 2022-08-29
+
+### Changed
+
+- Access modifier for ChaCha RNG
+
+## [2.0.0] - 2022-08-29
+
+### Added
+
+- Transaction Idempotence Support
+- TransactionStatusChecker for simpler and quicker transactions tatus
+- Async/Await API wrappers for MobileCoinClient
+- New `submitTransaction` method that always returns the conensus block count
+
+## [1.2.2-pre2] - 2022-07-13
+
+### Added
+
+- New testNet enclave measurements
+
+## [1.2.2-pre1] - 2022-07-13
+
+### Added
+
+- New method for `submitTransaction` that always returns the conensus block count
+
+### Changed
+
+- Old method for `submitTransaction` deprecated
+
+## [1.2.2-pre0] - 2022-06-24
+
+### Changed
+
+- SwiftNIO dependency update
+
+## [1.2.1] - 2022-06-09
+
+### Added
+
+- FFIs for root_entropy, shared_secret
+- v1.2.1 mobilecoin libraries
+
+## [1.2.0] - 2022-06-03
+
+### Added
+- Support for multiple [token types](https://github.com/mobilecoinfoundation/mcips/blob/main/text/0025-confidential-token-ids.md)
+- [Recoverable Transaction History (RTH)](https://github.com/mobilecoinfoundation/mcips/blob/main/text/0004-recoverable-transaction-history.md)
+
+### Changed
+- Change TxOuts are now sent to a dedicated [change subaddress](https://github.com/mobilecoinfoundation/mcips/blob/main/text/0036-reserved-subaddresses.md)
+- Internal block info cache invalidated on submit transaction error, causing fees and block version to be re-fetched
+- Deprecate older APIs that do not support Token IDs
+
+### Fixes
+- FogSyncException will be thrown if Fog View and Ledger are out of sync with each other or Consensus.
+  This signifies that balances may temporarily be out of date or incorrect.
+
 ## [1.2.0-pre11] - 2022-02-03
 
 ### Changed

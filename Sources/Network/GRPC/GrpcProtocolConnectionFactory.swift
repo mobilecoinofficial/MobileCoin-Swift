@@ -4,7 +4,7 @@
 
 import Foundation
 
-class GrpcProtocolConnectionFactory : ProtocolConnectionFactory {
+class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 
     let channelManager = GrpcChannelManager()
 
@@ -93,7 +93,7 @@ class GrpcProtocolConnectionFactory : ProtocolConnectionFactory {
             channelManager: channelManager,
             targetQueue: targetQueue)
     }
-    
+
     func makeFogReportService(
         url: FogUrl,
         transportProtocolOption: TransportProtocol.Option,
@@ -102,4 +102,3 @@ class GrpcProtocolConnectionFactory : ProtocolConnectionFactory {
         FogReportGrpcConnection(url: url, channelManager: channelManager, targetQueue: targetQueue)
     }
 }
-

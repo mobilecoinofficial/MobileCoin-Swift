@@ -13,12 +13,15 @@ struct TransactionPreparer {
     private let fogResolverManager: FogResolverManager
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogMerkleProofFetcher: FogMerkleProofFetcher
+    private let localRng: MobileCoinRng
+    private let rngSeed: RngSeed
 
     init(
         accountKey: AccountKey,
         fogMerkleProofService: FogMerkleProofService,
         fogResolverManager: FogResolverManager,
         mixinSelectionStrategy: MixinSelectionStrategy,
+        rngSeed: RngSeed,
         targetQueue: DispatchQueue?
     ) {
         self.serialQueue = DispatchQueue(
@@ -31,19 +34,23 @@ struct TransactionPreparer {
         self.fogMerkleProofFetcher = FogMerkleProofFetcher(
             fogMerkleProofService: fogMerkleProofService,
             targetQueue: targetQueue)
+        self.localRng = MobileCoinDefaultRng()
+        self.rngSeed = rngSeed
     }
 
     func prepareSelfAddressedTransaction(
         inputs: [KnownTxOut],
-        fee: UInt64,
+        recoverableMemo: Bool,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
+        blockVersion: BlockVersion,
         completion: @escaping (
             Result<Transaction, DefragTransactionPreparationError>
         ) -> Void
     ) {
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanValue: fee)
+                isGreaterThanValue: fee.value)
         else {
             logger.warning(
                 "Insufficient balance for self-addressed transaction: sum of inputs: " +
@@ -69,9 +76,12 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         sendingAllTo: self.selfPaymentAddress,
+                        memoType: recoverableMemo ? .recoverable : .unused,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver
+                        fogResolver: fogResolver,
+                        blockVersion: blockVersion,
+                        rngSeed: rngSeed
                     ).mapError { .invalidInput(String(describing: $0)) }
                     .map { $0.transaction }
                 })
@@ -81,15 +91,17 @@ struct TransactionPreparer {
     func prepareTransaction(
         inputs: [KnownTxOut],
         recipient: PublicAddress,
-        amount: UInt64,
-        fee: UInt64,
+        memoType: MemoType,
+        amount: Amount,
+        fee: Amount,
         tombstoneBlockIndex: UInt64,
+        blockVersion: BlockVersion,
         completion: @escaping (
-            Result<(transaction: Transaction, receipt: Receipt), TransactionPreparationError>
+            Result<PendingSinglePayloadTransaction, TransactionPreparationError>
         ) -> Void
     ) {
-        guard amount > 0, let amount = PositiveUInt64(amount) else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 MOB"
+        guard amount.value > 0, let positiveValue = PositiveUInt64(amount.value) else {
+            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 \(amount.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
                 completion(.failure(.invalidInput(errorMessage)))
@@ -98,7 +110,7 @@ struct TransactionPreparer {
         }
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanOrEqualToSumOfValues: [amount.value, fee])
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee.value])
         else {
             logger.warning(
                 "Insufficient balance to prepare transaction: sum of inputs: " +
@@ -125,11 +137,13 @@ struct TransactionPreparer {
                         inputs: preparedInputs,
                         accountKey: self.accountKey,
                         to: recipient,
-                        amount: amount,
-                        changeAddress: self.selfPaymentAddress,
+                        memoType: memoType,
+                        amount: positiveValue,
                         fee: fee,
                         tombstoneBlockIndex: tombstoneBlockIndex,
-                        fogResolver: fogResolver
+                        fogResolver: fogResolver,
+                        blockVersion: blockVersion,
+                        rngSeed: rngSeed
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
         })
@@ -141,7 +155,9 @@ struct TransactionPreparer {
         merkleRootBlock: UInt64? = nil,
         completion: @escaping (Result<[PreparedTxInput], ConnectionError>) -> Void
     ) {
-        let inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
+        var inputsMixinIndices: [[UInt64]]
+
+        inputsMixinIndices = mixinSelectionStrategy.selectMixinIndices(
             forRealTxOutIndices: inputs.map { $0.globalIndex },
             selectionRange: ledgerTxOutCount.map { ..<$0 }
         ).map { Array($0) }

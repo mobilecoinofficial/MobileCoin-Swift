@@ -34,7 +34,7 @@ class TransactionPublicApiTests: XCTestCase {
     func testFee() throws {
         let fixture = try Transaction.Fixtures.Default()
         let transaction = fixture.transaction
-        XCTAssertEqual(transaction.fee, fixture.fee)
+        XCTAssertEqual(transaction.fee, fixture.fee.value)
     }
 
     func testTombstoneBlockIndex() throws {

@@ -87,14 +87,16 @@ extension GrpcConnection {
         {
             switch callResult {
             case .failure(let error):
-                return .failure(.connectionFailure("url: \(url), erro: \(error.localizedDescription)"))
+                return .failure(.connectionFailure(
+                            "url: \(url), error: \(error.localizedDescription)"))
             case .success(let callResponse):
                 guard callResponse.status.code != .unauthenticated else {
                     return .failure(.authorizationFailure("url: \(url)"))
                 }
 
                 guard callResponse.status.isOk, let response = callResponse.response else {
-                    return .failure(.connectionFailure("url: \(url), status: \(callResponse.status)"))
+                    return .failure(.connectionFailure(
+                                "url: \(url), status: \(callResponse.status)"))
                 }
 
                 if let initialMetadata = callResponse.initialMetadata {

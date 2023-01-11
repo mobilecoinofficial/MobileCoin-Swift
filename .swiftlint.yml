@@ -2,7 +2,7 @@
 disabled_rules: # rule identifiers to exclude from running
   - nesting
   - opening_brace
-  # disabled by default
+  - inclusive_language
   - conditional_returns_on_newline
   - file_types_order
   - missing_docs
@@ -10,7 +10,6 @@ disabled_rules: # rule identifiers to exclude from running
   - nslocalizedstring_require_bundle
   - extension_access_modifier
   - type_contents_order
-  # consider enabling ones below
   - explicit_acl
   - identifier_name
   - empty_count
@@ -24,6 +23,7 @@ disabled_rules: # rule identifiers to exclude from running
   - vertical_whitespace_closing_braces
   - vertical_whitespace_opening_braces
   - trailing_closure
+
 opt_in_rules: # some rules are only opt-in
   - anyobject_protocol
   - array_init
@@ -88,12 +88,14 @@ opt_in_rules: # some rules are only opt-in
   - vertical_parameter_alignment_on_call
   - xct_specific_matcher
   - yoda_condition
+
   # Find all the available rules by running:
   # swiftlint rules
 included: # paths to include during linting. Ignored if `--path` is present unless `--force-exclude` is specified.
   - Sources
   - Tests
 excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - "Sources/Network/HTTPS/HttpConnection/HttpConnections/HttpProtoGenerated"
 # configurable rules can be customized from this configuration file
 # binary rules can set their severity level
 force_cast: warning # implicitly
@@ -132,3 +134,6 @@ file_header:
 # Temporarily turn this into a warning until the code is fixed
 large_tuple:
   error: 6
+
+file_name:
+  excluded: ["DictionaryCodable.swift"]
