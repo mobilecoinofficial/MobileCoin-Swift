@@ -98,14 +98,12 @@ extension TransactionBuilder {
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
         to recipient: PublicAddress,
-        amount: Amount,
-        presignedInput: SignedContingentInput? = nil
+        amount: Amount
     ) -> Result<PendingSinglePayloadTransaction, TransactionBuilderError> {
         build(
             context: context,
             inputs: inputs,
-            outputs: [TransactionOutput(recipient, amount)],
-            presignedInput: presignedInput
+            outputs: [TransactionOutput(recipient, amount)]
         ).map { pendingTransaction in
             pendingTransaction.singlePayload
         }
@@ -142,13 +140,11 @@ extension TransactionBuilder {
     static func build(
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
-        outputs: [TransactionOutput],
-        presignedInput: SignedContingentInput? = nil
+        presignedInput: SignedContingentInput
     ) -> Result<PendingTransaction, TransactionBuilderError> {
-        outputsAddingChangeOutput(
+        outputsAddingChangeOutputForSCI(
             inputs: inputs,
-            outputs: outputs,
-            fee: context.fee
+            presignedInput: presignedInput
         ).flatMap { buildingTransaction in
             build(
                 context: context,
@@ -161,15 +157,29 @@ extension TransactionBuilder {
     static func build(
         context: TransactionBuilder.Context,
         inputs: [PreparedTxInput],
+        outputs: [TransactionOutput]
+    ) -> Result<PendingTransaction, TransactionBuilderError> {
+        outputsAddingChangeOutput(
+            inputs: inputs,
+            outputs: outputs,
+            fee: context.fee
+        ).flatMap { buildingTransaction in
+            build(
+                context: context,
+                inputs: inputs,
+                possibleTransaction: buildingTransaction,
+                presignedInput: nil)
+        }
+    }
+
+    static func build(
+        context: TransactionBuilder.Context,
+        inputs: [PreparedTxInput],
         possibleTransaction: PossibleTransaction,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
-        guard Math.totalOutlayCheck(
-                for: possibleTransaction,
-                fee: context.fee,
-                inputs: inputs) else {
-            return .failure(.invalidInput("Input values != output values + fee"))
-        }
+        
+        // TODO: Add total outlay check
 
         let builder: TransactionBuilder
         do {
@@ -334,6 +344,31 @@ extension TransactionBuilder {
             }
         }
     }
+
+    private static func outputsAddingChangeOutputForSCI(
+        inputs: [PreparedTxInput],
+        presignedInput: SignedContingentInput
+    ) -> Result<PossibleTransaction, TransactionBuilderError> {
+
+        let reqdAmt = presignedInput.requiredAmount
+
+        // fee covered by sci reward amount
+        let zeroFee = Amount(0, in: presignedInput.requiredAmount.tokenId)
+
+        return Math.remainingAmount(
+            inputValues: inputs.map { $0.knownTxOut.value },
+            outputValues: [reqdAmt.value],
+            fee: zeroFee
+        )
+        .map { changeValue in
+            if let posChangeValue = PositiveUInt64(changeValue) {
+                return PossibleTransaction([], Amount(posChangeValue.value, in: reqdAmt.tokenId))
+            } else {
+                return PossibleTransaction([], Amount(0, in: reqdAmt.tokenId))
+            }
+        }
+    }
+
 }
 
 extension TransactionBuilder {
