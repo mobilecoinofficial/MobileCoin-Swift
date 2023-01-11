@@ -73,7 +73,7 @@ struct SignedContingentInputCreator {
         }
 
         guard amountToReceive.value > 0 else {
-            let errorMessage = "PrepareTransactionWithFee error: Cannot spend 0 " +
+            let errorMessage = "PrepareTransactionWithFee error: Cannot receive 0 " +
                 "\(amountToReceive.tokenId)"
             logger.error(errorMessage, logFunction: false)
             serialQueue.async {
