@@ -299,12 +299,28 @@ extension Account {
 
                     let (unspentTxOuts, ledgerBlockCount) =
                         self.account.readSync {
-                            ($0.unspentTxOuts(tokenId: feeTokenId), $0.knowableBlockCount)
+                            ($0.unspentTxOuts(tokenId: amountToSend.tokenId),
+                             $0.knowableBlockCount)
                         }
 
                     if ledgerBlockCount > presignedInput.tombstoneBlockIndex {
                         serialQueue.async {
                             completion(.failure(.invalidInput("Presigned Input Expired.")))
+                        }
+                        return
+                    }
+
+                    // calculate fee
+                    //  1 input from SCI creator
+                    //  1 input from SCI consumer
+                    //  1 output to consumer for reward amount from SCI creator's TxIn
+                    //  1 output (change) to return reward overage from creator's TxIn
+                    //  1 output to creator for required amount from SCI consumer's TxIn
+                    //  1 output (change) to consumer for overage from consumer's TxIn
+                    let fee = feeStrategy.fee(numInputs: 2, numOutputs: 4)
+                    if amountToReceive.value < fee {
+                        serialQueue.async {
+                            completion(.failure(.invalidInput("Reward Amount < Fee.")))
                         }
                         return
                     }
@@ -318,7 +334,7 @@ extension Account {
                     switch self.txOutSelector
                         .selectTransactionInput(
                             amount: amountToSend,
-                            feeStrategy: feeStrategy,
+                            feeStrategy: FixedFeeStrategy(fee: 0), // zero fee for SCI calculation
                             fromTxOuts: unspentTxOuts)
                         .mapError({ error -> TransactionPreparationError in
                             switch error {
@@ -329,7 +345,7 @@ extension Account {
                             }
                         })
                     {
-                    case .success(let (inputs: inputs, fee: fee)):
+                    case .success(let (inputs: inputs, fee: _ )):
                         metaFetcher.blockVersion {
                             switch $0 {
                             case .success(let blockVersion):
