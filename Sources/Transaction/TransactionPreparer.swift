@@ -179,14 +179,16 @@ struct TransactionPreparer {
             }
             return
         }
+
+        // NOTE: fee is not included here as it will be paid from the SCI reward amount input,
+        // not the consumer (this user's) inputs
         guard UInt64.safeCompare(
                 sumOfValues: inputs.map { $0.value },
-                isGreaterThanOrEqualToSumOfValues: [positiveValue.value, fee.value])
+                isGreaterThanOrEqualToSumOfValues: [positiveValue.value])
         else {
             logger.warning(
                 "Insufficient balance to prepare transaction: sum of inputs: " +
-                    "\(redacting: inputs.map { $0.value }) < amount: \(redacting: amount) + fee: " +
-                    "\(redacting: fee)",
+                    "\(redacting: inputs.map { $0.value }) < amount: \(redacting: amount)",
                 logFunction: false)
             serialQueue.async {
                 completion(.failure(.insufficientBalance()))
@@ -206,6 +208,7 @@ struct TransactionPreparer {
         }, completion: {
             completion($0.mapError { .connectionError($0) }
                 .flatMap { fogResolver, preparedInputs in
+
                     TransactionBuilder.build(
                         context: TransactionBuilder.Context(
                             accountKey: self.accountKey,
@@ -216,7 +219,6 @@ struct TransactionPreparer {
                             fee: fee,
                             rngSeed: rngSeed),
                         inputs: preparedInputs,
-                        outputs: [], // required output for SCI payment
                         presignedInput: presignedInput
                     ).mapError { .invalidInput(String(describing: $0)) }
                 })
