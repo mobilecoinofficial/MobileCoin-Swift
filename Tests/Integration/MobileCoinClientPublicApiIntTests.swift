@@ -37,11 +37,11 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func testPrintBalances() throws {
         let description = "Printing account balance"
         try testSupportedProtocols(description: description) {
-            try printBalance(transportProtocol: $0, expectation: $1)
+            try printBalances(transportProtocol: $0, expectation: $1)
         }
     }
 
-    func printBalance(
+    func printBalances(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
@@ -55,12 +55,21 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 transportProtocol: transportProtocol)
 
             let expect = XCTestExpectation(description: "Retrieving balance for acct idx \(index)")
-            client.updateBalance {
+            client.updateBalances {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
-                if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
-                    print("account index \(index) public address \(key.publicAddress)")
-                    print("account index \(index) balance: \(amountPicoMob)")
+                print("account index \(index) public address \(key.publicAddress)")
+
+                if let amtMob = try? XCTUnwrap(client.balance(for: .MOB)) {
+                    print("account index \(index) balance: \(amtMob)")
+                }
+
+                if let amtMob = try? XCTUnwrap(client.balance(for: .MOBUSD)) {
+                    print("account index \(index) balance: \(amtMob)")
+                }
+
+                if let amtEUsd = try? XCTUnwrap(client.balance(for: .eUSD)) {
+                    print("account index \(index) balance: \(amtEUsd)")
                 }
             }
 
@@ -430,10 +439,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         let amountToSend = Amount(1, in: .MOB)
         let amountToReceive = Amount(10, in: .MOBUSD)
 
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 2)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountIndex: 0,
+                accountIndex: 9,
                 expectation: expect,
                 transportProtocol: transportProtocol)
         { client in
@@ -464,20 +473,22 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let amountToSend = Amount(1, in: .MOB)
+        let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
         let amountToReceive = Amount(10, in: .eUSD)
 
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let creatorIndex = 4
+        let selfAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIndex)
 
-        // TODO: Clean up this test code
+        let consumerIndex = 5
+
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountIndex: creatorIndex,
                 expectation: expect,
                 transportProtocol: transportProtocol)
-        { sciCreatorClient in
-            // TODO: create API that does not take recipient, where recipient defaults to
-            // creators public address
-            sciCreatorClient.createSignedContingentInput(
-                recipient: recipient,
+        { sciCreator in
+
+            sciCreator.createSignedContingentInput(
+                recipient: selfAddr,
                 amountToSend: amountToSend,
                 amountToReceive: amountToReceive
             ) {
@@ -485,18 +496,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
                 do {
                     try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                            accountIndex: 1,
+                            accountIndex: consumerIndex,
                             expectation: expect,
                             transportProtocol: transportProtocol)
-                    { sciConsumerClient in
-                        sciConsumerClient.prepareTransaction(presignedInput: sci) {
-                            // TODO: fix this.. compiler could not infer type - so had to add explicitly
-                            (result: Result<PendingTransaction, TransactionPreparationError>)
+                    { sciConsumer in
+                        sciConsumer.prepareTransaction(presignedInput: sci)
+                        { (result: Result<PendingTransaction, TransactionPreparationError>)
                             -> Void in
 
                             switch result {
                             case .success(let pendingTransaction):
-                                sciConsumerClient.submitTransaction(pendingTransaction.transaction) {
+                                sciConsumer.submitTransaction(pendingTransaction.transaction) {
                                     guard $0.successOrFulfill(expectation: expect) != nil else {
                                         return
                                     }
@@ -505,18 +515,18 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                                     expect.fulfill()
                                 }
                             case .failure:
+                                print("Transaction submission unsuccessful")
                                 return
                             }
                         }
                     }
                 } catch {
+                    print("Transaction submission unsuccessful")
                     return
                 }
             }
         }
     }
-
-
 
     func testRecoverTransactions() throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasRecoverableTestTransactions)
