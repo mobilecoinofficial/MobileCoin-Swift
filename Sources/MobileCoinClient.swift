@@ -395,7 +395,7 @@ public final class MobileCoinClient {
             targetQueue: serialQueue
         ).preparePresignedInputTransaction(
             presignedInput: presignedInput,
-            memoType: .recoverable,
+            memoType: .unused,
             feeLevel: feeLevel) { result in
             self.callbackQueue.async {
                 completion(result)
