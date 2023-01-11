@@ -36,6 +36,13 @@ final class SignedContingentInputBuilder {
 
     private let memoBuilder: TxOutMemoBuilder
 
+    // Caching ring to replace membership proofs after sci creation.
+    // Mobilecoin removes them to save space, expecting the consumer of the SCI
+    // to recreate. For now, as a workaround, we're caching the ring to pass in to the build
+    // function so libmobilecoin can restore the proofs in the SCI immediately
+    // after mobilecoin lib creates it.
+    private let ring: McTransactionBuilderRing
+    
     private init(
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
@@ -50,6 +57,7 @@ final class SignedContingentInputBuilder {
         let result: Result<OpaquePointer, TransactionBuilderError>
 
         let ring = McTransactionBuilderRing(ring: preparedTxInput.ring)
+        self.ring = ring
 
         result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
             fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
@@ -182,6 +190,6 @@ extension SignedContingentInputBuilder {
     private func build(
         rng: MobileCoinRng
     ) -> Result<SignedContingentInput, TransactionBuilderError> {
-        SignedContingentInputBuilderUtils.build(ptr: ptr, rng: rng)
+        SignedContingentInputBuilderUtils.build(ptr: ptr, rng: rng, ring: self.ring)
     }
 }

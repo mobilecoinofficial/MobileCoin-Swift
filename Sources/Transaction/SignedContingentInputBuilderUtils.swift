@@ -143,20 +143,27 @@ enum SignedContingentInputBuilderUtils {
 
     static func build(
         ptr: OpaquePointer,
-        rng: MobileCoinRng
+        rng: MobileCoinRng,
+        ring: McTransactionBuilderRing
     ) -> Result<SignedContingentInput, TransactionBuilderError> {
 
         withMcRngObjCallback(rng: rng) { rngCallbackPtr in
-            Data.make(withMcDataBytes: { errorPtr in
-                mc_signed_contingent_input_builder_build(ptr, rngCallbackPtr, &errorPtr)
-            }).mapError {
-                switch $0.errorCode {
-                case .invalidInput:
-                    return .invalidInput("\(redacting: $0.description)")
-                default:
-                    // Safety: mc_signed_contingent_input_builder_build should not throw
-                    // non-documented errors.
-                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+            ring.withUnsafeOpaquePointer { ringPtr in
+                Data.make(withMcDataBytes: { errorPtr in
+                    mc_signed_contingent_input_builder_build(
+                        ptr,
+                        rngCallbackPtr,
+                        ringPtr,
+                        &errorPtr)
+                }).mapError {
+                    switch $0.errorCode {
+                    case .invalidInput:
+                        return .invalidInput("\(redacting: $0.description)")
+                    default:
+                        // Safety: mc_signed_contingent_input_builder_build should not throw
+                        // non-documented errors.
+                        logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+                    }
                 }
             }
         }.map { sciBytes in
