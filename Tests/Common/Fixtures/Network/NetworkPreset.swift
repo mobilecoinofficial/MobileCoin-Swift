@@ -651,7 +651,8 @@ extension NetworkPreset {
 
     func trustRootsBytes() throws -> [Data] {
         switch self {
-        case .mainNet, .testNet, .mobiledev, .master, .masterDev, .build, .demo, .diogenes, .drakeley, .eran:
+        case .mainNet, .testNet, .mobiledev, .master, .masterDev, .build, .demo, .diogenes,
+             .drakeley, .eran:
             return try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
         case .alpha:
             return DynamicNetworkConfig.trustRootsBytes()

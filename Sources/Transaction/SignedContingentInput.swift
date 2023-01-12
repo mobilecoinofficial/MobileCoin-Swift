@@ -36,7 +36,7 @@ public struct SignedContingentInput {
     }
 
     public var isValid: Bool {
-        return SignedContingentInputBuilderUtils.signed_contingent_input_is_valid(
+        SignedContingentInputBuilderUtils.signed_contingent_input_is_valid(
             sciData: self.serializedData)
     }
 

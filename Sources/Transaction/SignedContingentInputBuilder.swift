@@ -42,7 +42,7 @@ final class SignedContingentInputBuilder {
     // function so libmobilecoin can restore the proofs in the SCI immediately
     // after mobilecoin lib creates it.
     private let ring: McTransactionBuilderRing
-    
+
     private init(
         tombstoneBlockIndex: UInt64,
         fogResolver: FogResolver = FogResolver(),
