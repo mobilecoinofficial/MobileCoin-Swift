@@ -16,13 +16,16 @@ extension VersionedCryptoBox.Fixtures {
         let publicKey: RistrettoPublic
         let plaintext = Self.plaintext
         let ciphertext = Self.ciphertext
+        let accountKey: AccountKey
+        let publicAddress: PublicAddress
         let rng: @convention(c) (UnsafeMutableRawPointer?) -> UInt64 = testRngCallback
         let rngContext = TestRng()
 
         init() {
-            let accountKey = AccountKey.Fixtures.DefaultWithoutFog().accountKey
+            self.accountKey = AccountKey.Fixtures.DefaultWithoutFog().accountKey
             self.privateKey = accountKey.subaddressViewPrivateKey
             self.publicKey = accountKey.publicAddress.viewPublicKeyTyped
+            self.publicAddress = accountKey.publicAddress
         }
     }
 }
