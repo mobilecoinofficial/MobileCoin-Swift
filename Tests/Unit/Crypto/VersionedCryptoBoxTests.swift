@@ -25,4 +25,15 @@ class VersionedCryptoBoxTests: XCTestCase {
         XCTAssertEqual(decrypted, fixture.plaintext)
     }
 
+    func testDefaultBoxEncryption() throws {
+        let fixture = VersionedCryptoBox.Fixtures.Default()
+        let ciphertext = try XCTUnwrapSuccess(DefaultCryptoBox.encrypt(
+            plaintext: fixture.plaintext,
+            publicAddress: fixture.publicAddress))
+
+        let decrypted = try XCTUnwrapSuccess(DefaultCryptoBox.decrypt(
+            ciphertext: ciphertext,
+            accountKey: fixture.accountKey))
+        XCTAssertEqual(decrypted, fixture.plaintext)
+    }
 }
