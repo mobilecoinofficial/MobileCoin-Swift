@@ -301,6 +301,36 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         try await verifyBalanceChange(client, balancesBefore)
     }
 
+    func testCancelSignedContingentInput() async throws {
+        let description = "Cancel SCI"
+        try await testSupportedProtocols(description: description) {
+            try await self.cancelSignedContingentInput(transportProtocol: $0)
+        }
+    }
+
+    func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
+        let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
+        let amountToReceive = Amount(10, in: .eUSD)
+
+        let creatorIdx = 4
+        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
+        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
+        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: creatorAcctKey,
+            tokenId: .MOB,
+            transportProtocol: transportProtocol
+        )
+
+        let sci = try await creator.createSignedContingentInput(
+            recipient: creatorAddr,
+            amountToSend: amountToSend,
+            amountToReceive: amountToReceive)
+
+        try await creator.cancelSignedContingentInput(
+            signedContingentInput: sci,
+            feeLevel: .minimum)
+    }
+
     func testSubmitSignedContingentInputTransaction() async throws {
         let description = "Submitting SCI transaction"
         try await testSupportedProtocols(description: description) {

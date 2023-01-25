@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
+// swiftlint:disable closure_body_length
 
 import Foundation
 
@@ -11,6 +12,7 @@ extension Account {
         private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
         private let signedContingentInputCreator: SignedContingentInputCreator
+        private let transactionPreparer: TransactionPreparer
 
         init(
             account: ReadWriteDispatchLock<Account>,
@@ -35,6 +37,14 @@ extension Account {
                 mixinSelectionStrategy: mixinSelectionStrategy,
                 rngSeed: rngSeed,
                 targetQueue: targetQueue)
+            self.transactionPreparer = TransactionPreparer(
+                accountKey: account.accessWithoutLocking.accountKey,
+                fogMerkleProofService: fogMerkleProofService,
+                fogResolverManager: fogResolverManager,
+                mixinSelectionStrategy: mixinSelectionStrategy,
+                rngSeed: rngSeed,
+                targetQueue: targetQueue)
+
         }
 
         private func verifyBlockVersion(
@@ -164,6 +174,109 @@ extension Account {
                     completion(.failure(SignedContingentInputCreationError.create(from: error)))
                 }
             }
+        }
+
+        func cancelSignedContingentInput(
+            signedContingentInput: SignedContingentInput,
+            feeLevel: FeeLevel,
+            completion: @escaping (
+                Result<Void, SignedContingentInputCancelationError>
+            ) -> Void
+        ) {
+            // check sci is valid
+            guard signedContingentInput.isValid else {
+                serialQueue.async {
+                    completion(.failure(SignedContingentInputCancelationError.invalidSCI))
+                }
+                return
+            }
+
+            // get all unspent txOuts
+            let (ownedTxOuts, unspentTxOuts, publicAddress) =
+            account.readSync {
+                ($0.ownedTxOuts,
+                 $0.unspentTxOuts(tokenId: signedContingentInput.rewardAmount.tokenId),
+                 $0.publicAddress)
+            }
+
+            // match the owned [KnownTxOut] w/the SCI's TxIn's ring to get the SCI's real KnownTxOut
+            guard let ownedTxOut = signedContingentInput.matchTxInWith(ownedTxOuts) else {
+                serialQueue.async {
+                    completion(.failure(SignedContingentInputCancelationError.unownedTxOut()))
+                }
+                return
+            }
+
+            guard let txOut = unspentTxOuts.first(where: { $0.publicKey == ownedTxOut.publicKey } )
+            else {
+                serialQueue.async {
+                    completion(.failure(SignedContingentInputCancelationError.alreadySpent()))
+                }
+                return
+            }
+
+            // prepare transaction with txout
+            metaFetcher.feeStrategy(for: feeLevel, tokenId: txOut.tokenId) {
+                switch $0 {
+                case .success(let feeStrategy):
+                    metaFetcher.blockVersion {
+                        switch $0 {
+                        case .success(let blockVersion):
+                            let fee = feeStrategy.fee(numInputs: 1, numOutputs: 1)
+                            logger.info(
+                                "Transaction prepared with fee level. fee: \(redacting: fee)",
+                                logFunction: false)
+
+                            guard fee <= txOut.amount.value else {
+                                serialQueue.async {
+                                    completion(.failure(.inputError("fee > tx amount")))
+                                }
+                                return
+                            }
+
+                            let ledgerBlockCount = self.account.readSync { $0.knowableBlockCount }
+                            let tombstoneBlockIndex = ledgerBlockCount + 50
+                            self.transactionPreparer.prepareTransaction(
+                                inputs: [txOut],
+                                recipient: publicAddress,
+                                memoType: .unused,
+                                amount: Amount(txOut.amount.value - fee, in: txOut.amount.tokenId),
+                                fee: Amount(fee, in: txOut.amount.tokenId),
+                                tombstoneBlockIndex: tombstoneBlockIndex,
+                                blockVersion: blockVersion)
+                            { result in
+                                switch result {
+                                case .success(let pendingTransaction):
+                                    serialQueue.async {
+                                        // implement submission of transaction sending txOut to self
+                                        completion(.failure(.unknownError(
+                                            "Transaction Submission not implemented yet")))
+                                    }
+                                case .failure(let error):
+                                    serialQueue.async {
+                                        completion(.failure(
+                                            .transactionPreparationError(error)))
+                                    }
+                                }
+                            }
+                        case .failure(let error):
+                            logger.info(
+                                "prepareTransactionWithFee failure: \(error)",
+                                logFunction: false)
+
+                            serialQueue.async {
+                                completion(.failure(.connectionError(error)))
+                            }
+                        }
+                    }
+
+                case .failure(let connectionError):
+                    logger.info("failure - error: \(connectionError)")
+                    completion(.failure(.connectionError(connectionError)))
+                }
+            }
+
+            // wait for completion of transaction - look for success
         }
     }
 }

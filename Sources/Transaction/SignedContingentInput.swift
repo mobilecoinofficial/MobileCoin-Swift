@@ -95,3 +95,25 @@ extension External_SignedContingentInput {
         self = signedContingentInput.proto
     }
 }
+
+extension SignedContingentInput {
+
+    internal func matchTxInWith(_ knownTxOuts: [KnownTxOut]) -> KnownTxOut? {
+        guard proto.hasTxIn else {
+            return nil
+        }
+        
+        let ringPubKeySet = Set(proto.txIn.ring.map { RistrettoPublic($0.publicKey) })
+        let matchingTxOuts = knownTxOuts.filter { ringPubKeySet.contains($0.publicKey) }
+        
+        // there should be exactly one match
+        guard matchingTxOuts.count == 1,
+              let knownTxOut = matchingTxOuts.first,
+              knownTxOut.tokenId == self.pseudoOutputAmount.tokenId,
+              knownTxOut.amount.value == UInt64(self.pseudoOutputAmount.value) else {
+            return nil
+        }
+        
+        return knownTxOut
+    }
+}

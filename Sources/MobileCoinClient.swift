@@ -223,6 +223,39 @@ public final class MobileCoinClient {
         }
     }
 
+    public func cancelSignedContingentInput(
+        signedContingentInput: SignedContingentInput,
+        feeLevel: FeeLevel,
+        completion: @escaping (
+            Result<Void, SignedContingentInputCancelationError>
+        ) -> Void
+    ) {
+        guard let rngSeed = defaultRng.generateRngSeed() else {
+            completion(.failure(SignedContingentInputCancelationError.unknownError(
+                "Couldn't create 32byte RNG seed")))
+            return
+        }
+        Account.SCIOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rngSeed: rngSeed,
+            targetQueue: serialQueue
+        ).cancelSignedContingentInput(
+            signedContingentInput: signedContingentInput,
+            feeLevel: feeLevel
+        ) { result in
+            self.callbackQueue.async {
+                completion(result)
+            }
+        }
+
+    }
+
+
     public func prepareTransaction(
         to recipient: PublicAddress,
         memoType: MemoType = .recoverable,

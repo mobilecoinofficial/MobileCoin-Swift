@@ -188,6 +188,46 @@ extension SignedContingentInputCreationError: LocalizedError {
     }
 }
 
+public enum SignedContingentInputCancelationError: Error {
+    case invalidSCI
+    case inputError(String = String())
+    case alreadySpent(String = String())
+    case unownedTxOut(String = String())
+    case connectionError(ConnectionError)
+    case transactionPreparationError(TransactionPreparationError)
+    case unknownError(String)
+}
+
+extension SignedContingentInputCancelationError: CustomStringConvertible {
+    public var description: String {
+        "SignedContingentInput cancelation error: " + {
+            switch self {
+            case .invalidSCI:
+                return "Invalid signed contingent input"
+            case .inputError(let reason):
+                return "Input error\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .alreadySpent(let reason):
+                return "Transaction for SCI already spent\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .unownedTxOut(let reason):
+                return "The SCI txout is not owned by this account" +
+                "\(!reason.isEmpty ? ": \(reason)" : "")"
+            case .connectionError(let innerError):
+                return "\(innerError)"
+            case .transactionPreparationError(let innerError):
+                return "\(innerError)"
+            case .unknownError(let reason):
+                return "Unknown Error: \(reason)"
+            }
+        }()
+    }
+}
+
+extension SignedContingentInputCancelationError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
 public enum TransactionPreparationError: Error {
     case invalidInput(String)
     case insufficientBalance(String = String())

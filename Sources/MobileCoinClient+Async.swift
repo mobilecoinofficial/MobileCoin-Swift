@@ -76,6 +76,19 @@ extension MobileCoinClient {
         }
     }
 
+    public func cancelSignedContingentInput(
+        signedContingentInput: SignedContingentInput,
+        feeLevel: FeeLevel
+    ) async throws
+    {
+        try await withCheckedThrowingContinuation { continuation in
+            cancelSignedContingentInput(signedContingentInput: signedContingentInput,
+                                        feeLevel: feeLevel) {
+                continuation.resume(with: $0)
+            }
+        }
+    }
+
     public func prepareTransaction(
         presignedInput: SignedContingentInput,
         feeLevel: FeeLevel = .minimum
