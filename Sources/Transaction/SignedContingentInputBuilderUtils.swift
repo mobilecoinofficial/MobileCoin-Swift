@@ -34,8 +34,6 @@ enum SignedContingentInputBuilderUtils {
                     switch $0.errorCode {
                     case .invalidInput:
                         return .invalidInput("\(redacting: $0.description)")
-                    case .attestationVerificationFailed:
-                        return .attestationVerificationFailed("\(redacting: $0.description)")
                     default:
                         // Safety: mc_signed_contingent_input_builder_add_required_output should not
                         // throw non-documented errors.
@@ -91,9 +89,6 @@ enum SignedContingentInputBuilderUtils {
                         switch $0.errorCode {
                         case .invalidInput:
                             return .invalidInput("\(redacting: $0.description)")
-                        case .attestationVerificationFailed:
-                            return .attestationVerificationFailed(
-                                "\(redacting: $0.description)")
                         default:
                             // Safety: mc_signed_contingent_input_builder_add_required_change_output
                             // should not throw non-documented errors.
