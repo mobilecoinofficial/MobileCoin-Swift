@@ -92,20 +92,6 @@ extension Account {
                 logFunction: false)
         }
 
-        private func logUnspentTxOuts(
-            _ recipient: PublicAddress,
-            _ amountToSend: Amount,
-            _ amountToReceive: Amount,
-            _ txOuts: [KnownTxOut]
-        ) {
-            logger.info(
-                "Creating signed contingent input to recipient: \(redacting: recipient), " +
-                    "amountToSend: \(redacting: amountToSend), " +
-                    "amountToRecieve: \(redacting: amountToReceive), " +
-                    "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
-                logFunction: false)
-        }
-
         func createSignedContingentInput(
             to recipient: PublicAddress,
             memoType: MemoType,
@@ -115,8 +101,6 @@ extension Account {
                 Result<SignedContingentInput, SignedContingentInputCreationError>
             ) -> Void
         ) {
-            let functionName = "createSignedContingentInput"
-
             guard verifyAmountIsNonZero(amountToSend, "send", completion) else {
                 return
             }
@@ -130,7 +114,12 @@ extension Account {
             account.readSync {
                 ($0.unspentTxOuts(tokenId: amountToSend.tokenId), $0.knowableBlockCount)
             }
-            logUnspentTxOuts(recipient, amountToSend, amountToReceive, unspentTxOuts)
+            logger.info(
+                "Creating signed contingent input to recipient: \(redacting: recipient), " +
+                    "amountToSend: \(redacting: amountToSend), " +
+                    "amountToRecieve: \(redacting: amountToReceive), " +
+                    "unspentTxOutValues: \(redacting: unspentTxOuts.map { $0.value })",
+                logFunction: false)
 
             // fee is zero here, because the fee will be covered by the consumer of the SCI
             switch txOutSelector
@@ -160,7 +149,7 @@ extension Account {
                             }
                         }
                     case .failure(let error):
-                        logger.info("\(functionName) failure: \(error)", logFunction: false)
+                        logger.info("Error: \(error)")
 
                         serialQueue.async {
                             completion(.failure(.connectionError(error)))
@@ -169,7 +158,7 @@ extension Account {
                 }
 
             case .failure(let error):
-                logger.info("\(functionName) failure: \(error)", logFunction: false)
+                logger.info("Error: \(error)")
                 serialQueue.async {
                     completion(.failure(SignedContingentInputCreationError.create(from: error)))
                 }
