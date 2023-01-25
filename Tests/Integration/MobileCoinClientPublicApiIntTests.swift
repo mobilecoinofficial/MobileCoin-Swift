@@ -439,15 +439,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         let amountToSend = Amount(1, in: .MOB)
         let amountToReceive = Amount(10, in: .MOBUSD)
 
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 2)
+        let creatorIdx = 9
+        let creatorPubAddress = try IntegrationTestFixtures.createPublicAddress(
+            accountIndex: creatorIdx)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountIndex: 9,
+                accountIndex: creatorIdx,
                 expectation: expect,
                 transportProtocol: transportProtocol)
         { client in
             client.createSignedContingentInput(
-                recipient: recipient,
+                recipient: creatorPubAddress,
                 amountToSend: amountToSend,
                 amountToReceive: amountToReceive
             ) {
