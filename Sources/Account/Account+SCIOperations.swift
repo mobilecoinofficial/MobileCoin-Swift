@@ -1,7 +1,7 @@
 //
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
-// swiftlint:disable closure_body_length
+// swiftlint:disable closure_body_length function_body_length
 
 import Foundation
 
@@ -196,7 +196,7 @@ extension Account {
                 return
             }
 
-            guard let txOut = unspentTxOuts.first(where: { $0.publicKey == ownedTxOut.publicKey } )
+            guard let txOut = unspentTxOuts.first(where: { $0.publicKey == ownedTxOut.publicKey })
             else {
                 serialQueue.async {
                     completion(.failure(SignedContingentInputCancelationError.alreadySpent()))

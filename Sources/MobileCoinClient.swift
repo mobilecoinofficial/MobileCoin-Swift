@@ -3,7 +3,7 @@
 //
 
 // swiftlint:disable multiline_function_chains
-// swiftlint:disable function_default_parameter_at_end type_body_length
+// swiftlint:disable function_default_parameter_at_end type_body_length file_length
 
 import Foundation
 
@@ -523,5 +523,4 @@ public final class MobileCoinClient {
             completion($0)
         }
     }
-
 }
