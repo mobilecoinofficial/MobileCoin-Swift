@@ -223,11 +223,11 @@ public final class MobileCoinClient {
         }
     }
 
-    public func cancelSignedContingentInput(
+    public func prepareCancelSignedContingentInputTransaction(
         signedContingentInput: SignedContingentInput,
         feeLevel: FeeLevel,
         completion: @escaping (
-            Result<Void, SignedContingentInputCancelationError>
+            Result<PendingSinglePayloadTransaction, SignedContingentInputCancelationError>
         ) -> Void
     ) {
         guard let rngSeed = defaultRng.generateRngSeed() else {
@@ -244,7 +244,7 @@ public final class MobileCoinClient {
             mixinSelectionStrategy: mixinSelectionStrategy,
             rngSeed: rngSeed,
             targetQueue: serialQueue
-        ).cancelSignedContingentInput(
+        ).prepareCancelSignedContingentInputTransaction(
             signedContingentInput: signedContingentInput,
             feeLevel: feeLevel
         ) { result in
@@ -252,9 +252,7 @@ public final class MobileCoinClient {
                 completion(result)
             }
         }
-
     }
-
 
     public func prepareTransaction(
         to recipient: PublicAddress,

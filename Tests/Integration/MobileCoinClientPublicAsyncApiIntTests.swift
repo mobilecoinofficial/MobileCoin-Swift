@@ -308,6 +308,32 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         }
     }
 
+    func prepareAndSubmitSignedContingentInput(
+        _ creator: MobileCoinClient,
+        _ creatorAddress: PublicAddress,
+        _ consumer: MobileCoinClient,
+        _ amountToSend: Amount,
+        _ amountToReceive: Amount
+    ) async throws {
+        let sci = try await creator.createSignedContingentInput(
+            recipient: creatorAddress,
+            amountToSend: amountToSend,
+            amountToReceive: amountToReceive)
+
+        let pendingTransaction = try await consumer.prepareTransaction(presignedInput: sci)
+
+        let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+        XCTAssertNotNil(publicKey)
+
+        let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+        XCTAssertNotNil(sharedSecret)
+
+        let transaction = pendingTransaction.transaction
+        print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+        try await consumer.submitTransaction(transaction: transaction)
+    }
+
     func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
         let amountToReceive = Amount(10, in: .eUSD)
@@ -321,14 +347,41 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
             transportProtocol: transportProtocol
         )
 
+        let consumerIdx = 5
+        let consumerAcctKey =
+            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
+        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: consumerAcctKey,
+            tokenId: .eUSD,
+            transportProtocol: transportProtocol
+        )
+
         let sci = try await creator.createSignedContingentInput(
             recipient: creatorAddr,
             amountToSend: amountToSend,
             amountToReceive: amountToReceive)
 
-        try await creator.cancelSignedContingentInput(
+        let pendingTx = try await creator.prepareCancelSignedContingentInputTransaction(
             signedContingentInput: sci,
             feeLevel: .minimum)
+
+        try await creator.submitTransaction(transaction: pendingTx.transaction)
+
+        // sleep 10s
+        try await Task.sleep(nanoseconds: UInt64(10 * 1_000_000_000))
+
+        do {
+            // this should fail
+            try await prepareAndSubmitSignedContingentInput(
+                creator,
+                creatorAddr,
+                consumer,
+                amountToSend,
+                amountToReceive)
+            XCTFail("Signed Contingent Input submission should not succeed after cancelation")
+        } catch {
+            print("Attempt to consume SCI correctly failed with error \(error)")
+        }
     }
 
     func testSubmitSignedContingentInputTransaction() async throws {
@@ -350,30 +403,6 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
             let blockVersion = try await client.blockVersion()
             XCTAssertGreaterThanOrEqual(blockVersion, 3, "Test cannot run on blockversion < 3 ...")
             return try await client.estimateTotalFee(toSendAmount: amountToSend, feeLevel: .minimum)
-        }
-
-        func prepareAndSubmitSignedContingentInput(
-            _ creator: MobileCoinClient,
-            _ creatorAddress: PublicAddress,
-            _ consumer: MobileCoinClient
-        ) async throws {
-            let sci = try await creator.createSignedContingentInput(
-                recipient: creatorAddr,
-                amountToSend: amountToSend,
-                amountToReceive: amountToReceive)
-
-            let pendingTransaction = try await consumer.prepareTransaction(presignedInput: sci)
-
-            let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
-            XCTAssertNotNil(publicKey)
-
-            let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
-            XCTAssertNotNil(sharedSecret)
-
-            let transaction = pendingTransaction.transaction
-            print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
-
-            try await consumer.submitTransaction(transaction: transaction)
         }
 
         func getBalances(
@@ -453,7 +482,12 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         let fee = try await checkBlockVersionAndFee(creator)
         let creatorBalancesBefore = try await getBalances(creator)
         let consumerBalancesBefore = try await getBalances(consumer)
-        try await prepareAndSubmitSignedContingentInput(creator, creatorAddr, consumer)
+        try await prepareAndSubmitSignedContingentInput(
+            creator,
+            creatorAddr,
+            consumer,
+            amountToSend,
+            amountToReceive)
         try await verifyBalanceChanges(
             creator,
             creatorBalancesBefore,

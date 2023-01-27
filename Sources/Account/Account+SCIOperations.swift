@@ -165,11 +165,11 @@ extension Account {
             }
         }
 
-        func cancelSignedContingentInput(
+        func prepareCancelSignedContingentInputTransaction(
             signedContingentInput: SignedContingentInput,
             feeLevel: FeeLevel,
             completion: @escaping (
-                Result<Void, SignedContingentInputCancelationError>
+                Result<PendingSinglePayloadTransaction, SignedContingentInputCancelationError>
             ) -> Void
         ) {
             // check sci is valid
@@ -237,9 +237,7 @@ extension Account {
                                 switch result {
                                 case .success(let pendingTransaction):
                                     serialQueue.async {
-                                        // implement submission of transaction sending txOut to self
-                                        completion(.failure(.unknownError(
-                                            "Transaction Submission not implemented yet")))
+                                        completion(.success(pendingTransaction))
                                     }
                                 case .failure(let error):
                                     serialQueue.async {
