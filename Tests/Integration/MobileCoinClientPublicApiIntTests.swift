@@ -426,6 +426,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testCreateSignedContingentInput() throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
         let description = "Creating signed contingent input"
         try testSupportedProtocols(description: description) {
             try createSignedContingentInput(transportProtocol: $0, expectation: $1)
@@ -465,6 +467,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testSubmitSignedContingentInputTransaction() throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+        
         let description = "Submitting SCI Transaction"
         try testSupportedProtocols(description: description) {
             try submitSignedContingentInputTransaction(transportProtocol: $0, expectation: $1)

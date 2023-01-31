@@ -675,6 +675,15 @@ extension NetworkPreset {
         try Self.trustRootsB64.map { try XCTUnwrap(Data(base64Encoded: $0)) }
     }
 
+    var hasSignedContingentInputs: Bool {
+        switch self {
+        case .dynamic(let dynamicConfig):
+            return dynamicConfig.namespace == "alpha"
+        default:
+            return false
+        }
+    }
+
     var hasRecoverableTestTransactions: Bool {
         switch self {
         case .testNet:

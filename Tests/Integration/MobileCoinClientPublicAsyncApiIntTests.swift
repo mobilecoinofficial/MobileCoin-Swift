@@ -302,6 +302,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testCancelSignedContingentInput() async throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
         let description = "Cancel SCI"
         try await testSupportedProtocols(description: description) {
             try await self.cancelSignedContingentInput(transportProtocol: $0)
@@ -385,6 +387,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testSubmitSignedContingentInputTransaction() async throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
         let description = "Submitting SCI transaction"
         try await testSupportedProtocols(description: description) {
             try await self.submitSignedContingentInputTransaction(transportProtocol: $0)
