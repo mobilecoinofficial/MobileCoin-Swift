@@ -182,9 +182,9 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         func prepareForLoadingDefrager(
             defrageeClient: MobileCoinClient,
             defragerClient: MobileCoinClient,
-            completion: @escaping (_ defragee: MobileCoinClient, _ defrager: MobileCoinClient, _ fullAmount: UInt64) -> Void
+            completion: @escaping (_ fullAmount: UInt64) -> Void
         ) {
-            defrageeClient.amountTransferable(tokenId: .MOB, completion: { result in
+            defrageeClient.amountTransferable(tokenId: .MOB) { result in
                 guard let fullAmount = try? result.get() else {
                     XCTFail("Defrag unable to calculate full amount")
                     return
@@ -217,20 +217,23 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             }
         }
         
-            
-//                loadUpDefragerAccount(defrageeClient: defrageeClient, defragerClient: defragerClient) { _ in
-//                    fragmentAccount(
-//                        defragee: defrageeClient,
-//                        defrager: defragerClient,
-//                        amount: fullAmount,
-//                        count: splitFactor,
-//                        index: 0
-//                    ) { _ in
-//                        // verify that account 5 needs to be defragged to send (amount/20)*17
-//                        // defrag account 5
-//                        // verify that account 5 does not need to be defragged to send (amount/20)*17
-//                        expect.fulfill()
-//                    }
-//                }
+        createBothClients() { (_ defragee: MobileCoinClient, _ defrager: MobileCoinClient) in
+            prepareForLoadingDefrager(defrageeClient: defragee, defragerClient: defrager) { fullAmount in
+                loadUpDefragerAccount(defrageeClient: defragee, defragerClient: defrager, fullAmount: fullAmount) {
+                    fragmentAccount(
+                        defragee: defragee,
+                        defrager: defrager,
+                        amount: fullAmount,
+                        count: splitFactor,
+                        index: 0
+                    ) { _ in
+                        // verify that account 5 needs to be defragged to send (amount/20)*17
+                        // defrag account 5
+                        // verify that account 5 does not need to be defragged to send (amount/20)*17
+                        expect.fulfill()
+                    }
+                }
+            }
+        }
     }
 }
