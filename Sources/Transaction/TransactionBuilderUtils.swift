@@ -55,7 +55,7 @@ enum TransactionBuilderUtils {
             confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
                 sharedSecretData.asMcMutableBuffer { sharedSecretPtr in
                     Data.make(withMcDataBytes: { errorPtr in
-                        mc_transaction_builder_add_output(
+                        mc_transaction_builder_add_output_unmixed(
                             ptr,
                             amount,
                             publicAddressPtr,
@@ -124,7 +124,7 @@ enum TransactionBuilderUtils {
                 confirmationNumberData.asMcMutableBuffer { confirmationNumberPtr in
                     sharedSecretData.asMcMutableBuffer { sharedSecretPtr in
                         Data.make(withMcDataBytes: { errorPtr in
-                            mc_transaction_builder_add_change_output(
+                            mc_transaction_builder_add_change_output_unmixed(
                                 accountKeyPtr,
                                 ptr,
                                 amount,
