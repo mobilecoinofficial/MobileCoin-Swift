@@ -4,7 +4,7 @@
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
 
-import MobileCoin
+@testable import MobileCoin
 import XCTest
 
 class MobileCoinClientPublicApiIntTests: XCTestCase {
@@ -46,29 +46,43 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         expectation expect: XCTestExpectation
     ) throws {
         let numAccounts = IntegrationTestFixtures.testAccountCount
-        var balanceExpects: [XCTestExpectation] = []
-        try Array(0..<numAccounts).forEach({ index in
-            let key = try IntegrationTestFixtures.createAccountKey(accountIndex: index)
+        let serialQueue = DispatchQueue(label: "com.mobilecoin.printBalances")
 
-            let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountKey: key,
-                transportProtocol: transportProtocol)
-
-            let expect = XCTestExpectation(description: "Retrieving balance for acct idx \(index)")
-            client.updateBalance {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
-                    print("account index \(index) public address \(key.publicAddress)")
-                    print("account index \(index) balance: \(amountPicoMob)")
-                }
+        func completion(_ result: Result<[Balance], ConnectionError>) {
+            guard let balances = try? XCTUnwrapSuccess(result) else {
+                return
             }
 
-            balanceExpects.append(expect)
+            balances.enumerated().forEach({ index, balance in
+                guard let amountPicoMob = try? XCTUnwrap(balance.amountPicoMob()) else {
+                    return
+                }
+                print("account index \(index) balance: \(amountPicoMob)")
+            })
+        }
+
+        [0, 1, 2, 3, 4, 5].mapAsync({ index, callback in
+            guard
+                let key = try? IntegrationTestFixtures.createAccountKey(accountIndex: index)
+            else {
+                return
+            }
+
+            guard let client = try? IntegrationTestFixtures.createMobileCoinClient(
+                accountKey: key,
+                transportProtocol: transportProtocol
+            ) else {
+                return
+            }
+
+            client.updateBalance(completion: callback)
+        },
+        serialQueue: serialQueue,
+        completion: { result in
+            completion(result.map { $0.compactMap { $0 } })
+            expect.fulfill()
         })
 
-        XCTWaiter().wait(for: balanceExpects, timeout: 40)
-        expect.fulfill()
     }
 
     func testBalances() throws {
@@ -224,6 +238,41 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         expectation expect: XCTestExpectation
     ) throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol)
+        { client in
+            client.prepareTransaction(
+                to: recipient,
+                amount: 100,
+                fee: IntegrationTestFixtures.fee
+            ) {
+                guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
+                else { return }
+
+                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+                client.submitTransaction(transaction) {
+                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
+
+                    print("Transaction submission successful")
+                    expect.fulfill()
+                }
+            }
+        }
+    }
+
+    func defragmentationTesting(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+
+        func fragmentAccount(with index: Int) {
+
+        }
+
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
                 expectation: expect,

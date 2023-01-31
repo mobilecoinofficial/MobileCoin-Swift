@@ -337,6 +337,19 @@ public final class MobileCoinClient {
         }
     }
 
+    public func submitTransactions(
+        transactions: [Transaction],
+        completion: @escaping (Result<[UInt64], SubmitTransactionError>) -> Void
+    ) {
+        transactions.mapAsync({ transaction, callback in
+            self.submitTransaction(transaction: transaction, completion: callback)
+        },
+        serialQueue: serialQueue,
+        completion: { result in
+            completion(result.map { $0.compactMap { $0 } })
+        })
+    }
+
     public func submitTransaction(
         transaction: Transaction,
         completion: @escaping (Result<UInt64, SubmitTransactionError>) -> Void
