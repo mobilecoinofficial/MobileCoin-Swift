@@ -232,7 +232,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
                 expectation: expect,
@@ -645,7 +645,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 2)
+        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 0)
         let client = try IntegrationTestFixtures.createMobileCoinClient(
                 accountKey: accountKey,
                 transportProtocol: transportProtocol)
