@@ -382,3 +382,44 @@ extension MobileCoinClient {
     }
 
 }
+
+#if swift(>=5.5)
+
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+extension MobileCoinClient {
+    @available(*, deprecated, message:
+        """
+        Use the `prepareTransaction(...)` that accepts a MobileCoinRng instead of an RngSeed
+
+        ```
+        public func prepareTransaction(
+            to recipient: PublicAddress,
+            memoType: MemoType = .recoverable,
+            amount: Amount,
+            feeLevel: FeeLevel = .minimum,
+            rng: MobileCoinRng
+        ) async ... {
+        ```
+
+        this function creates a 32-byte seed by combining the data from 4 calls to rng.next()
+        """)
+    public func prepareTransaction(
+        to recipient: PublicAddress,
+        amount: Amount,
+        fee: UInt64,
+        rngSeed: RngSeed,
+        memoType: MemoType = .recoverable
+    ) async throws -> PendingSinglePayloadTransaction {
+        try await withCheckedThrowingContinuation { continuation in
+            prepareTransaction(to: recipient,
+                               memoType: memoType,
+                               amount: amount,
+                               fee: fee,
+                               rngSeed: rngSeed) {
+                continuation.resume(with: $0)
+            }
+        }
+    }
+}
+
+#endif
