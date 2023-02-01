@@ -103,7 +103,7 @@ GEM
     zeitwerk (2.6.6)
 
 PLATFORMS
-  x86_64-darwin-21
+  ruby
 
 DEPENDENCIES
   addressable (= 2.8.1)!
