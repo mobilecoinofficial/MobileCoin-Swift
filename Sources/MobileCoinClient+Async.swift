@@ -42,7 +42,7 @@ extension MobileCoinClient {
             }
         }
     }
-    
+
     public func prepareTransaction(
         to recipient: PublicAddress,
         amount: Amount,
@@ -60,7 +60,6 @@ extension MobileCoinClient {
             }
         }
     }
-
 
     @discardableResult
     public func submitTransaction(
