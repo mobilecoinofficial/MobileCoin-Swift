@@ -32,6 +32,13 @@ GIT
       fourflusher (~> 2.0)
       xcpretty (~> 0.3.0)
 
+GIT
+  remote: https://github.com/sporkmonger/addressable
+  revision: 1fdd676753fb2f44c9d7e0953c97c3e6becfb36a
+  specs:
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
+
 GEM
   specs:
 
@@ -46,8 +53,6 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-    addressable (2.8.1)
-      public_suffix (>= 2.0.2, < 6.0)
     algoliasearch (1.27.5)
       httpclient (~> 2.8, >= 2.8.3)
       json (>= 1.5.1)
@@ -307,12 +312,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable (= 2.8.1)!
   cocoapods!
   cocoapods-binary!
+  cocoapods-deintegrate (~> 1.0, >= 1.0.4)!
   cocoapods-keys!
   cocoapods-repo-update!
   fastlane!
   pkg-config!
 
 BUNDLED WITH
-   2.2.24
+   2.3.15

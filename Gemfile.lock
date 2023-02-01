@@ -22,6 +22,13 @@ GIT
       ruby-macho (>= 2.3.0, < 3.0)
       xcodeproj (>= 1.21.0, < 2.0)
 
+GIT
+  remote: https://github.com/sporkmonger/addressable
+  revision: 1fdd676753fb2f44c9d7e0953c97c3e6becfb36a
+  specs:
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
+
 GEM
   specs:
 
@@ -36,8 +43,6 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-    addressable (2.8.1)
-      public_suffix (>= 2.0.2, < 6.0)
     algoliasearch (1.27.5)
       httpclient (~> 2.8, >= 2.8.3)
       json (>= 1.5.1)
@@ -120,12 +125,14 @@ GEM
     zeitwerk (2.6.6)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-21
 
 DEPENDENCIES
+  addressable (= 2.8.1)!
   cocoapods!
+  cocoapods-deintegrate (~> 1.0, >= 1.0.4)!
   jazzy!
   pkg-config!
 
 BUNDLED WITH
-   2.2.24
+   2.3.15
