@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.platform     = :ios, "10.0"
+  s.platform     = :ios, "11.0"
 
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -58,7 +58,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/Core", "4.0.0-pre2"
+    subspec.dependency "LibMobileCoin/Core", "4.0.0-pre3"
 
     subspec.dependency "gRPC-Swift", "1.0.0"
     subspec.dependency "Logging", "~> 1.4"
@@ -90,7 +90,7 @@ Pod::Spec.new do |s|
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "4.0.0-pre2"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "4.0.0-pre3"
 
     subspec.dependency "Logging", "~> 1.4"
 
