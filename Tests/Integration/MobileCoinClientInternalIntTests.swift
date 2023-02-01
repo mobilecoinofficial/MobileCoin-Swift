@@ -11,7 +11,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
 
     func testDefragmentationTesting() throws {
         let description = "Defragmentation Testing"
-        try testSupportedProtocols(description: description, timeout: 1000) {
+        try testSupportedProtocols(description: description, timeout: 250) {
             try defragmentationTesting(transportProtocol: $0, expectation: $1)
         }
     }
@@ -28,7 +28,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             var numChecksRemaining = 5
             func checkBalanceChange() {
                 numChecksRemaining -= 1
-                print("Defrage updating balance...")
+                print("Defrag updating balance...")
                 client.updateBalances {
                     guard let balances = $0.successOrFulfill(expectation: expect) else { return }
                     print("Balances: \(balances)")
@@ -80,7 +80,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         
         let serialQueue = DispatchQueue(label: "com.mobilecoin.defragmentationTesting")
 
-        func fragmentAccount(
+        func fragmentDefrageeAccount(
             defragee: MobileCoinClient,
             defrager: MobileCoinClient,
             amount: UInt64,
@@ -95,6 +95,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             
             let fragmentAmount = amount.dividedReportingOverflow(by: UInt64(splitFactor)).partialValue
             
+            print("Defrag, defragee account is being fragmented by the Defrager")
             print("Defrag transaction preperation")
             defrager.prepareTransaction(
                 to: defrageeAccount.publicAddress,
@@ -113,7 +114,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
                     
                     verifyBalanceChange(defrager, defragerBalances) { _ in
                         defrager.updateBalances() { _ in
-                            fragmentAccount(
+                            fragmentDefrageeAccount(
                                 defragee: defragee,
                                 defrager: defrager,
                                 amount: amount,
@@ -179,10 +180,9 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             }
         }
         
-        func prepareForLoadingDefrager(
+        func verifyAccountIsDefragmented(
             defrageeClient: MobileCoinClient,
-            defragerClient: MobileCoinClient,
-            completion: @escaping (_ fullAmount: UInt64) -> Void
+            completion: @escaping (Bool, UInt64) -> Void
         ) {
             defrageeClient.amountTransferable(tokenId: .MOB) { result in
                 guard let fullAmount = try? result.get() else {
@@ -198,39 +198,92 @@ class MobileCoinClientInternalIntTests: XCTestCase {
                         return
                     }
                     
-                    if defragRequired {
-                        defrageeClient.prepareDefragmentationStepTransactions(
-                            toSendAmount: fullAmount
-                        ) { result in
-                            guard let stepTransactions = try? result.get() else {
-                                XCTFail("Defrag unable to calculate defrag step transactions")
-                                return
-                            }
-                            
-                            // Defrag account then call completion
-                            
-                        }
-                    } else {
-                        // Defrag call completion
+                    completion(defragRequired, fullAmount)
+                }
+            }
+        }
+        
+        func defragmentAccount(
+            defrageeClient: MobileCoinClient,
+            toSendAmount: UInt64,
+            completion: @escaping (_ fullAmount: UInt64) -> Void
+        ) {
+            defrageeClient.prepareDefragmentationStepTransactions(
+                toSendAmount: toSendAmount
+            ) { result in
+                guard let stepTransactions = try? result.get() else {
+                    XCTFail("Defrag unable to calculate defrag step transactions")
+                    return
+                }
+                
+                let defrageeBalances = defrageeClient.balances
+                defrageeClient.submitDefragStepTransactions(
+                    transactions: stepTransactions
+                ) { result in
+                    let feesSpent = McConstants.DEFAULT_MINIMUM_FEE.multipliedReportingOverflow(
+                        by: UInt64(stepTransactions.count)
+                    ).partialValue
+                    let newFullAmount = toSendAmount.subtractingReportingOverflow(feesSpent).partialValue
+                    
+                    verifyBalanceChange(defrageeClient, defrageeBalances, completion: { _ in
+                        completion(newFullAmount)
+                    })
+                }
+            }
+        }
+        
+        func prepareForLoadingDefrager(
+            defrageeClient: MobileCoinClient,
+            completion: @escaping (_ fullAmount: UInt64) -> Void
+        ) {
+            verifyAccountIsDefragmented(defrageeClient: defrageeClient) { defragRequired, fullAmount in
+                if defragRequired {
+                    defragmentAccount(defrageeClient: defrageeClient, toSendAmount: fullAmount) { newFullAmount in
+                        completion(newFullAmount)
                     }
+                } else {
+                    completion(fullAmount)
                 }
             }
         }
         
         createBothClients() { (_ defragee: MobileCoinClient, _ defrager: MobileCoinClient) in
-            prepareForLoadingDefrager(defrageeClient: defragee, defragerClient: defrager) { fullAmount in
+            prepareForLoadingDefrager(defrageeClient: defragee) { fullAmount in
+                print("Defragee account ready to send full amount to Defrager")
                 loadUpDefragerAccount(defrageeClient: defragee, defragerClient: defrager, fullAmount: fullAmount) {
-                    fragmentAccount(
+                    print("Defrag, full amount sent from Defragee to Defrager")
+                    let preFragmentedDefrageeBalances = defragee.balances
+                    fragmentDefrageeAccount(
                         defragee: defragee,
                         defrager: defrager,
                         amount: fullAmount,
                         count: splitFactor,
                         index: 0
                     ) { _ in
-                        // verify that account 5 needs to be defragged to send (amount/20)*17
-                        // defrag account 5
-                        // verify that account 5 does not need to be defragged to send (amount/20)*17
-                        expect.fulfill()
+                        verifyBalanceChange(defragee, preFragmentedDefrageeBalances) { _ in
+                            print("Defragee account should be fragmented")
+                            verifyAccountIsDefragmented(defrageeClient: defragee) { defragRequired, fullAmount in
+                                guard defragRequired else {
+                                    XCTFail("Defrag account should be deframented here")
+                                    return
+                                }
+                                print("Defragee account is fragmented")
+                                
+                                defragmentAccount(defrageeClient: defragee, toSendAmount: fullAmount) { newFullAmount in
+                                    print("Defragee account should be de-fragmented")
+                                    verifyAccountIsDefragmented(defrageeClient: defragee) { defragRequired, fullAmount in
+                                        guard defragRequired == false else {
+                                            XCTFail("Defrag account should NOT be deframented here")
+                                            return
+                                        }
+                                        print("Defragee account is verified de-fragmented")
+                                        print("Defrag SUCCESS")
+                                        
+                                        expect.fulfill()
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

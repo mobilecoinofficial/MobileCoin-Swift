@@ -441,7 +441,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             defragTransactions.append(selectedHighValueTxOuts + selectedLowValueTxOuts)
         }
         return .success(
-            defragTransactions.map { (inputIds: $0.map { $0.0 }, fee: defragTransactionFee) })
+            defragTransactions.map { (inputIds: $0.map { $0.1.inputIndex! }, fee: defragTransactionFee) })
     }
 
     /// Selects additional TxOuts to fill the remaining input slots in the final transaction,
