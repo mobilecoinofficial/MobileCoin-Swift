@@ -116,7 +116,7 @@ final class TxOutSelector {
         txOutSelectionStrategy.selectInputsForDefragTransactions(
             toSendAmount: amount,
             feeStrategy: feeStrategy,
-            fromTxOuts: txOuts.map(SelectionTxOut.init)
+            fromTxOuts: txOuts.enumerated().map(SelectionTxOut.init)
         ).map { defragTransactions in
             defragTransactions.map { (inputs: $0.inputIds.map { txOuts[$0] }, fee: $0.fee) }
         }
