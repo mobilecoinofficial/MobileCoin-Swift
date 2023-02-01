@@ -19,7 +19,12 @@ struct SelectionTxOut {
     }
 
     init(_ index: Int, _ txOut: KnownTxOut) {
-        self.init(value: txOut.value, blockIndex: txOut.block.index, knownTxOut: txOut, inputIndex: index)
+        self.init(
+            value: txOut.value,
+            blockIndex: txOut.block.index,
+            knownTxOut: txOut,
+            inputIndex: index
+        )
     }
 
     init(value: UInt64, blockIndex: UInt64, knownTxOut: KnownTxOut? = nil, inputIndex: Int? = nil) {
