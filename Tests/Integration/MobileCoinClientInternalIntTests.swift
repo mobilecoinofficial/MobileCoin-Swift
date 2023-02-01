@@ -61,25 +61,24 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             checkBalanceChange()
         }
         
-        // Store amount of coins in 5
-        // Send all coins from account 5 to 6
-        // submit amount/20 transactions from 6 to 5
-        // verify that account 5 needs to be defragged to send (amount/20)*17
+        // Figure out full spendable amount of coins in 5
+        // Defragment account 5 if necc.
+        // Send all coins from account 5 to
+        // Fragment Accoutn by submitting 20 transactions of (full-amount/20) from 6 to 5
+        // verify that account 5 needs to be defragged to send full amount ...
+        //     (now in 20 txOuts, but 16 is our Transaction Max, so defrag required should be true)
+        //
         // defrag account 5
-        // verify that account 5 does not need to be defragged to send (amount/20)*17
-        
+        // verify that account 5 does not need to be defragged to send full-amount, success.
 
         let defrageeIndex = 5
         let defragerIndex = 6
         
-        // let splitFactor = McConstants.MAX_INPUTS + 4
-        let splitFactor = 16 + 4
+        let splitFactor = McConstants.MAX_INPUTS + 4
         
         let defrageeAccount = try IntegrationTestFixtures.createAccountKey(accountIndex: defrageeIndex)
         let defragerAccount = try IntegrationTestFixtures.createAccountKey(accountIndex: defragerIndex)
         
-        let serialQueue = DispatchQueue(label: "com.mobilecoin.defragmentationTesting")
-
         func fragmentDefrageeAccount(
             defragee: MobileCoinClient,
             defrager: MobileCoinClient,
