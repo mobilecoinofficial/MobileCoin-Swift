@@ -224,7 +224,7 @@ SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
   LibMobileCoin: af8d6580227c14b787370209f5ed4c4a4fc90b9f
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: b8252319dcb70ff3c1e47fa604f8ec4d114c5fa6
+  MobileCoin: 1cc5ff311c2772ba96da3ac071a1c3ba43567a9c
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftNIO: 829958aab300642625091f82fc2f49cb7cf4ef24
   SwiftNIOConcurrencyHelpers: 697370136789b1074e4535eaae75cbd7f900370e
