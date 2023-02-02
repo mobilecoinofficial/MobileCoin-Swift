@@ -338,7 +338,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
     func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
-        let amountToReceive = Amount(10, in: .eUSD)
+        let amountToReceive = Amount(10, in: .TestToken)
 
         let creatorIdx = 4
         let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
@@ -354,7 +354,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
             try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
         let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: consumerAcctKey,
-            tokenId: .eUSD,
+            tokenId: .TestToken,
             transportProtocol: transportProtocol
         )
 
@@ -369,7 +369,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
         try await creator.submitTransaction(transaction: cancelSciTx.transaction)
 
-        // sleep 10s
+        // sleep 10s to allow transaction to resolve on chain
         try await Task.sleep(nanoseconds: UInt64(10 * 1_000_000_000))
 
         do {
@@ -399,7 +399,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol
     ) async throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
-        let amountToReceive = Amount(10, in: .eUSD)
+        let amountToReceive = Amount(10, in: .TestToken)
 
         func checkBlockVersionAndFee(
             _ client: MobileCoinClient
@@ -479,7 +479,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
             try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
         let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: consumerAcctKey,
-            tokenId: .eUSD,
+            tokenId: .TestToken,
             transportProtocol: transportProtocol
         )
 

@@ -38,6 +38,7 @@ extension TokenId: CustomStringConvertible {
         [
             .MOB: "MOB",
             .MOBUSD: "MOBUSD",
+            .TestToken: "TestToken",
         ]
     }()
 
@@ -45,6 +46,7 @@ extension TokenId: CustomStringConvertible {
         [
             .MOB: 12,
             .MOBUSD: 6,
+            .TestToken: 6,
         ]
     }()
 }
