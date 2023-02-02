@@ -24,6 +24,19 @@ extension IntegrationTestFixtures {
         return client
     }
 
+    static func createMobileCoinClientWithBalance(
+        accountKey: AccountKey,
+        tokenId: TokenId,
+        transportProtocol: TransportProtocol
+    ) async throws -> MobileCoinClient {
+        let client = try createMobileCoinClient(accountKey: accountKey,
+                                                transportProtocol: transportProtocol)
+        let balances = try await client.updateBalances()
+        let balance = try XCTUnwrap(balances.balances[tokenId]?.amount())
+        XCTAssertGreaterThan(balance, 0)
+        return client
+    }
+
 }
 
 #endif

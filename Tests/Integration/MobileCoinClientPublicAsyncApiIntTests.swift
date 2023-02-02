@@ -185,7 +185,7 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     }
 
     func testSubmitMobUSDTransaction() async throws {
-        let description = "Submitting transaction"
+        let description = "Submitting MobUSD Transaction"
         try await testSupportedProtocols(description: description) {
             try await self.submitMobUSDTransaction(transportProtocol: $0)
         }
@@ -299,6 +299,211 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
         let balancesBefore = try await checkBalances(client)
         try await prepareAndSubmit(client, fee)
         try await verifyBalanceChange(client, balancesBefore)
+    }
+
+    func testCancelSignedContingentInput() async throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
+        let description = "Cancel SCI"
+        try await testSupportedProtocols(description: description) {
+            try await self.cancelSignedContingentInput(transportProtocol: $0)
+        }
+    }
+
+    func prepareAndSubmitSignedContingentInput(
+        _ creator: MobileCoinClient,
+        _ creatorAddress: PublicAddress,
+        _ consumer: MobileCoinClient,
+        _ amountToSend: Amount,
+        _ amountToReceive: Amount
+    ) async throws {
+        let sci = try await creator.createSignedContingentInput(
+            recipient: creatorAddress,
+            amountToSend: amountToSend,
+            amountToReceive: amountToReceive)
+
+        let pendingTransaction = try await consumer.prepareTransaction(presignedInput: sci)
+
+        let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+        XCTAssertNotNil(publicKey)
+
+        let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+        XCTAssertNotNil(sharedSecret)
+
+        let transaction = pendingTransaction.transaction
+        print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+        try await consumer.submitTransaction(transaction: transaction)
+    }
+
+    func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
+        let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
+        let amountToReceive = Amount(10, in: .TestToken)
+
+        let creatorIdx = 4
+        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
+        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
+        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: creatorAcctKey,
+            tokenId: .MOB,
+            transportProtocol: transportProtocol
+        )
+
+        let consumerIdx = 5
+        let consumerAcctKey =
+            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
+        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: consumerAcctKey,
+            tokenId: .TestToken,
+            transportProtocol: transportProtocol
+        )
+
+        let sci = try await creator.createSignedContingentInput(
+            recipient: creatorAddr,
+            amountToSend: amountToSend,
+            amountToReceive: amountToReceive)
+
+        let cancelSciTx = try await creator.prepareCancelSignedContingentInputTransaction(
+            signedContingentInput: sci,
+            feeLevel: .minimum)
+
+        try await creator.submitTransaction(transaction: cancelSciTx.transaction)
+
+        // sleep 10s to allow transaction to resolve on chain
+        try await Task.sleep(nanoseconds: UInt64(10 * 1_000_000_000))
+
+        do {
+            // this should fail
+            try await prepareAndSubmitSignedContingentInput(
+                creator,
+                creatorAddr,
+                consumer,
+                amountToSend,
+                amountToReceive)
+            XCTFail("Signed Contingent Input submission should not succeed after cancelation")
+        } catch {
+            print("Attempt to consume SCI correctly failed with error \(error)")
+        }
+    }
+
+    func testSubmitSignedContingentInputTransaction() async throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
+        let description = "Submitting SCI transaction"
+        try await testSupportedProtocols(description: description) {
+            try await self.submitSignedContingentInputTransaction(transportProtocol: $0)
+        }
+    }
+
+    func submitSignedContingentInputTransaction(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
+        let amountToReceive = Amount(10, in: .TestToken)
+
+        func checkBlockVersionAndFee(
+            _ client: MobileCoinClient
+        ) async throws -> UInt64 {
+            let blockVersion = try await client.blockVersion()
+            XCTAssertGreaterThanOrEqual(blockVersion, 3, "Test cannot run on blockversion < 3 ...")
+            return try await client.estimateTotalFee(toSendAmount: amountToSend, feeLevel: .minimum)
+        }
+
+        func getBalances(
+            _ client: MobileCoinClient
+        ) async throws -> Balances {
+            try await client.updateBalances()
+            let balances = client.balances
+            print(balances)
+            return balances
+        }
+
+        func verifyBalanceChanges(
+            _ client: MobileCoinClient,
+            _ balancesBefore: Balances,
+            _ amountOut: Amount,
+            _ amountIn: Amount,
+            _ fee: UInt64
+        ) async throws {
+
+            let outTokenId = amountOut.tokenId
+            let inTokenId = amountIn.tokenId
+
+            var numChecksRemaining = 5
+            func checkBalanceChange() async throws {
+                numChecksRemaining -= 1
+                print("Updating balance...")
+                let balances = try await client.updateBalances()
+                print("Balances: \(balances)")
+
+                do {
+                    let balancesMap = balances.balances
+                    let balancesBeforeMap = balancesBefore.balances
+
+                    let outFinal = try XCTUnwrap(balancesMap[outTokenId]?.amount())
+                    let outInitial = try XCTUnwrap(balancesBeforeMap[outTokenId]?.amount())
+
+                    let inFinal = try XCTUnwrap(balancesMap[inTokenId]?.amount())
+                    let inInitial = try XCTUnwrap(balancesBeforeMap[inTokenId]?.amount())
+
+                    guard outInitial - outFinal == amountOut.value &&
+                            inFinal - inInitial == amountIn.value - fee
+                    else {
+                        guard numChecksRemaining > 0 else {
+                            XCTFail("Balances failed to correctly change. Initial balances: " +
+                                    "\(outInitial), \(inInitial), Current balances: " +
+                                    "\(outFinal), \(inFinal)")
+                            return
+                        }
+
+                        try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                        try await checkBalanceChange()
+                        return
+                    }
+                } catch {}
+            }
+            try await checkBalanceChange()
+        }
+
+        let creatorIdx = 4
+        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
+        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
+        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: creatorAcctKey,
+            tokenId: .MOB,
+            transportProtocol: transportProtocol
+        )
+
+        let consumerIdx = 5
+        let consumerAcctKey =
+            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
+        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: consumerAcctKey,
+            tokenId: .TestToken,
+            transportProtocol: transportProtocol
+        )
+
+        let fee = try await checkBlockVersionAndFee(creator)
+        let creatorBalancesBefore = try await getBalances(creator)
+        let consumerBalancesBefore = try await getBalances(consumer)
+        try await prepareAndSubmitSignedContingentInput(
+            creator,
+            creatorAddr,
+            consumer,
+            amountToSend,
+            amountToReceive)
+        try await verifyBalanceChanges(
+            creator,
+            creatorBalancesBefore,
+            amountToSend,
+            amountToReceive,
+            0)
+        try await verifyBalanceChanges(
+            consumer,
+            consumerBalancesBefore,
+            amountToReceive,
+            amountToSend,
+            fee)
     }
 
     func testSelfPaymentBalanceChange() async throws {

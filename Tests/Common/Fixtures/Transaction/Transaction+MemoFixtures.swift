@@ -18,7 +18,7 @@ extension Transaction.Fixtures {
         let txOuts: [TxOut]
         let membershipProofs: [TxOutMembershipProof]
         let fee = Self.fee
-        let amount: PositiveUInt64
+        let amount: Amount
         let tombstoneBlockIndex = Self.tombstoneBlockIndex
         let fogResolver: FogResolver
         let globalIndex: UInt64
@@ -32,7 +32,7 @@ extension Transaction.Fixtures {
         init() throws {
             self.inputs = try Self.inputs()
             self.txOuts = try Self.nativeTxOuts()
-            self.amount = try XCTUnwrap(PositiveUInt64(1))
+            self.amount = Amount(1, in: Self.fee.tokenId)
             self.membershipProofs = try Self.txOutMembershipProofs()
             self.senderAccountKey = try Self.senderAccountKey()
             self.recipientAccountKey = try Self.recipientAccountKey()

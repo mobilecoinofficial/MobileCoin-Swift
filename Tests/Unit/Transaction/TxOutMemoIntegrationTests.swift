@@ -11,17 +11,20 @@ class TxOutMemoIntegrationTests: XCTestCase {
         let fixture = try TransactionBuilder.Fixtures.SenderAndDestination()
         let txFixture = fixture.txFixture
 
-        XCTAssertSuccess(TransactionBuilder.build(
-            inputs: txFixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: txFixture.senderAccountKey,
-            to: txFixture.recipientAccountKey.publicAddress,
-            memoType: .recoverable,
-            amount: txFixture.amount,
-            fee: txFixture.fee,
-            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fogResolver: txFixture.fogResolver,
             blockVersion: txFixture.blockVersion,
-            rngSeed: testRngSeed()))
+            fogResolver: txFixture.fogResolver,
+            memoType: .recoverable,
+            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
+            fee: txFixture.fee,
+            rngSeed: testRngSeed())
+
+        XCTAssertSuccess(TransactionBuilder.build(
+            context: context,
+            inputs: txFixture.inputs,
+            to: txFixture.recipientAccountKey.publicAddress,
+            amount: txFixture.amount))
     }
 
     func testTransactionWithSenderMemo() throws {
@@ -62,19 +65,21 @@ class TxOutMemoIntegrationTests: XCTestCase {
     func testBuildTransactionWithSenderWithPaymentRequest() throws {
         let fixture = try TransactionBuilder.Fixtures.SenderWithPaymentRequestAndDestination()
         let txFixture = fixture.txFixture
-        let paymentRequestId = fixture.paymentRequestId
+
+        let context = TransactionBuilder.Context(
+            accountKey: txFixture.senderAccountKey,
+            blockVersion: txFixture.blockVersion,
+            fogResolver: txFixture.fogResolver,
+            memoType: fixture.memoType,
+            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
+            fee: txFixture.fee,
+            rngSeed: testRngSeed())
 
         XCTAssertSuccess(TransactionBuilder.build(
+            context: context,
             inputs: txFixture.inputs,
-            accountKey: txFixture.senderAccountKey,
             to: txFixture.recipientAccountKey.publicAddress,
-            memoType: fixture.memoType,
-            amount: txFixture.amount,
-            fee: txFixture.fee,
-            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fogResolver: txFixture.fogResolver,
-            blockVersion: txFixture.blockVersion,
-            rngSeed: testRngSeed()))
+            amount: txFixture.amount))
     }
 
     func testTransactionWithSenderWithPaymentRequestMemo() throws {
@@ -131,17 +136,20 @@ class TxOutMemoIntegrationTests: XCTestCase {
         let txFixture = fixture.txFixture
         let paymentIntentId = fixture.paymentIntentId
 
-        XCTAssertSuccess(TransactionBuilder.build(
-            inputs: txFixture.inputs,
+        let context = TransactionBuilder.Context(
             accountKey: txFixture.senderAccountKey,
-            to: txFixture.recipientAccountKey.publicAddress,
-            memoType: fixture.memoType,
-            amount: txFixture.amount,
-            fee: txFixture.fee,
-            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
-            fogResolver: txFixture.fogResolver,
             blockVersion: txFixture.blockVersion,
-            rngSeed: testRngSeed()))
+            fogResolver: txFixture.fogResolver,
+            memoType: fixture.memoType,
+            tombstoneBlockIndex: txFixture.tombstoneBlockIndex,
+            fee: txFixture.fee,
+            rngSeed: testRngSeed())
+
+        XCTAssertSuccess(TransactionBuilder.build(
+            context: context,
+            inputs: txFixture.inputs,
+            to: txFixture.recipientAccountKey.publicAddress,
+            amount: txFixture.amount))
     }
 
     func testTransactionWithSenderWithPaymentIntentMemo() throws {

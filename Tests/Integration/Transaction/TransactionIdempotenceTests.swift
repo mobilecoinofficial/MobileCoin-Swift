@@ -119,7 +119,6 @@ class TransactionIdempotenceTests: XCTestCase {
 
             client.updateBalances {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
                 client.prepareTransaction(
                     to: recipient,
                     memoType: .unused,

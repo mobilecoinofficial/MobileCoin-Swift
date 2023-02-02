@@ -105,6 +105,30 @@ extension TxOutSelectionStrategy {
             maxInputs: McConstants.MAX_INPUTS)
     }
 
+    func selectTransactionInput(
+        amount: Amount,
+        fee: UInt64,
+        fromTxOuts txOuts: [SelectionTxOut]
+    ) -> Result<[Int], TransactionInputSelectionError> {
+        selectTransactionInputs(
+            amount: amount,
+            fee: fee,
+            fromTxOuts: txOuts,
+            maxInputs: 1)
+    }
+
+    func selectTransactionInput(
+        amount: Amount,
+        feeStrategy: FeeStrategy,
+        fromTxOuts txOuts: [SelectionTxOut]
+    ) -> Result<(inputIds: [Int], fee: UInt64), TransactionInputSelectionError> {
+        selectTransactionInputs(
+            amount: amount,
+            feeStrategy: feeStrategy,
+            fromTxOuts: txOuts,
+            maxInputs: 1)
+    }
+
     func selectTransactionInputs(
         amount: Amount,
         feeStrategy: FeeStrategy,

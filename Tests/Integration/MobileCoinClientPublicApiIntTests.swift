@@ -37,11 +37,11 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func testPrintBalances() throws {
         let description = "Printing account balance"
         try testSupportedProtocols(description: description) {
-            try printBalance(transportProtocol: $0, expectation: $1)
+            try printBalances(transportProtocol: $0, expectation: $1)
         }
     }
 
-    func printBalance(
+    func printBalances(
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
@@ -55,12 +55,21 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 transportProtocol: transportProtocol)
 
             let expect = XCTestExpectation(description: "Retrieving balance for acct idx \(index)")
-            client.updateBalance {
+            client.updateBalances {
                 guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
-                if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
-                    print("account index \(index) public address \(key.publicAddress)")
-                    print("account index \(index) balance: \(amountPicoMob)")
+                print("account index \(index) public address \(key.publicAddress)")
+
+                if let amtMob = try? XCTUnwrap(client.balance(for: .MOB)) {
+                    print("account index \(index) balance: \(amtMob)")
+                }
+
+                if let amtMob = try? XCTUnwrap(client.balance(for: .MOBUSD)) {
+                    print("account index \(index) balance: \(amtMob)")
+                }
+
+                if let amtEUsd = try? XCTUnwrap(client.balance(for: .TestToken)) {
+                    print("account index \(index) balance: \(amtEUsd)")
                 }
             }
 
@@ -223,7 +232,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
                 expectation: expect,
@@ -416,6 +425,114 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
+    func testCreateSignedContingentInput() throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
+        let description = "Creating signed contingent input"
+        try testSupportedProtocols(description: description) {
+            try createSignedContingentInput(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func createSignedContingentInput(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let amountToSend = Amount(1, in: .MOB)
+        let amountToReceive = Amount(10, in: .MOBUSD)
+
+        let creatorIdx = 9
+        let creatorPubAddress = try IntegrationTestFixtures.createPublicAddress(
+            accountIndex: creatorIdx)
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountIndex: creatorIdx,
+                expectation: expect,
+                transportProtocol: transportProtocol)
+        { client in
+            client.createSignedContingentInput(
+                recipient: creatorPubAddress,
+                amountToSend: amountToSend,
+                amountToReceive: amountToReceive
+            ) {
+                guard let sci = $0.successOrFulfill(expectation: expect) else { return
+                }
+
+                XCTAssertEqual(sci.rewardAmount, amountToSend)
+                XCTAssertTrue(sci.isValid)
+                print("Signed contingent input creation successful")
+                expect.fulfill()
+            }
+        }
+    }
+
+    func testSubmitSignedContingentInputTransaction() throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+        let description = "Submitting SCI Transaction"
+        try testSupportedProtocols(description: description) {
+            try submitSignedContingentInputTransaction(transportProtocol: $0, expectation: $1)
+        }
+    }
+
+    func submitSignedContingentInputTransaction(
+        transportProtocol: TransportProtocol,
+        expectation expect: XCTestExpectation
+    ) throws {
+        let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
+        let amountToReceive = Amount(10, in: .TestToken)
+
+        let creatorIndex = 4
+        let selfAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIndex)
+
+        let consumerIndex = 5
+
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountIndex: creatorIndex,
+                expectation: expect,
+                transportProtocol: transportProtocol)
+        { sciCreator in
+
+            sciCreator.createSignedContingentInput(
+                recipient: selfAddr,
+                amountToSend: amountToSend,
+                amountToReceive: amountToReceive
+            ) {
+                guard let sci = $0.successOrFulfill(expectation: expect) else { return }
+
+                do {
+                    try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                            accountIndex: consumerIndex,
+                            expectation: expect,
+                            transportProtocol: transportProtocol)
+                    { sciConsumer in
+                        sciConsumer.prepareTransaction(presignedInput: sci)
+                        { (result: Result<PendingTransaction, TransactionPreparationError>)
+                            -> Void in
+
+                            switch result {
+                            case .success(let pendingTransaction):
+                                sciConsumer.submitTransaction(pendingTransaction.transaction) {
+                                    guard $0.successOrFulfill(expectation: expect) != nil else {
+                                        return
+                                    }
+
+                                    print("Transaction submission successful")
+                                    expect.fulfill()
+                                }
+                            case .failure:
+                                print("Transaction submission unsuccessful")
+                                return
+                            }
+                        }
+                    }
+                } catch {
+                    print("Transaction submission unsuccessful")
+                    return
+                }
+            }
+        }
+    }
+
     func testRecoverTransactions() throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasRecoverableTestTransactions)
 
@@ -516,6 +633,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             }
 
             expect.fulfill()
+
         }
     }
 
@@ -530,7 +648,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 2)
+        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 0)
         let client = try IntegrationTestFixtures.createMobileCoinClient(
                 accountKey: accountKey,
                 transportProtocol: transportProtocol)

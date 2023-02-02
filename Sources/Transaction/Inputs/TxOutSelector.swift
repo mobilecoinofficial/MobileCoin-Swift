@@ -96,6 +96,30 @@ final class TxOutSelector {
         ).map { $0.map { txOuts[$0] } }
     }
 
+    func selectTransactionInput(
+        amount: Amount,
+        feeStrategy: FeeStrategy,
+        fromTxOuts txOuts: [KnownTxOut]
+    ) -> Result<(inputs: [KnownTxOut], fee: UInt64), TransactionInputSelectionError> {
+        txOutSelectionStrategy.selectTransactionInput(
+            amount: amount,
+            feeStrategy: feeStrategy,
+            fromTxOuts: txOuts.map(SelectionTxOut.init)
+        ).map { (inputs: $0.inputIds.map { txOuts[$0] }, fee: $0.fee) }
+    }
+
+    func selectTransactionInput(
+        amount: Amount,
+        fee: UInt64,
+        fromTxOuts txOuts: [KnownTxOut]
+    ) -> Result<[KnownTxOut], TransactionInputSelectionError> {
+        txOutSelectionStrategy.selectTransactionInput(
+            amount: amount,
+            fee: fee,
+            fromTxOuts: txOuts.map(SelectionTxOut.init)
+        ).map { $0.map { txOuts[$0] } }
+    }
+
     func selectTransactionInputs(
         amount: Amount,
         feeStrategy: FeeStrategy,
