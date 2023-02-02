@@ -104,13 +104,14 @@ extension SignedContingentInput {
         }
 
         let ringPubKeySet = Set(proto.txIn.ring.map { RistrettoPublic($0.publicKey) })
-        let matchingTxOuts = knownTxOuts.filter { ringPubKeySet.contains($0.publicKey) }
+        let matchingTxOuts = knownTxOuts.filter {
+            ringPubKeySet.contains($0.publicKey) &&
+            $0.tokenId == self.pseudoOutputAmount.tokenId &&
+            $0.amount.value == UInt64(self.pseudoOutputAmount.value)
+        }
 
         // there should be exactly one match
-        guard matchingTxOuts.count == 1,
-              let knownTxOut = matchingTxOuts.first,
-              knownTxOut.tokenId == self.pseudoOutputAmount.tokenId,
-              knownTxOut.amount.value == UInt64(self.pseudoOutputAmount.value) else {
+        guard matchingTxOuts.count == 1, let knownTxOut = matchingTxOuts.first else {
             return nil
         }
 
