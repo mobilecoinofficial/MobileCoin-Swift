@@ -172,8 +172,8 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
     func submitTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 2)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 2)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
         let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: accountKey,
             transportProtocol: transportProtocol
@@ -363,11 +363,11 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
             amountToSend: amountToSend,
             amountToReceive: amountToReceive)
 
-        let pendingTx = try await creator.prepareCancelSignedContingentInputTransaction(
+        let cancelSciTx = try await creator.prepareCancelSignedContingentInputTransaction(
             signedContingentInput: sci,
             feeLevel: .minimum)
 
-        try await creator.submitTransaction(transaction: pendingTx.transaction)
+        try await creator.submitTransaction(transaction: cancelSciTx.transaction)
 
         // sleep 10s
         try await Task.sleep(nanoseconds: UInt64(10 * 1_000_000_000))

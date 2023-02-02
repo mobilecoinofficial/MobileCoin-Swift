@@ -68,7 +68,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     print("account index \(index) balance: \(amtMob)")
                 }
 
-                if let amtEUsd = try? XCTUnwrap(client.balance(for: .eUSD)) {
+                if let amtEUsd = try? XCTUnwrap(client.balance(for: .TestToken)) {
                     print("account index \(index) balance: \(amtEUsd)")
                 }
             }
@@ -479,7 +479,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         expectation expect: XCTestExpectation
     ) throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
-        let amountToReceive = Amount(10, in: .eUSD)
+        let amountToReceive = Amount(10, in: .TestToken)
 
         let creatorIndex = 4
         let selfAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIndex)
