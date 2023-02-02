@@ -468,7 +468,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func testSubmitSignedContingentInputTransaction() throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
-        
         let description = "Submitting SCI Transaction"
         try testSupportedProtocols(description: description) {
             try submitSignedContingentInputTransaction(transportProtocol: $0, expectation: $1)
