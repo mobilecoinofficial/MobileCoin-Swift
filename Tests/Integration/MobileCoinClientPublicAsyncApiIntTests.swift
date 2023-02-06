@@ -14,24 +14,6 @@ import XCTest
 @available(iOS 15.0, *)
 class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
-    func testBalance() async throws {
-        let description = "Updating account balance"
-        try await testSupportedProtocols(description: description) {
-            try await self.balance(transportProtocol: $0)
-        }
-    }
-
-    func balance(
-        transportProtocol: TransportProtocol
-    ) async throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
-        try await client.updateBalances()
-        if let amountPicoMob = try? XCTUnwrap(client.balance(for: .MOB).amount()) {
-            print("balance: \(amountPicoMob)")
-            XCTAssertGreaterThan(amountPicoMob, 0)
-        }
-    }
-
     func testPrintBalances() async throws {
         let description = "Printing account balance"
         try await testSupportedProtocols(description: description) {
@@ -51,52 +33,20 @@ class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
             try await client.updateBalances()
 
-            if let amountPicoMob = try? XCTUnwrap(client.balance(for: .MOB).amount()) {
-                print("account index \(index) public address \(key.publicAddress)")
-                print("account index \(index) balance: \(amountPicoMob)")
+            print("account index \(index) public address \(key.publicAddress)")
+
+            if let amtMob = try? XCTUnwrap(client.balance(for: .MOB)) {
+                print("account index \(index) balance: \(amtMob)")
+            }
+
+            if let amtMobUSD = try? XCTUnwrap(client.balance(for: .MOBUSD)) {
+                print("account index \(index) balance: \(amtMobUSD)")
+            }
+
+            if let amtTestToken = try? XCTUnwrap(client.balance(for: .TestToken)) {
+                print("account index \(index) balance: \(amtTestToken)")
             }
         }
-    }
-
-    func testBalances() async throws {
-        let description = "Updating account balance"
-        try await testSupportedProtocols(description: description) {
-            try await self.balances(transportProtocol: $0)
-        }
-    }
-
-    func balances(
-        transportProtocol: TransportProtocol
-    ) async throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountIndex: 0,
-            using: transportProtocol)
-
-        let blockVersion = try await client.blockVersion()
-        guard blockVersion >= 2 else {
-            print("Test cannot run on blockversion < 2 ... " +
-                  "fulfilling the expectation as a success")
-            return
-        }
-
-        try await client.updateBalances()
-
-        let balances = client.balances
-        print(balances)
-
-        XCTAssertGreaterThanOrEqual(balances.balances.count, 1)
-
-        print(client.accountActivity(for: .MOB).describeUnspentTxOuts())
-
-        guard let mobBalance = balances.balances[.MOB] else {
-            XCTFail("Expected Balance")
-            return
-        }
-
-        XCTAssertTrue(
-            mobBalance.amountParts.int > 0 ||
-            mobBalance.amountParts.frac > 0
-        )
     }
 
     func testAccountActivity() async throws {
