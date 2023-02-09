@@ -5,7 +5,85 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2023-02-07
+
+### Added
+
+- Signed Contingent Inputs MCIP#0031
+
+## [4.0.0-pre9] - 2023-02-01
+
+### Changed
+
+- Fix incorrect defragmentation tx out selection.
+
+### Added
+
+- Integration test for defragmentation and fragmentation
+
+## [4.0.0-pre8] - 2023-02-01
+
+### Changed
+
+- Use newer libmobilecoin commit that has Xcode 13/14 fixes
+
+## [4.0.0-pre7] - 2023-01-18
+
+### Changed
+
+- Access level of DefaultCyrptoBox
+
+## [4.0.0-pre6] - 2023-01-10
+
+### Changed
+
+- Update LICENSE from GPLv3 to Apace 2
+
+## [4.0.0-pre5] - 2022-12-15
+
+### Changed
+
+- Added more fields to Memo codable paths
+
+## [4.0.0-pre4] - 2022-12-13
+
+### Added
+
+- Encodable conformance to RecoveredMemo structs
+
+## [4.0.0-pre3] - 2022-12-11
+
+### Added
+
+- Un-authenticated sender memo access
+
+## [4.0.0-pre2] - 2022-12-08
+
+### Added
+
+- Masked Amount V1 & V2 Changes
+
+## [4.0.0-pre1] - 2022-11-07
+
+### Added
+
+- Add Payment Intent RTH Memos
+
+## [4.0.0-pre0] - 2022-11-07
+
+### Changed
+
+- Expose address hash publicly
+
+## [1.3.0-pre3] - 2022-10-05
+
+### Added
+
+- Add TokenID to PaymentRequest
+
 ## [1.3.0-pre2] - 2022-09-26
+
+### Added
 
 - Transaction Idempotence Compatibility Sync-up with Android SDK
 

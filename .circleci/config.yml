@@ -1,7 +1,7 @@
 version: 2.1
 
 defaults:
-  default-xcode-version: &default-xcode-version "12.5.1"
+  default-xcode-version: &default-xcode-version "14.1"
   default-ruby-version: &default-ruby-version "2.7"
 
   default-environment: &default-environment
@@ -390,7 +390,7 @@ workflows:
           name: build-and-test-xcode-<< matrix.xcode-version >>
           matrix:
             parameters:
-              xcode-version: [*default-xcode-version]
+              xcode-version: ["12.5.1"]
       - build-and-test-example-http:
           name: build-and-test-example-http-xcode-<< matrix.xcode-version >>
           matrix:
@@ -405,13 +405,16 @@ workflows:
           name: pod-lib-lint-<< matrix.xcode-version >>
           matrix:
             parameters:
-              xcode-version: [*default-xcode-version]
+              xcode-version: ["12.5.1"]
       - publish-pod-release:
           filters:
             branches: 
               only:
                 - master
                 - /release\/.*/
+          matrix:
+            parameters:
+              xcode-version: ["12.5.1"]
       #- generate-docs:
           #filters:
             #branches: { only: master }
