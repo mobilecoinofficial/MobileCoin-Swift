@@ -34,7 +34,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testPrintBalances() async throws {
-        try XCTSkip()
+//        try XCTSkip()
         let description = "Printing account balance"
         try await testSupportedProtocols(description: description) {
             try await self.printBalance(transportProtocol: $0)
@@ -142,14 +142,14 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func submitTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 5)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 9)
         let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: accountKey,
             transportProtocol: transportProtocol
         )
         let transaction = try await client.prepareTransaction(to: recipient,
-                                                              amount: Amount(100, in: .MOB),
+                                                              amount: Amount(1000000000000, in: .MOB),
                                                               fee: IntegrationTestFixtures.fee)
         try await client.submitTransaction(transaction: transaction.transaction)
     }
@@ -782,99 +782,239 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasRecoverableTestTransactions)
 
         let description = "Recovering transactions"
-        try await testSupportedProtocols(description: description) {
+        try await testSupportedProtocols(description: description, timeout: 120) {
             try await self.recoverTransaction(transportProtocol: $0)
         }
     }
 
     func recoverTransaction(transportProtocol: TransportProtocol) async throws {
-        let publicAddress = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let contact = Contact(
-            name: "Account Index 1",
-            username: "one",
-            publicAddress: publicAddress)
 
+        func recoverTransactions(
+            client: MobileCoinClient,
+            contact: Contact,
+            failOnNone: Bool = true
+        ) -> [HistoricalTransaction] {
+
+            let historicalTransacitions = client.recoverTransactions(contacts: Set([contact]))
+            guard !historicalTransacitions.isEmpty else {
+                if failOnNone {
+                    XCTFail("Expected some historical transactions")
+                }
+                return []
+            }
+
+            let recovered = historicalTransacitions.filter({ $0.contact != nil })
+            guard !recovered.isEmpty else {
+                if failOnNone {
+                    XCTFail("Expected some recovered transactions")
+                }
+                return []
+            }
+
+            return recovered
+        }
+
+        func verifyAllMemoTypesPresent(historicalTransactions: [HistoricalTransaction]) -> Bool {
+
+            // Test for presence of each RTH memo type
+            var destinationWithPaymentIntent = false
+            var destinationWithPaymentRequest = false
+            var destination = false
+            var senderWithPaymentIntent = false
+            var senderWithPaymentRequest = false
+            var sender = false
+
+            recovered.forEach({
+                switch $0.memo {
+                case .destinationWithPaymentIntent(let memo):
+                    guard
+                        memo.fee > 0,
+                        memo.numberOfRecipients > 0,
+                        memo.paymentIntentId > 0,
+                        memo.totalOutlay > 0
+                    else {
+                        return
+                    }
+                    destinationWithPaymentIntent = true
+                case .destinationWithPaymentRequest(let memo):
+                    guard
+                        memo.fee > 0,
+                        memo.numberOfRecipients > 0,
+                        memo.paymentRequestId > 0,
+                        memo.totalOutlay > 0
+                    else {
+                        return
+                    }
+                    destinationWithPaymentRequest = true
+                case .senderWithPaymentIntent(let memo):
+                    guard memo.paymentIntentId > 0 else { return }
+                    senderWithPaymentIntent = true
+                case .senderWithPaymentRequest(let memo):
+                    guard memo.paymentRequestId > 0 else { return }
+                    senderWithPaymentRequest = true
+                case .sender:
+                    sender = true
+                case .destination(let memo):
+                    guard
+                        memo.fee > 0,
+                        memo.numberOfRecipients > 0,
+                        memo.totalOutlay > 0
+                    else {
+                        return
+                    }
+                    destination = true
+                case .none:
+                    return
+                }
+            })
+
+            guard
+                sender,
+                destination,
+                destinationWithPaymentIntent,
+                destinationWithPaymentRequest,
+                senderWithPaymentIntent,
+                senderWithPaymentRequest
+            else {
+                return false
+            }
+
+            return true
+        }
+
+        func waitForTransaction(
+            senderClient: MobileCoinClient,
+            transaction: Transaction,
+            numChecks: Int = 10
+        ) async throws {
+            var numChecksRemaining = numChecks
+
+            while numChecksRemaining > 0 {
+                numChecksRemaining -= 1
+                print("Checking status...")
+                let balance = try await senderClient.updateBalances().mobBalance
+                print("Sender balance: \(balance)")
+
+                let status = try await senderClient.status(of: transaction)
+
+                switch status {
+                case .unknown:
+                    guard numChecksRemaining > 0 else {
+                        XCTFail("Failed to resolve trans status check after \(numChecks) tries")
+                        return
+                    }
+                    print("Sleeping 2s before re-checking...")
+                    Thread.sleep(forTimeInterval: 2)
+                case .accepted(block: let block):
+                    print("Transaction accepted in block index: \(block.index)")
+                    XCTAssertGreaterThan(block.index, 0)
+                    if let timestamp = block.timestamp {
+                        print("Block timestamp: \(timestamp)")
+                    }
+                case .failed:
+                    XCTFail("Transaction status check: Transaction failed")
+                }
+            }
+        }
+
+        func waitForReceipt(
+            receiverClient: MobileCoinClient,
+            receipt: Receipt,
+            numChecks: Int = 10
+        ) async throws {
+            var numChecksRemaining = numChecks
+
+            while numChecksRemaining > 0 {
+                numChecksRemaining -= 1
+                print("Checking status...")
+                let balance = try await receiverClient.updateBalances().mobBalance
+                print("Receiver balance: \(balance)")
+
+                guard let status = receiverClient.status(of: receipt)
+                    .successOrFulfill() else { return }
+                print("Receipt status: \(status)")
+
+                switch status {
+                case .unknown:
+                    guard numChecksRemaining > 0 else {
+                        XCTFail("Failed to resolve receipt status check after \(numChecks) tries")
+                        return
+                    }
+                    print("Sleeping 2s before re-checking...")
+                    Thread.sleep(forTimeInterval: 2)
+                case .received(block: let block):
+                    print("Received in block index: \(block.index)")
+                    XCTAssertGreaterThan(block.index, 0)
+                    if let timestamp = block.timestamp {
+                        print("Block timestamp: \(timestamp)")
+                    }
+                case .failed:
+                    XCTFail("Receipt status check: Transaction failed")
+                }
+            }
+        }
+
+        func populateMemoTypes(
+            _ client: MobileCoinClient,
+            _ clientKey: AccountKey,
+            _ contactClient: MobileCoinClient,
+            _ contactKey: AccountKey
+        ) async throws {
+
+            print("Populating Memo Types for RTH Testing")
+            let (a, aKey, b, bKey) = (client, clientKey, contactClient, contactKey)
+            let combos = [
+                (a, b, bKey.publicAddress, MemoType.recoverable),
+                (b, a, aKey.publicAddress, MemoType.recoverable),
+                (a, b, bKey.publicAddress, MemoType.recoverablePaymentIntent(id: 9)),
+                (b, a, aKey.publicAddress, MemoType.recoverablePaymentRequest(id: 9)),
+                (a, b, bKey.publicAddress, MemoType.recoverablePaymentRequest(id: 9)),
+                (b, a, aKey.publicAddress, MemoType.recoverablePaymentIntent(id: 9)),
+            ]
+
+            for combo in combos {
+                let (srcClient, dstClient, dstAddress, memoType) = combo
+
+                let trans = try await srcClient.prepareTransaction(
+                    to: dstAddress,
+                    amount: Amount(100, in: .MOB),
+                    fee: IntegrationTestFixtures.fee,
+                    memoType: memoType)
+                try await srcClient.updateBalances()
+                try await srcClient.submitTransaction(transaction: trans.transaction)
+                try await waitForTransaction(senderClient: client, transaction: trans.transaction)
+                try await waitForReceipt(receiverClient: dstClient, receipt: trans.receipt)
+            }
+        }
+
+        let clientIdx = 1
+        let contactIdx = 0
+
+        let contactKey = try IntegrationTestFixtures.createAccountKey(accountIndex: contactIdx)
+        let contact = Contact(
+            name: "Account Index \(contactIdx)",
+            username: "test",
+            publicAddress: contactKey.publicAddress)
+
+        let clientKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
         let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountIndex: 0,
+            accountIndex: clientIdx,
             transportProtocol: transportProtocol
         )
 
-        let historicalTransacitions = client.recoverTransactions(contacts: Set([contact]))
-        guard !historicalTransacitions.isEmpty else {
-            XCTFail("Expected some historical transactions on testNet")
-            return
-        }
-
-        let recovered = historicalTransacitions.filter({ $0.contact != nil })
-        guard !recovered.isEmpty else {
-            XCTFail("Expected some recovered transactions on testNet")
-            return
-        }
-
-        // Test for presence of each RTH memo type
-        var destinationWithPaymentIntent = false
-        var destinationWithPaymentRequest = false
-        var destination = false
-        var senderWithPaymentIntent = false
-        var senderWithPaymentRequest = false
-        var sender = false
-
-        recovered.forEach({
-            switch $0.memo {
-            case .destinationWithPaymentIntent(let memo):
-                guard
-                    memo.fee > 0,
-                    memo.numberOfRecipients > 0,
-                    memo.paymentIntentId > 0,
-                    memo.totalOutlay > 0
-                else {
-                    return
-                }
-                destinationWithPaymentIntent = true
-            case .destinationWithPaymentRequest(let memo):
-                guard
-                    memo.fee > 0,
-                    memo.numberOfRecipients > 0,
-                    memo.paymentRequestId > 0,
-                    memo.totalOutlay > 0
-                else {
-                    return
-                }
-                destinationWithPaymentRequest = true
-            case .senderWithPaymentIntent(let memo):
-                guard memo.paymentIntentId > 0 else { return }
-                senderWithPaymentIntent = true
-            case .senderWithPaymentRequest(let memo):
-                guard memo.paymentRequestId > 0 else { return }
-                senderWithPaymentRequest = true
-            case .sender:
-                sender = true
-            case .destination(let memo):
-                guard
-                    memo.fee > 0,
-                    memo.numberOfRecipients > 0,
-                    memo.totalOutlay > 0
-                else {
-                    return
-                }
-                destination = true
-            case .none:
-                return
+        var recovered = recoverTransactions(client: client, contact: contact, failOnNone: false)
+        if !verifyAllMemoTypesPresent(historicalTransactions: recovered) {
+            let contactClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountIndex: contactIdx,
+                transportProtocol: transportProtocol
+            )
+            try await client.updateBalances()
+            try await populateMemoTypes(client, clientKey, contactClient, contactKey)
+            recovered = recoverTransactions(client: client, contact: contact)
+            if !verifyAllMemoTypesPresent(historicalTransactions: recovered) {
+                XCTFail("Expected all recovered transaction types on testNet")
             }
-        })
-
-        guard
-            sender,
-            destination,
-            destinationWithPaymentIntent,
-            destinationWithPaymentRequest,
-            senderWithPaymentIntent,
-            senderWithPaymentRequest
-        else {
-            XCTFail("Expected all recovered transaction types on testNet")
-            return
         }
-
     }
 
     func testConsensusTrustRootWorks() async throws {
