@@ -14,7 +14,27 @@ import XCTest
 @available(iOS 15.0, *)
 class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
 
+    func testBalance() async throws {
+        try XCTSkip()
+        let description = "Updating account balance"
+        try await testSupportedProtocols(description: description) {
+            try await self.balance(transportProtocol: $0)
+        }
+    }
+
+    func balance(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
+        try await client.updateBalances()
+        if let amountPicoMob = try? XCTUnwrap(client.balance(for: .MOB).amount()) {
+            print("balance: \(amountPicoMob)")
+            XCTAssertGreaterThan(amountPicoMob, 0)
+        }
+    }
+
     func testPrintBalances() async throws {
+        try XCTSkip()
         let description = "Printing account balance"
         try await testSupportedProtocols(description: description) {
             try await self.printBalance(transportProtocol: $0)
