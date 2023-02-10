@@ -987,8 +987,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             }
         }
 
-        let clientIdx = 1
-        let contactIdx = 0
+        let clientIdx = 0
+        let contactIdx = 1
 
         let contactKey = try IntegrationTestFixtures.createAccountKey(accountIndex: contactIdx)
         let contact = Contact(
