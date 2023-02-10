@@ -778,110 +778,105 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         try await checkStatus()
     }
 
-    func testRecoverTransactions() throws {
+    func testRecoverTransactions() async throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasRecoverableTestTransactions)
 
         let description = "Recovering transactions"
-        try testSupportedProtocols(description: description) {
-            try recoverTransaction(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.recoverTransaction(transportProtocol: $0)
         }
     }
 
-    func recoverTransaction(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+    func recoverTransaction(transportProtocol: TransportProtocol) async throws {
         let publicAddress = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let contact = Contact(
             name: "Account Index 1",
             username: "one",
             publicAddress: publicAddress)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { client in
-            let historicalTransacitions = client.recoverTransactions(contacts: Set([contact]))
-            guard !historicalTransacitions.isEmpty else {
-                XCTFail("Expected some historical transactions on testNet")
-                return
-            }
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountIndex: 0,
+            transportProtocol: transportProtocol
+        )
 
-            let recovered = historicalTransacitions.filter({ $0.contact != nil })
-            guard !recovered.isEmpty else {
-                XCTFail("Expected some recovered transactions on testNet")
-                return
-            }
+        let historicalTransacitions = client.recoverTransactions(contacts: Set([contact]))
+        guard !historicalTransacitions.isEmpty else {
+            XCTFail("Expected some historical transactions on testNet")
+            return
+        }
 
-            // Test for presence of each RTH memo type
-            var destinationWithPaymentIntent = false
-            var destinationWithPaymentRequest = false
-            var destination = false
-            var senderWithPaymentIntent = false
-            var senderWithPaymentRequest = false
-            var sender = false
+        let recovered = historicalTransacitions.filter({ $0.contact != nil })
+        guard !recovered.isEmpty else {
+            XCTFail("Expected some recovered transactions on testNet")
+            return
+        }
 
-            recovered.forEach({
-                switch $0.memo {
-                case .destinationWithPaymentIntent(let memo):
-                    guard
-                        memo.fee > 0,
-                        memo.numberOfRecipients > 0,
-                        memo.paymentIntentId > 0,
-                        memo.totalOutlay > 0
-                    else {
-                        return
-                    }
-                    destinationWithPaymentIntent = true
-                case .destinationWithPaymentRequest(let memo):
-                    guard
-                        memo.fee > 0,
-                        memo.numberOfRecipients > 0,
-                        memo.paymentRequestId > 0,
-                        memo.totalOutlay > 0
-                    else {
-                        return
-                    }
-                    destinationWithPaymentRequest = true
-                case .senderWithPaymentIntent(let memo):
-                    guard memo.paymentIntentId > 0 else { return }
-                    senderWithPaymentIntent = true
-                case .senderWithPaymentRequest(let memo):
-                    guard memo.paymentRequestId > 0 else { return }
-                    senderWithPaymentRequest = true
-                case .sender:
-                    sender = true
-                case .destination(let memo):
-                    guard
-                        memo.fee > 0,
-                        memo.numberOfRecipients > 0,
-                        memo.totalOutlay > 0
-                    else {
-                        return
-                    }
-                    destination = true
-                case .none:
+        // Test for presence of each RTH memo type
+        var destinationWithPaymentIntent = false
+        var destinationWithPaymentRequest = false
+        var destination = false
+        var senderWithPaymentIntent = false
+        var senderWithPaymentRequest = false
+        var sender = false
+
+        recovered.forEach({
+            switch $0.memo {
+            case .destinationWithPaymentIntent(let memo):
+                guard
+                    memo.fee > 0,
+                    memo.numberOfRecipients > 0,
+                    memo.paymentIntentId > 0,
+                    memo.totalOutlay > 0
+                else {
                     return
                 }
-            })
-
-            guard
-                sender,
-                destination,
-                destinationWithPaymentIntent,
-                destinationWithPaymentRequest,
-                senderWithPaymentIntent,
-                senderWithPaymentRequest
-            else {
-                XCTFail("Expected all recovered transaction types on testNet")
+                destinationWithPaymentIntent = true
+            case .destinationWithPaymentRequest(let memo):
+                guard
+                    memo.fee > 0,
+                    memo.numberOfRecipients > 0,
+                    memo.paymentRequestId > 0,
+                    memo.totalOutlay > 0
+                else {
+                    return
+                }
+                destinationWithPaymentRequest = true
+            case .senderWithPaymentIntent(let memo):
+                guard memo.paymentIntentId > 0 else { return }
+                senderWithPaymentIntent = true
+            case .senderWithPaymentRequest(let memo):
+                guard memo.paymentRequestId > 0 else { return }
+                senderWithPaymentRequest = true
+            case .sender:
+                sender = true
+            case .destination(let memo):
+                guard
+                    memo.fee > 0,
+                    memo.numberOfRecipients > 0,
+                    memo.totalOutlay > 0
+                else {
+                    return
+                }
+                destination = true
+            case .none:
                 return
             }
+        })
 
-            expect.fulfill()
-
+        guard
+            sender,
+            destination,
+            destinationWithPaymentIntent,
+            destinationWithPaymentRequest,
+            senderWithPaymentIntent,
+            senderWithPaymentRequest
+        else {
+            XCTFail("Expected all recovered transaction types on testNet")
+            return
         }
+
     }
-    
+
     func testConsensusTrustRootWorks() async throws {
         let description = "Submitting transaction"
         try await testSupportedProtocols(description: description) {
