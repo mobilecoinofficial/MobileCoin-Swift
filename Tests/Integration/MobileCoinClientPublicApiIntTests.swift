@@ -12,7 +12,7 @@ import XCTest
 #if swift(>=5.5)
 
 @available(iOS 15.0, *)
-class MobileCoinClientPublicAsyncApiIntTests: XCTestCase {
+class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func testBalance() async throws {
         try XCTSkip()
