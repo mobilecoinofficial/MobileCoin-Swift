@@ -677,6 +677,8 @@ extension NetworkPreset {
 
     var hasSignedContingentInputs: Bool {
         switch self {
+        case .testNet:
+            return true
         case .dynamic(let dynamicConfig):
             return dynamicConfig.namespace == "alpha"
         default:

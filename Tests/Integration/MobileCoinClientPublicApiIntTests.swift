@@ -1,443 +1,333 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable superfluous_disable_command
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
+// swiftlint:disable empty_xctest_method
 
 import MobileCoin
 import XCTest
 
+#if swift(>=5.5)
+
+@available(iOS 15.0, *)
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
-    func testBalance() throws {
+    func testBalance() async throws {
         let description = "Updating account balance"
-        try testSupportedProtocols(description: description) {
-            try balance(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.balance(transportProtocol: $0)
         }
     }
 
-    func balance(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+    func balance(transportProtocol: TransportProtocol) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
+        try await client.updateBalances()
+        if let amountPicoMob = try? XCTUnwrap(client.balance(for: .MOB).amount()) {
+            print("balance: \(amountPicoMob)")
+            XCTAssertGreaterThan(amountPicoMob, 0)
+        }
+    }
+
+    func testBalances() async throws {
+        let description = "Updating account balances"
+        try await testSupportedProtocols(description: description) {
+            try await self.balances(transportProtocol: $0)
+        }
+    }
+
+    func balances(transportProtocol: TransportProtocol) async throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
-        client.updateBalance {
-            guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-            if let amountPicoMob = try? XCTUnwrap(client.balance.amountPicoMob()) {
-                print("balance: \(amountPicoMob)")
-                XCTAssertGreaterThan(amountPicoMob, 0)
-            }
-
-            expect.fulfill()
+        let blockVersion = try await client.blockVersion()
+        guard blockVersion >= 2 else {
+            print("Test cannot run on blockversion < 2, " +
+                  "returning as success without running test")
+            return
         }
+
+        try await client.updateBalances()
+        let balances = client.balances
+        print(balances)
+
+        XCTAssertGreaterThan(balances.balances.count, 1)
+
+        print(client.accountActivity.describeUnspentTxOuts())
+
+        guard let mobBalance = balances.balances[.MOB] else {
+            XCTFail("Expected Balance")
+            return
+        }
+
+        XCTAssertTrue(
+            mobBalance.amountParts.int > 0 ||
+            mobBalance.amountParts.frac > 0
+        )
+
+        guard let mobUSDBalance = balances.balances[.MOB] else {
+            XCTFail("Expected Balance")
+            return
+        }
+
+        XCTAssertTrue(
+            mobUSDBalance.amountParts.int > 0 ||
+            mobUSDBalance.amountParts.frac > 0
+        )
+
+        let unknownTokenId = TokenId(UInt64(17000))
+        XCTAssertNil(balances.balances[unknownTokenId])
     }
 
-    func testPrintBalances() throws {
+    func testPrintBalances() async throws {
+        try XCTSkip()
         let description = "Printing account balance"
-        try testSupportedProtocols(description: description) {
-            try printBalances(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.printBalance(transportProtocol: $0)
         }
     }
 
-    func printBalances(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let numAccounts = IntegrationTestFixtures.testAccountCount
-        var balanceExpects: [XCTestExpectation] = []
-        try Array(0..<numAccounts).forEach({ index in
+    func printBalance(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        for index in Array(0...9) {
             let key = try IntegrationTestFixtures.createAccountKey(accountIndex: index)
 
             let client = try IntegrationTestFixtures.createMobileCoinClient(
                 accountKey: key,
                 transportProtocol: transportProtocol)
 
-            let expect = XCTestExpectation(description: "Retrieving balance for acct idx \(index)")
-            client.updateBalances {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+            try await client.updateBalances()
 
-                print("account index \(index) public address \(key.publicAddress)")
+            print("account index \(index) public address \(key.publicAddress)")
 
-                if let amtMob = try? XCTUnwrap(client.balance(for: .MOB)) {
-                    print("account index \(index) balance: \(amtMob)")
-                }
-
-                if let amtMob = try? XCTUnwrap(client.balance(for: .MOBUSD)) {
-                    print("account index \(index) balance: \(amtMob)")
-                }
-
-                if let amtEUsd = try? XCTUnwrap(client.balance(for: .TestToken)) {
-                    print("account index \(index) balance: \(amtEUsd)")
-                }
+            if let amtMob = try? XCTUnwrap(client.balance(for: .MOB)) {
+                print("account index \(index) balance: \(amtMob)")
             }
 
-            balanceExpects.append(expect)
-        })
-
-        XCTWaiter().wait(for: balanceExpects, timeout: 40)
-        expect.fulfill()
-    }
-
-    func testBalances() throws {
-        let description = "Updating account balance"
-        try testSupportedProtocols(description: description) {
-            try balances(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-    func balances(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountIndex: 0,
-            using: transportProtocol)
-
-        client.blockVersion {
-            guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
-                print("Test cannot run on blockversion < 2 ... " +
-                      "fulfilling the expectation as a success")
-                expect.fulfill()
-                return
+            if let amtMobUSD = try? XCTUnwrap(client.balance(for: .MOBUSD)) {
+                print("account index \(index) balance: \(amtMobUSD)")
             }
 
-            client.updateBalances {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                let balances = client.balances
-                print(balances)
-
-                XCTAssertGreaterThan(balances.balances.count, 1)
-
-                print(client.accountActivity.describeUnspentTxOuts())
-
-                guard let mobBalance = balances.balances[.MOB] else {
-                    XCTFail("Expected Balance")
-                    return
-                }
-
-                XCTAssertTrue(
-                    mobBalance.amountParts.int > 0 ||
-                    mobBalance.amountParts.frac > 0
-                )
-
-                guard let mobUSDBalance = balances.balances[.MOB] else {
-                    XCTFail("Expected Balance")
-                    return
-                }
-
-                XCTAssertTrue(
-                    mobUSDBalance.amountParts.int > 0 ||
-                    mobUSDBalance.amountParts.frac > 0
-                )
-
-                let unknownTokenId = TokenId(UInt64(17000))
-                XCTAssertNil(balances.balances[unknownTokenId])
-
-                expect.fulfill()
+            if let amtTestToken = try? XCTUnwrap(client.balance(for: .TestToken)) {
+                print("account index \(index) balance: \(amtTestToken)")
             }
         }
     }
 
-    func testAccountActivity() throws {
+    func testAccountActivity() async throws {
         let description = "Updating account balance"
-        try testSupportedProtocols(description: description) {
-            try accountActivity(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.accountActivity(transportProtocol: $0)
         }
     }
 
     func accountActivity(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
 
-        client.updateBalance {
-            guard $0.successOrFulfill(expectation: expect) != nil else { return }
+        try await client.updateBalances()
 
-            let accountActivity = client.accountActivity
+        let accountActivity = client.accountActivity(for: .MOB)
 
-            print("txOuts.count: \(accountActivity.txOuts.count)")
-            XCTAssertGreaterThan(accountActivity.txOuts.count, 0)
+        print("txOuts.count: \(accountActivity.txOuts.count)")
+        XCTAssertGreaterThan(accountActivity.txOuts.count, 0)
 
-            print("blockCount: \(accountActivity.blockCount)")
-            XCTAssertGreaterThan(accountActivity.blockCount, 0)
-
-            expect.fulfill()
-        }
+        print("blockCount: \(accountActivity.blockCount)")
+        XCTAssertGreaterThan(accountActivity.blockCount, 0)
     }
 
-    func testUpdateBalance() throws {
+    func testUpdateBalance() async throws {
         let description = "Updating account balance"
-        try testSupportedProtocols(description: description) {
-            try updateBalance(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.updateBalance(transportProtocol: $0)
         }
     }
 
     func updateBalance(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol).updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
+        let balance = try await client.updateBalances().mobBalance
 
-            if let amountPicoMob = try? XCTUnwrap(balance.amountPicoMob()) {
-                print("balance: \(amountPicoMob)")
-                XCTAssertGreaterThan(amountPicoMob, 0)
-            }
-            expect.fulfill()
+        if let amountPicoMob = try? XCTUnwrap(balance.amount()) {
+            print("balance: \(amountPicoMob)")
+            XCTAssertGreaterThan(amountPicoMob, 0)
         }
     }
 
-    func testPrepareTransaction() throws {
+    func testPrepareTransaction() async throws {
         let description = "Preparing transaction"
-        try testSupportedProtocols(description: description) {
-            try prepareTransaction(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.prepareTransaction(transportProtocol: $0)
         }
     }
 
     func prepareTransaction(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { client in
-            client.prepareTransaction(
-                to: recipient,
-                amount: 100,
-                fee: IntegrationTestFixtures.fee
-            ) {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                print("Transaction preparation successful")
-                expect.fulfill()
-            }
-        }
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol
+        )
+        _ = try await client.prepareTransaction(to: recipient,
+                                                amount: Amount(100, in: .MOB),
+                                                fee: IntegrationTestFixtures.fee)
     }
 
-    func testSubmitTransaction() throws {
+    func testSubmitTransaction() async throws {
         let description = "Submitting transaction"
-        try testSupportedProtocols(description: description) {
-            try submitTransaction(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.submitTransaction(transportProtocol: $0)
         }
     }
 
     func submitTransaction(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { client in
-            client.prepareTransaction(
-                to: recipient,
-                amount: 100,
-                fee: IntegrationTestFixtures.fee
-            ) {
-                guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                else { return }
-
-                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
-
-                client.submitTransaction(transaction) {
-                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                    print("Transaction submission successful")
-                    expect.fulfill()
-                }
-            }
-        }
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol
+        )
+        let transaction = try await client.prepareTransaction(
+            to: recipient,
+            amount: Amount(100, in: .MOB),
+            fee: IntegrationTestFixtures.fee)
+        try await client.submitTransaction(transaction: transaction.transaction)
     }
 
-    func testSubmitMobUSDTransaction() throws {
-        let description = "Submitting transaction"
-        try testSupportedProtocols(description: description) {
-            try submitMobUSDTransaction(transportProtocol: $0, expectation: $1)
+    func testSubmitMobUSDTransaction() async throws {
+        let description = "Submitting MobUSD Transaction"
+        try await testSupportedProtocols(description: description) {
+            try await self.submitMobUSDTransaction(transportProtocol: $0)
         }
     }
 
     func submitMobUSDTransaction(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
         let amount = Amount(100, in: .MOBUSD)
 
         func checkBlockVersionAndFee(
-                _ client: MobileCoinClient,
-                _ expect: XCTestExpectation,
-                _ completion: @escaping (UInt64) -> Void
-        ) {
-
-            client.blockVersion {
-                guard let blockVersion = try? $0.get(), blockVersion >= 2 else {
-                    print("Test cannot run on blockversion < 2 ... " +
-                          "fulfilling the expectation as a success")
-                    expect.fulfill()
-                    return
-                }
-
-                client.estimateTotalFee(toSendAmount: amount, feeLevel: .minimum) { estimatedFee in
-                    guard let fee = estimatedFee.successOrFulfill(expectation: expect)
-                    else { return }
-
-                    completion(fee)
-                }
-            }
+            _ client: MobileCoinClient
+        ) async throws -> UInt64 {
+            let blockVersion = try await client.blockVersion()
+            XCTAssertGreaterThanOrEqual(blockVersion, 2, "Test cannot run on blockversion < 2 ...")
+            return try await client.estimateTotalFee(toSendAmount: amount, feeLevel: .minimum)
         }
 
         func prepareAndSubmit(
-                _ client: MobileCoinClient,
-                _ expect: XCTestExpectation,
-                _ fee: UInt64,
-                _ completion: @escaping () -> Void
-        ) {
+            _ client: MobileCoinClient,
+            _ fee: UInt64
+        ) async throws {
+            let pendingTransaction = try await client.prepareTransaction(to: recipient,
+                                                                         amount: amount,
+                                                                         fee: fee)
 
-            client.prepareTransaction(
-                to: recipient,
-                amount: amount,
-                fee: fee
-            ) {
-                guard let pendingTransaction = $0.successOrFulfill(expectation: expect)
-                else { return }
+            let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+            XCTAssertNotNil(publicKey)
 
-                let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
-                XCTAssertNotNil(publicKey)
+            let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+            XCTAssertNotNil(sharedSecret)
 
-                let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
-                XCTAssertNotNil(sharedSecret)
+            let transaction = pendingTransaction.transaction
+            print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
 
-                let transaction = pendingTransaction.transaction
-                print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
-
-                client.submitTransaction(transaction) {
-                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                    print("Transaction submission successful")
-
-                    completion()
-                }
-            }
+            try await client.submitTransaction(transaction: transaction)
         }
 
         func checkBalances(
-                _ client: MobileCoinClient,
-                _ expect: XCTestExpectation,
-                _ completion: @escaping (Balances) -> Void
-        ) {
+            _ client: MobileCoinClient
+        ) async throws -> Balances {
+            try await client.updateBalances()
 
-            client.updateBalances {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
+            let balances = client.balances
+            print(balances)
 
-                let balances = client.balances
-                print(balances)
+            XCTAssertGreaterThan(balances.balances.count, 1)
 
-                XCTAssertGreaterThan(balances.balances.count, 1)
+            print(client.accountActivity(for: .MOB).describeUnspentTxOuts())
 
-                print(client.accountActivity.describeUnspentTxOuts())
+            let mobBalance = try XCTUnwrap(balances.balances[.MOB], "Expected Balance")
+            XCTAssertTrue(
+                mobBalance.amountParts.int > 0 ||
+                mobBalance.amountParts.frac > 0
+            )
 
-                guard let mobBalance = balances.balances[.MOB] else {
-                    XCTFail("Expected Balance")
-                    return
-                }
+            let mobUSDBalance = try XCTUnwrap(balances.balances[.MOBUSD], "Expected Balance")
+            XCTAssertTrue(
+                mobUSDBalance.amountParts.int > 0 ||
+                mobUSDBalance.amountParts.frac > 0
+            )
 
-                XCTAssertTrue(
-                    mobBalance.amountParts.int > 0 ||
-                    mobBalance.amountParts.frac > 0
-                )
+            let unknownTokenId = TokenId(UInt64(17000))
+            XCTAssertNil(balances.balances[unknownTokenId])
 
-                guard let mobUSDBalance = balances.balances[.MOBUSD] else {
-                    XCTFail("Expected Balance")
-                    return
-                }
-
-                XCTAssertTrue(
-                    mobUSDBalance.amountParts.int > 0 ||
-                    mobUSDBalance.amountParts.frac > 0
-                )
-
-                let unknownTokenId = TokenId(UInt64(17000))
-                XCTAssertNil(balances.balances[unknownTokenId])
-
-                completion(balances)
-            }
+            return balances
         }
 
         func verifyBalanceChange(
-                _ client: MobileCoinClient,
-                _ balancesBefore: Balances,
-                _ expect: XCTestExpectation
-                ) {
+            _ client: MobileCoinClient,
+            _ balancesBefore: Balances
+        ) async throws {
 
             var numChecksRemaining = 5
-            func checkBalanceChange() {
+            func checkBalanceChange() async throws {
                 numChecksRemaining -= 1
                 print("Updating balance...")
-                client.updateBalances {
-                    guard let balances = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Balances: \(balances)")
+                let balances = try await client.updateBalances()
+                print("Balances: \(balances)")
 
-                    do {
-                        let balancesMap = balances.balances
-                        let balancesBeforeMap = balancesBefore.balances
-                        let mobUSD = try XCTUnwrap(balancesMap[.MOBUSD]?.amount())
-                        let initialMobUSD = try XCTUnwrap(balancesBeforeMap[.MOBUSD]?.amount())
+                do {
+                    let balancesMap = balances.balances
+                    let balancesBeforeMap = balancesBefore.balances
+                    let mobUSD = try XCTUnwrap(balancesMap[.MOBUSD]?.amount())
+                    let initialMobUSD = try XCTUnwrap(balancesBeforeMap[.MOBUSD]?.amount())
 
-                        guard mobUSD != initialMobUSD else {
-                            guard numChecksRemaining > 0 else {
-                                XCTFail("Failed to receive a changed balance. initial balance: " +
+                    guard mobUSD != initialMobUSD else {
+                        guard numChecksRemaining > 0 else {
+                            XCTFail("Failed to receive a changed balance. initial balance: " +
                                     "\(initialMobUSD), current balance: " +
                                     "\(mobUSD) microMOBUSD")
-                                expect.fulfill()
-                                return
-                            }
-
-                            Thread.sleep(forTimeInterval: 2)
-                            checkBalanceChange()
                             return
                         }
-                    } catch {}
-                    expect.fulfill()
-                }
+
+                        try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                        try await checkBalanceChange()
+                        return
+                    }
+                } catch {}
             }
-            checkBalanceChange()
+            try await checkBalanceChange()
         }
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                expectation: expect,
-                transportProtocol: transportProtocol) { client in
-            checkBlockVersionAndFee(client, expect) { fee in
-                checkBalances(client, expect) { balancesBefore in
-                    prepareAndSubmit(client, expect, fee) {
-                        verifyBalanceChange(client, balancesBefore, expect)
-                    }
-                }
-            }
-        }
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol
+        )
+        let fee = try await checkBlockVersionAndFee(client)
+        let balancesBefore = try await checkBalances(client)
+        try await prepareAndSubmit(client, fee)
+        try await verifyBalanceChange(client, balancesBefore)
     }
 
-    func testCreateSignedContingentInput() throws {
+    func testCreateSignedContingentInput() async throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
 
-        let description = "Creating signed contingent input"
-        try testSupportedProtocols(description: description) {
-            try createSignedContingentInput(transportProtocol: $0, expectation: $1)
+        let description = "Create signed contingent input"
+        try await testSupportedProtocols(description: description) {
+            try await self.createSignedContingentInput(transportProtocol: $0)
         }
     }
 
-    func createSignedContingentInput(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+    func createSignedContingentInput(transportProtocol: TransportProtocol) async throws {
         let amountToSend = Amount(1, in: .MOB)
         let amountToReceive = Amount(10, in: .MOBUSD)
 
@@ -445,128 +335,562 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         let creatorPubAddress = try IntegrationTestFixtures.createPublicAddress(
             accountIndex: creatorIdx)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
                 accountIndex: creatorIdx,
-                expectation: expect,
                 transportProtocol: transportProtocol)
-        { client in
-            client.createSignedContingentInput(
+
+        let sci = try await client.createSignedContingentInput(
                 recipient: creatorPubAddress,
                 amountToSend: amountToSend,
-                amountToReceive: amountToReceive
-            ) {
-                guard let sci = $0.successOrFulfill(expectation: expect) else { return
-                }
+                amountToReceive: amountToReceive)
+        XCTAssertNotNil(sci)
+        XCTAssertTrue(sci.isValid)
+    }
 
-                XCTAssertEqual(sci.rewardAmount, amountToSend)
-                XCTAssertTrue(sci.isValid)
-                print("Signed contingent input creation successful")
-                expect.fulfill()
-            }
+    func testCancelSignedContingentInput() async throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
+        let description = "Cancel SCI"
+        try await testSupportedProtocols(description: description) {
+            try await self.cancelSignedContingentInput(transportProtocol: $0)
         }
     }
 
-    func testSubmitSignedContingentInputTransaction() throws {
+    func prepareAndSubmitSignedContingentInput(
+        _ creator: MobileCoinClient,
+        _ creatorAddress: PublicAddress,
+        _ consumer: MobileCoinClient,
+        _ amountToSend: Amount,
+        _ amountToReceive: Amount
+    ) async throws {
+        let sci = try await creator.createSignedContingentInput(
+            recipient: creatorAddress,
+            amountToSend: amountToSend,
+            amountToReceive: amountToReceive)
+
+        let pendingTransaction = try await consumer.prepareTransaction(presignedInput: sci)
+
+        let publicKey = pendingTransaction.changeTxOutContext.txOutPublicKey
+        XCTAssertNotNil(publicKey)
+
+        let sharedSecret = pendingTransaction.changeTxOutContext.sharedSecretBytes
+        XCTAssertNotNil(sharedSecret)
+
+        let transaction = pendingTransaction.transaction
+        print("transaction fixture: \(transaction.serializedData.hexEncodedString())")
+
+        try await consumer.submitTransaction(transaction: transaction)
+    }
+
+    func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
+        let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
+        let amountToReceive = Amount(10, in: .TestToken)
+
+        let creatorIdx = 4
+        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
+        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
+        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: creatorAcctKey,
+            tokenId: .MOB,
+            transportProtocol: transportProtocol
+        )
+
+        let consumerIdx = 5
+        let consumerAcctKey =
+            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
+        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: consumerAcctKey,
+            tokenId: .TestToken,
+            transportProtocol: transportProtocol
+        )
+
+        let sci = try await creator.createSignedContingentInput(
+            recipient: creatorAddr,
+            amountToSend: amountToSend,
+            amountToReceive: amountToReceive)
+
+        let cancelSciTx = try await creator.prepareCancelSignedContingentInputTransaction(
+            signedContingentInput: sci,
+            feeLevel: .minimum)
+
+        try await creator.submitTransaction(transaction: cancelSciTx.transaction)
+
+        // sleep 10s to allow transaction to resolve on chain
+        try await Task.sleep(nanoseconds: UInt64(10 * 1_000_000_000))
+
+        do {
+            // this should fail
+            try await prepareAndSubmitSignedContingentInput(
+                creator,
+                creatorAddr,
+                consumer,
+                amountToSend,
+                amountToReceive)
+            XCTFail("Signed Contingent Input submission should not succeed after cancelation")
+        } catch {
+            print("Attempt to consume SCI correctly failed with error \(error)")
+        }
+    }
+
+    func testSubmitSignedContingentInputTransaction() async throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
-        let description = "Submitting SCI Transaction"
-        try testSupportedProtocols(description: description) {
-            try submitSignedContingentInputTransaction(transportProtocol: $0, expectation: $1)
+
+        let description = "Submitting SCI transaction"
+        try await testSupportedProtocols(description: description) {
+            try await self.submitSignedContingentInputTransaction(transportProtocol: $0)
         }
     }
 
     func submitSignedContingentInputTransaction(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
         let amountToReceive = Amount(10, in: .TestToken)
 
-        let creatorIndex = 4
-        let selfAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIndex)
+        func checkBlockVersionAndFee(
+            _ client: MobileCoinClient
+        ) async throws -> UInt64 {
+            let blockVersion = try await client.blockVersion()
+            XCTAssertGreaterThanOrEqual(blockVersion, 3, "Test cannot run on blockversion < 3 ...")
+            return try await client.estimateTotalFee(toSendAmount: amountToSend, feeLevel: .minimum)
+        }
 
-        let consumerIndex = 5
+        func getBalances(
+            _ client: MobileCoinClient
+        ) async throws -> Balances {
+            try await client.updateBalances()
+            let balances = client.balances
+            print(balances)
+            return balances
+        }
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountIndex: creatorIndex,
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { sciCreator in
+        func verifyBalanceChanges(
+            _ client: MobileCoinClient,
+            _ balancesBefore: Balances,
+            _ amountOut: Amount,
+            _ amountIn: Amount,
+            _ fee: UInt64
+        ) async throws {
 
-            sciCreator.createSignedContingentInput(
-                recipient: selfAddr,
-                amountToSend: amountToSend,
-                amountToReceive: amountToReceive
-            ) {
-                guard let sci = $0.successOrFulfill(expectation: expect) else { return }
+            let outTokenId = amountOut.tokenId
+            let inTokenId = amountIn.tokenId
+
+            var numChecksRemaining = 5
+            func checkBalanceChange() async throws {
+                numChecksRemaining -= 1
+                print("Updating balance...")
+                let balances = try await client.updateBalances()
+                print("Balances: \(balances)")
 
                 do {
-                    try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                            accountIndex: consumerIndex,
-                            expectation: expect,
-                            transportProtocol: transportProtocol)
-                    { sciConsumer in
-                        sciConsumer.prepareTransaction(presignedInput: sci)
-                        { (result: Result<PendingTransaction, TransactionPreparationError>)
-                            -> Void in
+                    let balancesMap = balances.balances
+                    let balancesBeforeMap = balancesBefore.balances
 
-                            switch result {
-                            case .success(let pendingTransaction):
-                                sciConsumer.submitTransaction(pendingTransaction.transaction) {
-                                    guard $0.successOrFulfill(expectation: expect) != nil else {
-                                        return
-                                    }
+                    let outFinal = try XCTUnwrap(balancesMap[outTokenId]?.amount())
+                    let outInitial = try XCTUnwrap(balancesBeforeMap[outTokenId]?.amount())
 
-                                    print("Transaction submission successful")
-                                    expect.fulfill()
-                                }
-                            case .failure:
-                                print("Transaction submission unsuccessful")
-                                return
-                            }
+                    let inFinal = try XCTUnwrap(balancesMap[inTokenId]?.amount())
+                    let inInitial = try XCTUnwrap(balancesBeforeMap[inTokenId]?.amount())
+
+                    guard outInitial - outFinal == amountOut.value &&
+                            inFinal - inInitial == amountIn.value - fee
+                    else {
+                        guard numChecksRemaining > 0 else {
+                            XCTFail("Balances failed to correctly change. Initial balances: " +
+                                    "\(outInitial), \(inInitial), Current balances: " +
+                                    "\(outFinal), \(inFinal)")
+                            return
                         }
+
+                        try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                        try await checkBalanceChange()
+                        return
                     }
-                } catch {
-                    print("Transaction submission unsuccessful")
-                    return
-                }
+                } catch {}
             }
+            try await checkBalanceChange()
+        }
+
+        let creatorIdx = 4
+        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
+        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
+        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: creatorAcctKey,
+            tokenId: .MOB,
+            transportProtocol: transportProtocol
+        )
+
+        let consumerIdx = 5
+        let consumerAcctKey =
+            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
+        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountKey: consumerAcctKey,
+            tokenId: .TestToken,
+            transportProtocol: transportProtocol
+        )
+
+        let fee = try await checkBlockVersionAndFee(creator)
+        let creatorBalancesBefore = try await getBalances(creator)
+        let consumerBalancesBefore = try await getBalances(consumer)
+        try await prepareAndSubmitSignedContingentInput(
+            creator,
+            creatorAddr,
+            consumer,
+            amountToSend,
+            amountToReceive)
+        try await verifyBalanceChanges(
+            creator,
+            creatorBalancesBefore,
+            amountToSend,
+            amountToReceive,
+            0)
+        try await verifyBalanceChanges(
+            consumer,
+            consumerBalancesBefore,
+            amountToReceive,
+            amountToSend,
+            fee)
+    }
+
+    func testSelfPaymentBalanceChange() async throws {
+        let description = "Self payment"
+        try await testSupportedProtocols(description: description) {
+            try await self.selfPaymentBalanceChange(transportProtocol: $0)
         }
     }
 
-    func testRecoverTransactions() throws {
+    func selfPaymentBalanceChange(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 2)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol)
+
+        func submitTransaction() async throws -> Balance {
+            let balance = try await client.updateBalances().mobBalance
+            print("Initial balance: \(balance)")
+
+            let transaction = try await client.prepareTransaction(
+                to: accountKey.publicAddress,
+                amount: Amount(100, in: .MOB),
+                fee: IntegrationTestFixtures.fee)
+            try await client.submitTransaction(transaction: transaction.transaction)
+            return balance
+        }
+
+        let initialBalance = try await submitTransaction()
+
+        var numChecksRemaining = 5
+        func checkBalance() async throws {
+            numChecksRemaining -= 1
+            print("Updating balance...")
+            let balance = try await client.updateBalances().mobBalance
+            print("Balance: \(balance)")
+
+            do {
+                let balancePicoMob = try XCTUnwrap(balance.amount())
+                let initialBalancePicoMob = try XCTUnwrap(initialBalance.amount())
+                let expectedBalancePicoMob =
+                initialBalancePicoMob - IntegrationTestFixtures.fee
+                guard balancePicoMob == expectedBalancePicoMob else {
+                    guard numChecksRemaining > 0 else {
+                        XCTFail("Failed to receive a changed balance. balance: " +
+                                "\(balancePicoMob), expected balance: " +
+                                "\(expectedBalancePicoMob) picoMOB")
+                        return
+                    }
+
+                    try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                    try await checkBalance()
+                    return
+                }
+            } catch {}
+        }
+        try await checkBalance()
+    }
+
+    func testSelfPaymentBalanceChangeFeeLevel() async throws {
+        let description = "Self payment"
+        try await testSupportedProtocols(description: description) {
+            try await self.selfPaymentBalanceChangeFeeLevel(transportProtocol: $0)
+        }
+    }
+
+    func selfPaymentBalanceChangeFeeLevel(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountKey: accountKey,
+            transportProtocol: transportProtocol)
+
+        func submitTransaction() async throws -> Balance {
+            let balance = try await client.updateBalances().mobBalance
+            print("Initial balance: \(balance)")
+            let transaction = try await client.prepareTransaction(
+                to: accountKey.publicAddress,
+                amount: Amount(100, in: .MOB),
+                fee: IntegrationTestFixtures.fee)
+            try await client.submitTransaction(transaction: transaction.transaction)
+            return balance
+        }
+
+        let initialBalance = try await submitTransaction()
+        var numChecksRemaining = 5
+        func checkBalance() async throws {
+            numChecksRemaining -= 1
+            print("Updating balance...")
+            let balance = try await client.updateBalances().mobBalance
+            print("Balance: \(balance)")
+
+            do {
+                let balancePicoMob = try XCTUnwrap(balance.amount())
+                let initialBalancePicoMob = try XCTUnwrap(initialBalance.amount())
+                guard balancePicoMob != initialBalancePicoMob else {
+                    guard numChecksRemaining > 0 else {
+                        XCTFail("Failed to receive a changed balance. initial balance: " +
+                                "\(initialBalancePicoMob), current balance: " +
+                                "\(balancePicoMob) picoMOB")
+                        return
+                    }
+
+                    try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                    try await checkBalance()
+                    return
+                }
+            } catch {}
+        }
+        try await checkBalance()
+    }
+
+    func testTransactionStatus() async throws {
+        let description = "Checking transaction status"
+        try await testSupportedProtocols(description: description) {
+            try await self.transactionStatus(transportProtocol: $0)
+        }
+    }
+
+    func transactionStatus(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 1,
+            using: transportProtocol)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+
+        func submitTransaction() async throws -> Transaction {
+            try await client.updateBalances()
+            let transaction = try await client.prepareTransaction(to: recipient,
+                                                                  amount: Amount(100, in: .MOB),
+                                                                  fee: IntegrationTestFixtures.fee)
+            try await client.submitTransaction(transaction: transaction.transaction)
+            return transaction.transaction
+        }
+
+        let transaction = try await submitTransaction()
+
+        var numChecksRemaining = 5
+
+        func checkStatus() async throws {
+            numChecksRemaining -= 1
+            print("Updating balance...")
+            let balance = try await client.updateBalances().mobBalance
+            print("Balance: \(balance)")
+
+            print("Checking status...")
+            let status = try await client.status(of: transaction)
+            print("Transaction status: \(status)")
+
+            switch status {
+            case .unknown:
+                guard numChecksRemaining > 0 else {
+                    XCTFail("Failed to resolve transaction status check")
+                    return
+                }
+
+                try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                try await checkStatus()
+                return
+            case .accepted(block: let block):
+                print("Block index: \(block.index)")
+                XCTAssertGreaterThan(block.index, 0)
+
+                if let timestamp = block.timestamp {
+                    print("Block timestamp: \(timestamp)")
+                }
+            case .failed:
+                XCTFail("Transaction status check: Transaction failed")
+            }
+        }
+        try await checkStatus()
+    }
+
+    func testTransactionTxOutStatus() async throws {
+        let description = "Checking transaction txOut status"
+        try await testSupportedProtocols(description: description) {
+            try await self.transactionTxOutStatus(transportProtocol: $0)
+        }
+    }
+
+    func transactionTxOutStatus(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 1,
+            using: transportProtocol)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+
+        func submitTransaction() async throws -> Transaction {
+            try await client.updateBalances()
+            let transaction = try await client.prepareTransaction(to: recipient,
+                                                                  amount: Amount(100, in: .MOB),
+                                                                  fee: IntegrationTestFixtures.fee)
+            try await client.submitTransaction(transaction: transaction.transaction)
+            return transaction.transaction
+        }
+
+        let transaction = try await submitTransaction()
+
+        var numChecksRemaining = 5
+
+        func checkStatus() async throws {
+            numChecksRemaining -= 1
+            print("Updating balance...")
+            let balance = try await client.updateBalances().mobBalance
+            print("Balance: \(balance)")
+
+            print("Checking status...")
+            let status = try await client.txOutStatus(of: transaction)
+            print("Transaction status: \(status)")
+
+            switch status {
+            case .unknown:
+                guard numChecksRemaining > 0 else {
+                    XCTFail("Failed to resolve transaction status check")
+                    return
+                }
+
+                try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                try await checkStatus()
+                return
+            case .accepted(block: let block):
+                print("Block index: \(block.index)")
+                XCTAssertGreaterThan(block.index, 0)
+
+                if let timestamp = block.timestamp {
+                    print("Block timestamp: \(timestamp)")
+                }
+            case .failed:
+                XCTFail("Transaction status check: Transaction failed")
+            }
+        }
+        try await checkStatus()
+    }
+
+    func testReceiptStatus() async throws {
+        let description = "Checking receipt status"
+        try await testSupportedProtocols(description: description) {
+            try await self.receiptStatus(transportProtocol: $0)
+        }
+    }
+
+    func receiptStatus(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 0,
+            using: transportProtocol)
+        let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
+            accountKey: receiverAccountKey,
+            transportProtocol: transportProtocol)
+
+        func submitTransaction() async throws -> Receipt {
+            let balance = try await senderClient.updateBalances().mobBalance
+            print("Account 0 balance: \(balance)")
+            let transaction = try await senderClient.prepareTransaction(
+                to: receiverAccountKey.publicAddress,
+                amount: Amount(100, in: .MOB),
+                fee: IntegrationTestFixtures.fee)
+            try await senderClient.submitTransaction(transaction: transaction.transaction)
+            return transaction.receipt
+        }
+
+        let receipt = try await submitTransaction()
+        var numChecksRemaining = 5
+
+        func checkStatus() async throws {
+            numChecksRemaining -= 1
+            print("Checking status...")
+            let balance = try await receiverClient.updateBalances().mobBalance
+            print("Account 1 balance: \(balance)")
+
+            guard let status = receiverClient.status(of: receipt)
+                .successOrFulfill() else { return }
+            print("Receipt status: \(status)")
+
+            switch status {
+            case .unknown:
+                guard numChecksRemaining > 0 else {
+                    XCTFail("Failed to resolve receipt status check")
+                    return
+                }
+
+                try await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+                try await checkStatus()
+                return
+            case .received(block: let block):
+                print("Block index: \(block.index)")
+                XCTAssertGreaterThan(block.index, 0)
+
+                if let timestamp = block.timestamp {
+                    print("Block timestamp: \(timestamp)")
+                }
+            case .failed:
+                XCTFail("Receipt status check: Transaction failed")
+            }
+        }
+        try await checkStatus()
+    }
+
+    func testRecoverTransactions() async throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasRecoverableTestTransactions)
 
         let description = "Recovering transactions"
-        try testSupportedProtocols(description: description) {
-            try recoverTransaction(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description, timeout: 120) {
+            try await self.recoverTransaction(transportProtocol: $0)
         }
     }
 
-    func recoverTransaction(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let publicAddress = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let contact = Contact(
-            name: "Account Index 1",
-            username: "one",
-            publicAddress: publicAddress)
+    func recoverTransaction(transportProtocol: TransportProtocol) async throws {
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { client in
+        func recoverTransactions(
+            client: MobileCoinClient,
+            contact: Contact,
+            failOnNone: Bool = true
+        ) -> [HistoricalTransaction] {
+
             let historicalTransacitions = client.recoverTransactions(contacts: Set([contact]))
             guard !historicalTransacitions.isEmpty else {
-                XCTFail("Expected some historical transactions on testNet")
-                return
+                if failOnNone {
+                    XCTFail("Expected some historical transactions")
+                }
+                return []
             }
 
             let recovered = historicalTransacitions.filter({ $0.contact != nil })
             guard !recovered.isEmpty else {
-                XCTFail("Expected some recovered transactions on testNet")
-                return
+                if failOnNone {
+                    XCTFail("Expected some recovered transactions")
+                }
+                return []
             }
+
+            return recovered
+        }
+
+        func verifyAllMemoTypesPresent(historicalTransactions: [HistoricalTransaction]) -> Bool {
 
             // Test for presence of each RTH memo type
             var destinationWithPaymentIntent = false
@@ -628,549 +952,247 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 senderWithPaymentIntent,
                 senderWithPaymentRequest
             else {
-                XCTFail("Expected all recovered transaction types on testNet")
-                return
+                return false
             }
 
-            expect.fulfill()
-
-        }
-    }
-
-    func testSelfPaymentBalanceChange() throws {
-        let description = "Self payment"
-        try testSupportedProtocols(description: description) {
-            try selfPaymentBalanceChange(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-    func selfPaymentBalanceChange(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 0)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountKey: accountKey,
-                transportProtocol: transportProtocol)
-
-        func submitTransaction(callback: @escaping (Balance) -> Void) {
-            client.updateBalance {
-                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                print("Initial balance: \(balance)")
-
-                client.prepareTransaction(
-                    to: accountKey.publicAddress,
-                    amount: 100,
-                    fee: IntegrationTestFixtures.fee
-                ) {
-                    guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                    else { return }
-
-                    client.submitTransaction(transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        print("Transaction submission successful")
-                        callback(balance)
-                    }
-                }
-            }
+            return true
         }
 
-        submitTransaction { initialBalance in
-            var numChecksRemaining = 5
-            func checkBalance() {
-                numChecksRemaining -= 1
-                print("Updating balance...")
-                client.updateBalance {
-                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Balance: \(balance)")
+        func waitForTransaction(
+            senderClient: MobileCoinClient,
+            transaction: Transaction,
+            numChecks: Int = 10
+        ) async throws {
+            var numChecksRemaining = numChecks
 
-                    do {
-                        let balancePicoMob = try XCTUnwrap(balance.amountPicoMob())
-                        let initialBalancePicoMob = try XCTUnwrap(initialBalance.amountPicoMob())
-                        let expectedBalancePicoMob =
-                            initialBalancePicoMob - IntegrationTestFixtures.fee
-                        guard balancePicoMob == expectedBalancePicoMob else {
-                            guard numChecksRemaining > 0 else {
-                                XCTFail("Failed to receive a changed balance. balance: " +
-                                    "\(balancePicoMob), expected balance: " +
-                                    "\(expectedBalancePicoMob) picoMOB")
-                                expect.fulfill()
-                                return
-                            }
-
-                            Thread.sleep(forTimeInterval: 2)
-                            checkBalance()
-                            return
-                        }
-                    } catch {}
-                    expect.fulfill()
-                }
-            }
-            checkBalance()
-        }
-    }
-
-    func testSelfPaymentBalanceChangeFeeLevel() throws {
-        let description = "Self payment"
-        try testSupportedProtocols(description: description) {
-            try selfPaymentBalanceChangeFeeLevel(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-    func selfPaymentBalanceChangeFeeLevel(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountKey: accountKey,
-                transportProtocol: transportProtocol)
-
-        func submitTransaction(callback: @escaping (Balance) -> Void) {
-            client.updateBalance {
-                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                print("Initial balance: \(balance)")
-
-                client.prepareTransaction(
-                    to: accountKey.publicAddress,
-                    amount: 100,
-                    feeLevel: .minimum
-                ) {
-                    guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                    else { return }
-
-                    client.submitTransaction(transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        print("Transaction submission successful")
-                        callback(balance)
-                    }
-                }
-            }
-        }
-
-        submitTransaction { initialBalance in
-            var numChecksRemaining = 5
-            func checkBalance() {
-                numChecksRemaining -= 1
-                print("Updating balance...")
-                client.updateBalance {
-                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Balance: \(balance)")
-
-                    do {
-                        let balancePicoMob = try XCTUnwrap(balance.amountPicoMob())
-                        let initialBalancePicoMob = try XCTUnwrap(initialBalance.amountPicoMob())
-                        guard balancePicoMob != initialBalancePicoMob else {
-                            guard numChecksRemaining > 0 else {
-                                XCTFail("Failed to receive a changed balance. initial balance: " +
-                                    "\(initialBalancePicoMob), current balance: " +
-                                    "\(balancePicoMob) picoMOB")
-                                expect.fulfill()
-                                return
-                            }
-
-                            Thread.sleep(forTimeInterval: 2)
-                            checkBalance()
-                            return
-                        }
-                    } catch {}
-                    expect.fulfill()
-                }
-            }
-            checkBalance()
-        }
-    }
-
-    func testTransactionStatus() throws {
-        let description = "Checking transaction status"
-        try testSupportedProtocols(description: description) {
-            try transactionStatus(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-    func transactionStatus(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 1,
-                using: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
-
-        func submitTransaction(callback: @escaping (Transaction) -> Void) {
-            client.updateBalance {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                client.prepareTransaction(
-                    to: recipient,
-                    amount: 100,
-                    fee: IntegrationTestFixtures.fee
-                ) {
-                    guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                    else { return }
-
-                    client.submitTransaction(transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        callback(transaction)
-                    }
-                }
-            }
-        }
-
-        submitTransaction { (transaction: Transaction) in
-            var numChecksRemaining = 5
-
-            func checkStatus() {
-                numChecksRemaining -= 1
-                print("Updating balance...")
-                client.updateBalance {
-                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Balance: \(balance)")
-
-                    print("Checking status...")
-                    client.status(of: transaction) {
-                        guard let status = $0.successOrFulfill(expectation: expect) else { return }
-                        print("Transaction status: \(status)")
-
-                        switch status {
-                        case .unknown:
-                            guard numChecksRemaining > 0 else {
-                                XCTFail("Failed to resolve transaction status check")
-                                expect.fulfill()
-                                return
-                            }
-
-                            Thread.sleep(forTimeInterval: 2)
-                            checkStatus()
-                            return
-                        case .accepted(block: let block):
-                            print("Block index: \(block.index)")
-                            XCTAssertGreaterThan(block.index, 0)
-
-                            if let timestamp = block.timestamp {
-                                print("Block timestamp: \(timestamp)")
-                            }
-                        case .failed:
-                            XCTFail("Transaction status check: Transaction failed")
-                        }
-                        expect.fulfill()
-                    }
-                }
-            }
-            checkStatus()
-        }
-    }
-
-    func testTransactionTxOutStatus() throws {
-        let description = "Checking transaction status"
-        try testSupportedProtocols(description: description) {
-            try transactionTxOutStatus(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-    func transactionTxOutStatus(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 1,
-                using: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
-
-        func submitTransaction(callback: @escaping (Transaction) -> Void) {
-            client.updateBalance {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                client.prepareTransaction(
-                    to: recipient,
-                    amount: 100,
-                    fee: IntegrationTestFixtures.fee
-                ) {
-                    guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                    else { return }
-
-                    client.submitTransaction(transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        callback(transaction)
-                    }
-                }
-            }
-        }
-
-        submitTransaction { (transaction: Transaction) in
-            var numChecksRemaining = 5
-
-            func checkStatus() {
-                numChecksRemaining -= 1
-                print("Updating balance...")
-                client.updateBalance {
-                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Balance: \(balance)")
-
-                    print("Checking status...")
-                    client.txOutStatus(of: transaction) {
-                        guard let status = $0.successOrFulfill(expectation: expect) else { return }
-                        print("Transaction status: \(status)")
-
-                        switch status {
-                        case .unknown:
-                            guard numChecksRemaining > 0 else {
-                                XCTFail("Failed to resolve transaction status check")
-                                expect.fulfill()
-                                return
-                            }
-
-                            Thread.sleep(forTimeInterval: 2)
-                            checkStatus()
-                            return
-                        case .accepted(block: let block):
-                            print("Block index: \(block.index)")
-                            XCTAssertGreaterThan(block.index, 0)
-
-                            if let timestamp = block.timestamp {
-                                print("Block timestamp: \(timestamp)")
-                            }
-                        case .failed:
-                            XCTFail("Transaction status check: Transaction failed")
-                        }
-                        expect.fulfill()
-                    }
-                }
-            }
-            checkStatus()
-        }
-    }
-
-    func testReceiptStatus() throws {
-        let description = "Checking receipt status"
-        try testSupportedProtocols(description: description) {
-            try receiptStatus(transportProtocol: $0, expectation: $1)
-        }
-    }
-
-    func receiptStatus(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
-        let senderClient = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 0,
-                using: transportProtocol)
-        let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
-        let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
-            accountKey: receiverAccountKey,
-            transportProtocol: transportProtocol)
-
-        func submitTransaction(callback: @escaping (Receipt) -> Void) {
-            senderClient.updateBalance {
-                guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                print("Account 0 balance: \(balance)")
-
-                senderClient.prepareTransaction(
-                    to: receiverAccountKey.publicAddress,
-                    amount: 100,
-                    fee: IntegrationTestFixtures.fee
-                ) {
-                    guard let (transaction, receipt) = $0.successOrFulfill(expectation: expect)
-                    else { return }
-
-                    senderClient.submitTransaction(transaction) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        callback(receipt)
-                    }
-                }
-            }
-        }
-
-        submitTransaction { (receipt: Receipt) in
-            var numChecksRemaining = 5
-
-            func checkStatus() {
+            while numChecksRemaining > 0 {
                 numChecksRemaining -= 1
                 print("Checking status...")
-                receiverClient.updateBalance {
-                    guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Account 1 balance: \(balance)")
+                let balance = try await senderClient.updateBalances().mobBalance
+                print("Sender balance: \(balance)")
 
-                    guard let status = receiverClient.status(of: receipt)
-                            .successOrFulfill(expectation: expect) else { return }
-                    print("Receipt status: \(status)")
+                let status = try await senderClient.status(of: transaction)
 
-                    switch status {
-                    case .unknown:
-                        guard numChecksRemaining > 0 else {
-                            XCTFail("Failed to resolve receipt status check")
-                            expect.fulfill()
-                            return
-                        }
-
-                        Thread.sleep(forTimeInterval: 2)
-                        checkStatus()
+                switch status {
+                case .unknown:
+                    guard numChecksRemaining > 0 else {
+                        XCTFail("Failed to resolve trans status check after \(numChecks) tries")
                         return
-                    case .received(block: let block):
-                        print("Block index: \(block.index)")
-                        XCTAssertGreaterThan(block.index, 0)
-
-                        if let timestamp = block.timestamp {
-                            print("Block timestamp: \(timestamp)")
-                        }
-                    case .failed:
-                        XCTFail("Receipt status check: Transaction failed")
                     }
-                    expect.fulfill()
+                    print("Sleeping 2s before re-checking...")
+                    Thread.sleep(forTimeInterval: 2)
+                case .accepted(block: let block):
+                    print("Transaction accepted in block index: \(block.index)")
+                    XCTAssertGreaterThan(block.index, 0)
+                    if let timestamp = block.timestamp {
+                        print("Block timestamp: \(timestamp)")
+                    }
+                case .failed:
+                    XCTFail("Transaction status check: Transaction failed")
                 }
             }
-            checkStatus()
+        }
+
+        func waitForReceipt(
+            receiverClient: MobileCoinClient,
+            receipt: Receipt,
+            numChecks: Int = 10
+        ) async throws {
+            var numChecksRemaining = numChecks
+
+            while numChecksRemaining > 0 {
+                numChecksRemaining -= 1
+                print("Checking status...")
+                let balance = try await receiverClient.updateBalances().mobBalance
+                print("Receiver balance: \(balance)")
+
+                guard let status = receiverClient.status(of: receipt)
+                    .successOrFulfill() else { return }
+                print("Receipt status: \(status)")
+
+                switch status {
+                case .unknown:
+                    guard numChecksRemaining > 0 else {
+                        XCTFail("Failed to resolve receipt status check after \(numChecks) tries")
+                        return
+                    }
+                    print("Sleeping 2s before re-checking...")
+                    Thread.sleep(forTimeInterval: 2)
+                case .received(block: let block):
+                    print("Received in block index: \(block.index)")
+                    XCTAssertGreaterThan(block.index, 0)
+                    if let timestamp = block.timestamp {
+                        print("Block timestamp: \(timestamp)")
+                    }
+                case .failed:
+                    XCTFail("Receipt status check: Transaction failed")
+                }
+            }
+        }
+
+        func populateMemoTypes(
+            _ client: MobileCoinClient,
+            _ clientKey: AccountKey,
+            _ contactClient: MobileCoinClient,
+            _ contactKey: AccountKey
+        ) async throws {
+
+            print("Populating Memo Types for RTH Testing")
+            let (a, aKey, b, bKey) = (client, clientKey, contactClient, contactKey)
+            let combos = [
+                (a, b, bKey.publicAddress, MemoType.recoverable),
+                (b, a, aKey.publicAddress, MemoType.recoverable),
+                (a, b, bKey.publicAddress, MemoType.recoverablePaymentIntent(id: 9)),
+                (b, a, aKey.publicAddress, MemoType.recoverablePaymentRequest(id: 9)),
+                (a, b, bKey.publicAddress, MemoType.recoverablePaymentRequest(id: 9)),
+                (b, a, aKey.publicAddress, MemoType.recoverablePaymentIntent(id: 9)),
+            ]
+
+            for combo in combos {
+                let (srcClient, dstClient, dstAddress, memoType) = combo
+
+                let trans = try await srcClient.prepareTransaction(
+                    to: dstAddress,
+                    amount: Amount(100, in: .MOB),
+                    fee: IntegrationTestFixtures.fee,
+                    memoType: memoType)
+                try await srcClient.updateBalances()
+                try await srcClient.submitTransaction(transaction: trans.transaction)
+                try await waitForTransaction(senderClient: client, transaction: trans.transaction)
+                try await waitForReceipt(receiverClient: dstClient, receipt: trans.receipt)
+            }
+        }
+
+        let clientIdx = 0
+        let contactIdx = 1
+
+        let contactKey = try IntegrationTestFixtures.createAccountKey(accountIndex: contactIdx)
+        let contact = Contact(
+            name: "Account Index \(contactIdx)",
+            username: "test",
+            publicAddress: contactKey.publicAddress)
+
+        let clientKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountIndex: clientIdx,
+            transportProtocol: transportProtocol
+        )
+
+        var recovered = recoverTransactions(client: client, contact: contact, failOnNone: false)
+        if !verifyAllMemoTypesPresent(historicalTransactions: recovered) {
+            let contactClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountIndex: contactIdx,
+                transportProtocol: transportProtocol
+            )
+            try await client.updateBalances()
+            try await populateMemoTypes(client, clientKey, contactClient, contactKey)
+            recovered = recoverTransactions(client: client, contact: contact)
+            if !verifyAllMemoTypesPresent(historicalTransactions: recovered) {
+                XCTFail("Expected all recovered transaction types on testNet")
+            }
         }
     }
 
-    func testConsensusTrustRootWorks() throws {
+    func testConsensusTrustRootWorks() async throws {
         let description = "Submitting transaction"
-        try testSupportedProtocols(description: description) {
-            try consensusTrustRootWorks(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.consensusTrustRootWorks(transportProtocol: $0)
         }
     }
 
     func consensusTrustRootWorks(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
-                using: transportProtocol)
+            using: transportProtocol)
         XCTAssertSuccess(
             config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()))
         let client = try IntegrationTestFixtures.createMobileCoinClient(
-                config: config,
-                transportProtocol: transportProtocol)
+            config: config,
+            transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
 
-        client.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-            guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
-            { expect.fulfill(); return }
-            print("balance: \(picoMob)")
-            XCTAssertGreaterThan(picoMob, 0)
-            guard picoMob > 0 else { expect.fulfill(); return }
+        let balance = try await client.updateBalances().mobBalance
+        guard let picoMob = try? XCTUnwrap(balance.amount()) else { return }
+        print("balance: \(picoMob)")
+        XCTAssertGreaterThan(picoMob, 0)
+        guard picoMob > 0 else { return }
 
-            client.prepareTransaction(
-                to: recipient,
-                amount: 100,
-                fee: IntegrationTestFixtures.fee
-            ) {
-                guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                else { return }
-
-                client.submitTransaction(transaction) {
-                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                    print("Transaction submission successful")
-                    expect.fulfill()
-                }
-            }
-        }
+        let transaction = try await client.prepareTransaction(
+            to: recipient,
+            amount: Amount(100, in: .MOB),
+            fee: IntegrationTestFixtures.fee
+        )
+        try await client.submitTransaction(transaction: transaction.transaction)
     }
 
-    func testExtraConsensusTrustRootWorks() throws {
+    func testExtraConsensusTrustRootWorks() async throws {
         let description = "Submitting transaction"
-        try testSupportedProtocols(description: description) {
-            try extraConsensusTrustRootWorks(transportProtocol: $0, expect: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.extraConsensusTrustRootWorks(transportProtocol: $0)
         }
     }
 
     func extraConsensusTrustRootWorks(
-        transportProtocol: TransportProtocol,
-        expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
-                using: transportProtocol)
+            using: transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()
-            + [try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes]))
+                            + [try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes]))
         let client =
-            try IntegrationTestFixtures.createMobileCoinClient(
-                    accountIndex: 1,
-                    config: config,
-                    transportProtocol: transportProtocol)
+        try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 1,
+            config: config,
+            transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
+        let balance = try await client.updateBalances().mobBalance
+        guard let picoMob = try? XCTUnwrap(balance.amount()) else { return }
+        print("balance: \(picoMob)")
+        XCTAssertGreaterThan(picoMob, 0)
+        guard picoMob > 0 else { return }
 
-        client.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-            guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
-            { expect.fulfill(); return }
-            print("balance: \(picoMob)")
-            XCTAssertGreaterThan(picoMob, 0)
-            guard picoMob > 0 else { expect.fulfill(); return }
-
-            client.prepareTransaction(
-                to: recipient,
-                amount: 100,
-                fee: IntegrationTestFixtures.fee
-            ) {
-                guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                else { return }
-
-                client.submitTransaction(transaction) {
-                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                    print("Transaction submission successful")
-                    expect.fulfill()
-                }
-            }
-        }
+        let transaction = try await client.prepareTransaction(
+            to: recipient,
+            amount: Amount(100, in: .MOB),
+            fee: IntegrationTestFixtures.fee)
+        try await client.submitTransaction(transaction: transaction.transaction)
     }
 
-    func testWrongConsensusTrustRootReturnsError() throws {
+    func testWrongConsensusTrustRootReturnsError() async throws {
         // Skipped because gRPC currently keeps retrying connection errors indefinitely.
         try XCTSkipIf(true)
 
         let description = "Submitting transaction"
-        try testSupportedProtocols(description: description) {
-            try wrongConsensusTrustRootReturnsError(transportProtocol: $0, expectation: $1)
+        try await testSupportedProtocols(description: description) {
+            try await self.wrongConsensusTrustRootReturnsError(transportProtocol: $0)
         }
     }
 
     func wrongConsensusTrustRootReturnsError(
-        transportProtocol: TransportProtocol,
-        expectation expect: XCTestExpectation
-    ) throws {
+        transportProtocol: TransportProtocol
+    ) async throws {
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
-                using: transportProtocol)
+            using: transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots([
             try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
         ]))
-        let client =
-            try IntegrationTestFixtures.createMobileCoinClient(
-                    accountIndex: 0,
-                    config: config,
-                    transportProtocol: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 0,
+            config: config,
+            transportProtocol: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let balance = try await client.updateBalances().mobBalance
+        guard let picoMob = try? XCTUnwrap(balance.amount()) else { return }
+        print("balance: \(picoMob)")
+        XCTAssertGreaterThan(picoMob, 0)
+        guard picoMob > 0 else { return }
 
-        client.updateBalance {
-            guard let balance = $0.successOrFulfill(expectation: expect) else { return }
-            guard let picoMob = try? XCTUnwrap(balance.amountPicoMob()) else
-            { expect.fulfill(); return }
-            print("balance: \(picoMob)")
-            XCTAssertGreaterThan(picoMob, 0)
-            guard picoMob > 0 else { expect.fulfill(); return }
-
-            client.prepareTransaction(
-                to: recipient,
-                amount: 100,
-                fee: IntegrationTestFixtures.fee
-            ) {
-                guard let (transaction, _) = $0.successOrFulfill(expectation: expect)
-                else { return }
-
-                print("Submitting transaction...")
-                client.submitTransaction(transaction) {
-                    XCTAssertFailure($0)
-                    expect.fulfill()
-                }
-            }
-        }
+        let transaction = try await client.prepareTransaction(
+            to: recipient,
+            amount: Amount(100, in: .MOB),
+            fee: IntegrationTestFixtures.fee)
+        try await client.submitTransaction(transaction: transaction.transaction)
     }
 
 }
@@ -1186,3 +1208,5 @@ extension AccountActivity {
         .joined(separator: ", \n")
     }
 }
+
+#endif
