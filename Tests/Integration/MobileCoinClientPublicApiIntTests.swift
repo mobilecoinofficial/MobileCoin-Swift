@@ -22,15 +22,63 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
     }
 
-    func balance(
-        transportProtocol: TransportProtocol
-    ) async throws {
+    func balance(transportProtocol: TransportProtocol) async throws {
         let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
         try await client.updateBalances()
         if let amountPicoMob = try? XCTUnwrap(client.balance(for: .MOB).amount()) {
             print("balance: \(amountPicoMob)")
             XCTAssertGreaterThan(amountPicoMob, 0)
         }
+    }
+
+    func testBalances() async throws {
+        try XCTSkip()
+        let description = "Updating account balances"
+        try await testSupportedProtocols(description: description) {
+            try await self.balances(transportProtocol: $0)
+        }
+    }
+
+    func balances(transportProtocol: TransportProtocol) async throws {
+        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
+
+        let blockVersion = try await client.blockVersion()
+        guard blockVersion >= 2 else {
+            print("Test cannot run on blockversion < 2 ... " +
+                  "returning with success without running test")
+            return
+        }
+
+        try await client.updateBalances()
+        let balances = client.balances
+        print(balances)
+
+        XCTAssertGreaterThan(balances.balances.count, 1)
+
+        print(client.accountActivity.describeUnspentTxOuts())
+
+        guard let mobBalance = balances.balances[.MOB] else {
+            XCTFail("Expected Balance")
+            return
+        }
+
+        XCTAssertTrue(
+            mobBalance.amountParts.int > 0 ||
+            mobBalance.amountParts.frac > 0
+        )
+
+        guard let mobUSDBalance = balances.balances[.MOB] else {
+            XCTFail("Expected Balance")
+            return
+        }
+
+        XCTAssertTrue(
+            mobUSDBalance.amountParts.int > 0 ||
+            mobUSDBalance.amountParts.frac > 0
+        )
+
+        let unknownTokenId = TokenId(UInt64(17000))
+        XCTAssertNil(balances.balances[unknownTokenId])
     }
 
     func testPrintBalances() async throws {
@@ -142,15 +190,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func submitTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 5)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 9)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
         let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: accountKey,
             transportProtocol: transportProtocol
         )
-        let transaction = try await client.prepareTransaction(to: recipient,
-                                                              amount: Amount(1000000000000, in: .MOB),
-                                                              fee: IntegrationTestFixtures.fee)
+        let transaction = try await client.prepareTransaction(
+            to: recipient,
+            amount: Amount(100, in: .MOB),
+            fee: IntegrationTestFixtures.fee)
         try await client.submitTransaction(transaction: transaction.transaction)
     }
 
