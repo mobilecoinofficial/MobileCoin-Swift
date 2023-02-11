@@ -42,8 +42,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
         let blockVersion = try await client.blockVersion()
         guard blockVersion >= 2 else {
-            print("Test cannot run on blockversion < 2 ... " +
-                  "returning with success without running test")
+            print("Test cannot run on blockversion < 2, " +
+                  "returning as success without running test")
             return
         }
 
