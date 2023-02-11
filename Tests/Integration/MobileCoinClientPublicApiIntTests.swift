@@ -271,6 +271,35 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         try await verifyBalanceChange(client, balancesBefore)
     }
 
+    func testCreateSignedContingentInput() async throws {
+        try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
+
+        let description = "Create signed contingent input"
+        try await testSupportedProtocols(description: description) {
+            try await self.createSignedContingentInput(transportProtocol: $0)
+        }
+    }
+
+    func createSignedContingentInput(transportProtocol: TransportProtocol) async throws {
+        let amountToSend = Amount(1, in: .MOB)
+        let amountToReceive = Amount(10, in: .MOBUSD)
+
+        let creatorIdx = 9
+        let creatorPubAddress = try IntegrationTestFixtures.createPublicAddress(
+            accountIndex: creatorIdx)
+
+        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountIndex: creatorIdx,
+                transportProtocol: transportProtocol)
+
+        let sci = try await client.createSignedContingentInput(
+                recipient: creatorPubAddress,
+                amountToSend: amountToSend,
+                amountToReceive: amountToReceive)
+        XCTAssertNotNil(sci)
+        XCTAssertTrue(sci.isValid)
+    }
+
     func testCancelSignedContingentInput() async throws {
         try XCTSkipUnless(IntegrationTestFixtures.network.hasSignedContingentInputs)
 
