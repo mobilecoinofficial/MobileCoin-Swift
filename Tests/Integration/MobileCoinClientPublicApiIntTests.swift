@@ -15,7 +15,6 @@ import XCTest
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func testBalance() async throws {
-        try XCTSkip()
         let description = "Updating account balance"
         try await testSupportedProtocols(description: description) {
             try await self.balance(transportProtocol: $0)
@@ -32,7 +31,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testBalances() async throws {
-        try XCTSkip()
         let description = "Updating account balances"
         try await testSupportedProtocols(description: description) {
             try await self.balances(transportProtocol: $0)
