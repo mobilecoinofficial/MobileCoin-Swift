@@ -7,9 +7,8 @@ import XCTest
 
 class ServiceUrlRotationTests: XCTestCase {
 
-    func testUrlRotation(fixture: ServiceFixture) throws {
+    func testUrlRotation(fixture: ServiceFixture, loadBalancer: MockUrlLoadBalancer) throws {
         let serviceName = fixture.serviceName
-        let loadBalancer = fixture.loadBalancer
 
         print("Test \(serviceName) url rotation occurs on request failure.")
 
@@ -21,37 +20,65 @@ class ServiceUrlRotationTests: XCTestCase {
     }
 
     func testBlockchainUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.Blockchain()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidConsensusUrlBalancer
+        let blockchain = try UnitTestFixtures.createBlockchainConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let blockchainFixture = try UrlLoadBalancerFixtures.Blockchain(blockchain)
+        try testUrlRotation(fixture: blockchainFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testConsensusUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.Consensus()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidConsensusUrlBalancer
+        let consensus = try UnitTestFixtures.createConsensusConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let consensusFixture = try UrlLoadBalancerFixtures.Consensus(consensus)
+        try testUrlRotation(fixture: consensusFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testFogBlockUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.FogBlock()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
+        let fogBlock = try UnitTestFixtures.createFogBlockConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let fogBlockFixture = try UrlLoadBalancerFixtures.FogBlock(fogBlock)
+        try testUrlRotation(fixture: fogBlockFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testFogKeyImageUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.FogKeyImage()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
+        let fogKeyImage = try UnitTestFixtures.createFogKeyImageConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let fogKeyImageFixture = try UrlLoadBalancerFixtures.FogKeyImage(fogKeyImage)
+        try testUrlRotation(fixture: fogKeyImageFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testFogMerkleProofUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.FogMerkleProof()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
+        let fogMerkleProof = try UnitTestFixtures.createFogMerkleProofConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let fogMerkleProofFixture = try UrlLoadBalancerFixtures.FogMerkleProof(fogMerkleProof)
+        try testUrlRotation(fixture: fogMerkleProofFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testFogUntrustedTxOutUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.FogUntrustedTxOut()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
+        let fogUntrustedTxOut = try UnitTestFixtures.createFogUntrustedTxOutConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let fogUntrustedTxOutFixture = try UrlLoadBalancerFixtures.FogUntrustedTxOut(fogUntrustedTxOut)
+        try testUrlRotation(fixture: fogUntrustedTxOutFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testFogViewUrlRotatesOnError() throws {
-        let fixture = try UrlLoadBalancerFixtures.FogView()
-        try testUrlRotation(fixture: fixture)
+        let seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
+        let fogView = try UnitTestFixtures.createFogViewConnection(
+            using: seqLoadBalancer,
+            httpRequester: MockFailingHttpRequester())
+        let fogViewFixture = try UrlLoadBalancerFixtures.FogView(fogView)
+        try testUrlRotation(fixture: fogViewFixture, loadBalancer: seqLoadBalancer)
     }
 }

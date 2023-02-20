@@ -20,7 +20,6 @@ struct UrlLoadBalancerFixtures {
 protocol ServiceFixture {
     var serviceName: String { get }
     var urlTypeName: String { get }
-    var loadBalancer: MockUrlLoadBalancer { get }
 
     func callService(expect: XCTestExpectation) throws
 }
@@ -30,17 +29,10 @@ extension UrlLoadBalancerFixtures {
     struct Blockchain: ServiceFixture {
         let serviceName = "Blockchain"
         let urlTypeName = "Consensus"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
         let blockchain: BlockchainConnection
 
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
-        }
-
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidConsensusUrlBalancer
-            self.blockchain = try UnitTestFixtures.createBlockchainConnection(
-                using: seqLoadBalancer)
+        init(_ blockchain: BlockchainConnection) throws {
+            self.blockchain = blockchain
         }
 
         func callService(expect: XCTestExpectation) throws {
@@ -61,17 +53,10 @@ extension UrlLoadBalancerFixtures {
     struct Consensus: ServiceFixture {
         let serviceName = "Consensus"
         let urlTypeName = "Consensus"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
         let consensus: ConsensusConnection
 
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidConsensusUrlBalancer
-            self.consensus = try UnitTestFixtures.createConsensusConnection(
-                using: seqLoadBalancer)
-        }
-
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
+        init(_ consensus: ConsensusConnection) throws {
+            self.consensus = consensus
         }
 
         func callService(expect: XCTestExpectation) throws {
@@ -92,17 +77,10 @@ extension UrlLoadBalancerFixtures {
     struct FogBlock: ServiceFixture {
         let serviceName = "FogBlock"
         let urlTypeName = "Fog"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
         let fogBlock: FogBlockConnection
 
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
-            self.fogBlock = try UnitTestFixtures.createFogBlockConnection(
-                using: seqLoadBalancer)
-        }
-
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
+        init(_ fogBlock: FogBlockConnection) throws {
+            self.fogBlock = fogBlock
         }
 
         func callService(expect: XCTestExpectation) throws {
@@ -123,17 +101,10 @@ extension UrlLoadBalancerFixtures {
     struct FogKeyImage: ServiceFixture {
         let serviceName = "FogKeyImage"
         let urlTypeName = "Fog"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
         let fogKeyImage: FogKeyImageConnection
 
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
-            self.fogKeyImage = try UnitTestFixtures.createFogKeyImageConnection(
-                using: seqLoadBalancer)
-        }
-
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
+        init(_ fogKeyImage: FogKeyImageConnection) throws {
+            self.fogKeyImage = fogKeyImage
         }
 
         func callService(expect: XCTestExpectation) throws {
@@ -154,17 +125,10 @@ extension UrlLoadBalancerFixtures {
     struct FogMerkleProof: ServiceFixture {
         let serviceName = "FogMerkleProof"
         let urlTypeName = "Fog"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
         let fogMerkleProof: FogMerkleProofConnection
 
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
-            self.fogMerkleProof = try UnitTestFixtures.createFogMerkleProofConnection(
-                using: seqLoadBalancer)
-        }
-
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
+        init(_ fogMerkleProof: FogMerkleProofConnection) throws {
+            self.fogMerkleProof = fogMerkleProof
         }
 
         func callService(expect: XCTestExpectation) throws {
@@ -185,17 +149,10 @@ extension UrlLoadBalancerFixtures {
     struct FogUntrustedTxOut: ServiceFixture {
         let serviceName = "FogUntrustedTxOut"
         let urlTypeName = "Fog"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
         let fogUntrustedTxOut: FogUntrustedTxOutConnection
 
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
-            self.fogUntrustedTxOut = try UnitTestFixtures.createFogUntrustedTxOutConnection(
-                using: seqLoadBalancer)
-        }
-
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
+        init(_ fogUntrustedTxOut: FogUntrustedTxOutConnection) throws {
+            self.fogUntrustedTxOut = fogUntrustedTxOut
         }
 
         func callService(expect: XCTestExpectation) throws {
@@ -216,18 +173,10 @@ extension UrlLoadBalancerFixtures {
     struct FogView: ServiceFixture {
         let serviceName = "FogView"
         let urlTypeName = "Fog"
-        let seqLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
         let fogView: FogViewConnection
 
-        init() throws {
-            self.seqLoadBalancer = try UrlLoadBalancerFixtures().invalidFogUrlBalancer
-
-            self.fogView = try UnitTestFixtures.createFogViewConnection(
-                using: seqLoadBalancer)
-        }
-
-        var loadBalancer: MockUrlLoadBalancer {
-            seqLoadBalancer
+        init(_ fogView: FogViewConnection) throws {
+            self.fogView = fogView
         }
 
         func callService(expect: XCTestExpectation) throws {

@@ -10,7 +10,8 @@ enum UnitTestFixtures {
 
     static func failingHttpNetworkConfig(
         _ fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
-        _ consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
+        _ consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>,
+        _ httpRequester: HttpRequester
     ) throws -> NetworkConfig {
         let attestation = Attestation(
             mrEnclaves: [],
@@ -30,16 +31,18 @@ enum UnitTestFixtures {
             transportProtocol: .http)
             .get()
 
-        networkConfig.httpRequester = MockHttpRequester()
+        networkConfig.httpRequester = httpRequester
         return networkConfig
     }
 
     static func createFogViewConnection(
-        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
+        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
+        httpRequester: HttpRequester
     ) throws -> FogViewConnection {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer)
+            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
+            httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogView = FogViewConnection(
@@ -53,11 +56,13 @@ enum UnitTestFixtures {
     }
 
     static func createFogUntrustedTxOutConnection(
-        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
+        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
+        httpRequester: HttpRequester
     ) throws -> FogUntrustedTxOutConnection {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer)
+            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
+            httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogUntrustedTxOut = FogUntrustedTxOutConnection(
@@ -71,11 +76,13 @@ enum UnitTestFixtures {
     }
 
     static func createFogMerkleProofConnection(
-        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
+        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
+        httpRequester: HttpRequester
     ) throws -> FogMerkleProofConnection {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer)
+            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
+            httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogMerkleProof = FogMerkleProofConnection(
@@ -89,11 +96,13 @@ enum UnitTestFixtures {
     }
 
     static func createFogKeyImageConnection(
-        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
+        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
+        httpRequester: HttpRequester
     ) throws -> FogKeyImageConnection {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer)
+            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
+            httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogKeyImage = FogKeyImageConnection(
@@ -107,11 +116,13 @@ enum UnitTestFixtures {
     }
 
     static func createFogBlockConnection(
-        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>
+        using fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
+        httpRequester: HttpRequester
     ) throws -> FogBlockConnection {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer)
+            UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
+            httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogBlock = FogBlockConnection(
@@ -125,11 +136,13 @@ enum UnitTestFixtures {
     }
 
     static func createBlockchainConnection(
-        using consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
+        using consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>,
+        httpRequester: HttpRequester
     ) throws -> BlockchainConnection {
         let networkConfig = try failingHttpNetworkConfig(
             UrlLoadBalancerFixtures().invalidFogUrlBalancer,
-            consensusUrlLoadBalancer)
+            consensusUrlLoadBalancer,
+            httpRequester)
 
         consensusUrlLoadBalancer.rotationEnabled = false
         let blockchain = BlockchainConnection(
@@ -143,11 +156,13 @@ enum UnitTestFixtures {
     }
 
     static func createConsensusConnection(
-        using consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
+        using consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>,
+        httpRequester: HttpRequester
     ) throws -> ConsensusConnection {
         let networkConfig = try failingHttpNetworkConfig(
             UrlLoadBalancerFixtures().invalidFogUrlBalancer,
-            consensusUrlLoadBalancer)
+            consensusUrlLoadBalancer,
+            httpRequester)
 
         consensusUrlLoadBalancer.rotationEnabled = false
         let consensus = ConsensusConnection(

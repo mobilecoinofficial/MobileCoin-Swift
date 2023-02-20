@@ -4,7 +4,7 @@
 @testable import MobileCoin
 import XCTest
 
-public class MockHttpRequester: NSObject, HttpRequester {
+public class MockFailingHttpRequester: NSObject, HttpRequester {
 
     private static let operationQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -38,7 +38,7 @@ public class MockHttpRequester: NSObject, HttpRequester {
     }
 }
 
-extension MockHttpRequester {
+extension MockFailingHttpRequester {
     private typealias ChainOfTrustKeyMatch = (match: Bool, index: Int, key: SecKey)
     private typealias ChainOfTrustKey = (index: Int, key: SecKey)
 
@@ -56,7 +56,7 @@ extension MockHttpRequester {
 
 }
 
-extension MockHttpRequester: URLSessionDelegate {
+extension MockFailingHttpRequester: URLSessionDelegate {
 
     public func urlSession(
         _ session: URLSession,
@@ -68,7 +68,7 @@ extension MockHttpRequester: URLSessionDelegate {
 
 }
 
-extension MockHttpRequester: URLSessionTaskDelegate {
+extension MockFailingHttpRequester: URLSessionTaskDelegate {
 
     public func urlSession(
         _ session: URLSession,
