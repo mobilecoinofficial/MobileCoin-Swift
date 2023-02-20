@@ -69,8 +69,8 @@ class ServiceUrlRotationTests: XCTestCase {
         let fogUntrustedTxOut = try UnitTestFixtures.createFogUntrustedTxOutConnection(
             using: seqLoadBalancer,
             httpRequester: MockFailingHttpRequester())
-        let fogUntrustedTxOutFixture = try UrlLoadBalancerFixtures.FogUntrustedTxOut(fogUntrustedTxOut)
-        try testUrlRotation(fixture: fogUntrustedTxOutFixture, loadBalancer: seqLoadBalancer)
+        let fogUntrustedFixture = try UrlLoadBalancerFixtures.FogUntrustedTxOut(fogUntrustedTxOut)
+        try testUrlRotation(fixture: fogUntrustedFixture, loadBalancer: seqLoadBalancer)
     }
 
     func testFogViewUrlRotatesOnError() throws {
