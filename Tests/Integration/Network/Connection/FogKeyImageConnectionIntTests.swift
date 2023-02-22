@@ -44,7 +44,7 @@ class FogKeyImageConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testCheckKeyImagesResponseIsPaddedForTooShortKeyImage() throws {
@@ -82,7 +82,7 @@ class FogKeyImageConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testCheckKeyImagesResponseFailsForTooLongKeyImage() throws {
@@ -106,7 +106,7 @@ class FogKeyImageConnectionIntTests: XCTestCase {
             guard let error = $0.failureOrFulfill(expectation: expect) else { return }
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
@@ -139,7 +139,7 @@ class FogKeyImageConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 }
 
