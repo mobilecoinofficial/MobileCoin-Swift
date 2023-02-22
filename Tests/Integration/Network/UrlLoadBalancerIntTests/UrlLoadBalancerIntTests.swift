@@ -46,7 +46,7 @@ class UrlLoadBalancerIntTests: XCTestCase {
 
     func testUrlRotation(fixture: ServiceFixture, with transProto: TransportProtocol) throws {
         let serviceName = fixture.serviceName
-        let urlType = "Consensus"
+        let urlType = fixture.urlTypeName
         let loadBalancer = fixture.loadBalancer
 
         let notMessage = fixture.useValidUrls ? " not" : ""
