@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
 
   s.license      = { :type => "GPLv3" }
 
-  s.source       = { 
+  s.source       = {
     :git => "https://github.com/mobilecoinofficial/MobileCoin-Swift.git",
     :tag => "v#{s.version}",
     :submodules => true
@@ -35,8 +35,13 @@ Pod::Spec.new do |s|
     ]
   end
 
-  s.test_spec 'IntegrationTests' do |test_spec|
-    test_spec.source_files = "Tests/{Integration,Common}/**/*.swift"
+  s.test_spec 'IntegrationTransactingTests' do |test_spec|
+    test_spec.source_files = "Tests/{Integration/Transacting,Common}/**/*.swift"
+    test_spec.resource = "Tests/Common/FixtureData/**/*"
+  end
+
+  s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
+    test_spec.source_files = "Tests/{Integration/NonTransacting,Common}/**/*.swift"
     test_spec.resource = "Tests/Common/FixtureData/**/*"
   end
 
@@ -147,4 +152,3 @@ Pod::Spec.new do |s|
     ]
   end
 end
-
