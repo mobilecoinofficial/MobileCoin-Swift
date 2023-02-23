@@ -67,83 +67,85 @@ class MobileCoinClientIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 0,
-                using: transportProtocol)
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
 
-        let submitTransaction = { (callback: @escaping (Transaction) -> Void) in
-            client.updateBalance {
-                guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                Array(repeating: (), count: 2).mapAsync({ _, callback in
-                    client.prepareTransaction(
-                        to: recipient,
-                        amount: 100,
-                        fee: IntegrationTestFixtures.fee,
-                        completion: callback)
-                }, serialQueue: DispatchQueue.main, completion: {
-                    guard let transactions = $0.successOrFulfill(expectation: expect)
-                    else { return }
-                    let (transactionToCheck, _) = transactions[0]
-                    let (transactionToSubmit, _) = transactions[1]
-
-                    // Ensure both Tx's are using the same inputs.
-                    // Note: It is not strictly necessary that 2 transactions prepared in succession
-                    // with the same amount/fee must use the same input TxOut's, however, for the
-                    // time being this assertion is the best way to ensure that they do match. If
-                    // TxOut selection becomes non-deterministic in the future, then this code
-                    // should be changed to ensure the same inputs are selected.
-                    XCTAssertEqual(
-                        transactions[0].0.inputKeyImagesTyped,
-                        transactions[1].0.inputKeyImagesTyped)
-
-                    client.submitTransaction(transactionToSubmit) {
-                        guard $0.successOrFulfill(expectation: expect) != nil else { return }
-
-                        callback(transactionToCheck)
-                    }
-                })
-            }
-        }
-
-        submitTransaction { (transaction: Transaction) in
-            var numChecksRemaining = 5
-
-            func checkStatus() {
-                numChecksRemaining -= 1
-                print("Checking status...")
-                client.status(of: transaction) {
-                    guard let status = $0.successOrFulfill(expectation: expect) else { return }
-                    print("Transaction status: \(status)")
-
-                    switch status {
-                    case .unknown:
-                        guard numChecksRemaining > 0 else {
-                            XCTFail("Failed to resolve transaction status check")
-                            expect.fulfill()
-                            return
+        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                expectation: expect,
+                transportProtocol: transportProtocol)
+        { client in
+            let submitTransaction = { (callback: @escaping (Transaction) -> Void) in
+                client.updateBalance {
+                    guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                    
+                    Array(repeating: (), count: 2).mapAsync({ _, callback in
+                        client.prepareTransaction(
+                            to: recipient,
+                            amount: 100,
+                            fee: IntegrationTestFixtures.fee,
+                            completion: callback)
+                    }, serialQueue: DispatchQueue.main, completion: {
+                        guard let transactions = $0.successOrFulfill(expectation: expect)
+                        else { return }
+                        let (transactionToCheck, _) = transactions[0]
+                        let (transactionToSubmit, _) = transactions[1]
+                        
+                        // Ensure both Tx's are using the same inputs.
+                        // Note: It is not strictly necessary that 2 transactions prepared in succession
+                        // with the same amount/fee must use the same input TxOut's, however, for the
+                        // time being this assertion is the best way to ensure that they do match. If
+                        // TxOut selection becomes non-deterministic in the future, then this code
+                        // should be changed to ensure the same inputs are selected.
+                        XCTAssertEqual(
+                            transactions[0].0.inputKeyImagesTyped,
+                            transactions[1].0.inputKeyImagesTyped)
+                        
+                        client.submitTransaction(transactionToSubmit) {
+                            guard $0.successOrFulfill(expectation: expect) != nil else { return }
+                            
+                            callback(transactionToCheck)
                         }
-
-                        Thread.sleep(forTimeInterval: 2)
-                        checkStatus()
-                        return
-                    case .accepted(block: let block):
-                        print("Block index: \(block.index)")
-                        XCTAssertGreaterThan(block.index, 0)
-
-                        if let timestamp = block.timestamp {
-                            print("Block timestamp: \(timestamp)")
-                        }
-                        XCTFail("Transaction status check succeeded when it should have failed")
-                    case .failed:
-                        break
-                    }
-
-                    expect.fulfill()
+                    })
                 }
             }
-            checkStatus()
+            
+            submitTransaction { (transaction: Transaction) in
+                var numChecksRemaining = 5
+                
+                func checkStatus() {
+                    numChecksRemaining -= 1
+                    print("Checking status...")
+                    client.status(of: transaction) {
+                        guard let status = $0.successOrFulfill(expectation: expect) else { return }
+                        print("Transaction status: \(status)")
+                        
+                        switch status {
+                        case .unknown:
+                            guard numChecksRemaining > 0 else {
+                                XCTFail("Failed to resolve transaction status check")
+                                expect.fulfill()
+                                return
+                            }
+                            
+                            Thread.sleep(forTimeInterval: 2)
+                            checkStatus()
+                            return
+                        case .accepted(block: let block):
+                            print("Block index: \(block.index)")
+                            XCTAssertGreaterThan(block.index, 0)
+                            
+                            if let timestamp = block.timestamp {
+                                print("Block timestamp: \(timestamp)")
+                            }
+                            XCTFail("Transaction status check succeeded when it should have failed")
+                        case .failed:
+                            break
+                        }
+                        
+                        expect.fulfill()
+                    }
+                }
+                checkStatus()
+            }
         }
     }
 

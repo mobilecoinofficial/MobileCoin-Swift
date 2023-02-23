@@ -69,7 +69,7 @@ post_install do |installer|
 
   # Add Keys framework to Integration Tests for injecting values using cocoapods-keys
   installer.pods_project.targets.each do |target|
-    next unless target.name == 'MobileCoin-Unit-IntegrationTests'
+    next unless ( target.name == 'MobileCoin-Unit-IntegrationTransactingTests' || target.name == 'MobileCoin-Unit-IntegrationNonTransactingTests' )
     installer.pods_project.targets.each do |keys_target|
       next unless keys_target.name == 'Keys'
       target.add_dependency(keys_target)

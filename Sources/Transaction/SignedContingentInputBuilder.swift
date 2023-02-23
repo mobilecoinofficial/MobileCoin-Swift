@@ -115,8 +115,16 @@ extension SignedContingentInputBuilder {
         rng: MobileCoinRng
     ) -> Result<SignedContingentInput, TransactionBuilderError> {
         let builder: SignedContingentInputBuilder
-        guard let input: PreparedTxInput = inputs.first else {
-            return .failure(.invalidInput("Insufficient funds"))
+
+        let possibleInputs = inputs.filter { $0.knownTxOut.amount.value >= amountToSend.value }
+        guard possibleInputs.count > 0 else {
+            return .failure(.invalidInput("Defragmentation Required"))
+        }
+
+        let input = possibleInputs.min { $0.knownTxOut.amount.value < $1.knownTxOut.amount.value }
+
+        guard let input = input else {
+            return .failure(.invalidInput("Unexpected error - unable to find valid input"))
         }
 
         let subaddressIndex = input.subaddressIndex

@@ -191,9 +191,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
-        let amountToReceive = Amount(10, in: .TestToken)
+        let amountToReceive = Amount(10, in: .MOBUSD)
 
-        let creatorIdx = 4
+        let creatorIdx = 1
         let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
         let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
         let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
@@ -202,12 +202,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             transportProtocol: transportProtocol
         )
 
-        let consumerIdx = 5
+        let consumerIdx = 0
         let consumerAcctKey =
             try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
         let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: consumerAcctKey,
-            tokenId: .TestToken,
+            tokenId: .MOBUSD,
             transportProtocol: transportProtocol
         )
 
@@ -252,7 +252,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol
     ) async throws {
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
-        let amountToReceive = Amount(10, in: .TestToken)
+        let amountToReceive = Amount(10, in: .MOBUSD)
 
         func checkBlockVersionAndFee(
             _ client: MobileCoinClient
@@ -318,7 +318,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try await checkBalanceChange()
         }
 
-        let creatorIdx = 4
+        let creatorIdx = 1
         let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
         let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
         let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
@@ -327,12 +327,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             transportProtocol: transportProtocol
         )
 
-        let consumerIdx = 5
+        let consumerIdx = 0
         let consumerAcctKey =
             try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
         let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: consumerAcctKey,
-            tokenId: .TestToken,
+            tokenId: .MOBUSD,
             transportProtocol: transportProtocol
         )
 
