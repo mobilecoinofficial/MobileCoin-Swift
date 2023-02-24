@@ -15,14 +15,14 @@ build:
 		--scheme "Unit Tests" \
 		--skip_archive \
 		--skip_codesigning
-		bundle exec fastlane gym \
-			--scheme "Integration NonTransacting Tests" \
-			--skip_archive \
-			--skip_codesigning
-		bundle exec fastlane gym \
-			--scheme "Integration Transacting Tests" \
-			--skip_archive \
-			--skip_codesigning
+	bundle exec fastlane gym \
+		--scheme "Integration NonTransacting Tests" \
+		--skip_archive \
+		--skip_codesigning
+	bundle exec fastlane gym \
+		--scheme "Integration Transacting Tests" \
+		--skip_archive \
+		--skip_codesigning
 	bundle exec fastlane gym \
 		--scheme "Performance Tests" \
 		--skip_archive \

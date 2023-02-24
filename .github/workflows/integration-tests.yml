@@ -17,7 +17,7 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
 
 jobs:
-  run-integration-tests:
+  run-non-transacting-integration-tests:
     runs-on: macos-latest
     steps:
       - name: Set Ruby Version to 2.7
@@ -26,7 +26,7 @@ jobs:
           ruby-version: '2.7'
           bundler-cache: true
 
-      - name: Install 'rename' command 
+      - name: Install 'rename' command
         run: brew install rename
 
       - name: Checkout Code
@@ -83,18 +83,22 @@ jobs:
 
       - name: Install pods for Example project
         working-directory: ./Example
-        run: bundle exec pod install --deployment 
+        run: bundle exec pod install --deployment
 
       - name: Generating CocoaPods Keys
         run: ./scripts/setkeysfor Example
 
       - name: Make Bootstrap PostKeys
         working-directory: ./Example
-        run: make bootstrap 
+        run: make bootstrap
 
-      - name: Run Integration Tests On Example
+      - name: Run Non-Transacting Integration Tests On Example
         working-directory: ./Example
-        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration Tests" --suppress_xcode_output
+        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration NonTransacting Tests" --suppress_xcode_output
+
+      - name: Run Transacting Integration Tests On Example
+        working-directory: ./Example
+        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration Transacting Tests" --suppress_xcode_output
 
       - name: Archive Build Results
         if: always()
@@ -111,4 +115,3 @@ jobs:
           name: integration-test-logs
           path: |
             ./Example/test_output/report.html
-
