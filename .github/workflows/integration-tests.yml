@@ -94,7 +94,7 @@ jobs:
 
       - name: Run Integration Tests On Example
         working-directory: ./Example
-        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration NonTransacting Tests" --suppress_xcode_output
+        run: export SCAN_XCODEBUILD_FORMATTER="xcpretty"; bundle exec fastlane scan --scheme "Integration NonTransacting Tests"  --device "iPhone 14 Pro" --suppress_xcode_output
 
       - name: Archive Build Results
         if: always()
