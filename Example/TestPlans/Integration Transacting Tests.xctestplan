@@ -1,7 +1,7 @@
 {
   "configurations" : [
     {
-      "id" : "7B8CC01D-B029-4322-84A2-F7F086835547",
+      "id" : "9E035E86-6A68-4783-9B31-7D3AC50123C8",
       "name" : "Configuration 1",
       "options" : {
 
@@ -9,15 +9,14 @@
     }
   ],
   "defaultOptions" : {
-
+    "testTimeoutsEnabled" : true
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Pods\/Pods.xcodeproj",
-        "identifier" : "A1F822BE1CADA3693528DBC440D61C8A",
-        "name" : "MobileCoin-Unit-IntegrationNonTransactingTests"
+        "identifier" : "81C37539394D35527AF430AF1B1F19C7",
+        "name" : "MobileCoin-Unit-IntegrationTransactingTests"
       }
     }
   ],

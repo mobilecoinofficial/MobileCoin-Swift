@@ -29,7 +29,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:TestPlans/Integration Tests.xctestplan"
+            reference = "container:TestPlans/Integration Transacting Tests.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
