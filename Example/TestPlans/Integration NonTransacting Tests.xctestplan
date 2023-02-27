@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "F80FB31C-4537-437F-ADF7-A29D0CCD5D71",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Pods\/Pods.xcodeproj",
+        "identifier" : "A1F822BE1CADA3693528DBC440D61C8A",
+        "name" : "MobileCoin-Unit-IntegrationNonTransactingTests"
+      }
+    }
+  ],
+  "version" : 1
+}

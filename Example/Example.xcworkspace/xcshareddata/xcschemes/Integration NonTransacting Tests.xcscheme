@@ -29,7 +29,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:TestPlans/Integration Tests.xctestplan"
+            reference = "container:TestPlans/Integration NonTransacting Tests.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -51,6 +51,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A1F822BE1CADA3693528DBC440D61C8A"
+            BuildableName = "MobileCoin-Unit-IntegrationNonTransactingTests.xctest"
+            BlueprintName = "MobileCoin-Unit-IntegrationNonTransactingTests"
+            ReferencedContainer = "container:Pods/Pods.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
