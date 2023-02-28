@@ -101,7 +101,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: integration-test-logs
+          name: integration-transacting-test-logs
           path: |
             ~/Library/Logs/scan
 
@@ -109,6 +109,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: integration-test-logs
+          name: integration-transacting-test-logs
           path: |
-            ./Example/test_output/transacting_report.html
+            ./Example/test_output/report.html
