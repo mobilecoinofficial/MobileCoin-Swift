@@ -11,7 +11,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
 
     func testDefragmentationTesting() throws {
         let description = "Defragmentation Testing"
-        XCTSkip("Skipping \(description)")
+        try XCTSkip()
         try testSupportedProtocols(description: description, timeout: 250) {
             try defragmentationTesting(transportProtocol: $0, expectation: $1)
         }
