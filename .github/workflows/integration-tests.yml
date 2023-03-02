@@ -35,7 +35,7 @@ jobs:
         run: brew install rename
 
       - name: Install 'xcbeautify'
-        run: brew install tify
+        run: brew install xcbeautify
 
       - name: Checkout Code
         uses: actions/checkout@v2
