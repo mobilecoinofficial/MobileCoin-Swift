@@ -20,6 +20,10 @@ jobs:
 
   run-transacting-integration-tests:
     runs-on: macos-latest
+    env:
+        # Override fastlane tooling variables
+        FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+        FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
     steps:
       - name: Set Ruby Version to 2.7
         uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
@@ -116,6 +120,10 @@ jobs:
 
   run-non-transacting-integration-tests:
     runs-on: macos-latest
+    env:
+        # Override fastlane tooling variables
+        FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+        FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
     steps:
       - name: Set Ruby Version to 2.7
         uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
