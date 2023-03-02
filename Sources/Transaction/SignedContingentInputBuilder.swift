@@ -1,10 +1,8 @@
 //
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
-
 // swiftlint:disable function_parameter_count function_default_parameter_at_end
 // swiftlint:disable closure_body_length
-
 import Foundation
 import LibMobileCoin
 
