@@ -24,12 +24,12 @@
 		270686982474C4DA00B82C57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2706869A2474C4DA00B82C57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27A1FABE24E8B89C001A0614 /* Performance Tests.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Performance Tests.xctestplan"; sourceTree = "<group>"; };
-		27A39C3C24C2622600B44786 /* Integration Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Integration Tests.xctestplan"; sourceTree = "<group>"; };
 		27A39C3D24C2622600B44786 /* Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Unit Tests.xctestplan"; sourceTree = "<group>"; };
 		3AF40DB60A0ADA2CB879AE38 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		4C0382FE8E8E7AAAC02CECA3 /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6672CD67276C080E00AE2DAE /* Http Protocol Unit Tests CoreHTTP.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Http Protocol Unit Tests CoreHTTP.xctestplan"; sourceTree = "<group>"; };
-		66EF3932276C1F2300753388 /* Protocol Unit Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Protocol Unit Tests.xctestplan"; path = "/Users/adam/Projects/MobileCoin/MobileCoin-Swift/Example/TestPlans/Protocol Unit Tests.xctestplan"; sourceTree = "<absolute>"; };
+		AE73B15229B16C1E000E89AD /* Integration Transacting Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Integration Transacting Tests.xctestplan"; sourceTree = "<group>"; };
+		AE73B15329B16C53000E89AD /* Integration NonTransacting Tests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Integration NonTransacting Tests.xctestplan"; sourceTree = "<group>"; };
 		FC106CAA4E993C2D6301C5CA /* Pods-Example.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.testable release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.testable release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,10 +88,10 @@
 			isa = PBXGroup;
 			children = (
 				27A39C3D24C2622600B44786 /* Unit Tests.xctestplan */,
-				27A39C3C24C2622600B44786 /* Integration Tests.xctestplan */,
 				27A1FABE24E8B89C001A0614 /* Performance Tests.xctestplan */,
-				66EF3932276C1F2300753388 /* Protocol Unit Tests.xctestplan */,
 				6672CD67276C080E00AE2DAE /* Http Protocol Unit Tests CoreHTTP.xctestplan */,
+				AE73B15229B16C1E000E89AD /* Integration Transacting Tests.xctestplan */,
+				AE73B15329B16C53000E89AD /* Integration NonTransacting Tests.xctestplan */,
 			);
 			path = TestPlans;
 			sourceTree = "<group>";

@@ -7,10 +7,4 @@
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:/Users/adam/Projects/MobileCoin/MobileCoin-Swift/Example/TestPlans/Protocol Unit Tests.xctestplan">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/carybakker/Dev/MobileCoin/src/tasks/cary/service-load-bal-unit-tests/MobileCoin-Swift/Example/TestPlans/Integration NonTransacting Tests.xctestplan">
-   </FileRef>
 </Workspace>

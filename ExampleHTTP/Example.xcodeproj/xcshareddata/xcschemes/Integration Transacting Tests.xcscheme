@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1250"
+   LastUpgradeVersion = "1420"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
-               BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
-               BlueprintName = "MobileCoin-Unit-IntegrationTests"
+               BlueprintIdentifier = "81C37539394D35527AF430AF1B1F19C7"
+               BuildableName = "MobileCoin-Unit-IntegrationTransactingTests.xctest"
+               BlueprintName = "MobileCoin-Unit-IntegrationTransactingTests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,8 +29,11 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:TestPlans/Integration Tests.xctestplan"
+            reference = "container:Integration Transacting Tests.xctestplan"
             default = "YES">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:TestPlans/Integration Transacting Tests.xctestplan">
          </TestPlanReference>
       </TestPlans>
    </TestAction>
@@ -54,9 +57,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
-            BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
-            BlueprintName = "MobileCoin-Unit-IntegrationTests"
+            BlueprintIdentifier = "81C37539394D35527AF430AF1B1F19C7"
+            BuildableName = "MobileCoin-Unit-IntegrationTransactingTests.xctest"
+            BlueprintName = "MobileCoin-Unit-IntegrationTransactingTests"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,7 +68,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Testable Release"
+      buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
