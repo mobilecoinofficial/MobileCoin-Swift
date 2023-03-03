@@ -3,18 +3,18 @@ PODS:
   - LibMobileCoin/CoreHTTP (4.0.0):
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (4.0.0)
-  - MobileCoin/CoreHTTP (4.0.0):
+  - MobileCoin (4.0.1)
+  - MobileCoin/CoreHTTP (4.0.1):
     - LibMobileCoin/CoreHTTP (~> 4.0.0-pre3)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (4.0.0):
+  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (4.0.1):
     - LibMobileCoin/CoreHTTP (~> 4.0.0-pre3)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/IntegrationTests (4.0.0)
-  - MobileCoin/PerformanceTests (4.0.0)
-  - MobileCoin/Tests (4.0.0)
+  - MobileCoin/IntegrationTests (4.0.1)
+  - MobileCoin/PerformanceTests (4.0.1)
+  - MobileCoin/Tests (4.0.1)
   - SwiftLint (0.47.1)
   - SwiftProtobuf (1.19.0)
 
