@@ -22,7 +22,7 @@ public enum DefaultCryptoBox {
         VersionedCryptoBox.decrypt(ciphertext: ciphertext,
                                    privateKey: accountKey.subaddressSpendPrivateKey)
     }
-    
+
     public static func encrypt(
         plaintext: Data,
         publicKey: WrappedRistrettoPublic

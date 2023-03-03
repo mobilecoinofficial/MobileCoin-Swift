@@ -48,7 +48,7 @@ extension External_RistrettoPrivate {
 
 public struct WrappedRistrettoPrivate: Hashable {
     let ristretto: RistrettoPrivate
-    
+
     public init?(_ data: Data) {
         guard
             let data32 = Data32(data.data),

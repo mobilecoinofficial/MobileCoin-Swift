@@ -93,7 +93,7 @@ class MobileCoinClientPublicApiTests: XCTestCase {
         let invalidKey = WrappedRistrettoPrivate(invalidRistrettoData)
         XCTAssertNil(invalidKey, "Init should fail")
     }
-    
+
     func testWrappedRistrettoPublic() throws {
         let validRistretto = "c235c13c4dedd808e95f428036716d52561fad7f51ce675f4d4c9c1fa1ea2165"
         let validRistrettoData = try XCTUnwrap(Data(hexEncoded: validRistretto))
