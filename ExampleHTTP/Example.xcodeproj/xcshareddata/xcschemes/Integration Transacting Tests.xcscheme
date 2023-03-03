@@ -32,9 +32,6 @@
             reference = "container:Integration Transacting Tests.xctestplan"
             default = "YES">
          </TestPlanReference>
-         <TestPlanReference
-            reference = "container:TestPlans/Integration Transacting Tests.xctestplan">
-         </TestPlanReference>
       </TestPlans>
    </TestAction>
    <LaunchAction
