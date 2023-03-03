@@ -59,6 +59,6 @@ public struct WrappedRistrettoPublic: Hashable {
         self.ristretto = ristretto
     }
 
-    var data: Data { ristretto.data }
+    public var data: Data { ristretto.data }
 }
 
