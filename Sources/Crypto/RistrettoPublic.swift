@@ -46,7 +46,7 @@ extension External_CompressedRistretto {
     }
 }
 
-public struct WrappedRistrettoPublic {
+public struct WrappedRistrettoPublic: Hashable {
     let ristretto: RistrettoPublic
     
     public init?(_ data: Data) {
@@ -61,3 +61,4 @@ public struct WrappedRistrettoPublic {
 
     var data: Data { ristretto.data }
 }
+

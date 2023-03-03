@@ -46,7 +46,7 @@ extension External_RistrettoPrivate {
     }
 }
 
-public struct WrappedRistrettoPrivate {
+public struct WrappedRistrettoPrivate: Hashable {
     let ristretto: RistrettoPrivate
     
     public init?(_ data: Data) {
