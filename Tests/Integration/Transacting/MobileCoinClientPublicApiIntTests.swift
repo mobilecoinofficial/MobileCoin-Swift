@@ -611,12 +611,11 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol
     ) async throws {
         // stagger source account to avoid protocol collisions with input transactions
-        let accountIndexOffset = transportProtocol == .http ? 1 : 0
         let senderClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountIndex: 3 + accountIndexOffset,
+            accountIndex: 3,
             transportProtocol: transportProtocol)
         let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(
-            accountIndex: 4 + accountIndexOffset)
+            accountIndex: 4)
         let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
             accountKey: receiverAccountKey,
             transportProtocol: transportProtocol)
@@ -680,8 +679,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol
     ) async throws {
 
-        let clientIndex = transportProtocol == .http ? 8 : 9
-        let recipientIndex = transportProtocol == .http ? 9 : 8
+        let clientIndex = 8
+        let recipientIndex = 9
 
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
             using: transportProtocol)
@@ -718,8 +717,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func extraConsensusTrustRootWorks(
         transportProtocol: TransportProtocol
     ) async throws {
-        let clientIndex = transportProtocol == .http ? 8 : 9
-        let recipientIndex = transportProtocol == .http ? 9 : 8
+        let clientIndex = 8
+        let recipientIndex = 9
 
         var config = try IntegrationTestFixtures.createMobileCoinClientConfig(
             using: transportProtocol)

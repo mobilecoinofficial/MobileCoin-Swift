@@ -11,7 +11,6 @@ class MobileCoinClientInternalIntTests: XCTestCase {
 
     func testDefragmentationTesting() throws {
         let description = "Defragmentation Testing"
-        try XCTSkip()
         try testSupportedProtocols(description: description, timeout: 250) {
             try defragmentationTesting(transportProtocol: $0, expectation: $1)
         }
@@ -194,7 +193,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
                 
                 defrageeClient.requiresDefragmentation(toSendAmount: fullAmount) { result in
                     guard let defragRequired = try? result.get() else {
-                        XCTFail("Defrag unable to calculate full amount")
+                        XCTFail("Defrag unable to determine if defrag is required")
                         return
                     }
                     
