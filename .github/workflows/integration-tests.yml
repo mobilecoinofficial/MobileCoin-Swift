@@ -118,7 +118,7 @@ jobs:
         with:
           name: integration-transacting-test-logs
           path: |
-            ./Example/test_output/report.html
+            ./Example/test_output
 
 
   run-non-transacting-integration-tests:
@@ -221,4 +221,4 @@ jobs:
         with:
           name: integration-non-transacting-test-logs
           path: |
-            ./Example/test_output/report.html
+            ./Example/test_output
