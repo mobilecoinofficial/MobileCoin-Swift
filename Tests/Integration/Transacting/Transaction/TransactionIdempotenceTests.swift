@@ -11,6 +11,9 @@ enum IdempotenceTestError: Error {
 
 class TransactionIdempotenceTests: XCTestCase {
 
+    let clientIdx = 9
+    let recipientIdx = 8
+    
     func testIdempotenceDoubleSubmissionFailure() throws {
         let description = "Testing idempotence submission failure"
         try testSupportedProtocols(description: description) {
@@ -24,9 +27,9 @@ class TransactionIdempotenceTests: XCTestCase {
     ) throws {
 
         let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 1,
+                accountIndex: clientIdx,
                 using: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 0)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
         let rngSeed = RngSeed()
 
         func waitForTransaction(

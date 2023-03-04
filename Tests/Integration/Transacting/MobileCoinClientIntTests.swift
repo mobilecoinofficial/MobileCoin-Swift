@@ -9,6 +9,9 @@ import XCTest
 
 class MobileCoinClientIntTests: XCTestCase {
 
+    let clientIdx = 7
+    let recipientIdx = 8
+
     func testTransactionDoubleSubmissionFails() throws {
         let description = "Submitting transaction twice"
         try testSupportedProtocols(description: description) {
@@ -20,9 +23,11 @@ class MobileCoinClientIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 7)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountKey: accountKey,
                 expectation: expect,
                 transportProtocol: transportProtocol)
         { client in
@@ -67,9 +72,11 @@ class MobileCoinClientIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 7)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
+        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
 
         try IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountKey: accountKey,
                 expectation: expect,
                 transportProtocol: transportProtocol)
         { client in

@@ -9,6 +9,9 @@ import XCTest
 
 class MobileCoinClientInternalIntTests: XCTestCase {
 
+    let defrageeIndex = 5
+    let defragerIndex = 6
+    
     func testDefragmentationTesting() throws {
         let description = "Defragmentation Testing"
         try testSupportedProtocols(description: description, timeout: 250) {
@@ -70,10 +73,6 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         //
         // defrag account 5
         // verify that account 5 does not need to be defragged to send full-amount, success.
-
-        let defrageeIndex = 5
-        let defragerIndex = 6
-        
         let splitFactor = McConstants.MAX_INPUTS + 4
         
         let defrageeAccount = try IntegrationTestFixtures.createAccountKey(accountIndex: defrageeIndex)
@@ -167,7 +166,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
                     transportProtocol: transportProtocol)
                 { defragerClient in
                     try? IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                        accountIndex: defrageeIndex,
+                        accountIndex: self.defrageeIndex,
                         expectation: expect,
                         transportProtocol: transportProtocol)
                     { defrageeClient in
