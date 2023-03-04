@@ -13,7 +13,7 @@ class TransactionIdempotenceTests: XCTestCase {
 
     let clientIdx = 9
     let recipientIdx = 8
-    
+
     func testIdempotenceDoubleSubmissionFailure() throws {
         let description = "Testing idempotence submission failure"
         try testSupportedProtocols(description: description) {
