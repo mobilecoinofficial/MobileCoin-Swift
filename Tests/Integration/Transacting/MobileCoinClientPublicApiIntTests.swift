@@ -16,6 +16,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     let clientIdx = 8
     let recipientIdx = 9
+    let numChecksForNewTx = 10
 
     func testSubmitTransaction() async throws {
         let description = "Submitting transaction"
@@ -116,7 +117,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             _ balancesBefore: Balances
         ) async throws {
 
-            var numChecksRemaining = 5
+            var numChecksRemaining = numChecksForNewTx
             func checkBalanceChange() async throws {
                 numChecksRemaining -= 1
                 print("Updating balance...")
@@ -289,7 +290,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             let outTokenId = amountOut.tokenId
             let inTokenId = amountIn.tokenId
 
-            var numChecksRemaining = 5
+            var numChecksRemaining = numChecksForNewTx
             func checkBalanceChange() async throws {
                 numChecksRemaining -= 1
                 print("Updating balance...")
@@ -398,7 +399,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
         let initialBalance = try await submitTransaction()
 
-        var numChecksRemaining = 5
+        var numChecksRemaining = 10
         func checkBalance() async throws {
             numChecksRemaining -= 1
             print("Updating balance...")
@@ -454,7 +455,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
 
         let initialBalance = try await submitTransaction()
-        var numChecksRemaining = 5
+        var numChecksRemaining = numChecksForNewTx
         func checkBalance() async throws {
             numChecksRemaining -= 1
             print("Updating balance...")
@@ -507,7 +508,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
         let transaction = try await submitTransaction()
 
-        var numChecksRemaining = 5
+        var numChecksRemaining = numChecksForNewTx
 
         func checkStatus() async throws {
             numChecksRemaining -= 1
@@ -569,7 +570,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
         let transaction = try await submitTransaction()
 
-        var numChecksRemaining = 5
+        var numChecksRemaining = numChecksForNewTx
 
         func checkStatus() async throws {
             numChecksRemaining -= 1
@@ -636,7 +637,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         }
 
         let receipt = try await submitTransaction()
-        var numChecksRemaining = 5
+        var numChecksRemaining = numChecksForNewTx
 
         func checkStatus() async throws {
             numChecksRemaining -= 1
