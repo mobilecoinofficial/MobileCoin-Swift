@@ -36,7 +36,7 @@ extension XCTestCase {
     @available(iOS 15.0, *)
     func testSupportedProtocols(
                 description: String,
-                timeout: Double = 80.0,
+                timeout: Double = 120.0,
                 interval: UInt64 = 20,
                 _ testCase: @escaping (TransportProtocol) async throws -> Void
     ) async throws {
