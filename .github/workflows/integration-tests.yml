@@ -102,7 +102,7 @@ jobs:
 
       - name: Run Transacting Integration Tests On Example
         working-directory: ./Example
-        run: export SCAN_XCODEBUILD_FORMATTER="xcbeautify"; bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro" --suppress_xcode_output
+        run: export SCAN_XCODEBUILD_FORMATTER="xcbeautify"; bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro"
 
       - name: Archive Build Results
         if: always()
@@ -205,7 +205,7 @@ jobs:
 
       - name: Run NonTransacting Integration Tests On Example
         working-directory: ./Example
-        run: export SCAN_XCODEBUILD_FORMATTER="xcbeautify"; bundle exec fastlane scan --scheme "Integration NonTransacting Tests"  --device "iPhone 14 Pro" --suppress_xcode_output
+        run: export SCAN_XCODEBUILD_FORMATTER="xcbeautify"; bundle exec fastlane scan --scheme "Integration NonTransacting Tests"  --device "iPhone 14 Pro"
 
       - name: Archive Build Results
         if: always()
