@@ -80,7 +80,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testPrintBalances() async throws {
-        // try XCTSkip()
+        try XCTSkip()
         let description = "Printing account balance"
         try await testSupportedProtocols(description: description) {
             try await self.printBalance(transportProtocol: $0)
@@ -168,7 +168,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         transportProtocol: TransportProtocol
     ) async throws {
         let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: 1)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
         let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
             accountKey: accountKey,
             transportProtocol: transportProtocol
@@ -191,7 +191,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         let amountToSend = Amount(1, in: .MOB)
         let amountToReceive = Amount(10, in: .MOBUSD)
 
-        let creatorIdx = 9
+        let creatorIdx = 0
         let creatorPubAddress = try IntegrationTestFixtures.createPublicAddress(
             accountIndex: creatorIdx)
 

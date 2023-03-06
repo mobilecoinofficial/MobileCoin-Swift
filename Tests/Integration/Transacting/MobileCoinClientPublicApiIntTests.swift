@@ -16,6 +16,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
 
     let clientIdx = 8
     let recipientIdx = 9
+    let selfPaymentIdx = 3
+    
     let numChecksForNewTx = 10
 
     func testSubmitTransaction() async throws {
@@ -380,7 +382,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func selfPaymentBalanceChange(
         transportProtocol: TransportProtocol
     ) async throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
+        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: selfPaymentIdx)
         let client = try IntegrationTestFixtures.createMobileCoinClient(
             accountKey: accountKey,
             transportProtocol: transportProtocol)
