@@ -6,6 +6,8 @@ import MobileCoin
 import XCTest
 
 class TransactionPublicApiIntTests: XCTestCase {
+    
+    let expectationWaitTime = 20
 
     func testSerializedData() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
@@ -40,7 +42,7 @@ class TransactionPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: expectationWaitTime)
     }
 
 }

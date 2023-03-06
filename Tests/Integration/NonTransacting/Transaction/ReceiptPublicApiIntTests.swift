@@ -7,6 +7,8 @@ import XCTest
 
 class ReceiptPublicApiIntTests: XCTestCase {
 
+    let expectationWaitTime = 20
+    
     func testSerializedData() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try serializedData(transportProtocol: transportProtocol)
@@ -34,7 +36,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: expectationWaitTime)
     }
 
     func testValidateAndUnmaskValueAccepts() throws {
@@ -67,7 +69,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: expectationWaitTime)
     }
 
     func testValidateAndUnmaskValueRejects() throws {
@@ -104,7 +106,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: expectationWaitTime)
     }
 
 }

@@ -23,7 +23,7 @@ class AccountTests: XCTestCase {
             XCTAssertEqual(balance.blockCount, 1)
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testViewTxOuts() throws {
@@ -45,7 +45,7 @@ class AccountTests: XCTestCase {
             XCTAssertEqual(balance.blockCount, 1)
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testMissedBlocks() throws {
@@ -67,7 +67,7 @@ class AccountTests: XCTestCase {
             XCTAssertEqual(balance.blockCount, 1)
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
 }

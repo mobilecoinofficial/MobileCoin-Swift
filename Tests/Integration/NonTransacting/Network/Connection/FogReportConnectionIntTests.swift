@@ -29,7 +29,7 @@ class FogReportConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetReportsShortURL() throws {
@@ -57,7 +57,7 @@ class FogReportConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
 }

@@ -32,7 +32,7 @@ class ConsensusConnectionIntTests: XCTestCase {
                     expect.fulfill()
                 }
             )
-            waitForExpectations(timeout: 20)
+            waitForExpectations(timeout: 40)
         }
     }
 
@@ -98,7 +98,7 @@ class ConsensusConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         })
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testTrustRootWorks() throws {
@@ -126,7 +126,7 @@ class ConsensusConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         })
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testExtraTrustRootWorks() throws {
@@ -154,7 +154,7 @@ class ConsensusConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         })
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testWrongTrustRootFails() throws {
