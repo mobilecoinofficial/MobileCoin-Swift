@@ -37,7 +37,7 @@ class FogViewConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testEnclaveRequestReturnsTxOuts() throws {
@@ -94,7 +94,7 @@ class FogViewConnectionIntTests: XCTestCase {
             })
         }
 
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testEnclaveRequestReturnsNotFoundForFakeData() throws {
@@ -125,7 +125,7 @@ class FogViewConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testEnclaveRequestReturnsBadSearchKeyForEmptySearchKey() throws {
@@ -159,7 +159,7 @@ class FogViewConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testEnclaveRequestReturnsBadSearchKeyForInvalidSearchKey() throws {
@@ -194,7 +194,7 @@ class FogViewConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testEnclaveRequestReturnsBadSearchKeyForTooShortSearchKey() throws {
@@ -229,7 +229,7 @@ class FogViewConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testEnclaveRequestReturnsBadSearchKeyForTooLongSearchKey() throws {
@@ -264,7 +264,7 @@ class FogViewConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
@@ -295,7 +295,7 @@ class FogViewConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 }
 

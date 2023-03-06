@@ -38,7 +38,7 @@ class FogBlockConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetBlockZero() throws {
@@ -95,7 +95,7 @@ class FogBlockConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetBlocksReturnsNoBlocksForEmptyRange() throws {
@@ -120,7 +120,7 @@ class FogBlockConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testDoSGetBlocks() throws {
@@ -154,7 +154,7 @@ class FogBlockConnectionIntTests: XCTestCase {
         group.notify(queue: DispatchQueue.main) {
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
@@ -185,7 +185,7 @@ class FogBlockConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
 }

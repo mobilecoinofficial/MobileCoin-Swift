@@ -20,7 +20,7 @@ ENV['MC_ENABLE_SWIFTLINT_SCRIPT'] = '1'
 ENV['MC_ENABLE_WARN_LONG_COMPILE_TIMES'] = '1'
 
 target 'Example' do
-  pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationTests', 'PerformanceTests']
+  pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationNonTransactingTests', 'IntegrationTransactingTests', 'PerformanceTests']
   pod 'MobileCoin/Core', path: '..', testspecs: ['ProtocolUnitTests']
   # pod 'MobileCoin/CoreHTTP', path: '..', testspecs: ['HttpProtocolUnitTests']
   # pod 'MobileCoin', podspec: '../MobileCoin.podspec'
@@ -69,7 +69,7 @@ post_install do |installer|
 
   # Add Keys framework to Integration Tests for injecting values using cocoapods-keys
   installer.pods_project.targets.each do |target|
-    next unless target.name == 'MobileCoin-Unit-IntegrationTests'
+    next unless ( target.name == 'MobileCoin-Unit-IntegrationTransactingTests' || target.name == 'MobileCoin-Unit-IntegrationNonTransactingTests' )
     installer.pods_project.targets.each do |keys_target|
       next unless keys_target.name == 'Keys'
       target.add_dependency(keys_target)

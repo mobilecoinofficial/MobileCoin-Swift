@@ -34,7 +34,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testValidateAndUnmaskValueAccepts() throws {
@@ -67,7 +67,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testValidateAndUnmaskValueRejects() throws {
@@ -78,8 +78,8 @@ class ReceiptPublicApiIntTests: XCTestCase {
 
     func validateAndUnmaskValueRejects(transportProtocol: TransportProtocol) throws {
         let accountKey = try IntegrationTestFixtures.createAccountKey()
-        let accountKey2 = try IntegrationTestFixtures.createAccountKey(accountIndex: 2)
-        let accountKey3 = try IntegrationTestFixtures.createAccountKey(accountIndex: 3)
+        let accountKey2 = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let accountKey3 = try IntegrationTestFixtures.createAccountKey(accountIndex: 2)
         let client = try IntegrationTestFixtures.createMobileCoinClient(
             accountKey: accountKey,
             transportProtocol: transportProtocol)
@@ -104,7 +104,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
 }

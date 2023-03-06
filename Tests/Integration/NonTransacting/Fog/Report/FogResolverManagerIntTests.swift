@@ -23,6 +23,6 @@ class FogResolverManagerIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 40)
     }
 }

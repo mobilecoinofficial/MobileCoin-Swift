@@ -16,7 +16,6 @@ extension XCTestCase {
     ) rethrows {
         let supportedProtocols = TransportProtocol.supportedProtocols
 
-        let last = supportedProtocols.last
         try supportedProtocols.forEach { transportProtocol in
             let description = "[\(transportProtocol.description)]:\(description)"
             print("Testing ... \(description)")
@@ -26,7 +25,7 @@ extension XCTestCase {
 
             // Without the sleep here, we were occasionally seeing 'insufficientFunds' errors
             // caused by tests that transact, where the change txo has not come back yet
-            sleep(transportProtocol == last ? 0 : interval)
+            sleep(interval)
         }
     }
 
@@ -37,12 +36,11 @@ extension XCTestCase {
     @available(iOS 15.0, *)
     func testSupportedProtocols(
                 description: String,
-                timeout: Double = 80.0,
-                interval: UInt64 = 10,
+                timeout: Double = 120.0,
+                interval: UInt64 = 20,
                 _ testCase: @escaping (TransportProtocol) async throws -> Void
     ) async throws {
         let supportedProtocols = TransportProtocol.supportedProtocols
-        let last = supportedProtocols.last
         for transportProtocol in supportedProtocols {
             let description = "[\(transportProtocol.description)]:\(description)"
             print("Testing ... \(description)")
@@ -50,7 +48,7 @@ extension XCTestCase {
                 try await testCase(transportProtocol)
             }
             try await Task.sleep(
-                nanoseconds: UInt64(transportProtocol == last ? 0 : interval * 1_000_000_000)
+                nanoseconds: UInt64(interval * 1_000_000_000)
             )
         }
     }

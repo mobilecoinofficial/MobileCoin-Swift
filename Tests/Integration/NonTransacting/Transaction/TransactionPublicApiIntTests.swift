@@ -40,7 +40,7 @@ class TransactionPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
 }

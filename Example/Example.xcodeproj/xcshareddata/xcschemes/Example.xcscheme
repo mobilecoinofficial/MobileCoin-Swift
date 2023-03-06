@@ -83,19 +83,31 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4DC8EA0DAC022968B96EB3B8D91B8843"
-               BuildableName = "MobileCoin-Unit-IntegrationTests.xctest"
-               BlueprintName = "MobileCoin-Unit-IntegrationTests"
+               BlueprintIdentifier = "15BC995FC0FAFC663C79A25F3AAC145E"
+               BuildableName = "MobileCoin-Unit-Tests.xctest"
+               BlueprintName = "MobileCoin-Unit-Tests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "15BC995FC0FAFC663C79A25F3AAC145E"
-               BuildableName = "MobileCoin-Unit-Tests.xctest"
-               BlueprintName = "MobileCoin-Unit-Tests"
+               BlueprintIdentifier = "A1F822BE1CADA3693528DBC440D61C8A"
+               BuildableName = "MobileCoin-Unit-IntegrationNonTransactingTests.xctest"
+               BlueprintName = "MobileCoin-Unit-IntegrationNonTransactingTests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "81C37539394D35527AF430AF1B1F19C7"
+               BuildableName = "MobileCoin-Unit-IntegrationTransactingTests.xctest"
+               BlueprintName = "MobileCoin-Unit-IntegrationTransactingTests"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </TestableReference>

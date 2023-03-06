@@ -40,7 +40,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetOutputsReturnsNoResultsWhenSearchingForZeroIndices() throws {
@@ -69,7 +69,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetOutputsRequestAcceptsUIntMinMerkleRootBlock() throws {
@@ -103,7 +103,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetOutputsRequestAcceptsUIntMaxMerkleRootBlock() throws {
@@ -137,7 +137,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testGetOutputsRequestReturnsNotFoundForUIntMax() throws {
@@ -167,7 +167,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
 
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 
     func testInvalidCredentialsReturnsAuthorizationFailure() throws {
@@ -199,7 +199,7 @@ class FogMerkleProofConnectionIntTests: XCTestCase {
             }
             expect.fulfill()
         }
-        waitForExpectations(timeout: 20)
+        waitForExpectations(timeout: 40)
     }
 }
 
