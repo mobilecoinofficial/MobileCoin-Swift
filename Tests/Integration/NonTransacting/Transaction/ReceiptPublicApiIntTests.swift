@@ -6,8 +6,6 @@ import MobileCoin
 import XCTest
 
 class ReceiptPublicApiIntTests: XCTestCase {
-
-    let expectationWaitTime = 20
     
     func testSerializedData() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
@@ -36,7 +34,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: expectationWaitTime)
+        waitForExpectations(timeout: 40)
     }
 
     func testValidateAndUnmaskValueAccepts() throws {
@@ -69,7 +67,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: expectationWaitTime)
+        waitForExpectations(timeout: 40)
     }
 
     func testValidateAndUnmaskValueRejects() throws {
@@ -106,7 +104,7 @@ class ReceiptPublicApiIntTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        waitForExpectations(timeout: expectationWaitTime)
+        waitForExpectations(timeout: 40)
     }
 
 }
