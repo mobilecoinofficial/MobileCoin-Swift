@@ -413,8 +413,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                 initialBalancePicoMob - IntegrationTestFixtures.fee
                 guard balancePicoMob == expectedBalancePicoMob else {
                     guard numChecksRemaining > 0 else {
-                        XCTFail("Failed to receive a changed balance. balance: " +
-                                "\(balancePicoMob), expected balance: " +
+                        XCTFail("Failed to receive a changed balance. initial balance: " +
+                                "\(initialBalancePicoMob), fee: \(IntegrationTestFixtures.fee)" +
+                                " balance: \(balancePicoMob), expected balance: " +
                                 "\(expectedBalancePicoMob) picoMOB")
                         return
                     }
