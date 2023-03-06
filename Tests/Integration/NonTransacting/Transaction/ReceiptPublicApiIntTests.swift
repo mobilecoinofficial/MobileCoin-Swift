@@ -6,7 +6,7 @@ import MobileCoin
 import XCTest
 
 class ReceiptPublicApiIntTests: XCTestCase {
-    
+
     func testSerializedData() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try serializedData(transportProtocol: transportProtocol)

@@ -17,7 +17,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     let clientIdx = 8
     let recipientIdx = 9
     let selfPaymentIdx = 3
-    
+
     let numChecksForNewTx = 10
 
     func testSubmitTransaction() async throws {
