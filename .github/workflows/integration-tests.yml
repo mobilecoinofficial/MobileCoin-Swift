@@ -55,9 +55,9 @@ jobs:
           bundle check || bundle install
 
       - name: Set the Network
+        if: ${{ github.event.inputs.network }}
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
-        if: ${{ $NETWORK_UNDER_TEST }}
         run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Common/Fixtures/NetworkConfigFixtures.swift
 
       - name: GCP Service Account
@@ -159,9 +159,9 @@ jobs:
           bundle check || bundle install
 
       - name: Set the Network
+        if: ${{ github.event.inputs.network }}
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
-        if: ${{ $NETWORK_UNDER_TEST }}
         run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Common/Fixtures/NetworkConfigFixtures.swift
 
       - name: GCP Service Account
