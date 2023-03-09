@@ -1,6 +1,9 @@
 name: integration-tests
 
 on:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       network:
@@ -52,6 +55,7 @@ jobs:
           bundle check || bundle install
 
       - name: Set the Network
+        if: ${{ github.event.inputs.network }}
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
         run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Common/Fixtures/NetworkConfigFixtures.swift
@@ -155,6 +159,7 @@ jobs:
           bundle check || bundle install
 
       - name: Set the Network
+        if: ${{ github.event.inputs.network }}
         env:
           NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
         run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Common/Fixtures/NetworkConfigFixtures.swift
