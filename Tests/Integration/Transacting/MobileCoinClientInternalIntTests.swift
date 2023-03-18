@@ -445,7 +445,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             fogAuthoritySpki: try NetworkConfigFixtures.network.fogAuthoritySpki())
         {
         case .success(let acctKey):
-            let sourceClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            let _ = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
                 accountKey: acctKey,
                 tokenId: .MOB,
                 transportProtocol: .http)
