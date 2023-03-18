@@ -124,7 +124,7 @@ extension MobileCoinClient {
             }
         }
     }
-    
+
     public func estimateTotalFee(
         toSendAmount amount: Amount,
         feeLevel: FeeLevel = .minimum
