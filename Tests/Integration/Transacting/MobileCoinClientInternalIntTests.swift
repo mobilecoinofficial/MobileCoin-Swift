@@ -287,4 +287,173 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             }
         }
     }
+    
+#if swift(>=5.5)
+
+    @available(iOS 15.0, *)
+    func testDynamicAccountCreation() async throws {
+        // try XCTSkip()
+        let minFee = IntegrationTestFixtures.fee
+         let minMOBUSDFee: UInt64 = 2650
+
+        func verifyBalances(
+            client: MobileCoinClient,
+            balances: [TokenId:[UInt64]],
+            returnAddress: PublicAddress
+        ) async throws {
+            let clientBals = client.balances
+            XCTAssertEqual(clientBals.tokenIds, Set<TokenId>(try XCTUnwrap(balances.keys)))
+                        
+            for tokenId in clientBals.tokenIds {
+                let expectedAmt = try XCTUnwrap(balances[tokenId]).reduce(0, +)
+                let clientBal = try XCTUnwrap(clientBals.balances[tokenId])
+                let clientAmt = try XCTUnwrap(clientBal.amount())
+                XCTAssertEqual(clientAmt, expectedAmt)
+                
+                while true {
+                    let amtTransferable = try await client.amountTransferable(tokenId: tokenId)
+                    guard amtTransferable > 0 else {
+                        break
+                    }
+
+                    let returnAmt = Amount(amtTransferable, in: tokenId)
+                    let fee = try await client.estimateTotalFee(
+                        toSendAmount: returnAmt,
+                        feeLevel: .minimum)
+
+                    let transaction = try await client.prepareTransaction(
+                        to: returnAddress,
+                        amount: returnAmt,
+                        fee: fee)
+                    try await client.submitTransaction(transaction: transaction.transaction)
+                    
+                    var txComplete = false
+                    while !txComplete {
+                        try await client.updateBalances()
+                        let txStatus = try await client.status(of: transaction.transaction)
+                        switch txStatus {
+                        case .accepted(block: _ ):
+                            txComplete = true
+                        case .failed:
+                            print("Failed to return funds")
+                            break
+                        case .unknown:
+                            // throttle the polling a bit
+                            sleep(1)
+                        }
+                    }
+                    
+                    try await client.updateBalances()
+                }
+            }
+        }
+
+        let sourceAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
+        let sourceClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+            accountIndex: 0,
+            transportProtocol: .http)
+
+        let accountFactory = TestAccountFactory(
+            fogReportUrl:  NetworkConfigFixtures.network.fogReportUrl,
+            fogAuthoritySpki: try NetworkConfigFixtures.network.fogAuthoritySpki())
+
+        let testAccountConfigs = [
+            TestAccountFactory.TestAccountConfig(
+                name:"acct0",
+                txData:
+                    [.MOB : [1 + minFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct1",
+                txData:
+                    [
+                        .MOB : [1, 2, minFee],
+                        .MOBUSD : [1 , 2, 3, minMOBUSDFee]
+                    ]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct3",
+                txData:[.MOBUSD : [3 + minMOBUSDFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct4",
+                txData:[.MOBUSD : [4 + minMOBUSDFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct5",
+                txData:[.MOBUSD : [5 + minMOBUSDFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct6",
+                txData:[.MOBUSD : [6 + minMOBUSDFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct7",
+                txData:[.MOBUSD : [7 + minMOBUSDFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct8",
+                txData:[.MOBUSD : [8 + minMOBUSDFee]]),
+            TestAccountFactory.TestAccountConfig(
+                name:"acct9",
+                txData:[.MOBUSD : [9 + minMOBUSDFee]]),
+        ]
+        
+        let testAccounts = try await accountFactory.makeAccounts(
+            sourceClient: sourceClient,
+            testAccountConfigs: testAccountConfigs
+        )
+
+        XCTAssertEqual(testAccountConfigs.count, testAccounts.count)
+
+        var testClients = [MobileCoinClient]()
+        for i in 0..<testAccounts.count {
+            let config = testAccountConfigs[i]
+            let account = testAccounts[i]
+            
+            let testClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountKey: account.accountKey,
+                //tokenId: .MOB,
+                tokenId: try XCTUnwrap(config.txData.first).key,
+                transportProtocol: .http)
+            testClients.append(testClient)
+        }
+        
+        for i in 0..<testAccounts.count {
+            let config = testAccountConfigs[i]
+            let testClient = testClients[i]
+
+            try await verifyBalances(
+                client: testClient,
+                balances: config.txData,
+                returnAddress: sourceAccountKey.publicAddress)
+        }
+    }
+    
+    @available(iOS 15.0, *)
+    func testDynamicAccountHasBalance() async throws {
+        try XCTSkip()
+        let entropyString = "QzNxpAlpc3yCU5qpe92TqhUHCMt0hTDwXplwu//JPiI="
+
+        guard let entropyData = Data(base64Encoded: entropyString, options: []) else {
+            XCTFail("can't create entropy from string")
+            return
+        }
+
+        guard let entropy32 = Data32(entropyData) else {
+            XCTFail("can't create entropy32")
+            return
+        }
+
+        switch AccountKey.make(
+            rootEntropy: entropy32.data,
+            fogReportUrl: NetworkConfigFixtures.network.fogReportUrl,
+            fogReportId: "",
+            fogAuthoritySpki: try NetworkConfigFixtures.network.fogAuthoritySpki())
+        {
+        case .success(let acctKey):
+            let sourceClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
+                accountKey: acctKey,
+                tokenId: .MOB,
+                transportProtocol: .http)
+        case .failure:
+            XCTFail("account not created or doesn't have balance")
+        }
+
+    }
+#endif
+    
 }

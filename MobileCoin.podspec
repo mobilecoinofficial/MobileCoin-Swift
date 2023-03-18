@@ -36,12 +36,12 @@ Pod::Spec.new do |s|
   end
 
   s.test_spec 'IntegrationTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Integration/Common,Integration/Transacting}/**/*.swift"
+    test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/Transacting}/**/*.swift"
     test_spec.resource = "Tests/Common/FixtureData/**/*"
   end
 
   s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Integration/Common,Integration/NonTransacting}/**/*.swift"
+    test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/NonTransacting}/**/*.swift"
     test_spec.resource = "Tests/Common/FixtureData/**/*"
   end
 
