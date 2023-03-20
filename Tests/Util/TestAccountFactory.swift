@@ -25,8 +25,9 @@ public struct TestAccountFactory {
     }
 
     public struct TestAccount {
-        let name: String
+        var name: String { config.name }
         let accountKey: AccountKey
+        let config: TestAccountConfig
     }
 
     func makeAccounts(
@@ -91,7 +92,7 @@ public struct TestAccountFactory {
             }
         }
 
-        return TestAccount(name: testAccountConfig.name, accountKey: acctKey)
+        return TestAccount(accountKey: acctKey, config: testAccountConfig)
     }
 
 }
