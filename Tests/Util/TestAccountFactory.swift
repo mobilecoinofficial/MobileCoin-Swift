@@ -22,6 +22,23 @@ public struct TestAccountFactory {
     public struct TestAccountConfig {
         let name: String
         let txAmounts: [Amount]
+
+        init(name: String, txAmounts: [Amount]) {
+            self.name = name
+            self.txAmounts = txAmounts
+        }
+
+        init(name: String, txData: [TokenId:[UInt64]]) {
+            self.name = name
+            var amounts = [Amount]()
+            for tokenId in txData.keys {
+                guard let vals = txData[tokenId] else { continue }
+                for val in vals {
+                    amounts.append(Amount(val, in: tokenId))
+                }
+            }
+            self.txAmounts = amounts
+        }
     }
 
     public struct TestAccount {
