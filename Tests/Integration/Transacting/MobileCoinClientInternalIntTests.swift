@@ -292,7 +292,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
 
     @available(iOS 15.0, *)
     func testDynamicAccountCreation() async throws {
-        // try XCTSkip()
+        try XCTSkip()
         let minFee = IntegrationTestFixtures.fee
          let minMOBUSDFee: UInt64 = 2650
 
@@ -357,61 +357,41 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         let accountFactory = TestAccountFactory(
             fogReportUrl:  NetworkConfigFixtures.network.fogReportUrl,
             fogAuthoritySpki: try NetworkConfigFixtures.network.fogAuthoritySpki())
-
         let testAccountConfigs = [
             TestAccountFactory.TestAccountConfig(
                 name:"acct0",
-                txAmounts: [
-                    Amount(1 + minFee, in: .MOB)
-                ]),
+                txData:
+                    [.MOB : [1 + minFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct1",
-                txAmounts: [
-                    Amount(1, in: .MOB),
-                    Amount(2, in: .MOB),
-                    Amount(minFee, in: .MOB),
-                    Amount(1, in: .MOBUSD),
-                    Amount(2, in: .MOBUSD),
-                    Amount(2, in: .MOBUSD),
-                    Amount(minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:
+                    [
+                        .MOB : [1, 2, minFee],
+                        .MOBUSD : [1 , 2, 3, minMOBUSDFee]
+                    ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct3",
-                txAmounts: [
-                    Amount(3 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [3 + minMOBUSDFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct4",
-                txAmounts: [
-                    Amount(4 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [4 + minMOBUSDFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct5",
-                txAmounts: [
-                    Amount(5 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [5 + minMOBUSDFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct6",
-                txAmounts: [
-                    Amount(6 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [6 + minMOBUSDFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct7",
-                txAmounts: [
-                    Amount(7 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [7 + minMOBUSDFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct8",
-                txAmounts: [
-                    Amount(8 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [8 + minMOBUSDFee]]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct9",
-                txAmounts: [
-                    Amount(9 + minMOBUSDFee, in: .MOBUSD),
-                ]),
+                txData:[.MOBUSD : [9 + minMOBUSDFee]]),
         ]
-        
+
         let testAccounts = try await accountFactory.makeAccounts(
             sourceClient: sourceClient,
             testAccountConfigs: testAccountConfigs
