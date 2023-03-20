@@ -127,7 +127,6 @@ final class Account {
         let txOuts = allTxOutTrackers
             .filter { $0.receivedAndUnspent(asOfBlockCount: knowableBlockCount) }
             .filter { $0.knownTxOut.tokenId == tokenId }
-            .filter { $0.knownTxOut.value > 0 }
             .map { $0.knownTxOut }
         return (txOuts: txOuts, blockCount: knowableBlockCount)
     }
