@@ -292,20 +292,21 @@ class MobileCoinClientInternalIntTests: XCTestCase {
 
     @available(iOS 15.0, *)
     func testDynamicAccountCreation() async throws {
-        try XCTSkip()
+        // try XCTSkip()
         let minFee = IntegrationTestFixtures.fee
          let minMOBUSDFee: UInt64 = 2650
 
         func verifyBalances(
             client: MobileCoinClient,
-            balances: [TokenId:[UInt64]],
+            amounts: [Amount],
             returnAddress: PublicAddress
         ) async throws {
             let clientBals = client.balances
-            XCTAssertEqual(clientBals.tokenIds, Set<TokenId>(try XCTUnwrap(balances.keys)))
                         
             for tokenId in clientBals.tokenIds {
-                let expectedAmt = try XCTUnwrap(balances[tokenId]).reduce(0, +)
+                let expectedAmt = amounts
+                    .filter { $0.tokenId == tokenId }
+                    .reduce(0){ $0 + $1.value }
                 let clientBal = try XCTUnwrap(clientBals.balances[tokenId])
                 let clientAmt = try XCTUnwrap(clientBal.amount())
                 XCTAssertEqual(clientAmt, expectedAmt)
@@ -360,36 +361,55 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         let testAccountConfigs = [
             TestAccountFactory.TestAccountConfig(
                 name:"acct0",
-                txData:
-                    [.MOB : [1 + minFee]]),
+                txAmounts: [
+                    Amount(1 + minFee, in: .MOB)
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct1",
-                txData:
-                    [
-                        .MOB : [1, 2, minFee],
-                        .MOBUSD : [1 , 2, 3, minMOBUSDFee]
-                    ]),
+                txAmounts: [
+                    Amount(1, in: .MOB),
+                    Amount(2, in: .MOB),
+                    Amount(minFee, in: .MOB),
+                    Amount(1, in: .MOBUSD),
+                    Amount(2, in: .MOBUSD),
+                    Amount(2, in: .MOBUSD),
+                    Amount(minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct3",
-                txData:[.MOBUSD : [3 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(3 + minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct4",
-                txData:[.MOBUSD : [4 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(4 + minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct5",
-                txData:[.MOBUSD : [5 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(5 + minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct6",
-                txData:[.MOBUSD : [6 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(6 + minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct7",
-                txData:[.MOBUSD : [7 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(7 + minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct8",
-                txData:[.MOBUSD : [8 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(8 + minMOBUSDFee, in: .MOBUSD),
+                ]),
             TestAccountFactory.TestAccountConfig(
                 name:"acct9",
-                txData:[.MOBUSD : [9 + minMOBUSDFee]]),
+                txAmounts: [
+                    Amount(9 + minMOBUSDFee, in: .MOBUSD),
+                ]),
         ]
         
         let testAccounts = try await accountFactory.makeAccounts(
@@ -406,8 +426,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             
             let testClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
                 accountKey: account.accountKey,
-                //tokenId: .MOB,
-                tokenId: try XCTUnwrap(config.txData.first).key,
+                tokenId: try XCTUnwrap(config.txAmounts.first).tokenId,
                 transportProtocol: .http)
             testClients.append(testClient)
         }
@@ -418,7 +437,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
 
             try await verifyBalances(
                 client: testClient,
-                balances: config.txData,
+                amounts: config.txAmounts,
                 returnAddress: sourceAccountKey.publicAddress)
         }
     }
