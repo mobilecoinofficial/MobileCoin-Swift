@@ -28,7 +28,7 @@ public struct TestAccountFactory {
             self.txAmounts = txAmounts
         }
 
-        init(name: String, txData: [TokenId:[UInt64]]) {
+        init(name: String, txData: [TokenId: [UInt64]]) {
             self.name = name
             var amounts = [Amount]()
             for tokenId in txData.keys {
