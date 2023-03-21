@@ -27,7 +27,7 @@ struct WrappedNIOSSLCertificate: SSLCertificates {
         for trustRootBytes in bytes {
             do {
                 trustRoots.append(
-                    try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .der)
+                    try NIOSSLCertificate(bytes: Array(trustRootBytes), format: .pem)
                 )
             } catch {
                 let errorMessage = "Error parsing trust root certificate: " +

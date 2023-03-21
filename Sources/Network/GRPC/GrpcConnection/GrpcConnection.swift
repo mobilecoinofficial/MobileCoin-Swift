@@ -79,6 +79,7 @@ extension GrpcConnection {
             var callOptions = CallOptions()
             session.addRequestHeaders(to: &callOptions.customMetadata)
             callOptions.timeLimit = GrpcChannelManager.Defaults.callOptionsTimeLimit
+            callOptions.logger = logger
             return callOptions
         }
 

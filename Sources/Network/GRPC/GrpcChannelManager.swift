@@ -14,6 +14,7 @@ final class GrpcChannelManager {
     func channel(for config: ConnectionConfigProtocol) -> GRPCChannel {
         let wrappedTrustRoots = config.trustRoots[.grpc] as? WrappedNIOSSLCertificate
         return channel(for: config.url, trustRoots: wrappedTrustRoots?.trustRoots)
+        // return channel(for: config.url, trustRoots: nil)
     }
 
     func channel(for url: MobileCoinUrlProtocol, trustRoots: [NIOSSLCertificate]? = nil)
@@ -31,7 +32,7 @@ final class GrpcChannelManager {
 
 extension GrpcChannelManager {
     enum Defaults {
-        static let callOptionsTimeLimit = TimeLimit.timeout(TimeAmount.seconds(30))
+        static let callOptionsTimeLimit = TimeLimit.timeout(TimeAmount.seconds(60))
     }
 }
 
@@ -42,12 +43,27 @@ extension ClientConnection {
         if config.useTls {
             let secureBuilder = ClientConnection.secure(group: group)
             if let trustRoots = config.trustRoots {
-                secureBuilder.withTLS(trustRoots: .certificates(trustRoots))
+                /**
+                 /// A custom verification callback that allows completely overriding the certificate verification logic.
+                 @discardableResult
+                 public func withTLSCustomVerificationCallback(
+                   _ callback: @escaping NIOSSLCustomVerificationCallback
+                 ) -> Self {
+                   self.tls.customVerificationCallback = callback
+                   return self
+                 }
+                 */
+//                secureBuilder.withTLSCustomVerificationCallback { certs, eventLoopPromise in
+//                    print(certs)
+//                }
+                 secureBuilder.withTLS(trustRoots: .certificates(trustRoots))
+                // secureBuilder.withTLS(certificateVerification: .fullVerification)
             }
             builder = secureBuilder
         } else {
             builder = ClientConnection.insecure(group: group)
         }
+        builder.withBackgroundActivityLogger(logger)
         return builder.connect(host: config.host, port: config.port)
     }
 }

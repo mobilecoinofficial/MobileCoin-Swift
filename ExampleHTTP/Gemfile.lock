@@ -40,9 +40,6 @@ GIT
       public_suffix (>= 2.0.2, < 6.0)
 
 GEM
-  specs:
-
-GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.6)
