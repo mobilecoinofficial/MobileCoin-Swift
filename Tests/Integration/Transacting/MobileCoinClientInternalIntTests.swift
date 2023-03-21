@@ -296,7 +296,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         let minFee = IntegrationTestFixtures.fee
          let minMOBUSDFee: UInt64 = 2650
 
-        func verifyBalances(
+        func verifyAndRefundBalances(
             client: MobileCoinClient,
             amounts: [Amount],
             returnAddress: PublicAddress
@@ -415,7 +415,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
             let config = testAccountConfigs[i]
             let testClient = testClients[i]
 
-            try await verifyBalances(
+            try await verifyAndRefundBalances(
                 client: testClient,
                 amounts: config.txAmounts,
                 returnAddress: sourceAccountKey.publicAddress)
