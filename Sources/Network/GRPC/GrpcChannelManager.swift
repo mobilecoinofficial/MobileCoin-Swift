@@ -36,18 +36,117 @@ extension GrpcChannelManager {
 }
 
 extension ClientConnection {
+
     fileprivate static func create(group: EventLoopGroup, config: GrpcChannelConfig) -> GRPCChannel
     {
         let builder: Builder
         if config.useTls {
             let secureBuilder = ClientConnection.secure(group: group)
             if let trustRoots = config.trustRoots {
-                secureBuilder.withTLS(trustRoots: .certificates(trustRoots))
+                // This is our "shared" cert-pinning implementation for both HTTP and GRPC
+                // GRPC's built in verification was failing for unknown reasons. That call was:
+                // secureBuilder.withTLS(trustRoots: .certificates(trustRoots))
+
+                // swiftlint:disable line_length
+                secureBuilder.withTLSCustomVerificationCallback { serverCerts, eventLoopPromise -> Void in
+                    let serverTrust: SecTrust
+                    do {
+                        serverTrust = try serverCerts.asServerSecTrust().get()
+                    } catch {
+                        logger.error(error.localizedDescription)
+                        eventLoopPromise.succeed(.failed)
+                        return
+                    }
+
+                    serverTrust.validateAgainst(pinnedKeys: trustRoots.asKeys) { result in
+                        switch result {
+                        case .success(let message):
+                            logger.debug(message)
+                            eventLoopPromise.succeed(.certificateVerified)
+                        case .failure(let error):
+                            logger.error(error.localizedDescription)
+                            eventLoopPromise.succeed(.failed)
+                        }
+                    }
+                }
+                // swiftlint:enable line_length
             }
             builder = secureBuilder
         } else {
             builder = ClientConnection.insecure(group: group)
         }
         return builder.connect(host: config.host, port: config.port)
+    }
+}
+
+struct SSLTrustError: Error {
+    let reason: String
+
+    init(_ reason: String) {
+        self.reason = reason
+    }
+}
+
+extension SSLTrustError: CustomStringConvertible {
+    public var description: String {
+        "SSL Trust Error: \(reason)"
+    }
+}
+
+extension SSLTrustError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
+
+extension Collection where Element == NIOSSLCertificate {
+    var asDerData: [Data] {
+        self.compactMap { certificate -> Data? in
+            guard let derBytes = try? certificate.toDERBytes()
+            else {
+                logger.error("Could not extract DER bytes from an NIOSSLCerticate")
+                return nil
+            }
+            return Data(derBytes)
+        }
+    }
+
+    func asServerSecTrust() -> Result<SecTrust, SSLTrustError> {
+        let secCertificates = self.asDerData.compactMap { certDerData in
+            SecCertificateCreateWithData(nil, certDerData as CFData)
+        }
+        guard secCertificates.count == self.count
+        else {
+            let missingCerts = secCertificates.count - self.count
+            return .failure(
+                SSLTrustError("Could not create \(missingCerts) SecCertificates")
+            )
+        }
+
+        var secTrust: SecTrust?
+        guard
+            SecTrustCreateWithCertificates(
+                secCertificates as AnyObject,
+                SecPolicyCreateBasicX509(),
+                &secTrust
+            ) == errSecSuccess,
+            let serverTrust = secTrust
+        else {
+            return .failure(
+                SSLTrustError("Cannot create SecTrust from Server Certificates")
+            )
+        }
+
+        return .success(serverTrust)
+    }
+
+    var asKeys: [SecKey] {
+        guard
+            let keys = try? Data.pinnedCertificateKeys(for: self.asDerData).get()
+        else {
+            logger.error("Could not recreate SecKey's from pinned NIOSSL certs")
+            return []
+        }
+        return keys
     }
 }

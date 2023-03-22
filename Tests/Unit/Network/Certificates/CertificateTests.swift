@@ -18,4 +18,33 @@ class CertificateTests: XCTestCase {
         try XCTUnwrapFailure(SecSSLCertificates.make(trustRootBytes: randomData))
     }
 
+    func testTestnetCertificateChain() throws {
+        let fixture = try SecCertificateTests.Fixtures.TestNet()
+
+        let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
+
+        fixture.secTrust.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertSuccess(result)
+        }
+    }
+
+    func testAlphaNetCertificateChain() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+
+        let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
+
+        fixture.secTrust.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertSuccess(result)
+        }
+    }
+
+    func testInvalidIntermediateAgainstCertificateChain() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+
+        let pinnedKeys = [try fixture.wrongIntermediate.asPublicKey().get()]
+
+        fixture.secTrust.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertFailure(result)
+        }
+    }
 }
