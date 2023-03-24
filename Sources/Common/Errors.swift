@@ -477,3 +477,23 @@ extension TimedOutError: LocalizedError {
         "\(self)"
     }
 }
+
+public struct SSLTrustError: Error {
+    let reason: String
+
+    init(_ reason: String) {
+        self.reason = reason
+    }
+}
+
+extension SSLTrustError: CustomStringConvertible {
+    public var description: String {
+        "SSL Trust Error: \(reason)"
+    }
+}
+
+extension SSLTrustError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}
