@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import LibMobileCoin
 
 public class DefaultHttpRequester: NSObject, HttpRequester {
     private var fogTrustRoots: SecSSLCertificates?
