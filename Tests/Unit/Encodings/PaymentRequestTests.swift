@@ -70,7 +70,7 @@ class PaymentRequestTests: XCTestCase {
             publicAddress: defaultFixture.publicAddress,
             value: defaultFixture.paymentValue,
             paymentID: defaultFixture.paymentID)
-        
+
         XCTAssertNotNil(paymentRequest)
 
         // create Printable_PaymentRequest from PaymentRequest
@@ -93,7 +93,6 @@ class PaymentRequestTests: XCTestCase {
         printablePaymentRequest.value = defaultFixture.paymentValue
         printablePaymentRequest.paymentID = defaultFixture.paymentID
 
-
         // create PaymentRequest from Printable_PaymentRequest
         let paymentRequest = PaymentRequest(printablePaymentRequest)
 
@@ -115,7 +114,7 @@ class PaymentRequestTests: XCTestCase {
             publicAddress: defaultFixture.publicAddress,
             memo: defaultFixture.memo,
             paymentID: defaultFixture.paymentID)
-        
+
         XCTAssertNotNil(paymentRequest)
 
         // create Printable_PaymentRequest from PaymentRequest
@@ -160,7 +159,7 @@ class PaymentRequestTests: XCTestCase {
             value: defaultFixture.paymentValue,
             memo: defaultFixture.memo,
             paymentID: defaultFixture.paymentID)
-        
+
         XCTAssertNotNil(paymentRequest)
 
         // create Printable_PaymentRequest from PaymentRequest
