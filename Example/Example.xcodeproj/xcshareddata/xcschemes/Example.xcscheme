@@ -133,6 +133,13 @@
             ReferencedContainer = "container:Example.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "testAccountSeed"
+            value = "/cIJRtAm93p9ZPrVrMcbPQYtEAKa3xiOhHaUh1NmuVY="
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

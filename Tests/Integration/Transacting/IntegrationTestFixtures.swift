@@ -7,6 +7,8 @@
 @testable import MobileCoin
 import XCTest
 
+#if swift(>=5.5)
+
 enum IntegrationTestFixtures {
     static let network: NetworkPreset = NetworkConfigFixtures.network
 }
@@ -221,11 +223,11 @@ extension IntegrationTestFixtures {
         completion: @escaping (MobileCoinClient) -> Void
     ) throws {
         let client =
-            try createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
+        try createMobileCoinClient(accountKey: accountKey, transportProtocol: transportProtocol)
         client.updateBalances {
             guard let balances = $0.successOrFulfill(expectation: expectation) else { return }
             guard let picoMob = try? XCTUnwrap(balances.mobBalance.amount()) else
-                { expectation.fulfill(); return }
+            { expectation.fulfill(); return }
             XCTAssertGreaterThan(picoMob, 0)
             guard picoMob > 0 else { expectation.fulfill(); return }
 
@@ -256,7 +258,7 @@ extension IntegrationTestFixtures {
     throws -> FogResolverManager {
         let serviceProvider = try createServiceProvider(transportProtocol: transportProtocol)
         let reportAttestation =
-            try NetworkConfigFixtures.create(using: transportProtocol).fogReportAttestation
+        try NetworkConfigFixtures.create(using: transportProtocol).fogReportAttestation
         return FogResolverManager(
             fogReportAttestation: reportAttestation,
             serviceProvider: serviceProvider,
@@ -293,3 +295,138 @@ extension IntegrationTestFixtures {
             httpConnectionFactory: httpFactory)
     }
 }
+
+extension IntegrationTestFixtures {
+    static func createDynamicClient(
+        transportProtocol: TransportProtocol,
+        testName: String,
+        purpose: String
+    ) throws -> (AccountKey, MobileCoinClient) {
+        let config = try createMobileCoinClientConfig(using: transportProtocol)
+        return try createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: testName,
+            purpose: purpose,
+            config: config)
+    }
+
+    static func createDynamicClient(
+        transportProtocol: TransportProtocol,
+        testName: String,
+        purpose: String,
+        config: MobileCoinClient.Config
+    ) throws -> (AccountKey, MobileCoinClient) {
+        guard let testAcountB64Seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
+            fatalError("Unable to get b64Seed value")
+        }
+        guard let seedData = Data(base64Encoded: testAcountB64Seed) else {
+            fatalError("Unable to create seedData from b64Seed")
+        }
+        guard let seed32 = Data32(seedData) else {
+            fatalError("Unable to create seed32 from seedData")
+        }
+
+        let clientNames = [
+            "0_HTTP_transactionDoubleSubmissionFails_Client",
+            "1_HTTP_transactionDoubleSubmissionFails_Recipient",
+            "2_GRPC_transactionDoubleSubmissionFails_Client",
+            "3_GRPC_transactionDoubleSubmissionFails_Recipient",
+            "4_HTTP_transactionStatusFailsWhenInputIsAlreadySpent_Client",
+            "5_HTTP_transactionStatusFailsWhenInputIsAlreadySpent_Recipient",
+            "6_GRPC_transactionStatusFailsWhenInputIsAlreadySpent_Client",
+            "7_GRPC_transactionStatusFailsWhenInputIsAlreadySpent_Recipient",
+            "8_HTTP_submitTransaction_Client",
+            "9_HTTP_submitTransaction_Recipient",
+            "10_GRPC_submitTransaction_Client",
+            "11_GRPC_submitTransaction_Recipient",
+            "12_HTTP_submitMobUSDTransaction_Client",
+            "13_HTTP_submitMobUSDTransaction_Recipient",
+            "14_GRPC_submitMobUSDTransaction_Client",
+            "15_GRPC_submitMobUSDTransaction_Recipient",
+            "16_HTTP_cancelSignedContingentInput_Creator",
+            "17_HTTP_cancelSignedContingentInput_Consumer",
+            "18_GRPC_cancelSignedContingentInput_Creator",
+            "19_GRPC_cancelSignedContingentInput_Consumer",
+            "20_HTTP_submitSignedContingentInputTransaction_Creator",
+            "21_HTTP_submitSignedContingentInputTransaction_Consumer",
+            "22_GRPC_submitSignedContingentInputTransaction_Creator",
+            "23_GRPC_submitSignedContingentInputTransaction_Consumer",
+            "24_HTTP_selfPaymentBalanceChange_Client",
+            "25_GRPC_selfPaymentBalanceChange_Client",
+            "26_HTTP_selfPaymentBalanceChangeFeeLevel_Client",
+            "27_GRPC_selfPaymentBalanceChangeFeeLevel_Client",
+            "28_HTTP_transactionStatus_Client",
+            "29_HTTP_transactionStatus_Recipient",
+            "30_GRPC_transactionStatus_Client",
+            "31_GRPC_transactionStatus_Recipient",
+            "32_HTTP_transactionTxOutStatus_Client",
+            "33_HTTP_transactionTxOutStatus_Recipient",
+            "34_GRPC_transactionTxOutStatus_Client",
+            "35_GRPC_transactionTxOutStatus_Recipient",
+            "36_HTTP_receiptStatus_Client",
+            "37_HTTP_receiptStatus_Recipient",
+            "38_GRPC_receiptStatus_Client",
+            "39_GRPC_receiptStatus_Recipient",
+            "40_HTTP_consensusTrustRootWorks_Client",
+            "41_HTTP_consensusTrustRootWorks_Recipient",
+            "42_GRPC_consensusTrustRootWorks_Client",
+            "43_GRPC_consensusTrustRootWorks_Recipient",
+            "44_HTTP_extraConsensusTrustRootWorks_Client",
+            "45_HTTP_extraConsensusTrustRootWorks_Recipient",
+            "46_GRPC_extraConsensusTrustRootWorks_Client",
+            "47_GRPC_extraConsensusTrustRootWorks_Recipient",
+            "48_HTTP_wrongConsensusTrustRootReturnsError_Client",
+            "49_HTTP_wrongConsensusTrustRootReturnsError_Recipient",
+            "50_GRPC_wrongConsensusTrustRootReturnsError_Client",
+            "51_GRPC_wrongConsensusTrustRootReturnsError_Recipient",
+        ]
+
+        let testNamePrefix = testName.components(separatedBy: "(")[0]
+
+        // compose the search string
+        let clientName = "_\(transportProtocol.description)_\(testNamePrefix)_\(purpose)"
+
+        // get the index of the clientName that ends with the search string
+        guard let index = clientNames.firstIndex(where: { $0.hasSuffix(clientName) }) else {
+            fatalError("Can't find requested client named: \(clientName)")
+        }
+
+        let rng = MobileCoinChaCha20Rng(seed32: seed32)
+
+        // skip to the right position (can possibly use setWordPos)
+        for _ in 0..<index { for _ in 1...4 { _ = rng.next() } }
+
+        // get 32 bytes of data from MobileCoinRng
+        var entropyData = Data()
+        for _ in 1...4 { entropyData.append(rng.next().data) }
+
+        guard let entropy32 = Data32(entropyData) else {
+            fatalError(".secRngGenBytes(32) should always create a valid Data32")
+        }
+
+        print("Account entropy for \(clientName): \(entropy32.base64EncodedString())")
+
+        let acctKey = try AccountKey.make(
+            rootEntropy: entropy32.data,
+            fogReportUrl: network.fogReportUrl,
+            fogReportId: network.fogReportId,
+            fogAuthoritySpki: network.fogAuthoritySpki())
+            .get()
+
+        let client = try createMobileCoinClient(
+            accountKey: acctKey,
+            config: config,
+            transportProtocol: transportProtocol)
+
+        return (acctKey, client)
+    }
+}
+
+extension UInt64 {
+    var data: Data {
+        var int = self
+        return Data(bytes: &int, count: MemoryLayout<UInt64>.size)
+    }
+}
+
+#endif

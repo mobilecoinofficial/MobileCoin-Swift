@@ -80,7 +80,6 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func testPrintBalances() async throws {
-        try XCTSkip()
         let description = "Printing account balance"
         try await testSupportedProtocols(description: description) {
             try await self.printBalance(transportProtocol: $0)
