@@ -37,7 +37,7 @@ jobs:
            path: ./tools
 
        - name: Generate Test Accounts
-         working-directory: tools/TestSetupClient
+         working-directory: TestSetupClient
          run: fastlane scan --scheme "TestSetupClient"
 
   # run-transacting-integration-tests:
