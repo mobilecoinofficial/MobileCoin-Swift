@@ -39,6 +39,10 @@ jobs:
        - name: Debug And Seed
          run: echo $TEST_RUNNER_testAccountSeed
 
+       - name: Pod install
+         working-directory: ./tools/TestSetupClient
+         run: pod install
+
        - name: Generate Test Accounts
          working-directory: ./tools/TestSetupClient
          run: fastlane scan --scheme "TestSetupClient"
