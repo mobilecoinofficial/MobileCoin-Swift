@@ -36,11 +36,11 @@ jobs:
          with:
            files: ./tools
 
-       - name: Debug Path
-         run: echo `ls`
+       - name: Debug And Seed
+         run: echo $TEST_RUNNER_testAccountSeed
 
        - name: Generate Test Accounts
-         working-directory: TestSetupClient
+         working-directory: ./tools/TestSetupClient
          run: fastlane scan --scheme "TestSetupClient"
 
   # run-transacting-integration-tests:
