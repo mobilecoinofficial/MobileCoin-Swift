@@ -36,6 +36,9 @@ jobs:
          with:
            path: ./tools
 
+       - name: Debug Path
+         run: echo `ls`
+
        - name: Generate Test Accounts
          working-directory: TestSetupClient
          run: fastlane scan --scheme "TestSetupClient"
