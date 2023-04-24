@@ -27,21 +27,20 @@ jobs:
     steps:
        - name: Generate Test Account Seed
          run: echo "TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`" >> $GITHUB_ENV
-       - name: Test
-         run: echo $TEST_RUNNER_testAccountSeed
+         run: echo "::add-mask::$TEST_RUNNER_testAccountSeed"
 
-       # - name: Checkout Code
-       #   uses: actions/checkout@v2
-       #   with:
-       #     files: ./tools
-       #
-       # - name: Pod install
-       #   working-directory: ./tools/TestSetupClient
-       #   run: pod install
-       #
-       # - name: Generate Test Accounts
-       #   working-directory: ./tools/TestSetupClient
-       #   run: fastlane scan --scheme "TestSetupClient"
+       - name: Checkout Code
+         uses: actions/checkout@v2
+         with:
+           files: ./tools
+
+       - name: Pod install
+         working-directory: ./tools/TestSetupClient
+         run: pod install
+
+       - name: Generate Test Accounts
+         working-directory: ./tools/TestSetupClient
+         run: fastlane scan --scheme "TestSetupClient"
 
   # run-transacting-integration-tests:
   #   runs-on: macos-latest
