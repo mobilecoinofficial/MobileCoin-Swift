@@ -41,7 +41,8 @@ jobs:
 
        - name: Generate Test Accounts
          working-directory: ./tools/TestSetupClient
-         run: fastlane scan --scheme "TestSetupClient"
+         run: |
+          export TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed; fastlane scan --scheme "TestSetupClient"
 
   # run-transacting-integration-tests:
   #   runs-on: macos-latest
