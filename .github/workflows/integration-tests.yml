@@ -42,7 +42,9 @@ jobs:
        - name: Generate Test Accounts
          working-directory: ./tools/TestSetupClient
          run: |
-          export TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed; fastlane scan --scheme "TestSetupClient"
+          export TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
+          export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
+          fastlane scan --scheme "TestSetupClient"
 
   # run-transacting-integration-tests:
   #   runs-on: macos-latest
