@@ -20,11 +20,16 @@ jobs:
 
   dynamic-acct-env-setup:
     runs-on: macos-latest
-  steps:
-     - name: Generate Test Account Seed
-       run: |
-        echo "TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`" >> $GITHUB_ENV
-        echo "::add-mask::$TEST_RUNNER_testAccountSeed"
+    env:
+        # Override fastlane tooling variables
+        FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+        FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
+    steps:
+
+      - name: Generate Test Account Seed
+        run: |
+         echo "TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`" >> $GITHUB_ENV
+         echo "::add-mask::$TEST_RUNNER_testAccountSeed"
 
 
   fund-test-accounts:
