@@ -9,9 +9,6 @@ import XCTest
 
 class MobileCoinClientIntTests: XCTestCase {
 
-    let clientIdx = 7
-    let recipientIdx = 8
-
     func testTransactionDoubleSubmissionFails() throws {
         let description = "Submitting transaction twice"
         try testSupportedProtocols(description: description) {

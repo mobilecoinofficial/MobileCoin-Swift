@@ -18,17 +18,23 @@ env:
 
 jobs:
 
+  dynamic-acct-env-setup:
+    runs-on: macos-latest
+  steps:
+     - name: Generate Test Account Seed
+       run: |
+        echo "TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`" >> $GITHUB_ENV
+        echo "::add-mask::$TEST_RUNNER_testAccountSeed"
+
+
   fund-test-accounts:
+    needs: dynamic-acct-env-setup
     runs-on: macos-latest
     env:
         # Override fastlane tooling variables
         FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
         FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
     steps:
-       - name: Generate Test Account Seed
-         run: |
-          echo "TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`" >> $GITHUB_ENV
-          echo "::add-mask::$TEST_RUNNER_testAccountSeed"
 
        - name: Checkout Code
          uses: actions/checkout@v2
@@ -47,6 +53,7 @@ jobs:
           fastlane scan --scheme "TestSetupClient"
 
   run-transacting-integration-tests:
+    needs: dynamic-acct-env-setup
     runs-on: macos-latest
     env:
         # Override fastlane tooling variables
@@ -133,7 +140,6 @@ jobs:
         working-directory: ./Example
         run: |
          export TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
-         export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
          export SCAN_XCODEBUILD_FORMATTER="xcbeautify"
          bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro" --result_bundle true
 
