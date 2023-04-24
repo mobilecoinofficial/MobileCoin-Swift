@@ -137,7 +137,7 @@
          <EnvironmentVariable
             key = "testAccountSeed"
             value = "/cIJRtAm93p9ZPrVrMcbPQYtEAKa3xiOhHaUh1NmuVY="
-            isEnabled = "YES">
+            isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
