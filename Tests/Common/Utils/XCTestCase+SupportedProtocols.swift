@@ -22,10 +22,6 @@ extension XCTestCase {
             let expect = expectation(description: description)
             try testCase(transportProtocol, expect)
             XCTWaiter().wait(for: [expect], timeout: timeout)
-
-            // Without the sleep here, we were occasionally seeing 'insufficientFunds' errors
-            // caused by tests that transact, where the change txo has not come back yet
-            sleep(interval)
         }
     }
 
@@ -47,9 +43,6 @@ extension XCTestCase {
             try await withTimeout(seconds: timeout) {
                 try await testCase(transportProtocol)
             }
-            try await Task.sleep(
-                nanoseconds: UInt64(interval * 1_000_000_000)
-            )
         }
     }
 
