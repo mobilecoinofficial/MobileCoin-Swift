@@ -144,7 +144,7 @@ jobs:
       - name: Run Transacting Integration Tests On Example
         working-directory: ./Example
         run: |
-         export TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
+         export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
          export SCAN_XCODEBUILD_FORMATTER="xcbeautify"
          bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro" --result_bundle true
 
