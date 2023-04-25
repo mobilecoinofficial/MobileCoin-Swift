@@ -14,6 +14,7 @@ extension PaymentRequest.Fixtures {
         let publicAddress: PublicAddress
         let externalPublicAddress: External_PublicAddress
         let paymentValue: UInt64 = 123
+        let paymentID: UInt64 = 456
         let memo = "test memo"
 
         init() throws {
