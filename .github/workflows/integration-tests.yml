@@ -81,11 +81,11 @@ jobs:
         # Override fastlane tooling variables
         FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
         FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
-        TEST_ACCOUNT_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
+        TEST_RUNNER_testAccountSeed: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
     steps:
       - name: Echo Seed
         run: |
-            echo "Seed = $TEST_ACCOUNT_SEED"
+            echo "Seed = $TEST_RUNNER_testAccountSeed"
 
       - name: Set Ruby Version to 2.7
         uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
@@ -166,7 +166,6 @@ jobs:
       - name: Run Transacting Integration Tests On Example
         working-directory: ./Example
         run: |
-         export TEST_RUNNER_testAccountSeed=$TEST_ACCOUNT_SEED
          export SCAN_XCODEBUILD_FORMATTER="xcbeautify"
          bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro" --result_bundle true
 
