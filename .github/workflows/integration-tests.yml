@@ -39,6 +39,7 @@ jobs:
          echo Post mask: TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
 
   echo-seed:
+    needs: dynamic-acct-env-setup
     runs-on: macos-latest
     env:
       TEST_RUNNER_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
