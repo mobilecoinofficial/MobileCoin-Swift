@@ -74,7 +74,7 @@ jobs:
        fastlane scan --scheme "TestSetupClient"
 
   run-transacting-integration-tests:
-    needs: fund-test-accounts
+    needs: [dynamic-acct-env-setup, fund-test-accounts]
     runs-on: macos-latest
     env:
         # Override fastlane tooling variables
