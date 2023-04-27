@@ -23,7 +23,9 @@ jobs:
     steps:
     - name: Generate Test Account Seed
       id: generate-seed
-      run: seed32=`head -c32 </dev/urandom | base64`
+      run: |
+        seed32=`head -c32 </dev/urandom | base64`
+        echo "account_seed=$seed32" >> $GITHUB_OUTPUT
     outputs:
       account_seed: ${{ steps.generate-seed.outputs.account_seed }}
 
