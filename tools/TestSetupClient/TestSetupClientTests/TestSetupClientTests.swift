@@ -30,9 +30,11 @@ final class TestSetupClientTests: XCTestCase {
             return
         }
 
-        await TestWalletCreator().createAccounts(
+        let response = await TestWalletCreator().createAccounts(
             srcAcctMnemonic: srcAcctMnemonic,
             testAccountSeed: testAccountSeed)
+        
+        XCTAssertEqual("success", response)
     }
 
 }
