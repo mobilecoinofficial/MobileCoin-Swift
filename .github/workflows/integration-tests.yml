@@ -28,19 +28,23 @@ jobs:
 
       - name: Generate Test Account Seed
         id: seed
-        run: |
-         TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
-         echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
-         echo Alternate reference: ${{ env.TEST_RUNNER_testAccountSeed }}
-         echo "TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
-         echo "::add-mask::$TEST_RUNNER_testAccountSeed"
-         echo Post mask: TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
+        outputs:
+          account_seed: ${{ steps.create_seed.outputs.seed }}
+        steps:
+          - id: create_seed
+            run: |
+             TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
+             echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
+             echo Alternate reference: ${{ env.TEST_RUNNER_testAccountSeed }}
+             echo "seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
+             echo "::add-mask::$TEST_RUNNER_testAccountSeed"
+             echo Post mask: TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
 
-      - name: Echo seed
-        with:
-          testAccountSeed: ${{ steps.seed.outputs.TEST_RUNNER_testAccountSeed }}
-          run: |
-            echo account seed = $testAccountSeed
+      - name: Echo Seed
+        env:
+          TEST_RUNNER_SEED: ${{ jobs.seed.steps.create_seed.seed }}
+        run: |
+            echo "Seed = $TEST_RUNNER_SEED"
   # fund-test-accounts:
   #   needs: dynamic-acct-env-setup
   #   runs-on: macos-latest
