@@ -29,13 +29,8 @@ jobs:
     - name: Generate Test Account Seed
       id: generate-seed
       run: |
-       TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
-       echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
-       echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
-       echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_ENV
-    - name: Print Seed
-      run: |
-       echo "Env Seed = ${{ env.account_seed }}"
+       seed32=`head -c32 </dev/urandom | base64`
+       echo "account_seed=$seed32" >> $GITHUB_OUTPUT
     outputs:
       account_seed: ${{ steps.generate-seed.outputs.account_seed }}
 
@@ -43,38 +38,38 @@ jobs:
     needs: dynamic-acct-env-setup
     runs-on: macos-latest
     env:
-      TEST_RUNNER_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
+      TEST_ACCOUNT_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
     steps:
       - name: echo_seed
         run: |
-            echo "Seed = $TEST_RUNNER_SEED"
-            echo "Output Seed = ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}"
-            echo "Env Seed = ${{ env.account_seed }}"
-  # fund-test-accounts:
-  #   needs: dynamic-acct-env-setup
-  #   runs-on: macos-latest
-  #   env:
-  #       # Override fastlane tooling variables
-  #       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
-  #       FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
-  #   steps:
-  #
-  #      - name: Checkout Code
-  #        uses: actions/checkout@v2
-  #        with:
-  #          files: ./tools
-  #
-  #      - name: Pod install
-  #        working-directory: ./tools/TestSetupClient
-  #        run: pod install
-  #
-  #      - name: Generate Test Accounts
-  #        working-directory: ./tools/TestSetupClient
-  #        run: |
-  #         export TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
-  #         export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
-  #         fastlane scan --scheme "TestSetupClient"
-  #
+            echo "Seed = $TEST_ACCOUNT_SEED"
+
+  fund-test-accounts:
+    needs: dynamic-acct-env-setup
+    runs-on: macos-latest
+    env:
+        # Override fastlane tooling variables
+        FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+        FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
+        TEST_ACCOUNT_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
+    steps:
+
+       - name: Checkout Code
+         uses: actions/checkout@v2
+         with:
+           files: ./tools
+
+       - name: Pod install
+         working-directory: ./tools/TestSetupClient
+         run: pod install
+
+       - name: Generate Test Accounts
+         working-directory: ./tools/TestSetupClient
+         run: |
+          export TEST_RUNNER_testAccountSeed=$TEST_ACCOUNT_SEED
+          export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
+          fastlane scan --scheme "TestSetupClient"
+
   # run-transacting-integration-tests:
   #   needs: fund-test-accounts
   #   runs-on: macos-latest
