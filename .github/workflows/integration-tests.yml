@@ -42,8 +42,7 @@ jobs:
       TEST_ACCOUNT_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
     steps:
       - name: Echo Seed
-        run: |
-            echo "Seed = $TEST_ACCOUNT_SEED"
+        run: echo "Seed = $TEST_ACCOUNT_SEED"
 
   fund-test-accounts:
     needs: dynamic-acct-env-setup
@@ -53,10 +52,10 @@ jobs:
       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
       FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
       TEST_RUNNER_testAccountSeed: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
+      TEST_RUNNER_srcAcctMnemonic: ${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
     steps:
     - name: Echo Seed
-      run: |
-          echo "Seed = $TEST_ACCOUNT_SEED"
+      run: echo "Seed = $TEST_ACCOUNT_SEED"
 
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -69,9 +68,7 @@ jobs:
 
     - name: Generate Test Accounts
       working-directory: ./tools/TestSetupClient
-      run: |
-       export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
-       fastlane scan --scheme "TestSetupClient"
+      run: fastlane scan --scheme "TestSetupClient"
 
   # run-transacting-integration-tests:
   #   needs: dynamic-acct-env-setup
