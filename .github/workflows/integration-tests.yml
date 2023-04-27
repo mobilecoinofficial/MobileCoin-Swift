@@ -35,6 +35,7 @@ jobs:
          echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
          echo Alternate reference: ${{ env.TEST_RUNNER_testAccountSeed }}
          echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
+         echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_ENV
          echo "::add-mask::$TEST_RUNNER_testAccountSeed"
          echo Post mask: TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
 
@@ -47,7 +48,8 @@ jobs:
       - name: echo_seed
         run: |
             echo "Seed = $TEST_RUNNER_SEED"
-            echo "Output Seed = ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}"
+            echo "Output Seed = ${{ needs.dynamic-acct-env-setup.outputs.account_seed
+            echo "Env Seed = ${{ env.account_seed }}"
   # fund-test-accounts:
   #   needs: dynamic-acct-env-setup
   #   runs-on: macos-latest
