@@ -452,16 +452,16 @@ class MobileCoinClientInternalIntTests: XCTestCase {
         case .failure:
             XCTFail("account not created or doesn't have balance")
         }
-
-        @available(iOS 15.0, *)
-        func testAccountSeed() async throws {
-            guard let testAcountB64Seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
-                XCTFail("Seed value not available from environment")
-                fatalError("Seed value not available from environment")
-            }
-            let seed = "w4g0Qi+3ytxup7H4NTxDwrwV6w4ditsHDzskq65B8ko="
-            XCTAssertEqual(testAcountB64Seed, seed)
+    }
+    
+    @available(iOS 15.0, *)
+    func testAccountSeed() async throws {
+        guard let testAcountB64Seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
+            XCTFail("Seed value not available from environment")
+            fatalError("Seed value not available from environment")
         }
+        let seed = "w4g0Qi+3ytxup7H4NTxDwrwV6w4ditsHDzskq65B8ko="
+        XCTAssertEqual(testAcountB64Seed, seed)
     }
 #endif
     
