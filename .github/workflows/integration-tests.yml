@@ -24,21 +24,20 @@ jobs:
         # Override fastlane tooling variables
         FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
         FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
-    outputs:
-      account_seed: ${{ steps.generate-seed.outputs.seed }}
     steps:
 
-      - name: Generate Test Account Seed
-        id: generate-seed
-        run: |
-         TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
-         echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
-         echo Alternate reference: ${{ env.TEST_RUNNER_testAccountSeed }}
-         echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
-         echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_ENV
-      - name: Print Seed
-        run: |
-         echo "Env Seed = ${{ env.account_seed }}"
+    - name: Generate Test Account Seed
+      id: generate-seed
+      run: |
+       TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
+       echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
+       echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
+       echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_ENV
+    - name: Print Seed
+      run: |
+       echo "Env Seed = ${{ env.account_seed }}"
+    outputs:
+      account_seed: ${{ steps.generate-seed.outputs.account_seed }}
 
   echo-seed:
     needs: dynamic-acct-env-setup
