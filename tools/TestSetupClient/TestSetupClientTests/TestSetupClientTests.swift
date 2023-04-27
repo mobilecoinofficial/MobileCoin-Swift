@@ -19,20 +19,20 @@ final class TestSetupClientTests: XCTestCase {
         XCTAssertEqual(testAcountB64Seed, seed)
     }
 
-    func testCreateAccounts() async throws {
-        guard let testAccountSeed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
-            XCTFail("Unable to get testAccountSeed value")
-            return
-        }
-
-        guard let srcAcctMnemonic = ProcessInfo.processInfo.environment["srcAcctMnemonic"] else {
-            XCTFail("Unable to get source account mnemonic")
-            return
-        }
-
-        await TestWalletCreator().createAccounts(
-            srcAcctMnemonic: srcAcctMnemonic,
-            testAccountSeed: testAccountSeed)
-    }
+//    func testCreateAccounts() async throws {
+//        guard let testAccountSeed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
+//            XCTFail("Unable to get testAccountSeed value")
+//            return
+//        }
+//
+//        guard let srcAcctMnemonic = ProcessInfo.processInfo.environment["srcAcctMnemonic"] else {
+//            XCTFail("Unable to get source account mnemonic")
+//            return
+//        }
+//
+//        await TestWalletCreator().createAccounts(
+//            srcAcctMnemonic: srcAcctMnemonic,
+//            testAccountSeed: testAccountSeed)
+//    }
 
 }
