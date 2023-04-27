@@ -108,8 +108,8 @@ public struct TestAccountFactory {
             fogReportId: self.fogReportId,
             fogAuthoritySpki: self.fogAuthoritySpki)
             .get()
-        
-        print("Funding View Public Key: \(acctKey.publicAddress.viewPublicKey.base64EncodedString())")
+
+        print("Funding View Pub Key: \(acctKey.publicAddress.viewPublicKey.base64EncodedString())")
 
         for amount in testAccountConfig.txAmounts {
             let fee = try await sourceClient.estimateTotalFee(

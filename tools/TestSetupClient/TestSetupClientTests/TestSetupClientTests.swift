@@ -21,11 +21,19 @@ final class TestSetupClientTests: XCTestCase {
             return
         }
 
-        let response = await TestWalletCreator().createAccounts(
+        let result = await TestWalletCreator().createAccounts(
             srcAcctMnemonic: srcAcctMnemonic,
             testAccountSeed: testAccountSeed)
         
-        XCTAssertEqual("success", response)
+        switch result {
+        case .success:
+            print("Test accounts created successfully")
+        case let .failure(error):
+            switch error {
+            case .error(let message):
+                XCTFail("Test account creation failed with error: \(message)")
+            }
+        }
     }
 
 }

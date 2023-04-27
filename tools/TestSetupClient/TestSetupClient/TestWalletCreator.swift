@@ -5,17 +5,21 @@
 import Foundation
 import MobileCoin
 
+enum TestWalletCreationError: Error, Equatable {
+    case error(String)
+}
+
 class TestWalletCreator: ObservableObject {
     init() {
     }
     
-    final func createAccounts(srcAcctMnemonic: String, testAccountSeed: String) async -> String {
+    final func createAccounts(srcAcctMnemonic: String, testAccountSeed: String) async -> Result<Void, TestWalletCreationError> {
         do {
             let minFee: UInt64 = 400_000_000
             let minMOBUSDFee: UInt64 = 2650
 
             guard let fogAuthoritySpki = Data(base64Encoded: NetworkPresets.fogAuthoritySpkiB64Encoded) else {
-                return "Unable to get fogAuthoritySpki"
+                return .failure(.error("Unable to get fogAuthoritySpki"))
             }
             
             guard let accountKey = try? AccountKey.make(
@@ -23,7 +27,7 @@ class TestWalletCreator: ObservableObject {
                 fogReportUrl: NetworkPresets.fogUrl,
                 fogReportId: "",
                 fogAuthoritySpki: fogAuthoritySpki).get() else {
-                return "Unable to create accountKey with mnemonic"
+                return .failure(.error("Unable to create accountKey with mnemonic"))
             }
 
             guard let config = try? MobileCoinClient.Config.make(
@@ -35,12 +39,12 @@ class TestWalletCreator: ObservableObject {
                 fogMerkleProofAttestation: NetworkPresets.fogLedgerAttestation(),
                 fogReportAttestation: NetworkPresets.fogReportAttestation(),
                 transportProtocol: .grpc).get() else {
-                return "Unable to get config"
+                return .failure(.error("Unable to get config"))
             }
             
             guard let sourceClient = try? MobileCoinClient.make(
                 accountKey: accountKey, config: config).get() else {
-                return "Unable to create source client"
+                return .failure(.error("Unable to create source client"))
             }
             
             let balances = try await sourceClient.updateBalances()
@@ -257,9 +261,9 @@ class TestWalletCreator: ObservableObject {
             
         } catch {
             print("Failed to create test accounts, error: \(error)")
-            return "\(error)"
+            return .failure(.error(error.localizedDescription))
         }
         
-        return "success"
+        return .success(())
     }
 }
