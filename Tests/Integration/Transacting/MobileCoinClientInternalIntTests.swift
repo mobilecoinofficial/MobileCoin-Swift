@@ -422,47 +422,6 @@ class MobileCoinClientInternalIntTests: XCTestCase {
                 returnAddress: sourceAccountKey.publicAddress)
         }
     }
-    
-    @available(iOS 15.0, *)
-    func testDynamicAccountHasBalance() async throws {
-        try XCTSkip()
-        let entropyString = "QzNxpAlpc3yCU5qpe92TqhUHCMt0hTDwXplwu//JPiI="
 
-        guard let entropyData = Data(base64Encoded: entropyString, options: []) else {
-            XCTFail("can't create entropy from string")
-            return
-        }
-
-        guard let entropy32 = Data32(entropyData) else {
-            XCTFail("can't create entropy32")
-            return
-        }
-
-        switch AccountKey.make(
-            rootEntropy: entropy32.data,
-            fogReportUrl: NetworkConfigFixtures.network.fogReportUrl,
-            fogReportId: "",
-            fogAuthoritySpki: try NetworkConfigFixtures.network.fogAuthoritySpki())
-        {
-        case .success(let acctKey):
-            let _ = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountKey: acctKey,
-                tokenId: .MOB,
-                transportProtocol: .http)
-        case .failure:
-            XCTFail("account not created or doesn't have balance")
-        }
-    }
-    
-    @available(iOS 15.0, *)
-    func testAccountSeedVerification() async throws {
-        guard let testAcountB64Seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
-            XCTFail("Seed value not available from environment")
-            fatalError("Seed value not available from environment")
-        }
-        let seed = "w4g0Qi+3ytxup7H4NTxDwrwV6w4ditsHDzskq65B8ko="
-        XCTAssertEqual(testAcountB64Seed, seed)
-    }
 #endif
-    
 }
