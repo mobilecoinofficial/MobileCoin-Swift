@@ -31,7 +31,8 @@ jobs:
         outputs:
           account_seed: ${{ steps.create_seed.outputs.seed }}
         steps:
-          - id: create_seed
+          - name: Create Seed
+            id: create_seed
             run: |
              TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
              echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
@@ -40,9 +41,12 @@ jobs:
              echo "::add-mask::$TEST_RUNNER_testAccountSeed"
              echo Post mask: TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
 
-      - name: Echo Seed
-        env:
-          TEST_RUNNER_SEED: ${{ jobs.seed.steps.create_seed.seed }}
+  echo-seed:
+    runs-on: macos-latest
+    env:
+      TEST_RUNNER_SEED: ${{ jobs.seed.steps.create_seed.seed }}
+    steps:
+      - name: echo_seed
         run: |
             echo "Seed = $TEST_RUNNER_SEED"
   # fund-test-accounts:
