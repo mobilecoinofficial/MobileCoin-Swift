@@ -34,7 +34,7 @@ jobs:
          TEST_RUNNER_testAccountSeed=`head -c32 </dev/urandom | base64`
          echo TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
          echo Alternate reference: ${{ env.TEST_RUNNER_testAccountSeed }}
-         echo "seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
+         echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
          echo "::add-mask::$TEST_RUNNER_testAccountSeed"
          echo Post mask: TEST_RUNNER_testAccountSeed=$TEST_RUNNER_testAccountSeed
 
