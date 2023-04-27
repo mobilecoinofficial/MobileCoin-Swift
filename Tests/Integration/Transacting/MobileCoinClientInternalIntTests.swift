@@ -455,7 +455,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
     }
     
     @available(iOS 15.0, *)
-    func testAccountSeed() async throws {
+    func testAccountSeedVerification() async throws {
         guard let testAcountB64Seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
             XCTFail("Seed value not available from environment")
             fatalError("Seed value not available from environment")
