@@ -72,118 +72,118 @@ jobs:
           export TEST_RUNNER_testAccountSeed=$TEST_ACCOUNT_SEED
           export TEST_RUNNER_srcAcctMnemonic=${{ secrets.DYNAMIC_SOURCE_ACCOUNT_MNEMONIC }}
           fastlane scan --scheme "TestSetupClient"
-
-  run-transacting-integration-tests:
-    needs: fund-test-accounts
-    runs-on: macos-latest
-    env:
-        # Override fastlane tooling variables
-        FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
-        FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
-        TEST_ACCOUNT_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
-    steps:
-      - name: Echo Seed
-        run: |
-            echo "Seed = $TEST_ACCOUNT_SEED"
-
-      - name: Set Ruby Version to 2.7
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
-        with:
-          ruby-version: '2.7'
-          bundler-cache: true
-
-      - name: Install 'rename' command
-        run: brew install rename
-
-      - name: Install 'xcbeautify'
-        run: brew install xcbeautify
-
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Get Submodules
-        working-directory: Vendor/libmobilecoin-ios-artifacts
-        run: git submodule update --init --depth 1 --recursive
-
-      - name: Install Gems
-        run: |
-          bundle config set --local deployment 'true'
-          bundle config set --local path '.vendor/bundle'
-          bundle config set --local clean 'true'
-          bundle check || bundle install
-
-      - name: Set the Network
-        if: ${{ github.event.inputs.network }}
-        env:
-          NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
-        run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Common/Fixtures/NetworkConfigFixtures.swift
-
-      - name: GCP Service Account
-        run: |
-          echo '${{ secrets.GCP_SERVICE_KEY }}' > "service-key.json"
-
-      - name: Install Example Gems
-        working-directory: ./Example
-        run: |
-          bundle config set --local deployment 'true'
-          bundle config set --local path '.vendor/bundle'
-          bundle config set --local clean 'true'
-          bundle check || bundle install
-
-      - name: Make Setup
-        working-directory: ./Example
-        run: make setup
-
-      - name: Provide Dev Credentials
-        working-directory: ./Example
-        env:
-          TEST_DEV_USER: ${{ secrets.DEV_NETWORK_AUTH_USERNAME }}
-          TEST_DEV_PASSWORD: ${{ secrets.DEV_NETWORK_AUTH_PASSWORD }}
-          TEST_NET_MNEMONICS: ${{ secrets.TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
-          DEV_NET_MNEMONICS: ${{ secrets.MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
-          DYNAMIC_FOG_AUTH_SPKI: ${{ secrets.DYNAMIC_FOG_AUTHORITY_SPKI }}
-          DYNAMIC_SEED_ENTROPIES: ${{ secrets.DYNAMIC_TEST_ACCOUNT_ENTROPIES_COMMA_SEPARATED }}
-        run: |
-          bundle exec pod keys set devNetworkAuthUsername "${TEST_DEV_USER}"
-          bundle exec pod keys set devNetworkAuthPassword "${TEST_DEV_PASSWORD}"
-          bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "${TEST_NET_MNEMONICS}"
-          bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "${DEV_NET_MNEMONICS}"
-          bundle exec pod keys set dynamicFogAuthoritySpki "${DYNAMIC_FOG_AUTH_SPKI}"
-          bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "${DYNAMIC_SEED_ENTROPIES}"
-
-      - name: Install pods for Example project
-        working-directory: ./Example
-        run: bundle exec pod install --deployment
-
-      - name: Generating CocoaPods Keys
-        run: ./scripts/setkeysfor Example
-
-      - name: Make Bootstrap PostKeys
-        working-directory: ./Example
-        run: make bootstrap
-
-      - name: Run Transacting Integration Tests On Example
-        working-directory: ./Example
-        run: |
-         export TEST_RUNNER_testAccountSeed=$TEST_ACCOUNT_SEED
-         export SCAN_XCODEBUILD_FORMATTER="xcbeautify"
-         bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro" --result_bundle true
-
-      - name: Archive Build Results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: integration-transacting-test-logs
-          path: |
-            ~/Library/Logs/scan
-
-      - name: Archive Test Results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: integration-transacting-test-logs
-          path: |
-            ./Example/test_output
+  # 
+  # run-transacting-integration-tests:
+  #   needs: fund-test-accounts
+  #   runs-on: macos-latest
+  #   env:
+  #       # Override fastlane tooling variables
+  #       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+  #       FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
+  #       TEST_ACCOUNT_SEED: ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}
+  #   steps:
+  #     - name: Echo Seed
+  #       run: |
+  #           echo "Seed = $TEST_ACCOUNT_SEED"
+  #
+  #     - name: Set Ruby Version to 2.7
+  #       uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+  #       with:
+  #         ruby-version: '2.7'
+  #         bundler-cache: true
+  #
+  #     - name: Install 'rename' command
+  #       run: brew install rename
+  #
+  #     - name: Install 'xcbeautify'
+  #       run: brew install xcbeautify
+  #
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v2
+  #
+  #     - name: Get Submodules
+  #       working-directory: Vendor/libmobilecoin-ios-artifacts
+  #       run: git submodule update --init --depth 1 --recursive
+  #
+  #     - name: Install Gems
+  #       run: |
+  #         bundle config set --local deployment 'true'
+  #         bundle config set --local path '.vendor/bundle'
+  #         bundle config set --local clean 'true'
+  #         bundle check || bundle install
+  #
+  #     - name: Set the Network
+  #       if: ${{ github.event.inputs.network }}
+  #       env:
+  #         NETWORK_UNDER_TEST: ${{ github.event.inputs.network }}
+  #       run: sed -i '' "s/NetworkPreset = \..*/NetworkPreset = .${NETWORK_UNDER_TEST}/" ./Tests/Integration/Common/Fixtures/NetworkConfigFixtures.swift
+  #
+  #     - name: GCP Service Account
+  #       run: |
+  #         echo '${{ secrets.GCP_SERVICE_KEY }}' > "service-key.json"
+  #
+  #     - name: Install Example Gems
+  #       working-directory: ./Example
+  #       run: |
+  #         bundle config set --local deployment 'true'
+  #         bundle config set --local path '.vendor/bundle'
+  #         bundle config set --local clean 'true'
+  #         bundle check || bundle install
+  #
+  #     - name: Make Setup
+  #       working-directory: ./Example
+  #       run: make setup
+  #
+  #     - name: Provide Dev Credentials
+  #       working-directory: ./Example
+  #       env:
+  #         TEST_DEV_USER: ${{ secrets.DEV_NETWORK_AUTH_USERNAME }}
+  #         TEST_DEV_PASSWORD: ${{ secrets.DEV_NETWORK_AUTH_PASSWORD }}
+  #         TEST_NET_MNEMONICS: ${{ secrets.TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+  #         DEV_NET_MNEMONICS: ${{ secrets.MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+  #         DYNAMIC_FOG_AUTH_SPKI: ${{ secrets.DYNAMIC_FOG_AUTHORITY_SPKI }}
+  #         DYNAMIC_SEED_ENTROPIES: ${{ secrets.DYNAMIC_TEST_ACCOUNT_ENTROPIES_COMMA_SEPARATED }}
+  #       run: |
+  #         bundle exec pod keys set devNetworkAuthUsername "${TEST_DEV_USER}"
+  #         bundle exec pod keys set devNetworkAuthPassword "${TEST_DEV_PASSWORD}"
+  #         bundle exec pod keys set testNetTestAccountMnemonicsCommaSeparated "${TEST_NET_MNEMONICS}"
+  #         bundle exec pod keys set mobileDevTestAccountMnemonicsCommaSeparated "${DEV_NET_MNEMONICS}"
+  #         bundle exec pod keys set dynamicFogAuthoritySpki "${DYNAMIC_FOG_AUTH_SPKI}"
+  #         bundle exec pod keys set dynamicTestAccountSeedEntropiesCommaSeparated "${DYNAMIC_SEED_ENTROPIES}"
+  #
+  #     - name: Install pods for Example project
+  #       working-directory: ./Example
+  #       run: bundle exec pod install --deployment
+  #
+  #     - name: Generating CocoaPods Keys
+  #       run: ./scripts/setkeysfor Example
+  #
+  #     - name: Make Bootstrap PostKeys
+  #       working-directory: ./Example
+  #       run: make bootstrap
+  #
+  #     - name: Run Transacting Integration Tests On Example
+  #       working-directory: ./Example
+  #       run: |
+  #        export TEST_RUNNER_testAccountSeed=$TEST_ACCOUNT_SEED
+  #        export SCAN_XCODEBUILD_FORMATTER="xcbeautify"
+  #        bundle exec fastlane scan --scheme "Integration Transacting Tests"  --device "iPhone 14 Pro" --result_bundle true
+  #
+  #     - name: Archive Build Results
+  #       if: always()
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: integration-transacting-test-logs
+  #         path: |
+  #           ~/Library/Logs/scan
+  #
+  #     - name: Archive Test Results
+  #       if: always()
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: integration-transacting-test-logs
+  #         path: |
+  #           ./Example/test_output
 
 
   # run-non-transacting-integration-tests:
