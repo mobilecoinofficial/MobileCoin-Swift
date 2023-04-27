@@ -47,6 +47,7 @@ jobs:
       - name: echo_seed
         run: |
             echo "Seed = $TEST_RUNNER_SEED"
+            echo "Output Seed = ${{ needs.dynamic-acct-env-setup.outputs.account_seed }}"
   # fund-test-accounts:
   #   needs: dynamic-acct-env-setup
   #   runs-on: macos-latest
