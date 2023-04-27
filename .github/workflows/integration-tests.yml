@@ -36,7 +36,6 @@ jobs:
          echo Alternate reference: ${{ env.TEST_RUNNER_testAccountSeed }}
          echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_OUTPUT
          echo "account_seed=$TEST_RUNNER_testAccountSeed" >> $GITHUB_ENV
-#         echo "::add-mask::$TEST_RUNNER_testAccountSeed"
          echo "Env Seed = ${{ env.account_seed }}"
 
   echo-seed:
