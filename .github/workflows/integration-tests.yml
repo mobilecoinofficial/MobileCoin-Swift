@@ -51,7 +51,7 @@ jobs:
       run: fastlane scan --scheme "TestSetupClient"
 
   run-transacting-integration-tests:
-    needs: set-seed
+    needs: [set-seed, fund-test-accounts]
     runs-on: macos-latest
     env:
         # Override fastlane tooling variables
