@@ -61,18 +61,6 @@
             ReferencedContainer = "container:TestSetupClient.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "srcAcctMnemonic"
-            value = "ordinary voice hawk rival outer fringe foot turn emerge name fluid surge call fatal airport fiction habit later monitor month gap gossip vessel path"
-            isEnabled = "NO">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "testAcctSeed"
-            value = "/cIJRtAm93p9ZPrVrMcbPQYtEAKa3xiOhHaUh1NmuVY="
-            isEnabled = "NO">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

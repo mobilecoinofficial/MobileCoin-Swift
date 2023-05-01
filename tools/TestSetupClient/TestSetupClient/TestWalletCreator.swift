@@ -54,7 +54,7 @@ class TestWalletCreator: ObservableObject {
                 fogReportUrl:  NetworkPresets.fogUrl,
                 fogAuthoritySpki: fogAuthoritySpki)
             let testAccountConfigs = [
-                
+
                 // testTransactionDoubleSubmissionFails
                 TestAccountFactory.TestAccountConfig(
                     name:"0_HTTP_testTransactionDoubleSubmissionFails_Client",
@@ -248,6 +248,21 @@ class TestWalletCreator: ObservableObject {
                 TestAccountFactory.TestAccountConfig(
                     name:"51_GRPC_testWrongConsensusTrustRootReturnsError_Recipient",
                     txData:[:]),
+
+                // testIdempotenceDoubleSubmissionFailure
+                TestAccountFactory.TestAccountConfig(
+                    name:"52_HTTP_testIdempotenceDoubleSubmissionFailure_Client",
+                    txData:[.MOB : [100 + minFee]]),
+                TestAccountFactory.TestAccountConfig(
+                    name:"53_HTTP_testIdempotenceDoubleSubmissionFailure_Recipient",
+                    txData:[:]),
+                TestAccountFactory.TestAccountConfig(
+                    name:"54_GRPC_testIdempotenceDoubleSubmissionFailure_Client",
+                    txData:[.MOB : [100 + minFee]]),
+                TestAccountFactory.TestAccountConfig(
+                    name:"55_GRPC_testIdempotenceDoubleSubmissionFailure_Recipient",
+                    txData:[:]),
+
             ]
 
 

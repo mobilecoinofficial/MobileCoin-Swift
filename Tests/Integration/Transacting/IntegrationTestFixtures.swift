@@ -379,6 +379,10 @@ extension IntegrationTestFixtures {
             "49_HTTP_wrongConsensusTrustRootReturnsError_Recipient",
             "50_GRPC_wrongConsensusTrustRootReturnsError_Client",
             "51_GRPC_wrongConsensusTrustRootReturnsError_Recipient",
+            "52_HTTP_idempotenceDoubleSubmissionFailure_Client",
+            "53_HTTP_idempotenceDoubleSubmissionFailure_Recipient",
+            "54_GRPC_idempotenceDoubleSubmissionFailure_Client",
+            "55_GRPC_idempotenceDoubleSubmissionFailure_Recipient",
         ]
 
         let testNamePrefix = testName.components(separatedBy: "(")[0]
