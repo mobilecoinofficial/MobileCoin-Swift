@@ -252,13 +252,13 @@ class TestWalletCreator: ObservableObject {
                 // testIdempotenceDoubleSubmissionFailure
                 TestAccountFactory.TestAccountConfig(
                     name:"52_HTTP_testIdempotenceDoubleSubmissionFailure_Client",
-                    txData:[.MOB : [100 + minFee]]),
+                    txData:[.MOB : [100 + minFee, 100 + minFee]]),
                 TestAccountFactory.TestAccountConfig(
                     name:"53_HTTP_testIdempotenceDoubleSubmissionFailure_Recipient",
                     txData:[:]),
                 TestAccountFactory.TestAccountConfig(
                     name:"54_GRPC_testIdempotenceDoubleSubmissionFailure_Client",
-                    txData:[.MOB : [100 + minFee]]),
+                    txData:[.MOB : [100 + minFee, 100 + minFee]]),
                 TestAccountFactory.TestAccountConfig(
                     name:"55_GRPC_testIdempotenceDoubleSubmissionFailure_Recipient",
                     txData:[:]),
