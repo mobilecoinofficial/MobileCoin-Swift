@@ -16,13 +16,13 @@ final class TestSetupClientTests: XCTestCase {
             return
         }
 
-        guard let srcAcctMnemonic = ProcessInfo.processInfo.environment["srcAcctMnemonic"] else {
-            XCTFail("Unable to get source account mnemonic")
+        guard let srcAcctEntropyString = ProcessInfo.processInfo.environment["srcAcctEntropyString"] else {
+            XCTFail("Unable to get source account emtropy string")
             return
         }
 
         let result = await TestWalletCreator().createAccounts(
-            srcAcctMnemonic: srcAcctMnemonic,
+            srcAcctEntropyString: srcAcctEntropyString,
             testAccountSeed: testAccountSeed)
         
         switch result {

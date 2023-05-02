@@ -13,7 +13,7 @@ class TestWalletCreator: ObservableObject {
     init() {
     }
     
-    final func createAccounts(srcAcctMnemonic: String, testAccountSeed: String) async -> Result<Void, TestWalletCreationError> {
+    final func createAccounts(srcAcctEntropyString: String, testAccountSeed: String) async -> Result<Void, TestWalletCreationError> {
         do {
             let minFee: UInt64 = 400_000_000
             let minMOBUSDFee: UInt64 = 2650
@@ -22,12 +22,16 @@ class TestWalletCreator: ObservableObject {
                 return .failure(.error("Unable to get fogAuthoritySpki"))
             }
             
+            guard let srcAcctEntropyData = Data(base64Encoded: srcAcctEntropyString, options: []) else {
+                return .failure(.error("Unable to extract entropy data from entropy string"))
+            }
+            
             guard let accountKey = try? AccountKey.make(
-                mnemonic: srcAcctMnemonic,
+                rootEntropy: srcAcctEntropyData,
                 fogReportUrl: NetworkPresets.fogUrl,
                 fogReportId: "",
                 fogAuthoritySpki: fogAuthoritySpki).get() else {
-                return .failure(.error("Unable to create accountKey with mnemonic"))
+                return .failure(.error("Unable to create source accountKey with entropy data"))
             }
 
             guard let config = try? MobileCoinClient.Config.make(
