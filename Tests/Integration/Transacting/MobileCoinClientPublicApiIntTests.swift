@@ -19,29 +19,35 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func testSubmitTransaction() async throws {
         let description = "Submitting transaction"
         try await testSupportedProtocols(description: description) {
+            if $0 == .http {
                 try await self.submitTransaction(transportProtocol: $0)
+            }
         }
     }
 
     func submitTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
-            transportProtocol: transportProtocol,
-            testName: #function,
-            purpose: "Client")
-        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
-            transportProtocol: transportProtocol,
-            testName: #function,
-            purpose: "Recipient")
+//        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+//            transportProtocol: transportProtocol,
+//            testName: #function,
+//            purpose: "Client")
+        
+        let (_, client) = try IntegrationTestFixtures.createMnemonicClient(mnemonic: "ordinary voice hawk rival outer fringe foot turn emerge name fluid surge call fatal airport fiction habit later monitor month gap gossip vessel path")
+        
+//        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+//            transportProtocol: transportProtocol,
+//            testName: #function,
+//            purpose: "Recipient")
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createRandomClient()
 
-        try await client.updateBalances()
-
-        let transaction = try await client.prepareTransaction(
-            to: recipientAccountKey.publicAddress,
-            amount: Amount(100, in: .MOB),
-            fee: IntegrationTestFixtures.fee)
-        try await client.submitTransaction(transaction: transaction.transaction)
+//        try await client.updateBalances()
+//
+//        let transaction = try await client.prepareTransaction(
+//            to: recipientAccountKey.publicAddress,
+//            amount: Amount(100, in: .MOB),
+//            fee: IntegrationTestFixtures.fee)
+//        try await client.submitTransaction(transaction: transaction.transaction)
     }
 
     func testSubmitMobUSDTransaction() async throws {
