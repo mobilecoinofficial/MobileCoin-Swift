@@ -13,7 +13,6 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Pods\/Pods.xcodeproj",
         "identifier" : "A1F822BE1CADA3693528DBC440D61C8A",

@@ -6,6 +6,6 @@ import Foundation
 
 extension TransportProtocol: SupportedProtocols {
     public static var supportedProtocols: [TransportProtocol] {
-        [.grpc, .http]
+        [.http]
     }
 }
