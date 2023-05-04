@@ -280,7 +280,6 @@ extension IntegrationTestFixtures {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
     ) throws -> ServiceProvider {
-
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
@@ -444,11 +443,9 @@ extension IntegrationTestFixtures {
         }
 
         print("Account entropy for random account: \(entropy32.base64EncodedString())")
-
         let res = Bip39Utils.mnemonic(fromEntropy: entropy32.data).flatMap { mnemonic in
 
             print("Account mnemonic for random account: \(mnemonic.phrase)")
-
             let acctKey = try AccountKey.make(
                 rootEntropy: entropy32.data,
                 fogReportUrl: network.fogReportUrl,
