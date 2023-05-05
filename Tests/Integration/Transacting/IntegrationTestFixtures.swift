@@ -7,8 +7,6 @@
 @testable import MobileCoin
 import XCTest
 
-#if swift(>=5.5)
-
 enum IntegrationTestFixtures {
     static let network: NetworkPreset = NetworkConfigFixtures.network
 }
@@ -423,71 +421,6 @@ extension IntegrationTestFixtures {
 
         return (acctKey, client)
     }
-
-    static func createRandomClient() throws -> (AccountKey, MobileCoinClient) {
-        let config = try createMobileCoinClientConfig(using: .http)
-        return try createRandomClient(config: config)
-    }
-
-    static func createRandomClient(
-        config: MobileCoinClient.Config
-    ) throws -> (AccountKey, MobileCoinClient) {
-        let rng = MobileCoinChaCha20Rng()
-
-        // get 32 bytes of data from MobileCoinRng
-        var entropyData = Data()
-        for _ in 1...4 { entropyData.append(rng.next().data) }
-
-        guard let entropy32 = Data32(entropyData) else {
-            fatalError(".secRngGenBytes(32) should always create a valid Data32")
-        }
-
-        print("Account entropy for random account: \(entropy32.base64EncodedString())")
-        let res = Bip39Utils.mnemonic(fromEntropy: entropy32.data).flatMap { mnemonic in
-
-            print("Account mnemonic for random account: \(mnemonic.phrase)")
-            let acctKey = try AccountKey.make(
-                rootEntropy: entropy32.data,
-                fogReportUrl: network.fogReportUrl,
-                fogReportId: network.fogReportId,
-                fogAuthoritySpki: network.fogAuthoritySpki())
-                .get()
-
-            let client = try createMobileCoinClient(
-                accountKey: acctKey,
-                config: config,
-                transportProtocol: .http)
-
-            return (acctKey, client)
-        }
-
-        return try res.get()
-    }
-
-    static func createMnemonicClient(mnemonic: String) throws -> (AccountKey, MobileCoinClient) {
-        let config = try createMobileCoinClientConfig(using: .http)
-        return try createMnemonicClient(mnemonic: mnemonic, config: config)
-    }
-
-    static func createMnemonicClient(
-        mnemonic: String,
-        config: MobileCoinClient.Config
-    ) throws -> (AccountKey, MobileCoinClient) {
-
-        let acctKey = try AccountKey.make(
-            mnemonic: mnemonic,
-            fogReportUrl: network.fogReportUrl,
-            fogReportId: network.fogReportId,
-            fogAuthoritySpki: network.fogAuthoritySpki()).get()
-
-        let client = try createMobileCoinClient(
-            accountKey: acctKey,
-            config: config,
-            transportProtocol: .http)
-
-        return (acctKey, client)
-    }
-
 }
 
 extension UInt64 {
@@ -496,5 +429,3 @@ extension UInt64 {
         return Data(bytes: &int, count: MemoryLayout<UInt64>.size)
     }
 }
-
-#endif
