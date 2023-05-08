@@ -1,0 +1,10 @@
+platform :ios, '14.0'
+use_frameworks!
+
+target 'TestSetupClient' do
+  pod 'MobileCoin/Core'
+end
+
+target 'TestSetupClientTests' do
+ pod 'MobileCoin/Core'
+end
