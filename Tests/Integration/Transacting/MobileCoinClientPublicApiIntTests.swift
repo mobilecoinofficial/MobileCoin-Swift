@@ -14,8 +14,8 @@ import XCTest
 @available(iOS 15.0, *)
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
-    let clientIdx = 8
-    let recipientIdx = 9
+    let clientIdx = 1
+    let recipientIdx = 0
     let selfPaymentIdx = 3
 
     let numChecksForNewTx = 10
