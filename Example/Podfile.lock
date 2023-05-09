@@ -224,7 +224,7 @@ SPEC CHECKSUMS:
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   gRPC-Swift: 77154009a019e97f8c4bd8f2bb75fe9726801157
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 16fef0e7da65281ceab86fcfc8f89757c09a0cb3
+  LibMobileCoin: f0ef0dfeb3d8940b0b8274a277a754db141c8a4e
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   MobileCoin: 6a608b6c863048f98d6e320c5b061bcef3e1f3ec
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
