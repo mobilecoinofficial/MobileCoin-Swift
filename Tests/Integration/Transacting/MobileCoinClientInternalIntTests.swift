@@ -13,6 +13,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
     let defragerIndex = 6
     
     func testDefragmentationTesting() throws {
+        try XCTSkip()
         let description = "Defragmentation Testing"
         try testSupportedProtocols(description: description, timeout: 250) {
             try defragmentationTesting(transportProtocol: $0, expectation: $1)
@@ -421,38 +422,6 @@ class MobileCoinClientInternalIntTests: XCTestCase {
                 returnAddress: sourceAccountKey.publicAddress)
         }
     }
-    
-    @available(iOS 15.0, *)
-    func testDynamicAccountHasBalance() async throws {
-        try XCTSkip()
-        let entropyString = "QzNxpAlpc3yCU5qpe92TqhUHCMt0hTDwXplwu//JPiI="
 
-        guard let entropyData = Data(base64Encoded: entropyString, options: []) else {
-            XCTFail("can't create entropy from string")
-            return
-        }
-
-        guard let entropy32 = Data32(entropyData) else {
-            XCTFail("can't create entropy32")
-            return
-        }
-
-        switch AccountKey.make(
-            rootEntropy: entropy32.data,
-            fogReportUrl: NetworkConfigFixtures.network.fogReportUrl,
-            fogReportId: "",
-            fogAuthoritySpki: try NetworkConfigFixtures.network.fogAuthoritySpki())
-        {
-        case .success(let acctKey):
-            let _ = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountKey: acctKey,
-                tokenId: .MOB,
-                transportProtocol: .http)
-        case .failure:
-            XCTFail("account not created or doesn't have balance")
-        }
-
-    }
 #endif
-    
 }

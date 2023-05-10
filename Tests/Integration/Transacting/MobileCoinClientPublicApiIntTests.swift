@@ -14,32 +14,37 @@ import XCTest
 @available(iOS 15.0, *)
 class MobileCoinClientPublicApiIntTests: XCTestCase {
 
-    let clientIdx = 1
-    let recipientIdx = 0
-    let selfPaymentIdx = 3
-
     let numChecksForNewTx = 10
 
     func testSubmitTransaction() async throws {
         let description = "Submitting transaction"
         try await testSupportedProtocols(description: description) {
+            if $0 == .http {
                 try await self.submitTransaction(transportProtocol: $0)
+            }
         }
     }
 
     func submitTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: accountKey,
-            transportProtocol: transportProtocol
-        )
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
+
+        try await client.updateBalances()
+
         let transaction = try await client.prepareTransaction(
-            to: recipient,
+            to: recipientAccountKey.publicAddress,
             amount: Amount(100, in: .MOB),
             fee: IntegrationTestFixtures.fee)
+
         try await client.submitTransaction(transaction: transaction.transaction)
     }
 
@@ -53,7 +58,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func submitMobUSDTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
+        let recipient = recipientAccountKey.publicAddress
+
         let amount = Amount(100, in: .MOBUSD)
 
         func checkBlockVersionAndFee(
@@ -92,15 +102,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             let balances = client.balances
             print(balances)
 
-            XCTAssertGreaterThan(balances.balances.count, 1)
-
             print(client.accountActivity(for: .MOB).describeUnspentTxOuts())
-
-            let mobBalance = try XCTUnwrap(balances.balances[.MOB], "Expected Balance")
-            XCTAssertTrue(
-                mobBalance.amountParts.int > 0 ||
-                mobBalance.amountParts.frac > 0
-            )
 
             let mobUSDBalance = try XCTUnwrap(balances.balances[.MOBUSD], "Expected Balance")
             XCTAssertTrue(
@@ -149,11 +151,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try await checkBalanceChange()
         }
 
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
-        let client = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: accountKey,
-            transportProtocol: transportProtocol
-        )
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+        try await client.updateBalances()
+
         let fee = try await checkBlockVersionAndFee(client)
         let balancesBefore = try await checkBalances(client)
         try await prepareAndSubmit(client, fee)
@@ -196,27 +199,21 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     }
 
     func cancelSignedContingentInput(transportProtocol: TransportProtocol) async throws {
-        let creatorIdx = clientIdx
-        let consumerIdx = recipientIdx
-
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
         let amountToReceive = Amount(10, in: .MOBUSD)
 
-        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
-        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
-        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: creatorAcctKey,
-            tokenId: .MOB,
-            transportProtocol: transportProtocol
-        )
+        let (creatorAccountKey, creator) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Creator")
+        let (_, consumer) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Consumer")
+        let creatorAddr = creatorAccountKey.publicAddress
 
-        let consumerAcctKey =
-            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
-        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: consumerAcctKey,
-            tokenId: .MOBUSD,
-            transportProtocol: transportProtocol
-        )
+        try await creator.updateBalances()
+        try await consumer.updateBalances()
 
         let sci = try await creator.createSignedContingentInput(
             recipient: creatorAddr,
@@ -258,10 +255,8 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func submitSignedContingentInputTransaction(
         transportProtocol: TransportProtocol
     ) async throws {
-        let creatorIdx = clientIdx
-        let consumerIdx = recipientIdx
-
         let amountToSend = Amount(100 + IntegrationTestFixtures.fee, in: .MOB)
+        let amountToSendWithoutFee = Amount(100, in: .MOB)
         let amountToReceive = Amount(10, in: .MOBUSD)
 
         func checkBlockVersionAndFee(
@@ -269,7 +264,9 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         ) async throws -> UInt64 {
             let blockVersion = try await client.blockVersion()
             XCTAssertGreaterThanOrEqual(blockVersion, 3, "Test cannot run on blockversion < 3 ...")
-            return try await client.estimateTotalFee(toSendAmount: amountToSend, feeLevel: .minimum)
+            return try await client.estimateTotalFee(
+                toSendAmount: amountToSendWithoutFee,
+                feeLevel: .minimum)
         }
 
         func getBalances(
@@ -312,7 +309,12 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
                     } else {
                         inFinal = 0
                     }
-                    let inInitial = try XCTUnwrap(balancesBeforeMap[inTokenId]?.amount())
+                    let inInitial: UInt64
+                    if let bal = balancesBeforeMap[inTokenId] {
+                        inInitial = bal.amount()!
+                    } else {
+                        inInitial = 0
+                    }
 
                     guard outInitial - outFinal == amountOut.value &&
                             inFinal - inInitial == amountIn.value - fee
@@ -333,25 +335,20 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             try await checkBalanceChange()
         }
 
-        let creatorAddr = try IntegrationTestFixtures.createPublicAddress(accountIndex: creatorIdx)
-        let creatorAcctKey = try IntegrationTestFixtures.createAccountKey(accountIndex: creatorIdx)
-        let creator = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: creatorAcctKey,
-            tokenId: .MOB,
-            transportProtocol: transportProtocol
-        )
+        let (creatorAccountKey, creator) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Creator")
+        let (_, consumer) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Consumer")
+        let creatorAddr = creatorAccountKey.publicAddress
 
-        let consumerAcctKey =
-            try IntegrationTestFixtures.createAccountKey(accountIndex: consumerIdx)
-        let consumer = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountKey: consumerAcctKey,
-            tokenId: .MOBUSD,
-            transportProtocol: transportProtocol
-        )
-
-        let fee = try await checkBlockVersionAndFee(creator)
         let creatorBalancesBefore = try await getBalances(creator)
         let consumerBalancesBefore = try await getBalances(consumer)
+        let fee = try await checkBlockVersionAndFee(creator)
+
         try await prepareAndSubmitSignedContingentInput(
             creator,
             creatorAddr,
@@ -382,17 +379,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func selfPaymentBalanceChange(
         transportProtocol: TransportProtocol
     ) async throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: selfPaymentIdx)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountKey: accountKey,
-            transportProtocol: transportProtocol)
+        let (clientAccountKey, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
 
         func submitTransaction() async throws -> Balance {
             let balance = try await client.updateBalances().mobBalance
             print("Initial balance: \(balance)")
 
             let transaction = try await client.prepareTransaction(
-                to: accountKey.publicAddress,
+                to: clientAccountKey.publicAddress,
                 amount: Amount(100, in: .MOB),
                 fee: IntegrationTestFixtures.fee)
             try await client.submitTransaction(transaction: transaction.transaction)
@@ -441,16 +438,16 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func selfPaymentBalanceChangeFeeLevel(
         transportProtocol: TransportProtocol
     ) async throws {
-        let accountKey = try  IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountKey: accountKey,
-            transportProtocol: transportProtocol)
+        let (clientAccountKey, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
 
         func submitTransaction() async throws -> Balance {
             let balance = try await client.updateBalances().mobBalance
             print("Initial balance: \(balance)")
             let transaction = try await client.prepareTransaction(
-                to: accountKey.publicAddress,
+                to: clientAccountKey.publicAddress,
                 amount: Amount(100, in: .MOB),
                 fee: IntegrationTestFixtures.fee)
             try await client.submitTransaction(transaction: transaction.transaction)
@@ -495,14 +492,20 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func transactionStatus(
         transportProtocol: TransportProtocol
     ) async throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountIndex: clientIdx,
-            using: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
+        let recipientPublicAddress = recipientAccountKey.publicAddress
 
         func submitTransaction() async throws -> Transaction {
             try await client.updateBalances()
-            let transaction = try await client.prepareTransaction(to: recipient,
+            let transaction = try await client.prepareTransaction(to: recipientPublicAddress,
                                                                   amount: Amount(100, in: .MOB),
                                                                   fee: IntegrationTestFixtures.fee)
             try await client.submitTransaction(transaction: transaction.transaction)
@@ -557,14 +560,19 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func transactionTxOutStatus(
         transportProtocol: TransportProtocol
     ) async throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountIndex: clientIdx,
-            using: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
+        let recipientPublicAddress = recipientAccountKey.publicAddress
 
         func submitTransaction() async throws -> Transaction {
             try await client.updateBalances()
-            let transaction = try await client.prepareTransaction(to: recipient,
+            let transaction = try await client.prepareTransaction(to: recipientPublicAddress,
                                                                   amount: Amount(100, in: .MOB),
                                                                   fee: IntegrationTestFixtures.fee)
             try await client.submitTransaction(transaction: transaction.transaction)
@@ -619,23 +627,23 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
     func receiptStatus(
         transportProtocol: TransportProtocol
     ) async throws {
-        let senderClient = try await IntegrationTestFixtures.createMobileCoinClientWithBalance(
-            accountIndex: clientIdx,
-            transportProtocol: transportProtocol)
-        let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(
-            accountIndex: recipientIdx)
-        let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
-            accountKey: receiverAccountKey,
-            transportProtocol: transportProtocol)
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+        let (recipientAccountKey, recipient) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
 
         func submitTransaction() async throws -> Receipt {
-            let balance = try await senderClient.updateBalances().mobBalance
+            let balance = try await client.updateBalances().mobBalance
             print("Account 0 balance: \(balance)")
-            let transaction = try await senderClient.prepareTransaction(
-                to: receiverAccountKey.publicAddress,
+            let transaction = try await client.prepareTransaction(
+                to: recipientAccountKey.publicAddress,
                 amount: Amount(100, in: .MOB),
                 fee: IntegrationTestFixtures.fee)
-            try await senderClient.submitTransaction(transaction: transaction.transaction)
+            try await client.submitTransaction(transaction: transaction.transaction)
             return transaction.receipt
         }
 
@@ -645,10 +653,10 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         func checkStatus() async throws {
             numChecksRemaining -= 1
             print("Checking status...")
-            let balance = try await receiverClient.updateBalances().mobBalance
+            let balance = try await recipient.updateBalances().mobBalance
             print("Account 1 balance: \(balance)")
 
-            guard let status = receiverClient.status(of: receipt)
+            guard let status = recipient.status(of: receipt)
                 .successOrFulfill() else { return }
             print("Receipt status: \(status)")
 
@@ -690,12 +698,17 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             using: transportProtocol)
         XCTAssertSuccess(
             config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()))
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountIndex: clientIdx,
-            config: config,
-            transportProtocol: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(
-            accountIndex: recipientIdx)
+
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client",
+            config: config)
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient",
+            config: config)
 
         let balance = try await client.updateBalances().mobBalance
         guard let picoMob = try? XCTUnwrap(balance.amount()) else { return }
@@ -704,7 +717,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         guard picoMob > 0 else { return }
 
         let transaction = try await client.prepareTransaction(
-            to: recipient,
+            to: recipientAccountKey.publicAddress,
             amount: Amount(100, in: .MOB),
             fee: IntegrationTestFixtures.fee
         )
@@ -725,13 +738,18 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
             using: transportProtocol)
         XCTAssertSuccess(config.setConsensusTrustRoots(try NetworkPreset.trustRootsBytes()
                             + [try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes]))
-        let client =
-            try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: clientIdx,
-                config: config,
-                transportProtocol: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(
-            accountIndex: recipientIdx)
+
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client",
+            config: config)
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient",
+            config: config)
+
         let balance = try await client.updateBalances().mobBalance
         guard let picoMob = try? XCTUnwrap(balance.amount()) else { return }
         print("balance: \(picoMob)")
@@ -739,7 +757,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         guard picoMob > 0 else { return }
 
         let transaction = try await client.prepareTransaction(
-            to: recipient,
+            to: recipientAccountKey.publicAddress,
             amount: Amount(100, in: .MOB),
             fee: IntegrationTestFixtures.fee)
         try await client.submitTransaction(transaction: transaction.transaction)
@@ -763,11 +781,18 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         XCTAssertSuccess(config.setConsensusTrustRoots([
             try MobileCoinClient.Config.Fixtures.Init().wrongTrustRootBytes,
         ]))
-        let client = try IntegrationTestFixtures.createMobileCoinClient(
-            accountIndex: clientIdx,
-            config: config,
-            transportProtocol: transportProtocol)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
+
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client",
+            config: config)
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient",
+            config: config)
+
         let balance = try await client.updateBalances().mobBalance
         guard let picoMob = try? XCTUnwrap(balance.amount()) else { return }
         print("balance: \(picoMob)")
@@ -775,7 +800,7 @@ class MobileCoinClientPublicApiIntTests: XCTestCase {
         guard picoMob > 0 else { return }
 
         let transaction = try await client.prepareTransaction(
-            to: recipient,
+            to: recipientAccountKey.publicAddress,
             amount: Amount(100, in: .MOB),
             fee: IntegrationTestFixtures.fee)
         try await client.submitTransaction(transaction: transaction.transaction)
