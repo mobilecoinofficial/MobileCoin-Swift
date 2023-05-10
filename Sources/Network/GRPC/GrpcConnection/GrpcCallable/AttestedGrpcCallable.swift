@@ -72,12 +72,12 @@ extension AttestedGrpcCallable
     ) -> Result < (responseAad: InnerResponseAad, response: InnerResponse),
                 AttestedGrpcConnectionError>
     {
-        guard response.aad == Data() else {
-            return .failure(.connectionError(.invalidServerResponse(
-                "\(Self.self) received unexpected aad: " +
-                    "\(redacting: response.aad.base64EncodedString()), message: " +
-                    "\(redacting: response.serializedDataInfallible.base64EncodedString())")))
-        }
+//        guard response.aad == Data() else {
+//            return .failure(.connectionError(.invalidServerResponse(
+//                "\(Self.self) received unexpected aad: " +
+//                    "\(redacting: response.aad.base64EncodedString()), message: " +
+//                    "\(redacting: response.serializedDataInfallible.base64EncodedString())")))
+//        }
 
         return attestAkeCipher.decryptMessage(response)
             .mapError { _ in .attestationFailure() }

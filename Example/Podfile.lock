@@ -19,33 +19,33 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.6.0)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin/Core (4.1.3):
+  - LibMobileCoin/Core (5.0.0-pre2):
     - gRPC-Swift
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (4.1.3)
-  - MobileCoin/Core (4.1.3):
+  - MobileCoin (5.0.0-pre2)
+  - MobileCoin/Core (5.0.0-pre2):
     - gRPC-Swift (= 1.0.0)
-    - LibMobileCoin/Core (~> 4.1.2)
+    - LibMobileCoin/Core (~> 5.0.0-pre2)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.40.0)
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.40.0)
     - SwiftProtobuf
-  - MobileCoin/Core/ProtocolUnitTests (4.1.3):
+  - MobileCoin/Core/ProtocolUnitTests (5.0.0-pre2):
     - gRPC-Swift (= 1.0.0)
-    - LibMobileCoin/Core (~> 4.1.2)
+    - LibMobileCoin/Core (~> 5.0.0-pre2)
     - Logging (~> 1.4)
     - SwiftLint
     - SwiftNIO (~> 2.40.0)
     - SwiftNIOHPACK (~> 1.16.3)
     - SwiftNIOHTTP1 (~> 2.40.0)
     - SwiftProtobuf
-  - MobileCoin/IntegrationNonTransactingTests (4.1.3)
-  - MobileCoin/IntegrationTransactingTests (4.1.3)
-  - MobileCoin/PerformanceTests (4.1.3)
-  - MobileCoin/Tests (4.1.3)
+  - MobileCoin/IntegrationNonTransactingTests (5.0.0-pre2)
+  - MobileCoin/IntegrationTransactingTests (5.0.0-pre2)
+  - MobileCoin/PerformanceTests (5.0.0-pre2)
+  - MobileCoin/Tests (5.0.0-pre2)
   - SwiftLint (0.47.1)
   - SwiftNIO (2.40.0):
     - _NIODataStructures (= 2.40.0)
@@ -224,9 +224,9 @@ SPEC CHECKSUMS:
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   gRPC-Swift: 77154009a019e97f8c4bd8f2bb75fe9726801157
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 9c7306a2d18fb93f9864cec9ccc5ad48949a1bbf
+  LibMobileCoin: f0ef0dfeb3d8940b0b8274a277a754db141c8a4e
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: bb909a4a243ec54c072b500f5e71738764025e74
+  MobileCoin: 6a608b6c863048f98d6e320c5b061bcef3e1f3ec
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftNIO: 829958aab300642625091f82fc2f49cb7cf4ef24
   SwiftNIOConcurrencyHelpers: 697370136789b1074e4535eaae75cbd7f900370e
