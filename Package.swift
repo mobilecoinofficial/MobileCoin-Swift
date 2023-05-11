@@ -6,7 +6,7 @@ let package = Package(
     name: "MobileCoin",
     platforms: [
         .iOS(.v13),
-            .macOS(.v11)
+        .macOS(.v11),
     ],
     products: [
         .library(
