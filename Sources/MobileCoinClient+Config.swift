@@ -18,6 +18,8 @@ extension MobileCoinClient {
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
             fogReportAttestation: Attestation,
+            mistyswapUrl: String,
+            mistyswapAttestation: Attestation,
             transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
             Self.make(consensusUrls: [consensusUrl],
@@ -27,6 +29,8 @@ extension MobileCoinClient {
                       fogKeyImageAttestation: fogKeyImageAttestation,
                       fogMerkleProofAttestation: fogMerkleProofAttestation,
                       fogReportAttestation: fogReportAttestation,
+                      mistyswapUrls: [mistyswapUrl],
+                      mistyswapAttestation: mistyswapAttestation,
                       transportProtocol: transportProtocol)
         }
 
@@ -40,6 +44,8 @@ extension MobileCoinClient {
             fogKeyImageAttestation: Attestation,
             fogMerkleProofAttestation: Attestation,
             fogReportAttestation: Attestation,
+            mistyswapUrls: [String],
+            mistyswapAttestation: Attestation,
             transportProtocol: TransportProtocol
         ) -> Result<Config, InvalidInputError> {
 
@@ -50,21 +56,30 @@ extension MobileCoinClient {
                     FogUrl.make(strings: fogUrls).flatMap { fogUrls in
                         RandomUrlLoadBalancer<FogUrl>.make(
                             urls: fogUrls
-                        ).map { fogUrlLoadBalancer in
+                        ).flatMap { fogUrlLoadBalancer in
+                            MistyswapUrl.make(strings: mistyswapUrls).flatMap { mistyswapUrls in
+                                RandomUrlLoadBalancer<MistyswapUrl>.make(
+                                    urls: mistyswapUrls
+                                ).map { mistyswapLoadBalancer in
 
-                            let attestationConfig = NetworkConfig.AttestationConfig(
-                                consensus: consensusAttestation,
-                                fogView: fogViewAttestation,
-                                fogKeyImage: fogKeyImageAttestation,
-                                fogMerkleProof: fogMerkleProofAttestation,
-                                fogReport: fogReportAttestation)
+                                    let attestationConfig = NetworkConfig.AttestationConfig(
+                                        consensus: consensusAttestation,
+                                        fogView: fogViewAttestation,
+                                        fogKeyImage: fogKeyImageAttestation,
+                                        fogMerkleProof: fogMerkleProofAttestation,
+                                        fogReport: fogReportAttestation,
+                                        mistyswap: mistyswapAttestation
+                                    )
 
-                            let networkConfig = NetworkConfig(
-                                consensusUrlLoadBalancer: consensusUrlLoadBalancer,
-                                fogUrlLoadBalancer: fogUrlLoadBalancer,
-                                attestation: attestationConfig,
-                                transportProtocol: transportProtocol)
-                            return Config(networkConfig: networkConfig)
+                                    let networkConfig = NetworkConfig(
+                                        consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                                        fogUrlLoadBalancer: fogUrlLoadBalancer,
+                                        mistyswapLoadBalancer: mistyswapLoadBalancer,
+                                        attestation: attestationConfig,
+                                        transportProtocol: transportProtocol)
+                                    return Config(networkConfig: networkConfig)
+                                }
+                            }
                         }
                     }
                 }

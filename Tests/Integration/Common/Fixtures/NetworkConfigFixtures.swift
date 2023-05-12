@@ -10,7 +10,8 @@ import XCTest
 
 enum NetworkConfigFixtures {
     static let alphaDev = DynamicNetworkConfig.AlphaDevelopment.make()
-    static let network: NetworkPreset = .dynamic(alphaDev)
+//    static let network: NetworkPreset = .dynamic(alphaDev)
+    static let network: NetworkPreset = .testNet
 }
 
 extension NetworkConfigFixtures {
@@ -42,6 +43,7 @@ extension NetworkConfigFixtures {
         var networkConfig = try NetworkConfig.make(
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
+            mistyswapLoadBalancer: NetworkPreset.eranDevNetworkMistyswapLoadBalancers(),
             attestation: attestationConfig,
             transportProtocol: transportProtocol).get()
 
@@ -66,6 +68,7 @@ extension NetworkConfigFixtures {
                         NetworkConfig(
                             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                             fogUrlLoadBalancer: fogUrlLoadBalancer,
+                            mistyswapLoadBalancer: try! NetworkPreset.eranDevNetworkMistyswapLoadBalancers(),
                             attestation: attestationConfig,
                             transportProtocol: transportProtocol)
                     }

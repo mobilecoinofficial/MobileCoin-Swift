@@ -69,3 +69,19 @@ protocol FogReportService {
         request: Report_ReportRequest,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void)
 }
+
+protocol MistyswapService {
+    func initiateOfframp(
+        request: Mistyswap_InitiateOfframpRequest,
+        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void)
+    
+    func forgetOfframp(
+        request: Mistyswap_ForgetOfframpRequest,
+        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void)
+    
+    func getOfframpStatus(
+        request: Mistyswap_GetOfframpStatusRequest,
+        completion: @escaping (Result<Attest_Message, ConnectionError>) -> Void)
+}
+
+protocol MistyswapServiceConnection: MistyswapService, ConnectionProtocol {}

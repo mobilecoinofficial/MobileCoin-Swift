@@ -241,6 +241,7 @@ extension NetworkPreset {
                     "\(preset.namespace).\(preset.environment).mobilecoin.com"
         }
     }
+    
     var fogShortUrl: String {
         switch self {
         case .mainNet:
@@ -255,6 +256,36 @@ extension NetworkPreset {
         }
     }
 
+    var mistyswapUrl: String {
+//        switch self {
+//        case .mainNet:
+//            return "fog://fog.prod.mobilecoinww.com"
+//        case .testNet:
+//            return "fog://fog.test.mobilecoin.com"
+//        case .alpha:
+//            return "fog://fog.alpha.development.mobilecoin.com"
+//        case .masterDev:
+//            return "fog://fog.mc-master.development.mobilecoin.com"
+//
+//        case .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+//            return "fog://fog.\(self).mobilecoin.com"
+//        case .dynamic(let preset):
+//            return "fog://\(preset.user)fog." +
+//                    "\(preset.namespace).\(preset.environment).mobilecoin.com"
+//        }
+        // eran dev box on gCloud
+        return "insecure-mistyswap://34.133.197.146:4040/"
+    }
+    
+    static var mistyswapUrl: String {
+        return "insecure-mistyswap://34.133.197.146:4040/"
+    }
+    
+    private static let mistyswapMrEnclaveHex =
+        "4ce5a80d652d708c2c9633ec86883add3ca981bc26cfc8894ea1b28f13f6e368"
+    private static let mistyswapMrSignerHex =
+        "e47e5fa5a69ea44e741813bc148f43cba31ed88ad1757c038a8853472d3d400b"
+    
     private static let mainNetConsensusMrEnclaveHex =
         "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
     private static let mainNetFogViewMrEnclaveHex =
@@ -263,7 +294,7 @@ extension NetworkPreset {
         "89db0d1684fcc98258295c39f4ab68f7de5917ef30f0004d9a86f29930cebbbd"
     private static let mainNetFogReportMrEnclaveHex =
         "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
-
+    
     // v1.1.0 Enclave Values
     private static let legacy_v1_1_0_testNetConsensusMrEnclaveHex =
         "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
@@ -505,17 +536,25 @@ extension NetworkPreset {
 
 extension NetworkPreset {
 
+    static func eranDevNetworkMistyswapLoadBalancers() throws -> UrlLoadBalancer<MistyswapUrl> {
+        let mistyswapUrls = try MistyswapUrl.make(strings: [mistyswapUrl]).get()
+        return try RandomUrlLoadBalancer.make(urls: mistyswapUrls).get()
+    }
+    
     func networkConfig(transportProtocol: TransportProtocol = .http) throws -> NetworkConfig {
         let consensusUrls = try ConsensusUrl.make(strings: [consensusUrl]).get()
         let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
         let fogUrls = try FogUrl.make(strings: [fogUrl]).get()
         let fogUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: fogUrls).get()
+        let mistyswapUrls = try MistyswapUrl.make(strings: [mistyswapUrl]).get()
+        let mistyswapLoadBalancer = try RandomUrlLoadBalancer.make(urls: mistyswapUrls).get()
 
         let attestationConfig = try self.attestationConfig()
 
         var networkConfig = try NetworkConfig.make(
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
+            mistyswapLoadBalancer: mistyswapLoadBalancer,
             attestation: attestationConfig,
             transportProtocol: transportProtocol).get()
 
@@ -570,7 +609,9 @@ extension NetworkPreset {
             fogView: try fogViewAttestation(),
             fogKeyImage: try fogLedgerAttestation(),
             fogMerkleProof: try fogLedgerAttestation(),
-            fogReport: try fogReportAttestation())
+            fogReport: try fogReportAttestation(),
+            mistyswap: try mistyswapAttestation()
+        )
     }
 
     func consensusAttestation() throws -> Attestation {
@@ -640,6 +681,24 @@ extension NetworkPreset {
                 minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
                 allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
+    }
+    
+    static func mistyswapAttestation() throws -> Attestation {
+        // Eran dev box on gCloud
+        return try XCTUnwrapSuccess(Attestation.make(
+            mrSigner: try XCTUnwrap(Data(hexEncoded: Self.mistyswapMrSignerHex)),
+            productId: McConstants.MISTYSWAP_PRODUCT_ID,
+            minimumSecurityVersion: McConstants.MISTYSWAP_SECURITY_VERSION,
+            allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
+    }
+
+    func mistyswapAttestation() throws -> Attestation {
+        // Eran dev box on gCloud
+        return try XCTUnwrapSuccess(Attestation.make(
+            mrSigner: try XCTUnwrap(Data(hexEncoded: Self.mistyswapMrSignerHex)),
+            productId: McConstants.MISTYSWAP_PRODUCT_ID,
+            minimumSecurityVersion: McConstants.MISTYSWAP_SECURITY_VERSION,
+            allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
     }
 
     private func defaultAttestation(mrEnclaveHex: String...) throws -> Attestation {
