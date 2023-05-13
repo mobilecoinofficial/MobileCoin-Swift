@@ -19,10 +19,11 @@ class MistyswapUntrustedTests: XCTestCase {
 
     func forgetOfframpRequest(transportProtocol: TransportProtocol) throws {
         let mistyswapConnection = try createMistyswapUntrustedConnection(transportProtocol: transportProtocol)
+        let fixtures = try Mistyswap.Fixtures.ForgetOfframp()
 
         let expect = expectation(description: "Making Mistyswap untrusted request")
         mistyswapConnection.forgetOfframp(
-            request: Mistyswap_ForgetOfframpRequest()
+            request: fixtures.request
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
