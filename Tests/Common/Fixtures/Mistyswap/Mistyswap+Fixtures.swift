@@ -30,3 +30,28 @@ extension Mistyswap.Fixtures {
     }
 }
 
+extension Mistyswap.Fixtures {
+    struct InitiateOfframp {
+        let request: Mistyswap_InitiateOfframpRequest
+
+        init() throws {
+            var request = Mistyswap_InitiateOfframpRequest()
+            self.request = request
+        }
+    }
+}
+
+extension Mistyswap.Fixtures {
+    struct GetOfframpStatus {
+        let offrampID: Data32
+        let request: Mistyswap_GetOfframpStatusRequest
+
+        init() throws {
+            self.offrampID = try XCTUnwrap(Data32(Data.init(randomOfLength: 32)))
+            
+            var request = Mistyswap_GetOfframpStatusRequest()
+            request.offrampID = offrampID.data
+            self.request = request
+        }
+    }
+}
