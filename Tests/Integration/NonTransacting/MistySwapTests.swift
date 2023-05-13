@@ -13,9 +13,8 @@ import XCTest
 class MistyswapTests: XCTestCase {
 
     func testOfframpRequest() throws {
-//        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
+        // HTTP not supported
         try offrampRequest(transportProtocol: .grpc)
-//        }
     }
 
     func offrampRequest(transportProtocol: TransportProtocol) throws {
@@ -27,21 +26,29 @@ class MistyswapTests: XCTestCase {
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
-//            print("highestProcessedBlockCount: \(response.highestProcessedBlockCount)")
-//            print("lastKnownBlockCount: \(response.lastKnownBlockCount)")
-//            print("lastKnownBlockCumulativeTxoCount: \(response.lastKnownBlockCumulativeTxoCount)")
-//
-//            XCTAssertGreaterThan(response.highestProcessedBlockCount, 0)
-//            XCTAssertGreaterThan(response.rngs.count, 0)
-//            XCTAssertEqual(response.txOutSearchResults.count, 0)
-//            XCTAssertGreaterThan(response.lastKnownBlockCount, 0)
-//            XCTAssertGreaterThan(response.lastKnownBlockCumulativeTxoCount, 0)
-
             expect.fulfill()
         }
         waitForExpectations(timeout: 40)
     }
     
+    func testGetOfframpStatusRequest() throws {
+        // HTTP not supported
+        try getOfframpStatusRequest(transportProtocol: .grpc)
+    }
+
+    func getOfframpStatusRequest(transportProtocol: TransportProtocol) throws {
+        let mistyswapConnection = try createMistyswapConnection(transportProtocol: transportProtocol)
+
+        let expect = expectation(description: "Making Mistyswap enclave request")
+        mistyswapConnection.getOfframpStatus(
+            request: Mistyswap_GetOfframpStatusRequest()
+        ) {
+            guard let response = $0.successOrFulfill(expectation: expect) else { return }
+
+            expect.fulfill()
+        }
+        waitForExpectations(timeout: 40)
+    }
 }
 
 extension MistyswapTests {

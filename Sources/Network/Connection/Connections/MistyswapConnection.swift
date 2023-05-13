@@ -87,19 +87,17 @@ final class MistyswapConnection: Connection<
 //        }
     }
     
-    func getOfframpStatus(request: LibMobileCoin.Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<LibMobileCoin.Attest_Message, ConnectionError>) -> Void) {
-//        switch connectionOptionWrapper {
-//        case .grpc(let grpcConnection):
-//            grpcConnection.query(
-//                    requestAad: requestAad,
-//                    request: request,
-//                    completion: rotateURLOnError(completion))
-//        case .http(let httpConnection):
-//            httpConnection.query(
-//                    requestAad: requestAad,
-//                    request: request,
-//                    completion: rotateURLOnError(completion))
-//        }
+    func getOfframpStatus(request: LibMobileCoin.Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<LibMobileCoin.Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.getOfframpStatus(
+                    request: request,
+                    completion: rotateURLOnError(completion))
+        case .http(let httpConnection):
+            httpConnection.getOfframpStatus(
+                    request: request,
+                    completion: rotateURLOnError(completion))
+        }
     }
     
 }

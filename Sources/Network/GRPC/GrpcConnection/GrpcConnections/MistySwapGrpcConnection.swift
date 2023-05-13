@@ -40,11 +40,11 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
 //            completion: completion)
     }
     
-    func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Attest_Message, ConnectionError>) -> Void) {
-//        performAttestedCall(
-//            GetOfframpStatus(client: client),
-//            request: tx,
-//            completion: completion)
+    func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
+        performAttestedCall(
+            GetOfframpStatus(client: client),
+            request: request,
+            completion: completion)
     }
     
 }
@@ -64,6 +64,26 @@ extension MistyswapGrpcConnection {
             ) -> Void
         ) {
             let unaryCall = client.initiateOfframp(request, callOptions: callOptions)
+            unaryCall.callResult.whenComplete(completion)
+        }
+    }
+}
+
+extension MistyswapGrpcConnection {
+    private struct GetOfframpStatus: AttestedGrpcCallable {
+        typealias InnerRequest = Mistyswap_GetOfframpStatusRequest
+        typealias InnerResponse = Mistyswap_GetOfframpStatusResponse
+
+        let client: Mistyswap_MistyswapOfframpApiClient
+
+        func call(
+            request: Attest_Message,
+            callOptions: CallOptions?,
+            completion: @escaping (
+                Result<UnaryCallResult<Attest_Message>, Error>
+            ) -> Void
+        ) {
+            let unaryCall = client.getOfframpStatus(request, callOptions: callOptions)
             unaryCall.callResult.whenComplete(completion)
         }
     }

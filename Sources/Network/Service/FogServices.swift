@@ -81,7 +81,7 @@ protocol MistyswapService {
     
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
-        completion: @escaping (Result<Attest_Message, ConnectionError>) -> Void)
+        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void)
 }
 
 protocol MistyswapServiceConnection: MistyswapService, ConnectionProtocol {}

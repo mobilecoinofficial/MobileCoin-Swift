@@ -240,7 +240,7 @@ class EmptyMistyswapService: MistyswapService {
         logger.assertionFailure("Not Implemented")
     }
     
-    func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Attest_Message, ConnectionError>) -> Void) {
+    func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }
 }
