@@ -135,6 +135,14 @@ struct NetworkConfig {
             authorization: mistyswapUserAuthorization)
     }
 
+    func mistyswapUntrustedConfig() -> ConnectionConfig<MistyswapUrl> {
+        ConnectionConfig(
+            url: mistyswapLoadBalancer.nextUrl(),
+            transportProtocolOption: transportProtocol.option,
+            trustRoots: mistyswapTrustRoots,
+            authorization: mistyswapUserAuthorization)
+    }
+
     var fogReportAttestation: Attestation { attestation.fogReport }
 
     private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>

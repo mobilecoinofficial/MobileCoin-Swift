@@ -5,11 +5,11 @@
 import Foundation
 import LibMobileCoin
 
-final class MistyswapConnection: Connection<
-        GrpcProtocolConnectionFactory.MistyswapServiceProvider,
-        HttpProtocolConnectionFactory.MistyswapServiceProvider
+final class MistyswapUntrustedConnection: Connection<
+        GrpcProtocolConnectionFactory.MistyswapUntrustedServiceProvider,
+        HttpProtocolConnectionFactory.MistyswapUntrustedServiceProvider
     >,
-    MistyswapService
+    MistyswapUntrustedService
 {
     private let httpFactory: HttpProtocolConnectionFactory
     private let grpcFactory: GrpcProtocolConnectionFactory
@@ -35,56 +35,42 @@ final class MistyswapConnection: Connection<
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.mistyswapConfig()
+                let rotatedConfig = config.mistyswapUntrustedConfig()
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
                         grpcService:
-                            grpcFactory.makeMistyswapService(
+                            grpcFactory.makeMistyswapUntrustedService(
                                 config: rotatedConfig,
-                                targetQueue: targetQueue,
-                                rng: rng,
-                                rngContext: rngContext))
+                                targetQueue: targetQueue
+                            )
+                    )
                 case .http:
                     return .http(
                         httpService:
-                            httpFactory.makeMistyswapService(
+                            httpFactory.makeMistyswapUntrustedService(
                                 config: rotatedConfig,
-                                targetQueue: targetQueue,
-                                rng: rng,
-                                rngContext: rngContext))
+                                targetQueue: targetQueue
+                            )
+                    )
                 }
             },
             transportProtocolOption: config.fogViewConfig().transportProtocolOption,
             targetQueue: targetQueue)
     }
 
-    func initiateOfframp(request: Mistyswap_InitiateOfframpRequest, completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void) {
+    func forgetOfframp(request: Mistyswap_ForgetOfframpRequest, completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void) {
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
-            grpcConnection.initiateOfframp(
-                request: request,
-                completion: rotateURLOnError(completion))
-        case .http(let httpConnection):
-            httpConnection.initiateOfframp(
-                request: request,
-                completion: rotateURLOnError(completion))
-        }
-    }
-    
-    func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
-        switch connectionOptionWrapper {
-        case .grpc(let grpcConnection):
-            grpcConnection.getOfframpStatus(
+            grpcConnection.forgetOfframp(
                     request: request,
                     completion: rotateURLOnError(completion))
         case .http(let httpConnection):
-            httpConnection.getOfframpStatus(
+            httpConnection.forgetOfframp(
                     request: request,
                     completion: rotateURLOnError(completion))
         }
     }
     
 }
-
-extension EmptyMistyswapService: ConnectionProtocol { }
+extension EmptyMistyswapUntrustedService: ConnectionProtocol { }

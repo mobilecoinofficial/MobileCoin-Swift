@@ -115,4 +115,15 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
             rng: rng,
             rngContext: rngContext)
     }
+    
+    func makeMistyswapUntrustedService(
+        config: ConnectionConfig<MistyswapUrl>,
+        targetQueue: DispatchQueue?
+    ) -> MistyswapUntrustedGrpcConnection {
+        MistyswapUntrustedGrpcConnection(
+            config: config,
+            channelManager: channelManager,
+            targetQueue: targetQueue
+        )
+    }
 }
