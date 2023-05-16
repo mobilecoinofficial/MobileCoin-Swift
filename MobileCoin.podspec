@@ -56,7 +56,7 @@ Pod::Spec.new do |s|
     subspec.source_files = [
       "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/{GRPC,HTTPS}/**/*.{h,m,swift}",
       "Sources/Network/ProtocolSpecific/Combined/**/*.{h,m,swift}",
@@ -88,7 +88,7 @@ Pod::Spec.new do |s|
     subspec.source_files = [
       "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
       "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",

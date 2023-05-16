@@ -497,3 +497,27 @@ extension SSLTrustError: LocalizedError {
         "\(self)"
     }
 }
+
+public enum MistyswapError: Error {
+    case invalidInput(InvalidInputError)
+    case connectionError(ConnectionError)
+}
+
+extension MistyswapError: CustomStringConvertible {
+    public var description: String {
+        "Mistyswap error: " + {
+            switch self {
+            case .invalidInput(let reason):
+                return "Invalid input: \(reason)"
+            case .connectionError(let innerError):
+                return "\(innerError)"
+            }
+        }()
+    }
+}
+
+extension MistyswapError: LocalizedError {
+    public var errorDescription: String? {
+        "\(self)"
+    }
+}

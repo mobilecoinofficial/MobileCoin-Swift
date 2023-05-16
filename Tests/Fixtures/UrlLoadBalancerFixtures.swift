@@ -10,10 +10,12 @@ import XCTest
 struct UrlLoadBalancerFixtures {
     let invalidFogUrlBalancer: SequentialUrlLoadBalancer<FogUrl>
     let invalidConsensusUrlBalancer: SequentialUrlLoadBalancer<ConsensusUrl>
+    let invalidMistyswapUrlBalancer: SequentialUrlLoadBalancer<MistyswapUrl>
 
     init() throws {
         invalidFogUrlBalancer = try Self.createInvalidFogUrlLoadBalancer()
         invalidConsensusUrlBalancer = try Self.createInvalidConsensusUrlLoadBalancer()
+        invalidMistyswapUrlBalancer = try Self.createInvalidMistyswapUrlLoadBalancer()
     }
 }
 
@@ -203,8 +205,8 @@ extension UrlLoadBalancerFixtures {
             UnitTestFixtures.invalidConsensusUrl,
             UnitTestFixtures.invalidConsensusUrl,
         ]
-        let consensusUrls = try ConsensusUrl.make(strings: urlStrings).get()
-        return SequentialUrlLoadBalancer(urls: consensusUrls)
+        let urls = try ConsensusUrl.make(strings: urlStrings).get()
+        return SequentialUrlLoadBalancer(urls: urls)
     }
 
     private static func createInvalidFogUrlLoadBalancer()
@@ -213,7 +215,18 @@ extension UrlLoadBalancerFixtures {
             UnitTestFixtures.invalidFogUrl,
             UnitTestFixtures.invalidFogUrl,
         ]
-        let fogUrls = try FogUrl.make(strings: urlStrings).get()
-        return SequentialUrlLoadBalancer(urls: fogUrls)
+        let urls = try FogUrl.make(strings: urlStrings).get()
+        return SequentialUrlLoadBalancer(urls: urls)
     }
+    
+    private static func createInvalidMistyswapUrlLoadBalancer()
+    throws -> SequentialUrlLoadBalancer<MistyswapUrl> {
+        let urlStrings = [
+            UnitTestFixtures.invalidMistyswapUrl,
+            UnitTestFixtures.invalidMistyswapUrl,
+        ]
+        let urls = try MistyswapUrl.make(strings: urlStrings).get()
+        return SequentialUrlLoadBalancer(urls: urls)
+    }
+
 }
