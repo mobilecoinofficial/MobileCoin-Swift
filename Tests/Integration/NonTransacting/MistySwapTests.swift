@@ -12,21 +12,22 @@ import XCTest
 
 class MistyswapTests: XCTestCase {
 
-    func testOfframpRequest() throws {
+    func testInitiateOfframpRequest() throws {
         // HTTP not supported
-        try offrampRequest(transportProtocol: .grpc)
+        try initiateOfframpRequest(transportProtocol: .grpc)
     }
 
-    func offrampRequest(transportProtocol: TransportProtocol) throws {
+    func initiateOfframpRequest(transportProtocol: TransportProtocol) throws {
         let mistyswapConnection = try createMistyswapConnection(transportProtocol: transportProtocol)
         let fixture = try Mistyswap.Fixtures.InitiateOfframp()
 
         let expect = expectation(description: "Making Mistyswap enclave request")
         mistyswapConnection.initiateOfframp(
-            request: request
+            request: fixture.request
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
+            print("Mistyswap Initiate Offramp Response \(response)")
             expect.fulfill()
         }
         waitForExpectations(timeout: 40)
@@ -47,6 +48,7 @@ class MistyswapTests: XCTestCase {
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
 
+            print("Mistyswap Get Offramp Status Response \(response)")
             expect.fulfill()
         }
         waitForExpectations(timeout: 40)

@@ -38,17 +38,25 @@ extension Mistyswap.Fixtures {
         let request: Mistyswap_InitiateOfframpRequest
         let goodJSON: String
         let badJSON: String
-        let srcAssetID: String = "67e55044-10b1-426f-9247-bb680e5fe0c8"
-        let srcExpectedAmount: String = "111222333444.666777888"
-        let dstAssetID: String = "67e55044-10b1-426f-9247-bb680e5fe0c8"
+        let srcAssetID: String = "eea900a8-b327-488c-8d8d-1428702fe240"
+        let srcExpectedAmount: String = "111222333.666777888"
+        let dstAssetID: String = "659c407a-0489-30bf-9e6f-84ef25c971c9"
         let dstAddress: String = ""
         let dstAddressTag: String = ""
-        let minDstReceivedAmount: String = "111222333444.111222333444"
-        let maxFeeAmountInDstTokens: String = "11222.333"
+        let minDstReceivedAmount: String = "111.222"
+        let maxFeeAmountInDstTokens: String = "4.333"
 
         init() throws {
-            var request = Mistyswap_InitiateOfframpRequest()
-            self.request = request
+            self.request = try XCTUnwrapSuccess(Mistyswap_InitiateOfframpRequest.make(
+                mixinCredentialsJSON: Self.goodJSON(),
+                srcAssetID: srcAssetID,
+                srcExpectedAmount: srcExpectedAmount,
+                dstAssetID: dstAssetID,
+                dstAddress: dstAddress,
+                dstAddressTag: dstAddressTag,
+                minDstReceivedAmount: minDstReceivedAmount,
+                maxFeeAmountInDstTokens: maxFeeAmountInDstTokens
+            ))
             self.goodJSON = try Self.goodJSON()
             self.badJSON = Self.badJSON()
         }
