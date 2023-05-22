@@ -13,7 +13,8 @@ extension Mistyswap_GetOfframpStatusRequest {
     static func make(offrampID: Data) -> Result<Self, InvalidInputError> {
         // Offramp ID should be 32 bytes
         guard let _ = Data32(offrampID) else {
-            return .failure(InvalidInputError("offrampID should be 32 bytes"))
+            return .failure(InvalidInputError(
+                "offrampID should be 32 bytes, instead its \(offrampID.count)"))
         }
         var proto = Mistyswap_GetOfframpStatusRequest()
         proto.offrampID = offrampID

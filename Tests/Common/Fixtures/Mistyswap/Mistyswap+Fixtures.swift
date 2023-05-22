@@ -38,9 +38,9 @@ extension Mistyswap.Fixtures {
         let request: Mistyswap_InitiateOfframpRequest
         let goodJSON: String
         let badJSON: String
-        let srcAssetID: String = "eea900a8-b327-488c-8d8d-1428702fe240"
+        let srcAssetID: String = MixinAssetID.MOB.rawValue
         let srcExpectedAmount: String = "111222333.666777888"
-        let dstAssetID: String = "659c407a-0489-30bf-9e6f-84ef25c971c9"
+        let dstAssetID: String = MixinAssetID.EUSD.rawValue
         let dstAddress: String = ""
         let dstAddressTag: String = ""
         let minDstReceivedAmount: String = "111.222"
@@ -58,6 +58,9 @@ extension Mistyswap.Fixtures {
                 maxFeeAmountInDstTokens: maxFeeAmountInDstTokens
             ))
             self.goodJSON = try Self.goodJSON()
+            print("\n\n\n\n")
+            print(self.goodJSON)
+            print("\n\n\n\n")
             self.badJSON = Self.badJSON()
         }
     }
