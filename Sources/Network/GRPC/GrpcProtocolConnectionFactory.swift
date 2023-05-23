@@ -126,4 +126,28 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
             targetQueue: targetQueue
         )
     }
+    
+    func makeEmptyMistyswapService(
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
+    ) -> EmptyMistyswapGrpcConnection {
+        EmptyMistyswapGrpcConnection(
+            config: EmptyAttestedConnectionConfig(),
+            channelManager: channelManager,
+            targetQueue: targetQueue,
+            rng: rng,
+            rngContext: rngContext)
+    }
+    
+    func makeEmptyMistyswapUntrustedService(
+        config: ConnectionConfig<MistyswapUrl>,
+        targetQueue: DispatchQueue?
+    ) -> EmptyMistyswapUntrustedGrpcConnection {
+        EmptyMistyswapUntrustedGrpcConnection(
+            config: EmptyConnectionConfig(),
+            channelManager: channelManager,
+            targetQueue: targetQueue
+        )
+    }
 }

@@ -43,9 +43,10 @@ extension NetworkConfigFixtures {
         var networkConfig = try NetworkConfig.make(
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
-            mistyswapLoadBalancer: NetworkPreset.eranDevNetworkMistyswapLoadBalancers(),
             attestation: attestationConfig,
-            transportProtocol: transportProtocol).get()
+            transportProtocol: transportProtocol,
+            mistyswapLoadBalancer: NetworkPreset.eranDevNetworkMistyswapLoadBalancers()
+        ).get()
 
         networkConfig.httpRequester = DefaultHttpRequester()
         try networkConfig.setConsensusTrustRoots(NetworkPreset.trustRootsBytes())
@@ -68,9 +69,10 @@ extension NetworkConfigFixtures {
                         NetworkConfig(
                             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                             fogUrlLoadBalancer: fogUrlLoadBalancer,
-                            mistyswapLoadBalancer: try! NetworkPreset.eranDevNetworkMistyswapLoadBalancers(),
                             attestation: attestationConfig,
-                            transportProtocol: transportProtocol)
+                            transportProtocol: transportProtocol,
+                            mistyswapLoadBalancer: try! NetworkPreset.eranDevNetworkMistyswapLoadBalancers()
+                        )
                     }
                 }
             }

@@ -7,12 +7,20 @@ import Foundation
 import LibMobileCoin
 
 struct Mistyswap: MistyswapService & MistyswapUntrustedService {
-    private let mistyswap: MistyswapService
-    private let mistyswapUntrusted: MistyswapUntrustedService
+    private let mistyswap: MistyswapService?
+    private let mistyswapUntrusted: MistyswapUntrustedService?
 
+    var mistyswapServiceInitialized: Bool {
+        mistyswap == nil
+    }
+    
+    var mistyswapUntrustedServiceInitialized: Bool {
+        mistyswapUntrusted == nil
+    }
+    
     init(
-        mistyswap: MistyswapService,
-        mistyswapUntrusted: MistyswapUntrustedService
+        mistyswap: MistyswapService?,
+        mistyswapUntrusted: MistyswapUntrustedService?
     ) {
         self.mistyswap = mistyswap
         self.mistyswapUntrusted = mistyswapUntrusted
@@ -22,21 +30,21 @@ struct Mistyswap: MistyswapService & MistyswapUntrustedService {
         request: Mistyswap_InitiateOfframpRequest,
         completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>
     ) -> Void) {
-        mistyswap.initiateOfframp(request: request, completion: completion)
+        mistyswap?.initiateOfframp(request: request, completion: completion)
     }
     
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
         completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>
     ) -> Void) {
-        mistyswap.getOfframpStatus(request: request, completion: completion)
+        mistyswap?.getOfframpStatus(request: request, completion: completion)
     }
     
     func forgetOfframp(
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>
     ) -> Void) {
-        mistyswapUntrusted.forgetOfframp(request: request, completion: completion)
+        mistyswapUntrusted?.forgetOfframp(request: request, completion: completion)
     }
 }
 

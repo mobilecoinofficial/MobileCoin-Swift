@@ -554,9 +554,10 @@ extension NetworkPreset {
         var networkConfig = try NetworkConfig.make(
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
-            mistyswapLoadBalancer: mistyswapLoadBalancer,
             attestation: attestationConfig,
-            transportProtocol: transportProtocol).get()
+            transportProtocol: transportProtocol,
+            mistyswapLoadBalancer: mistyswapLoadBalancer
+        ).get()
 
         networkConfig.httpRequester = DefaultHttpRequester()
         try networkConfig.setConsensusTrustRoots(trustRootsBytes())

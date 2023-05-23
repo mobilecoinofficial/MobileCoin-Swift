@@ -8,7 +8,29 @@ import Foundation
 
 extension MobileCoinClient {
     public struct Config {
-        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
+        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl`  are not well-formed URLs
+        ///     with the appropriate schemes.
+        public static func make(
+            consensusUrl: String,
+            consensusAttestation: Attestation,
+            fogUrl: String,
+            fogViewAttestation: Attestation,
+            fogKeyImageAttestation: Attestation,
+            fogMerkleProofAttestation: Attestation,
+            fogReportAttestation: Attestation,
+            transportProtocol: TransportProtocol
+        ) -> Result<Config, InvalidInputError> {
+            Self.make(consensusUrls: [consensusUrl],
+                      consensusAttestation: consensusAttestation,
+                      fogUrls: [fogUrl],
+                      fogViewAttestation: fogViewAttestation,
+                      fogKeyImageAttestation: fogKeyImageAttestation,
+                      fogMerkleProofAttestation: fogMerkleProofAttestation,
+                      fogReportAttestation: fogReportAttestation,
+                      transportProtocol: transportProtocol)
+        }
+        
+        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl or `mistyswapUrl` are not well-formed URLs
         ///     with the appropriate schemes.
         public static func make(
             consensusUrl: String,
@@ -58,7 +80,7 @@ extension MobileCoinClient {
                             urls: fogUrls
                         ).flatMap { fogUrlLoadBalancer in
                             MistyswapUrl.make(strings: mistyswapUrls).flatMap { mistyswapUrls in
-                                RandomUrlLoadBalancer<MistyswapUrl>.make(
+                                NonRotatingUrlLoadBalancer<MistyswapUrl>.make(
                                     urls: mistyswapUrls
                                 ).map { mistyswapLoadBalancer in
 
@@ -74,12 +96,59 @@ extension MobileCoinClient {
                                     let networkConfig = NetworkConfig(
                                         consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                                         fogUrlLoadBalancer: fogUrlLoadBalancer,
-                                        mistyswapLoadBalancer: mistyswapLoadBalancer,
                                         attestation: attestationConfig,
-                                        transportProtocol: transportProtocol)
+                                        transportProtocol: transportProtocol,
+                                        mistyswapLoadBalancer: mistyswapLoadBalancer)
+                                    
                                     return Config(networkConfig: networkConfig)
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
+        ///     with the appropriate schemes.
+        public static func make(
+            consensusUrls: [String],
+            consensusAttestation: Attestation,
+            fogUrls: [String],
+            fogViewAttestation: Attestation,
+            fogKeyImageAttestation: Attestation,
+            fogMerkleProofAttestation: Attestation,
+            fogReportAttestation: Attestation,
+            transportProtocol: TransportProtocol
+        ) -> Result<Config, InvalidInputError> {
+
+            ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
+                RandomUrlLoadBalancer<ConsensusUrl>.make(
+                    urls: consensusUrls
+                ).flatMap { consensusUrlLoadBalancer in
+                    FogUrl.make(strings: fogUrls).flatMap { fogUrls in
+                        RandomUrlLoadBalancer<FogUrl>.make(
+                            urls: fogUrls
+                        ).flatMap { fogUrlLoadBalancer in
+
+                            let attestationConfig = NetworkConfig.AttestationConfig(
+                                consensus: consensusAttestation,
+                                fogView: fogViewAttestation,
+                                fogKeyImage: fogKeyImageAttestation,
+                                fogMerkleProof: fogMerkleProofAttestation,
+                                fogReport: fogReportAttestation,
+                                mistyswap: nil
+                            )
+
+                            let networkConfig = NetworkConfig(
+                                consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+                                fogUrlLoadBalancer: fogUrlLoadBalancer,
+                                attestation: attestationConfig,
+                                transportProtocol: transportProtocol,
+                                mistyswapLoadBalancer: nil
+                            )
+                            
+                            return .success(Config(networkConfig: networkConfig))
                         }
                     }
                 }
@@ -156,6 +225,7 @@ extension MobileCoinClient {
             Fog KeyImage attestation: \(config.networkConfig.fogKeyImageConfig().attestation)
             Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProofConfig().attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
+            Mistyswap attestation: \(config.networkConfig.mistyswapConfig()?.attestation.description ?? "none")
             """
     }
 }

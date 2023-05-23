@@ -35,7 +35,13 @@ final class MistyswapConnection: Connection<
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.mistyswapConfig()
+                guard let rotatedConfig = config.mistyswapConfig() else {
+                    logger.fatalError(
+                        "This should never happen, no config passed to create a mistyswap" +
+                        " connection. Other checks should have caught this." +
+                        " Fix this by using valid mistyswap URLs and attestation")
+                }
+                
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -59,7 +65,19 @@ final class MistyswapConnection: Connection<
             targetQueue: targetQueue)
     }
 
-    func initiateOfframp(request: Mistyswap_InitiateOfframpRequest, completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void) {
+    func initiateOfframp(
+        request: Mistyswap_InitiateOfframpRequest,
+        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
+    ) {
+        guard let _ = config.mistyswapConfig() else {
+            completion(
+                .failure(
+                    .connectionFailure(
+                        "Config used to intialize your client " +
+                        "did not include URLs or Attestation info for Mistyswap.")))
+            return
+        }
+                
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.initiateOfframp(
@@ -72,7 +90,19 @@ final class MistyswapConnection: Connection<
         }
     }
     
-    func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
+    func getOfframpStatus(
+        request: Mistyswap_GetOfframpStatusRequest,
+        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
+    ) {
+        guard let _ = config.mistyswapConfig() else {
+            completion(
+                .failure(
+                    .connectionFailure(
+                        "Config used to intialize your client " +
+                        "did not include URLs or Attestation info for Mistyswap.")))
+            return
+        }
+        
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.getOfframpStatus(

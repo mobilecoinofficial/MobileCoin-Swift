@@ -501,6 +501,7 @@ extension SSLTrustError: LocalizedError {
 public enum MistyswapError: Error {
     case invalidInput(InvalidInputError)
     case connectionError(ConnectionError)
+    case notInitialized(String)
 }
 
 extension MistyswapError: CustomStringConvertible {
@@ -511,6 +512,8 @@ extension MistyswapError: CustomStringConvertible {
                 return "Invalid input: \(reason)"
             case .connectionError(let innerError):
                 return "\(innerError)"
+            case .notInitialized(let description):
+                return description
             }
         }()
     }

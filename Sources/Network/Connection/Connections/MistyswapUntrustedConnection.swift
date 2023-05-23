@@ -35,7 +35,13 @@ final class MistyswapUntrustedConnection: Connection<
 
         super.init(
             connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.mistyswapUntrustedConfig()
+                guard let rotatedConfig = config.mistyswapUntrustedConfig() else {
+                    logger.fatalError(
+                        "This should never happen, no config passed to create a mistyswap" +
+                        " connection. Other checks should have caught this." +
+                        " Fix this by using valid mistyswap URLs and attestation")
+                }
+                
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -60,6 +66,15 @@ final class MistyswapUntrustedConnection: Connection<
     }
 
     func forgetOfframp(request: Mistyswap_ForgetOfframpRequest, completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void) {
+        guard let _ = config.mistyswapUntrustedConfig() else {
+            completion(
+                .failure(
+                    .connectionFailure(
+                        "Config used to intialize your client " +
+                        "did not include URLs or Attestation info for Mistyswap.")))
+            return
+        }
+        
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.forgetOfframp(

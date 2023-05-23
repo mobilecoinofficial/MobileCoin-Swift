@@ -8,22 +8,22 @@ struct NetworkConfig {
     static func make(
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
-        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol
+        transportProtocol: TransportProtocol,
+        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>? = nil
     ) -> Result<NetworkConfig, InvalidInputError> {
         .success(NetworkConfig(
                     consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                     fogUrlLoadBalancer: fogUrlLoadBalancer,
-                    mistyswapLoadBalancer: mistyswapLoadBalancer,
                     attestation: attestation,
-                    transportProtocol: transportProtocol))
+                    transportProtocol: transportProtocol,
+                    mistyswapLoadBalancer: mistyswapLoadBalancer))
     }
 
     private let attestation: AttestationConfig
     private let consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>
     private let fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
-    private let mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>
+    private let mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>?
 
     var consensusUrls: [ConsensusUrl] {
         consensusUrlLoadBalancer.urlsTyped
@@ -55,9 +55,9 @@ struct NetworkConfig {
     init(
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
-        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol
+        transportProtocol: TransportProtocol,
+        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>? = nil
     ) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
@@ -126,17 +126,30 @@ struct NetworkConfig {
             authorization: fogUserAuthorization)
     }
 
-    func mistyswapConfig() -> AttestedConnectionConfig<MistyswapUrl> {
-        AttestedConnectionConfig(
+    func mistyswapConfig() -> AttestedConnectionConfig<MistyswapUrl>? {
+        guard
+            let mistyswapLoadBalancer = mistyswapLoadBalancer,
+            let mistyswapAttestation = attestation.mistyswap
+        else {
+            return nil
+        }
+        
+        return AttestedConnectionConfig(
             url: mistyswapLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
-            attestation: attestation.mistyswap,
+            attestation: mistyswapAttestation,
             trustRoots: mistyswapTrustRoots,
             authorization: mistyswapUserAuthorization)
     }
 
-    func mistyswapUntrustedConfig() -> ConnectionConfig<MistyswapUrl> {
-        ConnectionConfig(
+    func mistyswapUntrustedConfig() -> ConnectionConfig<MistyswapUrl>? {
+        guard
+            let mistyswapLoadBalancer = mistyswapLoadBalancer
+        else {
+            return nil
+        }
+        
+        return ConnectionConfig(
             url: mistyswapLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
             trustRoots: mistyswapTrustRoots,
@@ -206,6 +219,6 @@ extension NetworkConfig {
         let fogKeyImage: Attestation
         let fogMerkleProof: Attestation
         let fogReport: Attestation
-        let mistyswap: Attestation
+        let mistyswap: Attestation?
     }
 }

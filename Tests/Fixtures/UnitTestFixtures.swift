@@ -30,9 +30,10 @@ enum UnitTestFixtures {
         var networkConfig = try NetworkConfig.make(
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
-            mistyswapLoadBalancer: mistyswapUrlLoadBalancer,
             attestation: attestationConfig,
-            transportProtocol: .http)
+            transportProtocol: .http,
+            mistyswapLoadBalancer: mistyswapUrlLoadBalancer
+        )
             .get()
 
         networkConfig.httpRequester = httpRequester

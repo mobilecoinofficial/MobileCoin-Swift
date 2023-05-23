@@ -33,3 +33,52 @@ extension Mistyswap_InitiateOfframpRequest {
         })
     }
 }
+
+public struct InitiateOfframpResponse {
+    public let offrampResult: OfframpResult
+   
+    public var offrampID: Data {
+        response.offrampID
+    }
+    
+    public var srcAssetID: String {
+        response.srcAssetID
+    }
+    
+    public var dstAssetID: String {
+        response.dstAssetID
+    }
+    
+    private let response: Mistyswap_InitiateOfframpResponse
+}
+
+extension InitiateOfframpResponse {
+    init(response: Mistyswap_InitiateOfframpResponse) {
+        self.offrampResult = OfframpResult(result: response.result)
+        self.response = response
+    }
+}
+
+public struct OfframpResult {
+    public var code: Int {
+        result.code.rawValue
+    }
+        
+    public var codeDescription: String {
+        "\(String(describing: result.code).camelCaseToWords()) - \(code)"
+    }
+    
+    public var message: String {
+        result.message
+    }
+    
+    public var offrampID: Data {
+        result.offrampID
+    }
+        
+    private let result: Mistyswap_OfframpResult
+    
+    init(result: Mistyswap_OfframpResult) {
+        self.result = result
+    }
+}

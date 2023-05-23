@@ -13,9 +13,9 @@ protocol ServiceProvider {
     var fogKeyImageService: FogKeyImageService { get }
     var fogBlockService: FogBlockService { get }
     var fogUntrustedTxOutService: FogUntrustedTxOutService { get }
-    
-    var mistyswapService: MistyswapService { get }
-    var mistyswapUntrustedService: MistyswapUntrustedService { get }
+
+    var mistyswapService: MistyswapService? { get }
+    var mistyswapUntrustedService: MistyswapUntrustedService? { get }
 
     func fogReportService(
         for fogReportUrl: FogUrl,
