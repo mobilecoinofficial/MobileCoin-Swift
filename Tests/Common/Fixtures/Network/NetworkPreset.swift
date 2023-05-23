@@ -282,9 +282,9 @@ extension NetworkPreset {
     }
     
     private static let mistyswapMrEnclaveHex =
-        "4ce5a80d652d708c2c9633ec86883add3ca981bc26cfc8894ea1b28f13f6e368"
+        "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
     private static let mistyswapMrSignerHex =
-        "e47e5fa5a69ea44e741813bc148f43cba31ed88ad1757c038a8853472d3d400b"
+        "e1004164be659a4aef2768857cd7ecc95d3afd09d6afb41ec1862adb8a4387ed"
     
     private static let mainNetConsensusMrEnclaveHex =
         "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
