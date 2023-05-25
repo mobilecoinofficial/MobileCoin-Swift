@@ -18,11 +18,11 @@ class MistyswapTests: XCTestCase {
     }
 
     func initiateOfframpRequest(transportProtocol: TransportProtocol) throws {
-        let mistyswapConnection = try createMistyswapConnection(transportProtocol: transportProtocol)
+        let connection = try createMistyswapConnection(transportProtocol: transportProtocol)
         let fixture = try Mistyswap.Fixtures.InitiateOfframp()
 
         let expect = expectation(description: "Making Mistyswap enclave request")
-        mistyswapConnection.initiateOfframp(
+        connection.initiateOfframp(
             request: fixture.request
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
@@ -39,11 +39,11 @@ class MistyswapTests: XCTestCase {
     }
 
     func getOfframpStatusRequest(transportProtocol: TransportProtocol) throws {
-        let mistyswapConnection = try createMistyswapConnection(transportProtocol: transportProtocol)
+        let connection = try createMistyswapConnection(transportProtocol: transportProtocol)
         let fixture = try Mistyswap.Fixtures.GetOfframpStatus()
 
         let expect = expectation(description: "Making Mistyswap enclave request")
-        mistyswapConnection.getOfframpStatus(
+        connection.getOfframpStatus(
             request: fixture.request
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
@@ -60,11 +60,11 @@ class MistyswapTests: XCTestCase {
     }
 
     func forgetOfframpRequest(transportProtocol: TransportProtocol) throws {
-        let mistyswapConnection = try createMistyswapConnection(transportProtocol: transportProtocol)
+        let connection = try createMistyswapConnection(transportProtocol: transportProtocol)
         let fixture = try Mistyswap.Fixtures.ForgetOfframp()
 
         let expect = expectation(description: "Making Mistyswap enclave request")
-        mistyswapConnection.forgetOfframp(
+        connection.forgetOfframp(
             request: fixture.request
         ) {
             guard let response = $0.successOrFulfill(expectation: expect) else { return }
