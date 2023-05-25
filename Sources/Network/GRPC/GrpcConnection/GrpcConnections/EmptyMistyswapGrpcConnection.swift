@@ -32,21 +32,30 @@ final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapServi
         request: Mistyswap_InitiateOfframpRequest,
         completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
     ) {
-        completion(.failure(.connectionFailure("Config used to intialize your client did not include URLs or Attestation info for Mistyswap.")))
+        completion(.failure(.connectionFailure(
+            "Config used to intialize your client " +
+            "did not include URLs or Attestation info for Mistyswap."
+        )))
     }
 
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
         completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
     ) {
-        completion(.failure(.connectionFailure("Config used to intialize your client did not include URLs or Attestation info for Mistyswap.")))
+        completion(.failure(.connectionFailure(
+            "Config used to intialize your client " +
+            "did not include URLs or Attestation info for Mistyswap."
+        )))
     }
 
     func forgetOfframp(
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
     ) {
-        completion(.failure(.connectionFailure("Config used to intialize your client did not include URLs or Attestation info for Mistyswap.")))
+        completion(.failure(.connectionFailure(
+            "Config used to intialize your client " +
+            "did not include URLs or Attestation info for Mistyswap."
+        )))
     }
 
 }

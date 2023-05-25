@@ -72,7 +72,7 @@ final class DefaultServiceProvider: ServiceProvider {
             config: networkConfig,
             targetQueue: targetQueue)
 
-        if let _ = networkConfig.mistyswapConfig() {
+        if networkConfig.mistyswapConfig() != nil {
             self.mistyswap = MistyswapConnection(
                 httpFactory: self.httpConnectionFactory,
                 grpcFactory: self.grpcConnectionFactory,
