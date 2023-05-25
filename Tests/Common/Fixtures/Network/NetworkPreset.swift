@@ -241,7 +241,7 @@ extension NetworkPreset {
                     "\(preset.namespace).\(preset.environment).mobilecoin.com"
         }
     }
-    
+
     var fogShortUrl: String {
         switch self {
         case .mainNet:
@@ -274,19 +274,19 @@ extension NetworkPreset {
 //                    "\(preset.namespace).\(preset.environment).mobilecoin.com"
 //        }
         // eran dev box on gCloud
-        
+
         return "insecure-mistyswap://40.112.132.134:3229/"
     }
-    
+
     static var mistyswapUrl: String {
-        return "insecure-mistyswap://40.112.132.134:3229/"
+        "insecure-mistyswap://40.112.132.134:3229/"
     }
-    
+
     private static let mistyswapMrEnclaveHex =
         "e1004164be659a4aef2768857cd7ecc95d3afd09d6afb41ec1862adb8a4387ed"
     private static let mistyswapMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
-    
+
     private static let mainNetConsensusMrEnclaveHex =
         "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
     private static let mainNetFogViewMrEnclaveHex =
@@ -295,7 +295,7 @@ extension NetworkPreset {
         "89db0d1684fcc98258295c39f4ab68f7de5917ef30f0004d9a86f29930cebbbd"
     private static let mainNetFogReportMrEnclaveHex =
         "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
-    
+
     // v1.1.0 Enclave Values
     private static let legacy_v1_1_0_testNetConsensusMrEnclaveHex =
         "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
@@ -541,7 +541,7 @@ extension NetworkPreset {
         let mistyswapUrls = try MistyswapUrl.make(strings: [mistyswapUrl]).get()
         return try RandomUrlLoadBalancer.make(urls: mistyswapUrls).get()
     }
-    
+
     func networkConfig(transportProtocol: TransportProtocol = .http) throws -> NetworkConfig {
         let consensusUrls = try ConsensusUrl.make(strings: [consensusUrl]).get()
         let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
@@ -684,7 +684,7 @@ extension NetworkPreset {
                 allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
     }
-    
+
     static func mistyswapAttestation() throws -> Attestation {
         // Eran dev box on gCloud
         return try XCTUnwrapSuccess(Attestation.make(

@@ -22,7 +22,7 @@ extension Mistyswap_InitiateOfframpRequest {
         JSONSerialization.verify(jsonString: mixinCredentialsJSON).map({ () in
             var proto = Mistyswap_InitiateOfframpRequest()
             proto.mixinCredentialsJson = mixinCredentialsJSON
-            
+
             var params = Mistyswap_OfframpParams()
             params.srcAssetID = srcAssetID
             params.srcExpectedAmount = srcExpectedAmount
@@ -31,7 +31,7 @@ extension Mistyswap_InitiateOfframpRequest {
             params.dstAddressTag = dstAddressTag
             params.minDstReceivedAmount = minDstReceivedAmount
             params.maxFeeAmountInDstTokens = maxFeeAmountInDstTokens
-            
+
             proto.params = params
             return proto
         })

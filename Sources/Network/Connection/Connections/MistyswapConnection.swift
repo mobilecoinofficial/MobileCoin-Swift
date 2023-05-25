@@ -41,7 +41,7 @@ final class MistyswapConnection: Connection<
                         " connection. Other checks should have caught this." +
                         " Fix this by using valid mistyswap URLs and attestation")
                 }
-                
+
                 switch transportProtocolOption {
                 case .grpc:
                     return .grpc(
@@ -77,7 +77,7 @@ final class MistyswapConnection: Connection<
                         "did not include URLs or Attestation info for Mistyswap.")))
             return
         }
-                
+
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.initiateOfframp(
@@ -89,7 +89,7 @@ final class MistyswapConnection: Connection<
                 completion: rotateURLOnError(completion))
         }
     }
-    
+
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
         completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
@@ -102,7 +102,7 @@ final class MistyswapConnection: Connection<
                         "did not include URLs or Attestation info for Mistyswap.")))
             return
         }
-        
+
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.getOfframpStatus(
@@ -114,7 +114,7 @@ final class MistyswapConnection: Connection<
                     completion: rotateURLOnError(completion))
         }
     }
-    
+
     func forgetOfframp(
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
@@ -127,7 +127,7 @@ final class MistyswapConnection: Connection<
                         "did not include URLs or Attestation info for Mistyswap.")))
             return
         }
-        
+
         switch connectionOptionWrapper {
         case .grpc(let grpcConnection):
             grpcConnection.forgetOfframp(
@@ -139,7 +139,7 @@ final class MistyswapConnection: Connection<
                     completion: rotateURLOnError(completion))
         }
     }
-    
+
 }
 
 extension EmptyMistyswapService: ConnectionProtocol { }

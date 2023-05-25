@@ -107,7 +107,7 @@ class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
             requester: RestApiRequester(requester: requester, baseUrl: url),
             targetQueue: targetQueue)
     }
-    
+
 //    func makeMistyswapService(
 //        config: AttestedConnectionConfig<MistyswapUrl>,
 //        targetQueue: DispatchQueue?,

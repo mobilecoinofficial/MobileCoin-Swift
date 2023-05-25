@@ -163,7 +163,6 @@ extension McConstants {
         121, 244, 252, 42, 166, 188, 185, 147, 1, 44, 60, 56, 108,
     ])
 
-    
     static let MISTYSWAP_SECURITY_VERSION: UInt16 = 6
 }
 
@@ -180,7 +179,7 @@ extension McConstants {
     /// Default port numbers
     static let CONSENSUS_DEFAULT_SECURE_PORT = 443
     static let CONSENSUS_DEFAULT_INSECURE_PORT = 3223
-    
+
     /// The part before the '://' of a URL.
     static let MISTYSWAP_SCHEME_SECURE = "mistyswap"
     static let MISTYSWAP_SCHEME_INSECURE = "insecure-mistyswap"

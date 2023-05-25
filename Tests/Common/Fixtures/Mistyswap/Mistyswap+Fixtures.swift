@@ -5,8 +5,8 @@
 // swiftlint:disable multiline_function_chains
 
 import Foundation
-@testable import MobileCoin
 @testable import LibMobileCoin
+@testable import MobileCoin
 import XCTest
 
 enum Mistyswap {}
@@ -22,10 +22,9 @@ extension Mistyswap.Fixtures {
         let request: Mistyswap_ForgetOfframpRequest
 
         init() throws {
-            self.offrampID = try XCTUnwrap(Data32(Data.init(randomOfLength: 32)))
-            self.badOfframpID = try XCTUnwrap(Data.init(randomOfLength: 16))
-            
-            
+            self.offrampID = try XCTUnwrap(Data32(Data(randomOfLength: 32)))
+            self.badOfframpID = try XCTUnwrap(Data(randomOfLength: 16))
+
             var request = Mistyswap_ForgetOfframpRequest()
             request.offrampID = offrampID.data
             self.request = request
@@ -79,7 +78,7 @@ extension Mistyswap.Fixtures.InitiateOfframp {
         }
         """
     }
-    
+
     static func badJSON() -> String {
         """
         {
@@ -96,9 +95,9 @@ extension Mistyswap.Fixtures {
         let request: Mistyswap_GetOfframpStatusRequest
 
         init() throws {
-            self.offrampID = try XCTUnwrap(Data32(Data.init(randomOfLength: 32)))
-            self.badOfframpID = try XCTUnwrap(Data.init(randomOfLength: 16))
-            
+            self.offrampID = try XCTUnwrap(Data32(Data(randomOfLength: 32)))
+            self.badOfframpID = try XCTUnwrap(Data(randomOfLength: 16))
+
             var request = Mistyswap_GetOfframpStatusRequest()
             request.offrampID = offrampID.data
             self.request = request

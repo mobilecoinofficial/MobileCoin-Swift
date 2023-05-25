@@ -37,7 +37,7 @@ public final class MobileCoinClient {
     private let fogSyncChecker: FogSyncCheckable
 
     let mistyswap: Mistyswap
-    
+
     static let latestBlockVersion = BlockVersion.legacy
 
     init(accountKey: AccountKeyWithFog, config: Config) {
@@ -73,7 +73,7 @@ public final class MobileCoinClient {
             blockchainService: serviceProvider.blockchainService,
             metaCacheTTL: config.metaCacheTTL,
             targetQueue: serialQueue)
-        
+
         self.mistyswap = Mistyswap(
             mistyswap: serviceProvider.mistyswapService
         )

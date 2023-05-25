@@ -133,7 +133,7 @@ struct NetworkConfig {
         else {
             return nil
         }
-        
+
         return AttestedConnectionConfig(
             url: mistyswapLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,
@@ -148,7 +148,7 @@ struct NetworkConfig {
         else {
             return nil
         }
-        
+
         return ConnectionConfig(
             url: mistyswapLoadBalancer.nextUrl(),
             transportProtocolOption: transportProtocol.option,

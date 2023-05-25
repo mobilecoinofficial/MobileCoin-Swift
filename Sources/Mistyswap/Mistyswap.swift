@@ -13,7 +13,7 @@ struct Mistyswap: MistyswapService {
     var mistyswapServiceInitialized: Bool {
         mistyswap == nil
     }
-    
+
 //    var mistyswapUntrustedServiceInitialized: Bool {
 //        mistyswapUntrusted == nil
 //    }
@@ -25,21 +25,21 @@ struct Mistyswap: MistyswapService {
         self.mistyswap = mistyswap
 //        self.mistyswapUntrusted = mistyswapUntrusted
     }
-    
+
     func initiateOfframp(
         request: Mistyswap_InitiateOfframpRequest,
         completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>
     ) -> Void) {
         mistyswap?.initiateOfframp(request: request, completion: completion)
     }
-    
+
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
         completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>
     ) -> Void) {
         mistyswap?.getOfframpStatus(request: request, completion: completion)
     }
-    
+
     func forgetOfframp(
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>
@@ -49,7 +49,7 @@ struct Mistyswap: MistyswapService {
 }
 
 /// Mixin asset ids we care about - these are fetched by querying https://mtgswap-api.fox.one/api/assets
-public enum MixinAssetID : String {
+public enum MixinAssetID: String {
     case MOB = "eea900a8-b327-488c-8d8d-1428702fe240"
     case EUSD = "659c407a-0489-30bf-9e6f-84ef25c971c9"
     case USDC = "9b180ab6-6abe-3dc0-a13f-04169eb34bfa"

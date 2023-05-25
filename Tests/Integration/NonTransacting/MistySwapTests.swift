@@ -32,7 +32,7 @@ class MistyswapTests: XCTestCase {
         }
         waitForExpectations(timeout: 40)
     }
-    
+
     func testGetOfframpStatusRequest() throws {
         // HTTP not supported
         try getOfframpStatusRequest(transportProtocol: .grpc)
@@ -53,7 +53,7 @@ class MistyswapTests: XCTestCase {
         }
         waitForExpectations(timeout: 40)
     }
-    
+
     func testForgetOfframpRequest() throws {
         // HTTP not supported
         try forgetOfframpRequest(transportProtocol: .grpc)
@@ -74,7 +74,7 @@ class MistyswapTests: XCTestCase {
         }
         waitForExpectations(timeout: 40)
     }
-    
+
 }
 
 extension MistyswapTests {
@@ -82,7 +82,7 @@ extension MistyswapTests {
         let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createMistyswapConnection(networkConfig: networkConfig)
     }
-    
+
     func createMistyswapConnectionWithInvalidCredentials(
         transportProtocol: TransportProtocol
     ) throws -> MistyswapConnection {
@@ -90,7 +90,7 @@ extension MistyswapTests {
             using: transportProtocol)
         return createMistyswapConnection(networkConfig: networkConfig)
     }
-    
+
     func createMistyswapConnection(networkConfig: NetworkConfig) -> MistyswapConnection {
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())

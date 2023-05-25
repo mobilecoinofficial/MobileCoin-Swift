@@ -9,7 +9,7 @@ import LibMobileCoin
 //        validations. For now, we will add extension to proto.
 
 extension Mistyswap_ForgetOfframpRequest {
-    
+
     static func make(offrampID: Data) -> Result<Self, InvalidInputError> {
         // Offramp ID should be 32 bytes
         guard let _ = Data32(offrampID) else {
@@ -19,6 +19,5 @@ extension Mistyswap_ForgetOfframpRequest {
         proto.offrampID = offrampID
         return .success(proto)
     }
-    
-}
 
+}

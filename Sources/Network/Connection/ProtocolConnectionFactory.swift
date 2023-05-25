@@ -64,7 +64,7 @@ protocol ProtocolConnectionFactory {
         transportProtocolOption: TransportProtocol.Option,
         targetQueue: DispatchQueue?
     ) -> FogReportServiceProvider
-    
+
     func makeMistyswapService(
         config: AttestedConnectionConfig<MistyswapUrl>,
         targetQueue: DispatchQueue?,
@@ -138,7 +138,7 @@ extension ProtocolConnectionFactory {
     ) -> EmptyFogReportService {
         EmptyFogReportService()
     }
-    
+
     func makeMistyswapService(
         config: AttestedConnectionConfig<MistyswapUrl>,
         targetQueue: DispatchQueue?,
@@ -235,11 +235,11 @@ class EmptyMistyswapService: MistyswapService {
     func forgetOfframp(request: LibMobileCoin.Mistyswap_ForgetOfframpRequest, completion: @escaping (Result<LibMobileCoin.Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }
-    
+
     func initiateOfframp(request: Mistyswap_InitiateOfframpRequest, completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }
-    
+
     func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }

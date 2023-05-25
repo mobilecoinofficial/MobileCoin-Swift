@@ -23,7 +23,7 @@ extension MobileCoinClient {
             completion(.failure(.notInitialized("Mistyswap service not configured")))
             return
         }
-            
+
         let result = Mistyswap_InitiateOfframpRequest.make(
             mixinCredentialsJSON: mixinCredentialsJSON,
             srcAssetID: srcAssetID,
@@ -36,7 +36,7 @@ extension MobileCoinClient {
         ).mapError { invalidInputError in
             MistyswapError.invalidInput(invalidInputError)
         }
-        
+
         switch result {
         case .success(let proto):
             mistyswap.initiateOfframp(request: proto) { result in
@@ -62,13 +62,13 @@ extension MobileCoinClient {
             completion(.failure(.notInitialized("Mistyswap service not configured")))
             return
         }
-            
+
         let result = Mistyswap_GetOfframpStatusRequest.make(
             offrampID: offrampID
         ).mapError { invalidInputError in
             MistyswapError.invalidInput(invalidInputError)
         }
-        
+
         switch result {
         case .success(let proto):
             mistyswap.getOfframpStatus(request: proto) { result in
@@ -85,7 +85,7 @@ extension MobileCoinClient {
             completion(.failure(error))
         }
     }
-    
+
     public func forgetOfframp(
         offrampID: Data,
         _ completion: @escaping (Result<Data, MistyswapError>) -> Void
@@ -94,13 +94,13 @@ extension MobileCoinClient {
             completion(.failure(.notInitialized("Mistyswap service not configured")))
             return
         }
-            
+
         let result = Mistyswap_ForgetOfframpRequest.make(
             offrampID: offrampID
         ).mapError { invalidInputError in
             MistyswapError.invalidInput(invalidInputError)
         }
-        
+
         switch result {
         case .success(let proto):
             mistyswap.forgetOfframp(request: proto) { result in

@@ -115,7 +115,7 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
             rng: rng,
             rngContext: rngContext)
     }
-    
+
     func makeEmptyMistyswapService(
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,

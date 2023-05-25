@@ -218,7 +218,7 @@ extension UrlLoadBalancerFixtures {
         let urls = try FogUrl.make(strings: urlStrings).get()
         return SequentialUrlLoadBalancer(urls: urls)
     }
-    
+
     private static func createInvalidMistyswapUrlLoadBalancer()
     throws -> SequentialUrlLoadBalancer<MistyswapUrl> {
         let urlStrings = [

@@ -29,7 +29,7 @@ extension MobileCoinClient {
                       fogReportAttestation: fogReportAttestation,
                       transportProtocol: transportProtocol)
         }
-        
+
         /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl or `mistyswapUrl` are not well-formed URLs
         ///     with the appropriate schemes.
         public static func make(
@@ -99,7 +99,7 @@ extension MobileCoinClient {
                                         attestation: attestationConfig,
                                         transportProtocol: transportProtocol,
                                         mistyswapLoadBalancer: mistyswapLoadBalancer)
-                                    
+
                                     return Config(networkConfig: networkConfig)
                                 }
                             }
@@ -147,7 +147,7 @@ extension MobileCoinClient {
                                 transportProtocol: transportProtocol,
                                 mistyswapLoadBalancer: nil
                             )
-                            
+
                             return .success(Config(networkConfig: networkConfig))
                         }
                     }

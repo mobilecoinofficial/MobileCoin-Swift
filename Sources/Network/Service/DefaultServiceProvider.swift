@@ -71,7 +71,7 @@ final class DefaultServiceProvider: ServiceProvider {
             grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
-        
+
         if let _ = networkConfig.mistyswapConfig() {
             self.mistyswap = MistyswapConnection(
                 httpFactory: self.httpConnectionFactory,
@@ -125,7 +125,7 @@ final class DefaultServiceProvider: ServiceProvider {
         block.setAuthorization(credentials: credentials)
         untrustedTxOut.setAuthorization(credentials: credentials)
     }
-    
+
     func setMistyswapAuthorization(credentials: BasicCredentials) {
         mistyswap?.setAuthorization(credentials: credentials)
     }
