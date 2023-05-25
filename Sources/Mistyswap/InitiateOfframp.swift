@@ -1,12 +1,10 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable function_parameter_count
 
 import Foundation
 import LibMobileCoin
-
-// TODO - Could make a public wrapper around the proto with better type checking and
-//        validations. For now, we will add extension to proto.
 
 extension Mistyswap_InitiateOfframpRequest {
     static func make(
