@@ -90,7 +90,7 @@ extension MobileCoinClient {
         offrampID: Data,
         _ completion: @escaping (Result<Data, MistyswapError>) -> Void
     ) {
-        guard mistyswap.mistyswapUntrustedServiceInitialized else {
+        guard mistyswap.mistyswapServiceInitialized else {
             completion(.failure(.notInitialized("Mistyswap service not configured")))
             return
         }

@@ -75,8 +75,7 @@ public final class MobileCoinClient {
             targetQueue: serialQueue)
         
         self.mistyswap = Mistyswap(
-            mistyswap: serviceProvider.mistyswapService,
-            mistyswapUntrusted: serviceProvider.mistyswapUntrustedService
+            mistyswap: serviceProvider.mistyswapService
         )
     }
 

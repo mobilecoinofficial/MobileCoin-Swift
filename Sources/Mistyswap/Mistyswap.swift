@@ -6,24 +6,24 @@
 import Foundation
 import LibMobileCoin
 
-struct Mistyswap: MistyswapService & MistyswapUntrustedService {
+struct Mistyswap: MistyswapService {
     private let mistyswap: MistyswapService?
-    private let mistyswapUntrusted: MistyswapUntrustedService?
+//    private let mistyswapUntrusted: MistyswapUntrustedService?
 
     var mistyswapServiceInitialized: Bool {
         mistyswap == nil
     }
     
-    var mistyswapUntrustedServiceInitialized: Bool {
-        mistyswapUntrusted == nil
-    }
-    
+//    var mistyswapUntrustedServiceInitialized: Bool {
+//        mistyswapUntrusted == nil
+//    }
+//
     init(
-        mistyswap: MistyswapService?,
-        mistyswapUntrusted: MistyswapUntrustedService?
+        mistyswap: MistyswapService?
+//        mistyswapUntrusted: MistyswapUntrustedService?
     ) {
         self.mistyswap = mistyswap
-        self.mistyswapUntrusted = mistyswapUntrusted
+//        self.mistyswapUntrusted = mistyswapUntrusted
     }
     
     func initiateOfframp(
@@ -44,7 +44,7 @@ struct Mistyswap: MistyswapService & MistyswapUntrustedService {
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>
     ) -> Void) {
-        mistyswapUntrusted?.forgetOfframp(request: request, completion: completion)
+        mistyswap?.forgetOfframp(request: request, completion: completion)
     }
 }
 

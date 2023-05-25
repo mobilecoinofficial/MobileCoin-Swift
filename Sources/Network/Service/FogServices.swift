@@ -78,14 +78,18 @@ protocol MistyswapService {
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
         completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void)
-}
-
-protocol MistyswapServiceConnection: MistyswapService, ConnectionProtocol {}
-
-protocol MistyswapUntrustedService {
+    
     func forgetOfframp(
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void)
 }
 
-protocol MistyswapUntrustedServiceConnection: MistyswapUntrustedService, ConnectionProtocol {}
+protocol MistyswapServiceConnection: MistyswapService, ConnectionProtocol {}
+
+//protocol MistyswapUntrustedService {
+//    func forgetOfframp(
+//        request: Mistyswap_ForgetOfframpRequest,
+//        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void)
+//}
+//
+//protocol MistyswapUntrustedServiceConnection: MistyswapUntrustedService, ConnectionProtocol {}

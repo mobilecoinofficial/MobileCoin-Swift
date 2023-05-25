@@ -16,7 +16,6 @@ final class DefaultServiceProvider: ServiceProvider {
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
     private let mistyswap: MistyswapConnection?
-    private let mistyswapUntrusted: MistyswapUntrustedConnection?
     private let grpcConnectionFactory: GrpcProtocolConnectionFactory
     private let httpConnectionFactory: HttpProtocolConnectionFactory
 
@@ -82,16 +81,6 @@ final class DefaultServiceProvider: ServiceProvider {
         } else {
             self.mistyswap = nil
         }
-        
-        if let _ = networkConfig.mistyswapUntrustedConfig() {
-            self.mistyswapUntrusted = MistyswapUntrustedConnection(
-                httpFactory: self.httpConnectionFactory,
-                grpcFactory: self.grpcConnectionFactory,
-                config: networkConfig,
-                targetQueue: targetQueue)
-        } else {
-            self.mistyswapUntrusted = nil
-        }
     }
 
     var consensusService: ConsensusService { consensus }
@@ -102,7 +91,6 @@ final class DefaultServiceProvider: ServiceProvider {
     var fogBlockService: FogBlockService { block }
     var fogUntrustedTxOutService: FogUntrustedTxOutService { untrustedTxOut }
     var mistyswapService: MistyswapService? { mistyswap }
-    var mistyswapUntrustedService: MistyswapUntrustedService? { mistyswapUntrusted }
 
     func fogReportService(
         for fogReportUrl: FogUrl,
@@ -140,7 +128,6 @@ final class DefaultServiceProvider: ServiceProvider {
     
     func setMistyswapAuthorization(credentials: BasicCredentials) {
         mistyswap?.setAuthorization(credentials: credentials)
-        mistyswapUntrusted?.setAuthorization(credentials: credentials)
     }
 }
 

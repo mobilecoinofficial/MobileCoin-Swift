@@ -115,6 +115,31 @@ final class MistyswapConnection: Connection<
         }
     }
     
+    func forgetOfframp(
+        request: Mistyswap_ForgetOfframpRequest,
+        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
+    ) {
+        guard let _ = config.mistyswapConfig() else {
+            completion(
+                .failure(
+                    .connectionFailure(
+                        "Config used to intialize your client " +
+                        "did not include URLs or Attestation info for Mistyswap.")))
+            return
+        }
+        
+        switch connectionOptionWrapper {
+        case .grpc(let grpcConnection):
+            grpcConnection.forgetOfframp(
+                    request: request,
+                    completion: rotateURLOnError(completion))
+        case .http(let httpConnection):
+            httpConnection.forgetOfframp(
+                    request: request,
+                    completion: rotateURLOnError(completion))
+        }
+    }
+    
 }
 
 extension EmptyMistyswapService: ConnectionProtocol { }

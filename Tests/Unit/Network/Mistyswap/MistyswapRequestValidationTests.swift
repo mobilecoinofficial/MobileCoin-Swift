@@ -22,13 +22,13 @@ class MistyswapRequestValidationTests: XCTestCase {
         ))
 
         XCTAssertEqual(proto.mixinCredentialsJson, fixtures.goodJSON)
-        XCTAssertEqual(proto.srcAssetID, fixtures.srcAssetID)
-        XCTAssertEqual(proto.srcExpectedAmount, fixtures.srcExpectedAmount)
-        XCTAssertEqual(proto.dstAssetID, fixtures.dstAssetID)
-        XCTAssertEqual(proto.dstAddress, fixtures.dstAddress)
-        XCTAssertEqual(proto.dstAddressTag, fixtures.dstAddressTag)
-        XCTAssertEqual(proto.minDstReceivedAmount, fixtures.minDstReceivedAmount)
-        XCTAssertEqual(proto.maxFeeAmountInDstTokens, fixtures.maxFeeAmountInDstTokens)
+        XCTAssertEqual(proto.params.srcAssetID, fixtures.srcAssetID)
+        XCTAssertEqual(proto.params.srcExpectedAmount, fixtures.srcExpectedAmount)
+        XCTAssertEqual(proto.params.dstAssetID, fixtures.dstAssetID)
+        XCTAssertEqual(proto.params.dstAddress, fixtures.dstAddress)
+        XCTAssertEqual(proto.params.dstAddressTag, fixtures.dstAddressTag)
+        XCTAssertEqual(proto.params.minDstReceivedAmount, fixtures.minDstReceivedAmount)
+        XCTAssertEqual(proto.params.maxFeeAmountInDstTokens, fixtures.maxFeeAmountInDstTokens)
     }
 
     func testBadJSON() throws {

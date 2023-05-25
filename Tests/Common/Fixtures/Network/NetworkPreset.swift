@@ -274,11 +274,12 @@ extension NetworkPreset {
 //                    "\(preset.namespace).\(preset.environment).mobilecoin.com"
 //        }
         // eran dev box on gCloud
-        return "insecure-mistyswap://34.133.197.146:4040/"
+        
+        return "insecure-mistyswap://40.112.132.134:3229/"
     }
     
     static var mistyswapUrl: String {
-        return "insecure-mistyswap://34.133.197.146:4040/"
+        return "insecure-mistyswap://40.112.132.134:3229/"
     }
     
     private static let mistyswapMrEnclaveHex =

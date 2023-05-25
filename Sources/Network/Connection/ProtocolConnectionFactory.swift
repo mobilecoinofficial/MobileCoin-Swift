@@ -15,7 +15,6 @@ protocol ProtocolConnectionFactory {
     associatedtype FogUntrustedTxOutServiceProvider: FogUntrustedTxOutServiceConnection
     associatedtype FogReportServiceProvider: FogReportService
     associatedtype MistyswapServiceProvider: MistyswapService
-    associatedtype MistyswapUntrustedServiceProvider: MistyswapUntrustedService
 
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
@@ -72,11 +71,6 @@ protocol ProtocolConnectionFactory {
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
         rngContext: Any?
     ) -> MistyswapServiceProvider
-    
-    func makeMistyswapUntrustedService(
-        config: ConnectionConfig<MistyswapUrl>,
-        targetQueue: DispatchQueue?
-    ) -> MistyswapUntrustedServiceProvider
 }
 
 extension ProtocolConnectionFactory {
@@ -152,13 +146,6 @@ extension ProtocolConnectionFactory {
         rngContext: Any?
     ) -> EmptyMistyswapService {
         EmptyMistyswapService()
-    }
-    
-    func makeMistyswapUntrustedService(
-        config: ConnectionConfig<MistyswapUrl>,
-        targetQueue: DispatchQueue?
-    ) -> EmptyMistyswapUntrustedService {
-        EmptyMistyswapUntrustedService()
     }
 }
 
@@ -245,17 +232,15 @@ class EmptyFogReportService: FogReportService {
 }
 
 class EmptyMistyswapService: MistyswapService {
+    func forgetOfframp(request: LibMobileCoin.Mistyswap_ForgetOfframpRequest, completion: @escaping (Result<LibMobileCoin.Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void) {
+        logger.assertionFailure("Not Implemented")
+    }
+    
     func initiateOfframp(request: Mistyswap_InitiateOfframpRequest, completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }
     
     func getOfframpStatus(request: Mistyswap_GetOfframpStatusRequest, completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void) {
-        logger.assertionFailure("Not Implemented")
-    }
-}
-
-class EmptyMistyswapUntrustedService: MistyswapUntrustedService {
-    func forgetOfframp(request: Mistyswap_ForgetOfframpRequest, completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void) {
         logger.assertionFailure("Not Implemented")
     }
 }
