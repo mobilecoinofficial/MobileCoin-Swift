@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
+// swiftlint:disable closure_body_length
 
 import Foundation
 import LibMobileCoin
@@ -69,7 +70,7 @@ final class MistyswapConnection: Connection<
         request: Mistyswap_InitiateOfframpRequest,
         completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
     ) {
-        guard let _ = config.mistyswapConfig() else {
+        guard config.mistyswapConfig() != nil else {
             completion(
                 .failure(
                     .connectionFailure(
@@ -94,7 +95,7 @@ final class MistyswapConnection: Connection<
         request: Mistyswap_GetOfframpStatusRequest,
         completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
     ) {
-        guard let _ = config.mistyswapConfig() else {
+        guard config.mistyswapConfig() != nil else {
             completion(
                 .failure(
                     .connectionFailure(
@@ -119,7 +120,7 @@ final class MistyswapConnection: Connection<
         request: Mistyswap_ForgetOfframpRequest,
         completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
     ) {
-        guard let _ = config.mistyswapConfig() else {
+        guard config.mistyswapConfig() != nil else {
             completion(
                 .failure(
                     .connectionFailure(
