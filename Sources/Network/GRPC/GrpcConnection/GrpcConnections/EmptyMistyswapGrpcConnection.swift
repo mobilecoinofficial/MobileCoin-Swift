@@ -5,9 +5,6 @@
 import Foundation
 import LibMobileCoin
 
-/// This class is returend by the GRPCProtocolConnection Factory when we cannot get a valid mistyswap Config
-/// Under normal circumstances it should never be returned because we check for valid config higher-up in
-/// the call-stack but if the code changes this is a fallback for consumers.
 final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
     private let client: Mistyswap_MistyswapOfframpApiClient
 

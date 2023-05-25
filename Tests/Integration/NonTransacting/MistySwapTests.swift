@@ -78,7 +78,9 @@ class MistyswapTests: XCTestCase {
 }
 
 extension MistyswapTests {
-    func createMistyswapConnection(transportProtocol: TransportProtocol) throws -> MistyswapConnection {
+    func createMistyswapConnection(
+        transportProtocol: TransportProtocol
+    ) throws -> MistyswapConnection {
         let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         return createMistyswapConnection(networkConfig: networkConfig)
     }

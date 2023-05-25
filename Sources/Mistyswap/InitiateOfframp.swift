@@ -1,4 +1,5 @@
-// swiftlint:disable:this function_parameter_count file_name
+// swiftlint:disable:this file_name
+// swiftlint:disable function_parameter_count
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
