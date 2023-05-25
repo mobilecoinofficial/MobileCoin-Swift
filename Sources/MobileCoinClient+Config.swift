@@ -2,7 +2,7 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable function_parameter_count multiline_function_chains
+// swiftlint:disable function_parameter_count multiline_function_chains line_length closure_body_length
 
 import Foundation
 
@@ -212,6 +212,9 @@ extension MobileCoinClient {
     static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
 
+        let mistyswapInfo = config.networkConfig.mistyswapConfig()?.attestation.description
+            ?? "none"
+        
         return """
             Consensus urls: \(config.networkConfig.consensusUrls)
             Fog urls: \(config.networkConfig.fogUrls)
@@ -225,7 +228,7 @@ extension MobileCoinClient {
             Fog KeyImage attestation: \(config.networkConfig.fogKeyImageConfig().attestation)
             Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProofConfig().attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
-            Mistyswap attestation: \(config.networkConfig.mistyswapConfig()?.attestation.description ?? "none")
+            Mistyswap attestation: \(mistyswapInfo)
             """
     }
 }
