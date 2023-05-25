@@ -33,7 +33,8 @@ extension MobileCoinClient {
             dstAddressTag: dstAddressTag,
             minDstReceivedAmount: minDstReceivedAmount,
             maxFeeAmountInDstTokens: maxFeeAmountInDstTokens
-        ).mapError { invalidInputError in
+        )
+        .mapError { invalidInputError in
             MistyswapError.invalidInput(invalidInputError)
         }
 
@@ -65,7 +66,8 @@ extension MobileCoinClient {
 
         let result = Mistyswap_GetOfframpStatusRequest.make(
             offrampID: offrampID
-        ).mapError { invalidInputError in
+        )
+        .mapError { invalidInputError in
             MistyswapError.invalidInput(invalidInputError)
         }
 
@@ -97,7 +99,8 @@ extension MobileCoinClient {
 
         let result = Mistyswap_ForgetOfframpRequest.make(
             offrampID: offrampID
-        ).mapError { invalidInputError in
+        )
+        .mapError { invalidInputError in
             MistyswapError.invalidInput(invalidInputError)
         }
 

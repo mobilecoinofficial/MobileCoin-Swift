@@ -1,8 +1,8 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-
-// swiftlint:disable function_parameter_count multiline_function_chains line_length closure_body_length
+// swiftlint:disable line_length closure_body_length
+// swiftlint:disable function_parameter_count multiline_function_chains
 
 import Foundation
 
@@ -214,7 +214,7 @@ extension MobileCoinClient {
 
         let mistyswapInfo = config.networkConfig.mistyswapConfig()?.attestation.description
             ?? "none"
-        
+
         return """
             Consensus urls: \(config.networkConfig.consensusUrls)
             Fog urls: \(config.networkConfig.fogUrls)
