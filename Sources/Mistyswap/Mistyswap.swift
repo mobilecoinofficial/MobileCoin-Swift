@@ -1,54 +1,46 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable closure_body_length multiline_function_chains
+// swiftlint:disable multiline_function_chains
 
 import Foundation
 import LibMobileCoin
 
 struct Mistyswap: MistyswapService {
     private let mistyswap: MistyswapService?
-//    private let mistyswapUntrusted: MistyswapUntrustedService?
 
     var mistyswapServiceInitialized: Bool {
         mistyswap == nil
     }
 
-//    var mistyswapUntrustedServiceInitialized: Bool {
-//        mistyswapUntrusted == nil
-//    }
-//
     init(
         mistyswap: MistyswapService?
-//        mistyswapUntrusted: MistyswapUntrustedService?
     ) {
         self.mistyswap = mistyswap
-//        self.mistyswapUntrusted = mistyswapUntrusted
     }
 
     func initiateOfframp(
         request: Mistyswap_InitiateOfframpRequest,
-        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>
-    ) -> Void) {
+        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
+    ) {
         mistyswap?.initiateOfframp(request: request, completion: completion)
     }
 
     func getOfframpStatus(
         request: Mistyswap_GetOfframpStatusRequest,
-        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>
-    ) -> Void) {
+        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
+    ) {
         mistyswap?.getOfframpStatus(request: request, completion: completion)
     }
 
     func forgetOfframp(
         request: Mistyswap_ForgetOfframpRequest,
-        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>
-    ) -> Void) {
+        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
+    ) {
         mistyswap?.forgetOfframp(request: request, completion: completion)
     }
 }
 
-/// Mixin asset ids we care about - these are fetched by querying https://mtgswap-api.fox.one/api/assets
 public enum MixinAssetID: String {
     case MOB = "eea900a8-b327-488c-8d8d-1428702fe240"
     case EUSD = "659c407a-0489-30bf-9e6f-84ef25c971c9"
