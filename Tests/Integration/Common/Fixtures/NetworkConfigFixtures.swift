@@ -71,7 +71,8 @@ extension NetworkConfigFixtures {
                             fogUrlLoadBalancer: fogUrlLoadBalancer,
                             attestation: attestationConfig,
                             transportProtocol: transportProtocol,
-                            mistyswapLoadBalancer: try! NetworkPreset.eranDevNetworkMistyswapLoadBalancers()
+                            mistyswapLoadBalancer: try! NetworkPreset
+                                .eranDevNetworkMistyswapLoadBalancers()
                         )
                     }
                 }

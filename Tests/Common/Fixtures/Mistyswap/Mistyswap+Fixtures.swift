@@ -2,8 +2,6 @@
 //  Copyright (c) 2023-2024 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable multiline_function_chains
-
 import Foundation
 @testable import LibMobileCoin
 @testable import MobileCoin
