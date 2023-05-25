@@ -54,6 +54,27 @@ class MistyswapTests: XCTestCase {
         waitForExpectations(timeout: 40)
     }
     
+    func testForgetOfframpRequest() throws {
+        // HTTP not supported
+        try forgetOfframpRequest(transportProtocol: .grpc)
+    }
+
+    func forgetOfframpRequest(transportProtocol: TransportProtocol) throws {
+        let mistyswapConnection = try createMistyswapConnection(transportProtocol: transportProtocol)
+        let fixture = try Mistyswap.Fixtures.ForgetOfframp()
+
+        let expect = expectation(description: "Making Mistyswap enclave request")
+        mistyswapConnection.forgetOfframp(
+            request: fixture.request
+        ) {
+            guard let response = $0.successOrFulfill(expectation: expect) else { return }
+
+            print("Mistyswap Get Offramp Status Response \(response)")
+            expect.fulfill()
+        }
+        waitForExpectations(timeout: 40)
+    }
+    
 }
 
 extension MistyswapTests {
