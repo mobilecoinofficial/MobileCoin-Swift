@@ -23,7 +23,7 @@ commands:
           command: |
             git submodule update --init --depth 1
             cd /Users/distiller/project/Vendor/libmobilecoin-ios-artifacts
-            git submodule update Vendor/mobilecoin
+            git submodule update --init Vendor/mobilecoin
 
   print-tool-versions:
     description: Print versions of various tools used
