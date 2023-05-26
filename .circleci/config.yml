@@ -20,7 +20,7 @@ commands:
       - run:
           name: Run git submodule update --init
           working_directory: Vendor/libmobilecoin-ios-artifacts
-          command: git submodule update --init --depth 1 --recursive
+          command: git submodule update --init --depth 1
 
   print-tool-versions:
     description: Print versions of various tools used
