@@ -15,7 +15,7 @@ extension MobileCoinClient.Config.Fixtures {
     struct Init {
         let consensusUrl = "mc://node1.fake.mobilecoin.com"
         let fogUrl = "fog://fog.fake.mobilecoin.com"
-        let mistyswapUrl = "insecure-mistyswap//34.133.197.146:4040/"
+        let mistyswapUrl = "insecure-mistyswap://34.133.197.146:4040/"
 
         let trustRootsBytes: [Data]
 
