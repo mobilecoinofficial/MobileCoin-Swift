@@ -3,7 +3,7 @@
 //
 
 import Foundation
-@testable import LibMobileCoin
+import LibMobileCoin
 @testable import MobileCoin
 import XCTest
 
