@@ -45,7 +45,7 @@ extension Mistyswap.Fixtures {
 
         init() throws {
             let goodJSON = try Self.goodJSON()
-                
+
             let result = Mistyswap_InitiateOfframpRequest.make(
                 mixinCredentialsJSON: goodJSON,
                 srcAssetID: srcAssetID,
@@ -56,14 +56,14 @@ extension Mistyswap.Fixtures {
                 minDstReceivedAmount: minDstReceivedAmount,
                 maxFeeAmountInDstTokens: maxFeeAmountInDstTokens
             )
-            
+
             switch result {
             case .success(let offrampRequest):
                 self.request = offrampRequest
             case .failure(let error):
                 throw error
             }
-            
+
             self.goodJSON = goodJSON
             self.badJSON = Self.badJSON()
         }
