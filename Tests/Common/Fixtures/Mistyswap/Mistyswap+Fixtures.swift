@@ -44,7 +44,7 @@ extension Mistyswap.Fixtures {
         let maxFeeAmountInDstTokens: String = "4.333"
 
         init() throws {
-            self.request = try XCTUnwrapSuccess(Mistyswap_InitiateOfframpRequest.make(
+            let request = try XCTUnwrapSuccess(Mistyswap_InitiateOfframpRequest.make(
                 mixinCredentialsJSON: Self.goodJSON(),
                 srcAssetID: srcAssetID,
                 srcExpectedAmount: srcExpectedAmount,
@@ -54,10 +54,8 @@ extension Mistyswap.Fixtures {
                 minDstReceivedAmount: minDstReceivedAmount,
                 maxFeeAmountInDstTokens: maxFeeAmountInDstTokens
             ))
+            self.request = request
             self.goodJSON = try Self.goodJSON()
-            print("\n\n\n\n")
-            print(self.goodJSON)
-            print("\n\n\n\n")
             self.badJSON = Self.badJSON()
         }
     }
