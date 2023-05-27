@@ -96,6 +96,8 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
+            mistyswapUrl: network.mistyswapUrl,
+            mistyswapAttestation: network.mistyswapAttestation(),
             transportProtocol: transportProtocol).get()
     }
 
@@ -110,6 +112,8 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
+            mistyswapUrls: [network.mistyswapUrl],
+            mistyswapAttestation: network.mistyswapAttestation(),
             transportProtocol: transportProtocol).get()
     }
 
@@ -124,6 +128,8 @@ extension IntegrationTestFixtures {
             fogKeyImageAttestation: network.fogLedgerAttestation(),
             fogMerkleProofAttestation: network.fogLedgerAttestation(),
             fogReportAttestation: network.fogReportAttestation(),
+            mistyswapUrls: [network.mistyswapUrl],
+            mistyswapAttestation: network.mistyswapAttestation(),
             transportProtocol: transportProtocol).get()
     }
 
