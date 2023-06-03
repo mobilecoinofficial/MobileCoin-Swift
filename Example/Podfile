@@ -28,10 +28,10 @@ target 'Example' do
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['ProtocolUnitTests']
 
-  pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin-ios-artifacts'
-  # pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin-ios-artifacts'
-  # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin-ios-artifacts/LibMobileCoin.podspec'
-  # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin-ios-artifacts.git'
+  pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin'
+  # pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin'
+  # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin/LibMobileCoin.podspec'
+  # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin.git'
 
   pod 'gRPC-Swift'
   pod 'SwiftProtobuf'
