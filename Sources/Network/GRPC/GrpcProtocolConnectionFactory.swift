@@ -101,4 +101,31 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
     ) -> FogReportGrpcConnection {
         FogReportGrpcConnection(url: url, channelManager: channelManager, targetQueue: targetQueue)
     }
+
+    func makeMistyswapService(
+        config: AttestedConnectionConfig<MistyswapUrl>,
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
+    ) -> MistyswapGrpcConnection {
+        MistyswapGrpcConnection(
+            config: config,
+            channelManager: channelManager,
+            targetQueue: targetQueue,
+            rng: rng,
+            rngContext: rngContext)
+    }
+
+    func makeEmptyMistyswapService(
+        targetQueue: DispatchQueue?,
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
+    ) -> EmptyMistyswapGrpcConnection {
+        EmptyMistyswapGrpcConnection(
+            config: EmptyAttestedConnectionConfig(),
+            channelManager: channelManager,
+            targetQueue: targetQueue,
+            rng: rng,
+            rngContext: rngContext)
+    }
 }

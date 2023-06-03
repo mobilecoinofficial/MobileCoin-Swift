@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "4.1.4"
+  s.version      = "5.0.0"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -56,14 +56,14 @@ Pod::Spec.new do |s|
     subspec.source_files = [
       "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/{GRPC,HTTPS}/**/*.{h,m,swift}",
       "Sources/Network/ProtocolSpecific/Combined/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/Core", "~> 4.1.4"
+    subspec.dependency "LibMobileCoin/Core", "~> 5.0.0"
 
     subspec.dependency "gRPC-Swift", "1.0.0"
     subspec.dependency "Logging", "~> 1.4"
@@ -88,14 +88,14 @@ Pod::Spec.new do |s|
     subspec.source_files = [
       "Sources/*.{h,m,swift}",
       "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-      "Sources/{LibMobileCoin,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
+      "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
       "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 4.1.4"
+    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 5.0.0"
 
     subspec.dependency "Logging", "~> 1.4"
 

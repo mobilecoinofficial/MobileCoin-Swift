@@ -9,9 +9,6 @@ import XCTest
 
 class MobileCoinClientIntTests: XCTestCase {
 
-    let clientIdx = 7
-    let recipientIdx = 8
-
     func testTransactionDoubleSubmissionFails() throws {
         let description = "Submitting transaction twice"
         try testSupportedProtocols(description: description) {
@@ -23,16 +20,19 @@ class MobileCoinClientIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountKey: accountKey,
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { client in
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
+
+        client.updateBalances { _ in
             client.prepareTransaction(
-                to: recipient,
+                to: recipientAccountKey.publicAddress,
                 amount: 100,
                 fee: IntegrationTestFixtures.fee
             ) {
@@ -72,21 +72,24 @@ class MobileCoinClientIntTests: XCTestCase {
         transportProtocol: TransportProtocol,
         expectation expect: XCTestExpectation
     ) throws {
-        let accountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: clientIdx)
-        let recipient = try IntegrationTestFixtures.createPublicAddress(accountIndex: recipientIdx)
 
-        try IntegrationTestFixtures.createMobileCoinClientWithBalance(
-                accountKey: accountKey,
-                expectation: expect,
-                transportProtocol: transportProtocol)
-        { client in
+        let (_, client) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Client")
+        let (recipientAccountKey, _) = try IntegrationTestFixtures.createDynamicClient(
+            transportProtocol: transportProtocol,
+            testName: #function,
+            purpose: "Recipient")
+
+        client.updateBalances { _ in
             let submitTransaction = { (callback: @escaping (Transaction) -> Void) in
                 client.updateBalance {
                     guard $0.successOrFulfill(expectation: expect) != nil else { return }
 
                     Array(repeating: (), count: 2).mapAsync({ _, callback in
                         client.prepareTransaction(
-                            to: recipient,
+                            to: recipientAccountKey.publicAddress,
                             amount: 100,
                             fee: IntegrationTestFixtures.fee,
                             completion: callback)

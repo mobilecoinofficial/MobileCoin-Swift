@@ -90,43 +90,36 @@ extension DynamicNetworkConfig {
 extension DynamicNetworkConfig {
     static var developmentNetworkTrustRootsB64 = [
         """
-        MIIG1TCCBL2gAwIBAgIQbFWr29AHksedBwzYEZ7WvzANBgkqhkiG9w0BAQwFADCB\
-        iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl\
-        cnNleSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNV\
-        BAMTJVVTRVJUcnVzdCBSU0EgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMjAw\
-        MTMwMDAwMDAwWhcNMzAwMTI5MjM1OTU5WjBLMQswCQYDVQQGEwJBVDEQMA4GA1UE\
-        ChMHWmVyb1NTTDEqMCgGA1UEAxMhWmVyb1NTTCBSU0EgRG9tYWluIFNlY3VyZSBT\
-        aXRlIENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAhmlzfqO1Mdgj\
-        4W3dpBPTVBX1AuvcAyG1fl0dUnw/MeueCWzRWTheZ35LVo91kLI3DDVaZKW+TBAs\
-        JBjEbYmMwcWSTWYCg5334SF0+ctDAsFxsX+rTDh9kSrG/4mp6OShubLaEIUJiZo4\
-        t873TuSd0Wj5DWt3DtpAG8T35l/v+xrN8ub8PSSoX5Vkgw+jWf4KQtNvUFLDq8mF\
-        WhUnPL6jHAADXpvs4lTNYwOtx9yQtbpxwSt7QJY1+ICrmRJB6BuKRt/jfDJF9Jsc\
-        RQVlHIxQdKAJl7oaVnXgDkqtk2qddd3kCDXd74gv813G91z7CjsGyJ93oJIlNS3U\
-        gFbD6V54JMgZ3rSmotYbz98oZxX7MKbtCm1aJ/q+hTv2YK1yMxrnfcieKmOYBbFD\
-        hnW5O6RMA703dBK92j6XRN2EttLkQuujZgy+jXRKtaWMIlkNkWJmOiHmErQngHvt\
-        iNkIcjJumq1ddFX4iaTI40a6zgvIBtxFeDs2RfcaH73er7ctNUUqgQT5rFgJhMmF\
-        x76rQgB5OZUkodb5k2ex7P+Gu4J86bS15094UuYcV09hVeknmTh5Ex9CBKipLS2W\
-        2wKBakf+aVYnNCU6S0nASqt2xrZpGC1v7v6DhuepyyJtn3qSV2PoBiU5Sql+aARp\
-        wUibQMGm44gjyNDqDlVp+ShLQlUH9x8CAwEAAaOCAXUwggFxMB8GA1UdIwQYMBaA\
-        FFN5v1qqK0rPVIDh2JvAnfKyA2bLMB0GA1UdDgQWBBTI2XhootkZaNU9ct5fCj7c\
-        tYaGpjAOBgNVHQ8BAf8EBAMCAYYwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHSUE\
-        FjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwIgYDVR0gBBswGTANBgsrBgEEAbIxAQIC\
-        TjAIBgZngQwBAgEwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2VydHJ1\
-        c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYG\
-        CCsGAQUFBwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3Qu\
-        Y29tL1VTRVJUcnVzdFJTQUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRw\
-        Oi8vb2NzcC51c2VydHJ1c3QuY29tMA0GCSqGSIb3DQEBDAUAA4ICAQAVDwoIzQDV\
-        ercT0eYqZjBNJ8VNWwVFlQOtZERqn5iWnEVaLZZdzxlbvz2Fx0ExUNuUEgYkIVM4\
-        YocKkCQ7hO5noicoq/DrEYH5IuNcuW1I8JJZ9DLuB1fYvIHlZ2JG46iNbVKA3ygA\
-        Ez86RvDQlt2C494qqPVItRjrz9YlJEGT0DrttyApq0YLFDzf+Z1pkMhh7c+7fXeJ\
-        qmIhfJpduKc8HEQkYQQShen426S3H0JrIAbKcBCiyYFuOhfyvuwVCFDfFvrjADjd\
-        4jX1uQXd161IyFRbm89s2Oj5oU1wDYz5sx+hoCuh6lSs+/uPuWomIq3y1GDFNafW\
-        +LsHBU16lQo5Q2yh25laQsKRgyPmMpHJ98edm6y2sHUabASmRHxvGiuwwE25aDU0\
-        2SAeepyImJ2CzB80YG7WxlynHqNhpE7xfC7PzQlLgmfEHdU+tHFeQazRQnrFkW2W\
-        kqRGIq7cKRnyypvjPMkjeiV9lRdAM9fSJvsB3svUuu1coIG1xxI1yegoGM4r5QP4\
-        RGIVvYaiI76C0djoSbQ/dkIUUXQuB8AL5jyH34g3BZaaXyvpmnV4ilppMXVAnAYG\
-        ON51WhJ6W0xNdNJwzYASZYH+tmCWI+N60Gv2NNMGHwMZ7e9bXgzUCZH5FaBFDGR5\
-        S9VWqHB73Q+OyIVvIbKYcSc2w/aSuFKGSA==
+        MIIFjDCCA3SgAwIBAgINAgO8UKMnU/CRgCLt8TANBgkqhkiG9w0BAQsFADBHMQsw\
+        CQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExMQzEU\
+        MBIGA1UEAxMLR1RTIFJvb3QgUjEwHhcNMjAwODEzMDAwMDQyWhcNMjcwOTMwMDAw\
+        MDQyWjBGMQswCQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZp\
+        Y2VzIExMQzETMBEGA1UEAxMKR1RTIENBIDFQNTCCASIwDQYJKoZIhvcNAQEBBQAD\
+        ggEPADCCAQoCggEBALOC8CSMvy2Hr7LZp676yrpE1ls+/rL3smUW3N4Q6E8tEFha\
+        KIaHoe5qs6DZdU9/oVIBi1WoSlsGSMg2EiWrifnyI1+dYGX5XNq+OuhcbX2c0IQY\
+        hTDNTpvsPNiz4ZbU88ULZduPsHTL9h7zePGslcXdc8MxiIGvdKpv/QzjBZXwxRBP\
+        ZWP6oK/GGD3Fod+XedcFibMwsHSuPZIQa4wVd90LBFf7gQPd6iI01eVWsvDEjUGx\
+        wwLbYuyA0P921IbkBBq2tgwrYnF92a/Z8V76wB7KoBlcVfCA0SoMB4aQnzXjKCtb\
+        7yPIox2kozru/oPcgkwlsE3FUa2em9NbhMIaWukCAwEAAaOCAXYwggFyMA4GA1Ud\
+        DwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwEgYDVR0T\
+        AQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQU1fyeDd8eyt0Il5duK8VfxSv17LgwHwYD\
+        VR0jBBgwFoAU5K8rJnEaK0gnhS9SZizv8IkTcT4waAYIKwYBBQUHAQEEXDBaMCYG\
+        CCsGAQUFBzABhhpodHRwOi8vb2NzcC5wa2kuZ29vZy9ndHNyMTAwBggrBgEFBQcw\
+        AoYkaHR0cDovL3BraS5nb29nL3JlcG8vY2VydHMvZ3RzcjEuZGVyMDQGA1UdHwQt\
+        MCswKaAnoCWGI2h0dHA6Ly9jcmwucGtpLmdvb2cvZ3RzcjEvZ3RzcjEuY3JsME0G\
+        A1UdIARGMEQwOAYKKwYBBAHWeQIFAzAqMCgGCCsGAQUFBwIBFhxodHRwczovL3Br\
+        aS5nb29nL3JlcG9zaXRvcnkvMAgGBmeBDAECATANBgkqhkiG9w0BAQsFAAOCAgEA\
+        bGMn7iPf5VJoTYFmkYXffWXlWzcxCCayB12avrHKAbmtv5139lEd15jFC0mhe6HX\
+        02jlRA+LujbdQoJ30o3d9T/768gHmJPuWtC1Pd5LHC2MTex+jHv+TkD98LSzWQIQ\
+        UVzjwCv9twZIUX4JXj8P3Kf+l+d5xQ5EiXjFaVkpoJo6SDYpppSTVS24R7XplrWf\
+        B82mqz4yisCGg8XBQcifLzWODcAHeuGsyWW1y4qn3XHYYWU5hKwyPvd6NvFWn1ep\
+        QW1akKfbOup1gAxjC2l0bwdMFfM3KKUZpG719iDNY7J+xCsJdYna0Twuck82GqGe\
+        RNDNm6YjCD+XoaeeWqX3CZStXXZdKFbRGmZRUQd73j2wyO8weiQtvrizhvZL9/C1\
+        T//Oxvn2PyonCA8JPiNax+NCLXo25D2YlmA5mOrR22Mq63gJsU4hs463zj6S8ZVc\
+        pDnQwCvIUxX10i+CzQZ0Z5mQdzcKly3FHB700FvpFePqAgnIE9cTcGW/+4ibWiW+\
+        dwnhp2pOEXW5Hk3xABtqZnmOw27YbaIiom0F+yzy8VDloNHYnzV9/HCrWSoC8b6w\
+        0/H4zRK5aiWQW+OFIOb12stAHBk0IANhd7p/SA9JCynr52Fkx2PRR+sc4e6URu85\
+        c8zuTyuN3PtYp7NlIJmVuftVb9eWbpQ99HqSjmMd320=
         """,
     ]
 
@@ -248,6 +241,7 @@ extension NetworkPreset {
                     "\(preset.namespace).\(preset.environment).mobilecoin.com"
         }
     }
+
     var fogShortUrl: String {
         switch self {
         case .mainNet:
@@ -261,6 +255,37 @@ extension NetworkPreset {
             return ""
         }
     }
+
+    var mistyswapUrl: String {
+//        switch self {
+//        case .mainNet:
+//            return "fog://fog.prod.mobilecoinww.com"
+//        case .testNet:
+//            return "fog://fog.test.mobilecoin.com"
+//        case .alpha:
+//            return "fog://fog.alpha.development.mobilecoin.com"
+//        case .masterDev:
+//            return "fog://fog.mc-master.development.mobilecoin.com"
+//
+//        case .mobiledev, .master, .build, .demo, .diogenes, .drakeley, .eran:
+//            return "fog://fog.\(self).mobilecoin.com"
+//        case .dynamic(let preset):
+//            return "fog://\(preset.user)fog." +
+//                    "\(preset.namespace).\(preset.environment).mobilecoin.com"
+//        }
+        // eran dev box on gCloud
+
+        return "insecure-mistyswap://40.112.132.134:3229/"
+    }
+
+    static var mistyswapUrl: String {
+        "insecure-mistyswap://40.112.132.134:3229/"
+    }
+
+    private static let mistyswapMrEnclaveHex =
+        "e1004164be659a4aef2768857cd7ecc95d3afd09d6afb41ec1862adb8a4387ed"
+    private static let mistyswapMrSignerHex =
+        "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
 
     private static let mainNetConsensusMrEnclaveHex =
         "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
@@ -512,11 +537,18 @@ extension NetworkPreset {
 
 extension NetworkPreset {
 
+    static func eranDevNetworkMistyswapLoadBalancers() throws -> UrlLoadBalancer<MistyswapUrl> {
+        let mistyswapUrls = try MistyswapUrl.make(strings: [mistyswapUrl]).get()
+        return try RandomUrlLoadBalancer.make(urls: mistyswapUrls).get()
+    }
+
     func networkConfig(transportProtocol: TransportProtocol = .http) throws -> NetworkConfig {
         let consensusUrls = try ConsensusUrl.make(strings: [consensusUrl]).get()
         let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
         let fogUrls = try FogUrl.make(strings: [fogUrl]).get()
         let fogUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: fogUrls).get()
+        let mistyswapUrls = try MistyswapUrl.make(strings: [mistyswapUrl]).get()
+        let mistyswapLoadBalancer = try RandomUrlLoadBalancer.make(urls: mistyswapUrls).get()
 
         let attestationConfig = try self.attestationConfig()
 
@@ -524,7 +556,9 @@ extension NetworkPreset {
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
             attestation: attestationConfig,
-            transportProtocol: transportProtocol).get()
+            transportProtocol: transportProtocol,
+            mistyswapLoadBalancer: mistyswapLoadBalancer
+        ).get()
 
         networkConfig.httpRequester = DefaultHttpRequester()
         try networkConfig.setConsensusTrustRoots(trustRootsBytes())
@@ -577,7 +611,9 @@ extension NetworkPreset {
             fogView: try fogViewAttestation(),
             fogKeyImage: try fogLedgerAttestation(),
             fogMerkleProof: try fogLedgerAttestation(),
-            fogReport: try fogReportAttestation())
+            fogReport: try fogReportAttestation(),
+            mistyswap: try mistyswapAttestation()
+        )
     }
 
     func consensusAttestation() throws -> Attestation {
@@ -647,6 +683,24 @@ extension NetworkPreset {
                 minimumSecurityVersion: McConstants.FOG_REPORT_SECURITY_VERSION,
                 allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
         }
+    }
+
+    static func mistyswapAttestation() throws -> Attestation {
+        // Eran dev box on gCloud
+        return try XCTUnwrapSuccess(Attestation.make(
+            mrSigner: try XCTUnwrap(Data(hexEncoded: Self.mistyswapMrSignerHex)),
+            productId: McConstants.MISTYSWAP_PRODUCT_ID,
+            minimumSecurityVersion: McConstants.MISTYSWAP_SECURITY_VERSION,
+            allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
+    }
+
+    func mistyswapAttestation() throws -> Attestation {
+        // Eran dev box on gCloud
+        return try XCTUnwrapSuccess(Attestation.make(
+            mrSigner: try XCTUnwrap(Data(hexEncoded: Self.mistyswapMrSignerHex)),
+            productId: McConstants.MISTYSWAP_PRODUCT_ID,
+            minimumSecurityVersion: McConstants.MISTYSWAP_SECURITY_VERSION,
+            allowedHardeningAdvisories: NetworkPreset.allowedHardeiningAdvisories))
     }
 
     private func defaultAttestation(mrEnclaveHex: String...) throws -> Attestation {

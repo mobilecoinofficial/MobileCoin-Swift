@@ -10,6 +10,7 @@ import XCTest
 
 enum NetworkConfigFixtures {
     static let alphaDev = DynamicNetworkConfig.AlphaDevelopment.make()
+    /*static let network: NetworkPreset = .dynamic(alphaDev)*/
     static let network: NetworkPreset = .testNet
 }
 
@@ -43,7 +44,9 @@ extension NetworkConfigFixtures {
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
             attestation: attestationConfig,
-            transportProtocol: transportProtocol).get()
+            transportProtocol: transportProtocol,
+            mistyswapLoadBalancer: NetworkPreset.eranDevNetworkMistyswapLoadBalancers()
+        ).get()
 
         networkConfig.httpRequester = DefaultHttpRequester()
         try networkConfig.setConsensusTrustRoots(NetworkPreset.trustRootsBytes())
@@ -67,7 +70,10 @@ extension NetworkConfigFixtures {
                             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                             fogUrlLoadBalancer: fogUrlLoadBalancer,
                             attestation: attestationConfig,
-                            transportProtocol: transportProtocol)
+                            transportProtocol: transportProtocol,
+                            mistyswapLoadBalancer: try! NetworkPreset
+                                .eranDevNetworkMistyswapLoadBalancers()
+                        )
                     }
                 }
             }
