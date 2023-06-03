@@ -8,25 +8,25 @@ GIT
       fourflusher (~> 2.0)
       xcpretty (~> 0.3.0)
 
-GEM
+GIT
+  remote: https://github.com/sporkmonger/addressable
+  revision: b56cef3e69bb1294ac4e31dad150e910b05f607f
+  branch: main
   specs:
+    addressable (2.8.4)
+      public_suffix (>= 2.0.2, < 6.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.5)
       rexml
-    RubyInline (3.12.5)
-      ZenTest (~> 4.3)
-    ZenTest (4.12.0)
     activesupport (6.1.4.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-    addressable (2.8.0)
-      public_suffix (>= 2.0.2, < 5.0)
     algoliasearch (1.27.5)
       httpclient (~> 2.8, >= 2.8.3)
       json (>= 1.5.1)
@@ -80,9 +80,9 @@ GEM
       typhoeus (~> 1.0)
     cocoapods-deintegrate (1.0.5)
     cocoapods-downloader (1.5.1)
-    cocoapods-keys (2.2.1)
+    cocoapods-keys (2.3.1)
       dotenv
-      osx_keychain
+      ruby-keychain
     cocoapods-plugins (1.0.0)
       nap
     cocoapods-repo-update (0.0.4)
@@ -102,7 +102,7 @@ GEM
       rake (>= 12.0.0, < 14.0.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (2.7.6)
+    dotenv (2.8.1)
     emoji_regex (3.2.3)
     escape (0.0.4)
     ethon (0.15.0)
@@ -238,10 +238,11 @@ GEM
     nap (1.1.0)
     naturally (2.2.1)
     netrc (0.11.0)
+    og-corefoundation (0.2.3)
+      ffi
     optparse (0.1.1)
     os (1.1.4)
-    osx_keychain (1.0.2)
-      RubyInline (~> 3)
+    pkg-config (1.5.1)
     plist (3.6.0)
     public_suffix (4.0.6)
     rake (13.0.6)
@@ -252,6 +253,9 @@ GEM
     retriable (3.1.2)
     rexml (3.2.5)
     rouge (2.0.7)
+    ruby-keychain (0.4.0)
+      ffi
+      og-corefoundation (~> 0.2.0)
     ruby-macho (2.5.1)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
@@ -300,11 +304,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  cocoapods (~> 1.11)!
+  addressable (= 2.8.4)!
+  cocoapods (~> 1.0, >= 1.11.2)!
   cocoapods-binary!
+  cocoapods-deintegrate (~> 1.0, >= 1.0.4)!
   cocoapods-keys!
   cocoapods-repo-update!
   fastlane!
+  pkg-config!
 
 BUNDLED WITH
    2.2.24
