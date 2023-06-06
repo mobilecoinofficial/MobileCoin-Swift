@@ -91,6 +91,7 @@ Pod::Spec.new do |s|
       "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
+      "Sources/Network/GRPC/GrpcProtocolConnectionFactory.swift",
       "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]
