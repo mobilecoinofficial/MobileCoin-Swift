@@ -9,7 +9,7 @@ struct Mistyswap: MistyswapService {
     private let mistyswap: MistyswapService?
 
     var mistyswapServiceInitialized: Bool {
-        mistyswap == nil
+        mistyswap != nil
     }
 
     init(
