@@ -11,20 +11,19 @@ let package = Package(
     products: [
         .library(
             name: "MobileCoinCore",
-            targets: ["MobileCoinHTTP", "MobileCoinGRPC", "MobileCoinCommon"]),
+            targets: ["MobileCoinHTTPS", "MobileCoinGRPC", "MobileCoinCommon"]),
         .library(
             name: "MobileCoinGRPC",
             targets: ["MobileCoinGRPC", "MobileCoinCommon"]),
         .library(
             name: "MobileCoinHTTP",
-            targets: ["MobileCoinHTTP", "MobileCoinCommon"]),
+            targets: ["MobileCoinHTTPS", "MobileCoinCommon"]),
     ],
     dependencies: [
         // Here we define our package's external dependencies
         // and from where they can be fetched:
         .package(
-            url: "https://github.com/mobilecoinofficial/libmobilecoin",
-            from: "1.4.0"
+            path: "Vendor/libmobilecoin"
         ),
         .package(
             url: "https://github.com/apple/swift-log",
@@ -39,24 +38,19 @@ let package = Package(
     targets: [
         .target(
             name: "MobileCoinCommon",
-            dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf")],
+            dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf"), .product(name: "LibMobileCoinCore", package: "libmobilecoin")],
             path: "Sources/Common"
          ),
         .target(
-            name: "MobileCoinHTTP",
-            dependencies: [.target(name: "LibMobileCoinCommon")],
-            path: "Sources/HTTP"
+            name: "MobileCoinHTTPS",
+            dependencies: [.target(name: "MobileCoinCommon"),.product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin")],
+            path: "Sources/HTTPS"
         ),
         .target(
             name: "MobileCoinGRPC",
-            dependencies: [.target(name: "LibMobileCoinCommon"), .product(name: "GRPC", package: "grpc-swift")],
+            dependencies: [.target(name: "MobileCoinCommon"),.product(name: "LibMobileCoinCoreGRPC", package: "libmobilecoin"), .product(name: "GRPC", package: "grpc-swift")],
             path: "Sources/GRPC"
-        ),
-        .binaryTarget(
-            name: "LibMobileCoinLibrary",
-            url: "https://yus.s3.us-east-1.amazonaws.com/bundle.zip",
-            // url: "https://github.com/mobilecoinofficial/libmobilecoin/blob/adam/%23184377543-3/Artifacts/bundle.zip",
-            checksum: "051c9615e85c7bf092f8bf3121eccd55c3f297240209b10d25a312835bc7a2ec")
+        )
     ]
 )
 
