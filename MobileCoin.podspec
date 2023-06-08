@@ -31,7 +31,7 @@ Pod::Spec.new do |s|
     test_spec.source_files = "Tests/{Unit,Common,Fixtures,Mocks}/**/*.swift"
     test_spec.resources = [
       "Tests/Common/FixtureData/**/*",
-      "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
+      "Vendor/libmobilecoin/Vendor/mobilecoin/test-vectors/vectors/**/*",
     ]
   end
 
@@ -91,7 +91,6 @@ Pod::Spec.new do |s|
       "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
       "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
       "Sources/Network/HTTPS/**/*.{h,m,swift}",
-      "Sources/Network/GRPC/GrpcProtocolConnectionFactory.swift",
       "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",
       "Sources/Network/*.{h,m,swift}",
     ]

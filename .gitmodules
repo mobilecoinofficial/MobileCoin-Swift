@@ -1,4 +1,4 @@
-[submodule "Vendor/libmobilecoin-ios-artifacts"]
+[submodule "Vendor/libmobilecoin"]
 	path = Vendor/libmobilecoin
-	url = https://github.com/mobilecoinofficial/libmobilecoin-ios-artifacts.git
+	url = https://github.com/mobilecoinofficial/libmobilecoin.git
 	shallow = true
