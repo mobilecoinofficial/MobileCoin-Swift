@@ -10,6 +10,7 @@ import GRPC
 import LibMobileCoin
 #if canImport(LibMobileCoinGRPC)
 import LibMobileCoinGRPC
+import LibMobileCoinCommon
 #endif
 
 enum AttestedGrpcConnectionError: Error {

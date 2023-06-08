@@ -6,6 +6,7 @@ import Foundation
 import LibMobileCoin
 #if canImport(LibMobileCoinHTTP)
 import LibMobileCoinHTTP
+import LibMobileCoinCommon
 #endif
 
 final class FogReportHttpConnection: ArbitraryHttpConnection, FogReportService {

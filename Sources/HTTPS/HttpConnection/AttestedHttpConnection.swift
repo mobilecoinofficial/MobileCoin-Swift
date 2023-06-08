@@ -9,6 +9,7 @@ import Foundation
 import LibMobileCoin
 #if canImport(LibMobileCoinHTTP)
 import LibMobileCoinHTTP
+import LibMobileCoinCommon
 #endif
 
 enum AttestedHttpConnectionError: Error {
