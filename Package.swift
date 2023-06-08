@@ -26,14 +26,14 @@ let package = Package(
             path: "Vendor/libmobilecoin"
         ),
         .package(
-            url: "https://github.com/apple/swift-log",
+            url: "https://github.com/apple/swift-log.git",
             from: "1.4.0"
         ),
         .package(
-            url: "https://github.com/apple/swift-protobuf",
+            url: "https://github.com/apple/swift-protobuf.git",
             from: "1.5.0"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.0.0")
+        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.15.0")
     ],
     targets: [
         .target(
