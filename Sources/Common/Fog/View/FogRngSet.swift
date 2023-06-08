@@ -6,6 +6,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 final class FogRngSet {
     private var ingestInvocationIdToRngTrackers: [Int64: RngTracker] = [:]

@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 public enum Base58DecodingResult {
     case publicAddress(PublicAddress)

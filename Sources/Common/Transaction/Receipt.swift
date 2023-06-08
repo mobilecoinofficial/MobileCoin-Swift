@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 /// Represents a single "output" `TxOut` from a `Transaction`. Intended to be serialized and sent to
 /// the recipient of that `TxOut`. The recipient is able to use `Receipt` to validate that a

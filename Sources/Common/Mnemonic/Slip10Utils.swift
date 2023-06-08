@@ -6,6 +6,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 /// See https://github.com/satoshilabs/slips/blob/master/slip-0010.md
 enum Slip10Utils {

@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 enum RootEntropyUtils {
     static func privateKeys(

@@ -6,6 +6,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 final class FogView {
     var syncCheckerLock: ReadWriteDispatchLock<FogSyncCheckable>

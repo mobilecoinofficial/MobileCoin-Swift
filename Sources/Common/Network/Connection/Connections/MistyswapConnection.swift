@@ -5,6 +5,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 final class MistyswapConnection: Connection<
         GrpcProtocolConnectionFactory.MistyswapServiceProvider,

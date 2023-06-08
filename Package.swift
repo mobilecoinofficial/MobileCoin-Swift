@@ -11,13 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "MobileCoinCore",
-            targets: ["MobileCoinHTTPS", "MobileCoinGRPC", "MobileCoinCommon"]),
-        .library(
-            name: "MobileCoinGRPC",
-            targets: ["MobileCoinGRPC", "MobileCoinCommon"]),
-        .library(
-            name: "MobileCoinHTTP",
-            targets: ["MobileCoinHTTPS", "MobileCoinCommon"]),
+            targets: ["MobileCoinCommon"]),
     ],
     dependencies: [
         // Here we define our package's external dependencies
@@ -39,18 +33,8 @@ let package = Package(
         .target(
             name: "MobileCoinCommon",
             dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf"), .product(name: "LibMobileCoinCore", package: "libmobilecoin")],
-            path: "Sources/Common"
+            path: "Sources"
          ),
-        .target(
-            name: "MobileCoinHTTPS",
-            dependencies: [.target(name: "MobileCoinCommon"),.product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin")],
-            path: "Sources/HTTPS"
-        ),
-        .target(
-            name: "MobileCoinGRPC",
-            dependencies: [.target(name: "MobileCoinCommon"),.product(name: "LibMobileCoinCoreGRPC", package: "libmobilecoin"), .product(name: "GRPC", package: "grpc-swift")],
-            path: "Sources/GRPC"
-        )
     ]
 )
 

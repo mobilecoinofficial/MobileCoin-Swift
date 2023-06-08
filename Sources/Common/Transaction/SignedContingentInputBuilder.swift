@@ -5,6 +5,9 @@
 // swiftlint:disable closure_body_length
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 enum SignedContingentInputBuilderError: Error {
     case invalidInput(String)

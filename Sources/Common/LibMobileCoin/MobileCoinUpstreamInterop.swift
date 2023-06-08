@@ -5,6 +5,9 @@
 // swiftlint:disable orphaned_doc_comment
 
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 /// This file contains temporary interop code to allow easy source compatibility with upstream
 /// LibMobileCoin and MobileCoin server code. The code in this file can be removed once upstream

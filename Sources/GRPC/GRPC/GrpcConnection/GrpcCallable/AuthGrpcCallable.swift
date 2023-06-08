@@ -7,8 +7,8 @@
 import Foundation
 import GRPC
 import LibMobileCoin
-#if canImport(LibMobileCoinCoreGRPC)
-import LibMobileCoinCoreGRPC
+#if canImport(LibMobileCoinGRPC)
+import LibMobileCoinGRPC
 #endif
 
 protocol AuthGrpcCallable {

@@ -6,6 +6,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 extension Printable_PrintableWrapper {
     init?(base58Encoded base58String: String) {

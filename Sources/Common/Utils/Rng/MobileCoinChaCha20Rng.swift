@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 //
 //    Full access to the RNG class is no longer neccessary for repeatable transaction creation.

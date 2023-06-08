@@ -5,6 +5,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 
 enum SenderMemoUtils {
     static func isValid(

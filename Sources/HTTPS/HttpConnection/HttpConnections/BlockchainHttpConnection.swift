@@ -4,8 +4,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCoreHTTP)
-import LibMobileCoinCoreHTTP
+#if canImport(LibMobileCoinHTTP)
+import LibMobileCoinHTTP
 #endif
 import SwiftProtobuf
 
