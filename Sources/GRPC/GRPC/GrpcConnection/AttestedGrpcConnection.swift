@@ -8,6 +8,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 enum AttestedGrpcConnectionError: Error {
     case connectionError(ConnectionError)

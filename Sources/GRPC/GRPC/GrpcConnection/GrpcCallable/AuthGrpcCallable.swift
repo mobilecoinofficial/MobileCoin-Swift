@@ -7,6 +7,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 protocol AuthGrpcCallable {
     func auth(

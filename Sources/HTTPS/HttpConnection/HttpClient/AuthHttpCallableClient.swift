@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 protocol AuthHttpCallableClient: AttestableHttpClient, AuthHttpCallable {
     func auth(_ request: Attest_AuthMessage, callOptions: HTTPCallOptions?)

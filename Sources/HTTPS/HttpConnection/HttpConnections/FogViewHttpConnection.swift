@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 final class FogViewHttpConnection: AttestedHttpConnection, FogViewService {
     private let client: AuthHttpCallableClientWrapper<FogView_FogViewAPIRestClient>

@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 protocol AuthHttpCallable {
     var requester: RestApiRequester { get }

@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 public class DefaultHttpRequester: NSObject, HttpRequester {
     private var fogTrustRoots: SecSSLCertificates?

@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 protocol AuthGrpcCallableClient: AttestableGrpcClient, AuthGrpcCallable {
     func auth(_ request: Attest_AuthMessage, callOptions: CallOptions?)

@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 final class FogMerkleProofHttpConnection: AttestedHttpConnection, FogMerkleProofService {
     private let client: AuthHttpCallableClientWrapper<FogLedger_FogMerkleProofAPIRestClient>

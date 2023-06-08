@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 final class ConsensusHttpConnection: AttestedHttpConnection, ConsensusService {
     private let client: ConsensusClient_ConsensusClientAPIRestClient

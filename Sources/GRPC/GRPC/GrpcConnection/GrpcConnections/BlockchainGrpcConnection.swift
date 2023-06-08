@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 import SwiftProtobuf
 
 final class BlockchainGrpcConnection: GrpcConnection, BlockchainService {

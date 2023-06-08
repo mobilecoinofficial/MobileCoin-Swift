@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 final class FogUntrustedTxOutHttpConnection: HttpConnection, FogUntrustedTxOutService {
     private let client: FogLedger_FogUntrustedTxOutApiRestClient

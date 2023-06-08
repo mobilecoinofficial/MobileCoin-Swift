@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
     private let client: Mistyswap_MistyswapOfframpApiClient

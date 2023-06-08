@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 final class FogViewGrpcConnection: AttestedGrpcConnection, FogViewService {
     private let client: FogView_FogViewAPIClient

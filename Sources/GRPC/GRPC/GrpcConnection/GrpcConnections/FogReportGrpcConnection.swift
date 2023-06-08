@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 final class FogReportGrpcConnection: ArbitraryGrpcConnection, FogReportService {
     private let client: Report_ReportAPIClient

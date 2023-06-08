@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 final class FogBlockGrpcConnection: GrpcConnection, FogBlockService {
     private let client: FogLedger_FogBlockAPIClient

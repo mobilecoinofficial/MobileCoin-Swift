@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 final class FogKeyImageGrpcConnection: AttestedGrpcConnection, FogKeyImageService {
     private let client: FogLedger_FogKeyImageAPIClient

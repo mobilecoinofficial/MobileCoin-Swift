@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 import SwiftProtobuf
 
 protocol AttestedGrpcCallable: GrpcCallable {

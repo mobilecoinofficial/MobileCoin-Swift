@@ -5,6 +5,9 @@
 import Foundation
 import GRPC
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreGRPC)
+import LibMobileCoinCoreGRPC
+#endif
 
 final class ConsensusGrpcConnection: AttestedGrpcConnection, ConsensusService {
     private let client: ConsensusClient_ConsensusClientAPIClient

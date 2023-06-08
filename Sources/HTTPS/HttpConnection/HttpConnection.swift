@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 class HttpConnection: ConnectionProtocol {
     private let inner: SerialDispatchLock<Inner>

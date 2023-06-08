@@ -4,6 +4,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCoreHTTP)
+import LibMobileCoinCoreHTTP
+#endif
 
 final class FogKeyImageHttpConnection: AttestedHttpConnection, FogKeyImageService {
     private let client: AuthHttpCallableClientWrapper<FogLedger_FogKeyImageAPIRestClient>
