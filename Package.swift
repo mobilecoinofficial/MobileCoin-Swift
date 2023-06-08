@@ -23,7 +23,7 @@ let package = Package(
         // Here we define our package's external dependencies
         // and from where they can be fetched:
         .package(
-            url: "https://github.com/mobilecoin/libmobilecoin",
+            url: "https://github.com/mobilecoinofficial/libmobilecoin",
             from: "1.4.0"
         ),
         .package(
