@@ -3,6 +3,7 @@
 //
 
 import Security
+import Foundation
 
 func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
     withMcInfallibleReturningOptional {

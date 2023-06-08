@@ -51,7 +51,7 @@ extension MobileCoinUrlProtocol {
     }
 }
 
-struct MobileCoinUrl<Scheme: MobileCoin.Scheme>: MobileCoinUrlProtocol {
+struct MobileCoinUrl<URLScheme: Scheme>: MobileCoinUrlProtocol {
 
     // convenience method that takes an array of url strings and returns a
     // resulting array of MobileCoinUrl only if all strings are valid
@@ -81,13 +81,13 @@ struct MobileCoinUrl<Scheme: MobileCoin.Scheme>: MobileCoinUrlProtocol {
 
         let useTls: Bool
         switch url.scheme {
-        case .some(Scheme.secureScheme):
+        case .some(URLScheme.secureScheme):
             useTls = true
-        case .some(Scheme.insecureScheme):
+        case .some(URLScheme.insecureScheme):
             useTls = false
         default:
             return .failure(InvalidInputError("Unrecognized scheme: \(string), expected: " +
-                "[\"\(Scheme.secureScheme)\", \"\(Scheme.insecureScheme)\"]"))
+                "[\"\(URLScheme.secureScheme)\", \"\(URLScheme.insecureScheme)\"]"))
         }
 
         guard let host = url.host, !host.isEmpty else {
@@ -111,7 +111,7 @@ struct MobileCoinUrl<Scheme: MobileCoin.Scheme>: MobileCoinUrlProtocol {
         if let port = url.port {
             self.port = port
         } else {
-            self.port = self.useTls ? Scheme.defaultSecurePort : Scheme.defaultInsecurePort
+            self.port = self.useTls ? URLScheme.defaultSecurePort : URLScheme.defaultInsecurePort
         }
     }
 }
