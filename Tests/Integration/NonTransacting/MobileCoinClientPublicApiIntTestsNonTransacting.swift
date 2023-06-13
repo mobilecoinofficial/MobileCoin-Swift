@@ -11,8 +11,8 @@ import XCTest
 
 #if swift(>=5.5)
 
-@available(iOS 15.0, *)
-class MobileCoinClientPublicApiIntTests: XCTestCase {
+@available(iOS 15.0, macOS 12.0, *)
+class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
 
     func testBalance() async throws {
         let description = "Updating account balance"

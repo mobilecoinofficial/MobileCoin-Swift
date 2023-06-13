@@ -7,7 +7,7 @@
 @testable import MobileCoin
 import XCTest
 
-class MobileCoinClientIntTests: XCTestCase {
+class MobileCoinClientIntTestsTransacting: XCTestCase {
 
     func testTransactionDoubleSubmissionFails() throws {
         let description = "Submitting transaction twice"

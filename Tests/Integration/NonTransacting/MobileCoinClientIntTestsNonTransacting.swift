@@ -7,7 +7,7 @@
 @testable import MobileCoin
 import XCTest
 
-class MobileCoinClientIntTests: XCTestCase {
+class MobileCoinClientIntTestsNonTransacting: XCTestCase {
 
     func testTransactionStatusDoesNotSucceedWithoutSubmission() throws {
         let description = "Checking transaction status"

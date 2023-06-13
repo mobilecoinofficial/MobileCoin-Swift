@@ -9,7 +9,7 @@ enum IdempotenceTestError: Error {
     case testError(String = String())
 }
 
-class TransactionIdempotenceTests: XCTestCase {
+class TransactionIdempotenceTestsNonTransacting: XCTestCase {
 
     func testAndroidIdempotenceOutputPublicKeyMatch() throws {
         let description = "Testing idempotence submission failure"

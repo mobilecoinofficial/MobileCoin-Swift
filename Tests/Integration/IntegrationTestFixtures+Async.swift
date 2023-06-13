@@ -9,7 +9,7 @@ import XCTest
 // swiftlint:disable superfluous_disable_command
 // swiftlint:disable multiline_parameters
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 extension IntegrationTestFixtures {
 
     static func createMobileCoinClientWithBalance(

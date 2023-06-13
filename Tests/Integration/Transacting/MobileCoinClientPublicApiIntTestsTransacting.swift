@@ -11,8 +11,8 @@ import XCTest
 
 #if swift(>=5.5)
 
-@available(iOS 15.0, *)
-class MobileCoinClientPublicApiIntTests: XCTestCase {
+@available(iOS 15.0, macOS 12.0, *)
+class MobileCoinClientPublicApiIntTestsTransacting: XCTestCase {
 
     let numChecksForNewTx = 10
 
