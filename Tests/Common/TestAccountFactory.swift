@@ -6,7 +6,7 @@ import XCTest
 
 #if swift(>=5.5)
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 
 public struct TestAccountFactory {
 

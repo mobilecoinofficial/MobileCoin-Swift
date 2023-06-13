@@ -2,6 +2,9 @@
 //  Copyright (c) 2020-2022 MobileCoin. All rights reserved.
 //
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 @testable import MobileCoin
 import XCTest
 

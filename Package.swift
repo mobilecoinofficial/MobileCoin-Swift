@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "MobileCoinCore",
-            targets: ["MobileCoinCommon"]),
+            targets: ["MobileCoin"]),
     ],
     dependencies: [
         // Here we define our package's external dependencies
@@ -31,11 +31,17 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MobileCoinCommon",
+            name: "MobileCoin",
             dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf"), .product(name: "LibMobileCoinCore", package: "libmobilecoin")],
             path: "Sources"
          ),
+        .testTarget(
+            name: "MobileCoinTests",
+            dependencies: ["MobileCoin"], 
+            path: "Tests",
+            resources: [
+                .copy("Common/FixtureData/Transaction")
+            ]
+        )
     ]
 )
-
-
