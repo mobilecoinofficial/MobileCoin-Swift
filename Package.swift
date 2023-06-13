@@ -40,7 +40,8 @@ let package = Package(
             dependencies: ["MobileCoin"], 
             path: "Tests",
             resources: [
-                .copy("Common/FixtureData/Transaction")
+                .copy("Common/FixtureData/Transaction"),
+                .copy("Common/Secrets/secrets.json")
             ]
         )
     ]

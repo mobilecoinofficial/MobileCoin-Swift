@@ -8,11 +8,6 @@ import XCTest
 #if swift(>=5.5)
 
 @available(iOS 15.0, macOS 12.0, *)
-enum IdempotenceTestError: Error {
-    case testError(String = String())
-}
-
-@available(iOS 15.0, macOS 12.0, *)
 class TransactionIdempotenceTestsTransacting: XCTestCase {
 
     func testIdempotenceDoubleSubmissionFailure() async throws {

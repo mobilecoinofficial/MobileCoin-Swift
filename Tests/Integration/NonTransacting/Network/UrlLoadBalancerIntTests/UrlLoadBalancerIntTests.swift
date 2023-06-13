@@ -13,7 +13,7 @@ class UrlLoadBalancerIntTests: XCTestCase {
 
     func testConsensusDoesNotRotate() throws {
         try TransportProtocol.supportedProtocols.forEach { transProtocol in
-            let fixture = try UrlLoadBalancerFixtures.Consensus(
+            let fixture = try UrlLoadBalancerFixturesIntegration.Consensus(
                 with: transProtocol,
                 useValidUrls: true)
             try testUrlRotation(fixture: fixture, with: transProtocol)
@@ -22,7 +22,7 @@ class UrlLoadBalancerIntTests: XCTestCase {
 
     func testFogViewDoesNotRotate() throws {
         try TransportProtocol.supportedProtocols.forEach { transProtocol in
-            let fixture = try UrlLoadBalancerFixtures.FogView(
+            let fixture = try UrlLoadBalancerFixturesIntegration.FogView(
                 with: transProtocol,
                 useValidUrls: true)
             try testUrlRotation(fixture: fixture, with: transProtocol)
@@ -31,7 +31,7 @@ class UrlLoadBalancerIntTests: XCTestCase {
 
     func testConsensusDoesRotate() throws {
         try TransportProtocol.supportedProtocols.forEach { transProtocol in
-            let fixture = try UrlLoadBalancerFixtures.Consensus(
+            let fixture = try UrlLoadBalancerFixturesIntegration.Consensus(
                 with: transProtocol,
                 useValidUrls: false)
             try testUrlRotation(fixture: fixture, with: transProtocol)
@@ -40,14 +40,14 @@ class UrlLoadBalancerIntTests: XCTestCase {
 
     func testFogViewDoesRotate() throws {
         try TransportProtocol.supportedProtocols.forEach { transProtocol in
-            let fixture = try UrlLoadBalancerFixtures.FogView(
+            let fixture = try UrlLoadBalancerFixturesIntegration.FogView(
                 with: transProtocol,
                 useValidUrls: false)
             try testUrlRotation(fixture: fixture, with: transProtocol)
         }
     }
 
-    func testUrlRotation(fixture: ServiceFixture, with transProto: TransportProtocol) throws {
+    func testUrlRotation(fixture: ServiceFixtureIntegration, with transProto: TransportProtocol) throws {
         let serviceName = fixture.serviceName
         let urlType = fixture.urlTypeName
         let loadBalancer = fixture.loadBalancer

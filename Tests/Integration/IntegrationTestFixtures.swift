@@ -307,13 +307,19 @@ extension IntegrationTestFixtures {
             config: config)
     }
 
+    static func getTestAccountSeed() -> String? {
+        guard let seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
+            return try? Data(randomOfLength: 32).base64EncodedString()
+        }
+        return seed
+    }
     static func createDynamicClient(
         transportProtocol: TransportProtocol,
         testName: String,
         purpose: String,
         config: MobileCoinClient.Config
     ) throws -> (AccountKey, MobileCoinClient) {
-        guard let testAcountB64Seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
+        guard let testAcountB64Seed = getTestAccountSeed() else {
             fatalError("Unable to get b64Seed value")
         }
         guard let seedData = Data(base64Encoded: testAcountB64Seed) else {

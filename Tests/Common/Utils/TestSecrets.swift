@@ -1,0 +1,17 @@
+//
+//  File.swift
+//  
+//
+//  Created by Adam Mork on 6/13/23.
+//
+
+import Foundation
+
+struct TestSecrets: Codable {
+    "DEV_NETWORK_AUTH_USERNAME":"",
+    "DEV_NETWORK_AUTH_PASSWORD":"",
+    "TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED":"",
+    "MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED":"",
+    "DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED":"",
+    "DYNAMIC_FOG_AUTHORITY_SPKI":""
+}

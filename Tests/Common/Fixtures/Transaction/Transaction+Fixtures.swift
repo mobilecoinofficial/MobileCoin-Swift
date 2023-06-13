@@ -466,7 +466,8 @@ extension Transaction.Fixtures.ExactChange {
 extension Transaction.Fixtures.Serialization {
 
     fileprivate static func serializedData() throws -> Data {
-        try Data(contentsOf: Bundle.url("TransactionSerializedData", "bin"))
+//        try Data(contentsOf: Bundle.url("TransactionSerializedData", "bin"))
+        try Data(contentsOf: Bundle.testDataModuleUrl("TransactionSerializedData", withExtension: "bin"))
     }
 
 }

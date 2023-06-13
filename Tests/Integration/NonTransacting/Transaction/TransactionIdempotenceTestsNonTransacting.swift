@@ -5,10 +5,6 @@
 @testable import MobileCoin
 import XCTest
 
-enum IdempotenceTestError: Error {
-    case testError(String = String())
-}
-
 class TransactionIdempotenceTestsNonTransacting: XCTestCase {
 
     func testAndroidIdempotenceOutputPublicKeyMatch() throws {

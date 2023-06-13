@@ -15,7 +15,7 @@ extension IntegrationTestFixtures {
     ) throws -> FogViewConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -38,7 +38,7 @@ extension IntegrationTestFixtures {
     ) throws -> FogUntrustedTxOutConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -61,7 +61,7 @@ extension IntegrationTestFixtures {
     ) throws -> FogMerkleProofConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -84,7 +84,7 @@ extension IntegrationTestFixtures {
     ) throws -> FogKeyImageConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -107,7 +107,7 @@ extension IntegrationTestFixtures {
     ) throws -> FogBlockConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -130,7 +130,7 @@ extension IntegrationTestFixtures {
     ) throws -> BlockchainConnection {
         consensusUrlLoadBalancer.rotationEnabled = false
 
-        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsFogUrlBalancer
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsFogUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -153,7 +153,7 @@ extension IntegrationTestFixtures {
     ) throws -> ConsensusConnection {
         consensusUrlLoadBalancer.rotationEnabled = false
 
-        let fogUrlLoadBalancer = try UrlLoadBalancerFixtures().validUrlsFogUrlBalancer
+        let fogUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsFogUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
