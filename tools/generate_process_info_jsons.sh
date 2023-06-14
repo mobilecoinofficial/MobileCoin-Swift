@@ -28,5 +28,5 @@ SRC_ACCT_ENTROPY_STRING=$(lookup SRC_ACCT_ENTROPY_STRING <(decrypt_secrets| sed 
 
 jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
-  --arg SRC_ACCT_ENTROPY_STRING $($SRC_ACCT_ENTROPY_STRING | xargs) \ # remove quotes with xargs
+  --arg SRC_ACCT_ENTROPY_STRING "$(echo $SRC_ACCT_ENTROPY_STRING | xargs)" \
   '{ "testAccountSeed": $TEST_ACCOUNT_SEED, "srcAcctEntropyString": $SRC_ACCT_ENTROPY_STRING }' > $REPO_ROOT/tools/TestSetupClient/TestSetupClientTests/process_info.json
