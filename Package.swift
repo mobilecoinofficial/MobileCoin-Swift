@@ -40,7 +40,7 @@ let package = Package(
             dependencies: ["MobileCoin"], 
             path: "Tests",
             exclude: [
-                "Common/Secrets/secrets.sample.json"
+                "Common/Secrets/secrets.json.sample"
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),
