@@ -21,6 +21,7 @@ commands:
           name: Run git submodule update --init
           working_directory: Vendor/libmobilecoin-ios-artifacts
           command: |
+            brew install git-lfs
             git submodule update --init --depth 1
             cd /Users/distiller/project/Vendor/libmobilecoin-ios-artifacts
             git submodule update --init Vendor/mobilecoin
