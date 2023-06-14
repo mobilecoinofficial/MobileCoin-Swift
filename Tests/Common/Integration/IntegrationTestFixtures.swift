@@ -436,7 +436,6 @@ extension UInt64 {
     }
 }
 
-
 extension ProcessInfo {
     func combined(_ variable: String) -> String? {
         // Check environment first, then check "local environment" (secrets JSON file)
@@ -448,7 +447,7 @@ extension ProcessInfo {
                 return nil
             }
         }
-        
+
         return value
     }
 }
@@ -471,7 +470,6 @@ struct ProcessInfoLocal: Decodable {
         processInfoFileUrl = try Bundle.url("process_info", "json")
         #endif
 
-        
         guard
             let processInfoFileUrl = processInfoFileUrl,
             let processInfoFileData = try? Data(contentsOf: processInfoFileUrl)
@@ -482,7 +480,7 @@ struct ProcessInfoLocal: Decodable {
                 "Or, make duplicate `process_info.json.sample` and remove the `.sample` extension."
             )
         }
-        
+
         return try JSONDecoder().decode(Self.self, from: processInfoFileData)
     }
 }

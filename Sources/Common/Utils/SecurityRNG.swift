@@ -2,8 +2,8 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-import Security
 import Foundation
+import Security
 
 func securityRNG(context: UnsafeMutableRawPointer? = nil) -> UInt64 {
     withMcInfallibleReturningOptional {

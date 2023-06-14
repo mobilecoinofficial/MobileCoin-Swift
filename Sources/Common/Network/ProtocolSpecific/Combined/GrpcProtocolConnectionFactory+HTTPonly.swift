@@ -5,7 +5,7 @@
 import Foundation
 
 // Can import GRPC so we want the full GRPC Version
-#if canImport(LibMobileCoinGRPC) 
+#if canImport(LibMobileCoinGRPC)
 class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 
     let channelManager = GrpcChannelManager()
@@ -133,7 +133,7 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 }
 #else
 
-    #if canImport(LibMobileCoinHTTP) 
+    #if canImport(LibMobileCoinHTTP)
     class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {}
     #else
 
@@ -277,14 +277,12 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 
     // GRPC-Only
     // Cannot import HTTP, can import GRPC == GRPC-only
-    #if canImport(LibMobileCoinHTTP) 
+    #if canImport(LibMobileCoinHTTP)
     #else
-    
-    #if canImport(LibMobileCoinGRPC) 
+
+    #if canImport(LibMobileCoinGRPC)
     // GRPC Only SPM, not currently supported
     #else
     #endif
 
 #endif
-
-

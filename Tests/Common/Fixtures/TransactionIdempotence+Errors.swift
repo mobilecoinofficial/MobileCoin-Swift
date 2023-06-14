@@ -3,4 +3,3 @@
 enum IdempotenceTestError: Error {
     case testError(String = String())
 }
-

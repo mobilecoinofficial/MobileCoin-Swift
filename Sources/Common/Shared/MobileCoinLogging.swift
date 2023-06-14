@@ -4,8 +4,8 @@
 
 // swiftlint:disable function_parameter_count prefixed_toplevel_constant
 
-import Logging
 import Foundation
+import Logging
 
 public enum MobileCoinLogging {
     public static var logSensitiveData = false {

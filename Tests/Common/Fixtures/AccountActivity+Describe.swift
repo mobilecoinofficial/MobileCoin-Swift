@@ -12,4 +12,3 @@ extension AccountActivity {
         .joined(separator: ", \n")
     }
 }
-

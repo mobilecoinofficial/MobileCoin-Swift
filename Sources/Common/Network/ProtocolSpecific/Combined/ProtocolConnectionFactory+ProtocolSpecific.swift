@@ -4,13 +4,12 @@
 
 import Foundation
 
-
 // HTTP-Only
 // Cannot import GRPC, can import HTTP == HTTP-only
-#if canImport(LibMobileCoinGRPC) 
+#if canImport(LibMobileCoinGRPC)
 #else
 
-    #if canImport(LibMobileCoinHTTP) 
+    #if canImport(LibMobileCoinHTTP)
     class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {}
     #else
     #endif
@@ -19,7 +18,7 @@ import Foundation
 
 // GRPC-Only
 // Cannot import HTTP, can import GRPC == GRPC-only
-#if canImport(LibMobileCoinHTTP) 
+#if canImport(LibMobileCoinHTTP)
 #else
 
     #if canImport(LibMobileCoinGRPC)

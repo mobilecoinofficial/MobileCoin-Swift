@@ -17,7 +17,6 @@ extension TestVector where Self: Decodable {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         decoder.dataDecodingStrategy = .deferredToData
 
-        
         let filename = String(describing: Self.self).camelCaseToSnakeCase()
         #if canImport(LibMobileCoinTestVector)
         let path = try Bundle.testVectorModuleUrl(filename)

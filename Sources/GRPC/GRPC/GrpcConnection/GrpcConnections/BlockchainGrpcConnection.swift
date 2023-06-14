@@ -6,8 +6,8 @@ import Foundation
 import GRPC
 import LibMobileCoin
 #if canImport(LibMobileCoinGRPC)
-import LibMobileCoinGRPC
 import LibMobileCoinCommon
+import LibMobileCoinGRPC
 #endif
 import SwiftProtobuf
 

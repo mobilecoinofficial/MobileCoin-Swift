@@ -5,8 +5,8 @@
 import Foundation
 import LibMobileCoin
 #if canImport(LibMobileCoinHTTP)
-import LibMobileCoinHTTP
 import LibMobileCoinCommon
+import LibMobileCoinHTTP
 #endif
 
 final class FogViewHttpConnection: AttestedHttpConnection, FogViewService {

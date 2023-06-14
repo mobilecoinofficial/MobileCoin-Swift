@@ -5,8 +5,8 @@
 import Foundation
 import LibMobileCoin
 #if canImport(LibMobileCoinGRPC)
-import LibMobileCoinGRPC
 import LibMobileCoinCommon
+import LibMobileCoinGRPC
 #endif
 
 final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {

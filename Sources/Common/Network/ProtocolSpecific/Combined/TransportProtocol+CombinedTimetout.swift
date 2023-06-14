@@ -3,10 +3,9 @@
 //
 import Foundation
 
-
 // Can import GRPC in SPM, and SPM only supports a GRPC+HTTP target, 
 // So we support both if GRPC present.
-#if canImport(LibMobileCoinGRPC) 
+#if canImport(LibMobileCoinGRPC)
 extension TransportProtocol {
     static var grpcTimeout: Double = {
         guard let timeout = GrpcChannelManager.Defaults.callOptionsTimeLimit.timeout else {
@@ -31,7 +30,7 @@ extension TransportProtocol {
 }
 #else
 
-    #if canImport(LibMobileCoinHTTP) 
+    #if canImport(LibMobileCoinHTTP)
     #else
 
         // Cannot import either SPM modules
@@ -88,13 +87,11 @@ extension TransportProtocol {
 
     // GRPC-Only
     // Cannot import HTTP, can import GRPC == GRPC-only
-    #if canImport(LibMobileCoinHTTP) 
+    #if canImport(LibMobileCoinHTTP)
     #else
-    
-    #if canImport(LibMobileCoinGRPC) 
+
+    #if canImport(LibMobileCoinGRPC)
     #else
     #endif
 
 #endif
-
-
