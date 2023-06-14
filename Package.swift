@@ -39,6 +39,9 @@ let package = Package(
             name: "MobileCoinTests",
             dependencies: ["MobileCoin"], 
             path: "Tests",
+            exclude: [
+                "Common/Secrets/secrets.sample.json"
+            ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),
                 .copy("Common/Secrets/secrets.json"),
@@ -48,12 +51,19 @@ let package = Package(
         .target(
             name: "TestSetupClient",
             dependencies: ["MobileCoin"],
-            path: "tools/TestSetupClient/TestSetupClient"
+            path: "tools/TestSetupClient/TestSetupClient",
+            exclude: [
+                "Assets.xcassets",
+                "Preview Content/Preview Assets.xcassets"
+            ]
          ),
         .testTarget(
             name: "TestSetupClientTests",
             dependencies: ["TestSetupClient"],
             path: "tools/TestSetupClient/TestSetupClientTests",
+            exclude: [
+                "process_info.json.sample"
+            ],
             resources: [
                 .copy("process_info.json")
             ]
