@@ -29,3 +29,6 @@ node_modules/
 
 # secrets JSON 
 Tests/Common/Secrets/secrets.json
+
+# process info JSON
+tools/TestSetupClient/TestSetupClientTests/process_info.json
