@@ -466,8 +466,11 @@ extension Transaction.Fixtures.ExactChange {
 extension Transaction.Fixtures.Serialization {
 
     fileprivate static func serializedData() throws -> Data {
-//        try Data(contentsOf: Bundle.url("TransactionSerializedData", "bin"))
+        #if canImport(LibMobileCoinHTTP)
         try Data(contentsOf: Bundle.testDataModuleUrl("TransactionSerializedData", withExtension: "bin"))
+        #else
+        try Data(contentsOf: Bundle.url("TransactionSerializedData", "bin"))
+        #endif
     }
 
 }

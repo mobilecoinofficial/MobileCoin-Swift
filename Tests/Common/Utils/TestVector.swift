@@ -19,8 +19,11 @@ extension TestVector where Self: Decodable {
 
         
         let filename = String(describing: Self.self).camelCaseToSnakeCase()
+        #if canImport(LibMobileCoinTestVector)
         let path = try Bundle.testVectorModuleUrl(filename)
-        // let path = try Bundle.url(filename, "jsonl") - CocoaPods Way
+        #else
+        let path = try Bundle.url(filename, "jsonl")
+        #endif
         let text = try String(contentsOf: path, encoding: .utf8)
         let lines = text.components(separatedBy: CharacterSet.newlines).filter { !$0.isEmpty }
         return try lines.map { try decoder.decode(Self.self, from: $0.data(using: .utf8)!) }

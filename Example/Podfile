@@ -21,7 +21,8 @@ ENV['MC_ENABLE_WARN_LONG_COMPILE_TIMES'] = '1'
 
 target 'Example' do
   pod 'MobileCoin', path: '..', testspecs: ['Tests', 'IntegrationNonTransactingTests', 'IntegrationTransactingTests', 'PerformanceTests']
-  pod 'MobileCoin/Core', path: '..', testspecs: ['ProtocolUnitTests']
+  pod 'MobileCoin/Core', path: '..'
+# pod 'MobileCoin/Core', path: '..', testspecs: ['ProtocolUnitTests']
   # pod 'MobileCoin/CoreHTTP', path: '..', testspecs: ['HttpProtocolUnitTests']
   # pod 'MobileCoin', podspec: '../MobileCoin.podspec'
   # pod 'MobileCoin/Core', podspec: '../MobileCoin.podspec', testspecs: ['ProtocolUnitTests']

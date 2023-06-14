@@ -7,7 +7,7 @@
 @testable import MobileCoin
 import XCTest
 
-enum IntegrationTestFixtures {
+public enum IntegrationTestFixtures {
     static let network: NetworkPreset = NetworkConfigFixtures.network
 }
 
@@ -459,10 +459,18 @@ struct ProcessInfoLocal: Decodable {
     static var shared = try? Self.load()
 
     static func load() throws -> Self {
-        let processInfoFileUrl = Bundle.module.url(
+        // We're using SPM
+        var processInfoFileUrl: URL?
+        #if canImport(LibMobileCoinHTTP)
+        processInfoFileUrl = Bundle.module.url(
             forResource: "process_info",
             withExtension: "json"
         )
+        #else
+        // We're using cocoapods
+        processInfoFileUrl = try Bundle.url("process_info", "json")
+        #endif
+
         
         guard
             let processInfoFileUrl = processInfoFileUrl,

@@ -17,6 +17,7 @@ extension Bundle {
     private final class BundleType {}
 }
 
+#if canImport(LibMobileCoinHTTP)
 extension Bundle {
     public static let mobilecoin_TestDataBundleIdentifier = Bundle.module.bundleIdentifier!
     
@@ -29,3 +30,4 @@ extension Bundle {
         return url
     }
 }
+#endif
