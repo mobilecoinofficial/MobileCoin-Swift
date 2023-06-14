@@ -2,7 +2,7 @@
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-source <(../scripts/decrypt_secrets)
+source <($REPO_ROOT/scripts/decrypt_secrets)
 
 jq --null-input \
   --arg DEV_NETWORK_AUTH_USERNAME "$DEV_NETWORK_AUTH_USERNAME" \

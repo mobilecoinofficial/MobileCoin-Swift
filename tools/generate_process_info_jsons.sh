@@ -17,7 +17,7 @@ jq --null-input \
   '{ "testAccountSeed": $TEST_ACCOUNT_SEED }' > $REPO_ROOT/Tests/Common/Secrets/process_info.json
 
 # we need the src account entropy for the next process_info.json
-source <(../scripts/decrypt_secrets)
+source <($REPO_ROOT/scripts/decrypt_secrets)
 
 jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
