@@ -16,10 +16,17 @@ jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
   '{ "testAccountSeed": $TEST_ACCOUNT_SEED }' > $REPO_ROOT/Tests/Common/Secrets/process_info.json
 
-# we need the src account entropy for the next process_info.json
-source <($REPO_ROOT/scripts/decrypt_secrets)
+lookup() {
+if [[ -z "$1" ]] ; then
+  echo ""
+else
+  awk -v "id=$1" 'BEGIN { FS = "=" } $1 == id { print $2 ; exit }' $2
+fi
+}
+
+SRC_ACCT_ENTROPY_STRING=$(lookup SRC_ACCT_ENTROPY_STRING <(decrypt_secrets| sed 's/export //'))
 
 jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
-  --arg SRC_ACCT_ENTROPY_STRING "$SRC_ACCT_ENTROPY_STRING" \
+  --arg SRC_ACCT_ENTROPY_STRING $($SRC_ACCT_ENTROPY_STRING | xargs) \ # remove quotes with xargs
   '{ "testAccountSeed": $TEST_ACCOUNT_SEED, "srcAcctEntropyString": $SRC_ACCT_ENTROPY_STRING }' > $REPO_ROOT/tools/TestSetupClient/TestSetupClientTests/process_info.json

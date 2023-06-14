@@ -177,3 +177,8 @@ swiftlint:
 upgrade-deps:
 	bundle update
 	$(MAKE) -C Example upgrade-deps
+
+.PHONY: fund-wallets-spm
+fund-wallets-spm:
+	tools/generate_process_info_jsons.sh
+	swift test --filter "TestSetupClientTests"
