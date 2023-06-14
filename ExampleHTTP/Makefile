@@ -27,10 +27,10 @@ build:
 		--scheme "Performance Tests" \
 		--skip_archive \
 		--skip_codesigning
-	bundle exec fastlane gym \
-		--scheme "Http Protocol Unit Tests" \
-		--skip_archive \
-		--skip_codesigning
+	#bundle exec fastlane gym \
+		#--scheme "Http Protocol Unit Tests" \
+		#--skip_archive \
+		#--skip_codesigning
 
 .PHONY: test
 test:
