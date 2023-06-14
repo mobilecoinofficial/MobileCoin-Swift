@@ -21,7 +21,6 @@ commands:
           name: brew install git-lfs
           working_directory: 
           command: |
-            brew install git-lfs
             git lfs install
 
   initialize-lfs:
@@ -40,7 +39,6 @@ commands:
           name: Run git submodule update --init
           working_directory: Vendor/libmobilecoin
           command: |
-            brew install git-lfs
             git submodule update --init --depth 1
             cd /Users/distiller/project/Vendor/libmobilecoin
             git submodule update --init Vendor/mobilecoin
