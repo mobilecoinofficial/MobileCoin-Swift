@@ -14,6 +14,15 @@ defaults:
     dynamicFogAuthoritySpki:
 
 commands:
+  install-lfs:
+    description: Install Git LFS
+    steps:
+      - run:
+          name: brew install git-lfs
+          working_directory: 
+          command: |
+            brew install git-lfs
+            git lfs install
   init-artifacts-submodule:
     description: Initialize libmobilecoin-ios-artifacts submodule
     steps:
@@ -230,6 +239,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -260,6 +270,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -290,6 +301,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -317,6 +329,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -338,6 +351,7 @@ jobs:
     environment:
       <<: *default-environment
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -361,6 +375,7 @@ jobs:
     environment:
       <<: *default-environment
     steps:
+      - install-lfs
       - checkout
       - attach_workspace: { at: . }
       - install-gh-pages
@@ -376,6 +391,7 @@ jobs:
     environment:
       <<: *default-environment
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
