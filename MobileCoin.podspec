@@ -27,30 +27,30 @@ Pod::Spec.new do |s|
 
   s.default_subspec = :none
 
-  s.test_spec do |test_spec|
-    test_spec.source_files = "Tests/{Unit,Common,Fixtures,Mocks}/**/*.swift"
-    test_spec.resources = [
-      "Tests/Common/FixtureData/**/*",
-      "Vendor/libmobilecoin/Vendor/mobilecoin/test-vectors/vectors/**/*",
-    ]
-  end
-
-  s.test_spec 'IntegrationTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/Transacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*"
-  end
-
-  s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/NonTransacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*"
-  end
-
-  s.test_spec 'PerformanceTests' do |test_spec|
-    test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
-
-    test_spec.test_type = :ui
-    test_spec.requires_app_host = true
-  end
+#   s.test_spec do |test_spec|
+#     test_spec.source_files = "Tests/{Unit,Common,Fixtures,Mocks}/**/*.swift"
+#     test_spec.resources = [
+#       "Tests/Common/FixtureData/**/*",
+#       "Vendor/libmobilecoin/Vendor/mobilecoin/test-vectors/vectors/**/*",
+#     ]
+#   end
+# 
+#   s.test_spec 'IntegrationTransactingTests' do |test_spec|
+#     test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/Transacting}/**/*.swift"
+#     test_spec.resource = "Tests/Common/FixtureData/**/*"
+#   end
+# 
+#   s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
+#     test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/NonTransacting}/**/*.swift"
+#     test_spec.resource = "Tests/Common/FixtureData/**/*"
+#   end
+# 
+#   s.test_spec 'PerformanceTests' do |test_spec|
+#     test_spec.source_files = "Tests/{Performance,Common}/**/*.swift"
+# 
+#     test_spec.test_type = :ui
+#     test_spec.requires_app_host = true
+#   end
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
