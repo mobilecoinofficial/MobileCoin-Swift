@@ -75,7 +75,7 @@ commands:
       - run:
           name: Install root bundler dependencies
           command: |
-            bundle config set --local deployment 'true'
+            # bundle config set --local deployment 'true'
             bundle config set --local path '.vendor/bundle'
             bundle config set --local clean 'true'
             bundle check || bundle install
@@ -101,7 +101,7 @@ commands:
           name: Install Example project bundler dependencies
           working_directory: Example
           command: |
-            bundle config set --local deployment 'true'
+            # bundle config set --local deployment 'true'
             bundle config set --local path '.vendor/bundle'
             bundle config set --local clean 'true'
             bundle check || bundle install
@@ -127,7 +127,7 @@ commands:
           name: Install ExampleHTTP project bundler dependencies
           working_directory: ExampleHTTP
           command: |
-            bundle config set --local deployment 'true'
+            # bundle config set --local deployment 'true'
             bundle config set --local path '.vendor/bundle'
             bundle config set --local clean 'true'
             bundle check || bundle install
