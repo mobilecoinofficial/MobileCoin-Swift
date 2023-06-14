@@ -178,6 +178,10 @@ upgrade-deps:
 	bundle update
 	$(MAKE) -C Example upgrade-deps
 
+.PHONY: generate-local-process-info
+generate-local-process-info:
+	tools/generate_process_info_jsons.sh
+
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:
 	tools/generate_process_info_jsons.sh
