@@ -15,8 +15,8 @@ struct TestSecrets: Codable {
     let DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED: String
     let DYNAMIC_FOG_AUTHORITY_SPKI: String
     
-    static var secrets: TestSecrets? = {
-        (try? load())
+    static var shared: TestSecrets = {
+        (try! load())
     }()
     
     static func load() throws -> Self {

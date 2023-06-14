@@ -5,10 +5,14 @@
 import Foundation
 import MobileCoin
 
+#if swift(>=5.5)
+
+@available(iOS 15.0, macOS 12.0, *)
 enum TestWalletCreationError: Error, Equatable {
     case error(String)
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 class TestWalletCreator: ObservableObject {
     init() {
     }
@@ -53,6 +57,7 @@ class TestWalletCreator: ObservableObject {
             
             let balances = try await sourceClient.updateBalances()
             print("balances: \(balances)")
+            print("Source Acct Public Address: \(Base58Coder.encode(accountKey.publicAddress))")
             
             let accountFactory = TestAccountFactory(
                 fogReportUrl:  NetworkPresets.fogUrl,
@@ -286,3 +291,5 @@ class TestWalletCreator: ObservableObject {
         return .success(())
     }
 }
+
+#endif

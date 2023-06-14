@@ -41,8 +41,22 @@ let package = Package(
             path: "Tests",
             resources: [
                 .copy("Common/FixtureData/Transaction"),
-                .copy("Common/Secrets/secrets.json")
+                .copy("Common/Secrets/secrets.json"),
+                .copy("Common/Secrets/process_info.json")
             ]
-        )
+        ),
+        .target(
+            name: "TestSetupClient",
+            dependencies: ["MobileCoin"],
+            path: "tools/TestSetupClient/TestSetupClient"
+         ),
+        .testTarget(
+            name: "TestSetupClientTests",
+            dependencies: ["TestSetupClient"],
+            path: "tools/TestSetupClient/TestSetupClientTests",
+            resources: [
+                .copy("process_info.json")
+            ]
+         )
     ]
 )

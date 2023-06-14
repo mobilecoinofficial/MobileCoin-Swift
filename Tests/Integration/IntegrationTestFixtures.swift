@@ -308,8 +308,8 @@ extension IntegrationTestFixtures {
     }
 
     static func getTestAccountSeed() -> String? {
-        guard let seed = ProcessInfo.processInfo.environment["testAccountSeed"] else {
-            return try? Data(randomOfLength: 32).base64EncodedString()
+        guard let seed = ProcessInfo.processInfo.combined("testAccountSeed") else {
+            fatalError("Unable to get b64Seed value")
         }
         return seed
     }
@@ -433,5 +433,48 @@ extension UInt64 {
     var data: Data {
         var int = self
         return Data(bytes: &int, count: MemoryLayout<UInt64>.size)
+    }
+}
+
+
+extension ProcessInfo {
+    func combined(_ variable: String) -> String? {
+        // Check environment first, then check "local environment" (secrets JSON file)
+        guard let value = ProcessInfo.processInfo.environment[variable] else {
+            switch variable {
+            case "testAccountSeed":
+                return ProcessInfoLocal.shared?.testAccountSeed
+            default:
+                return nil
+            }
+        }
+        
+        return value
+    }
+}
+
+struct ProcessInfoLocal: Decodable {
+    let testAccountSeed: String
+
+    static var shared = try? Self.load()
+
+    static func load() throws -> Self {
+        let processInfoFileUrl = Bundle.module.url(
+            forResource: "process_info",
+            withExtension: "json"
+        )
+        
+        guard
+            let processInfoFileUrl = processInfoFileUrl,
+            let processInfoFileData = try? Data(contentsOf: processInfoFileUrl)
+        else {
+            fatalError(
+                "No `process_info.json` file found." +
+                "initialize with `make init-secrets`" +
+                "Or, make duplicate `process_info.json.sample` and remove the `.sample` extension."
+            )
+        }
+        
+        return try JSONDecoder().decode(Self.self, from: processInfoFileData)
     }
 }
