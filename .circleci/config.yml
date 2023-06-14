@@ -21,16 +21,7 @@ commands:
           name: brew install git-lfs
           working_directory: 
           command: |
-            git lfs install
-
-  initialize-lfs:
-    description: Init Git LFS
-    steps:
-      - run:
-          name: git lfs install
-          working_directory: 
-          command: |
-            git lfs install
+            git lfs install --skip-smudge
 
   init-artifacts-submodule:
     description: Initialize libmobilecoin submodule
