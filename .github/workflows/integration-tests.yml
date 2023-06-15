@@ -84,12 +84,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get Submodules
-        working-directory: Vendor/libmobilecoin-ios-artifacts
+        working-directory: Vendor/libmobilecoin
         run: git submodule update --init --depth 1 --recursive
 
       - name: Install Gems
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
@@ -107,7 +107,7 @@ jobs:
       - name: Install Example Gems
         working-directory: ./Example
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
@@ -190,12 +190,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get Submodules
-        working-directory: Vendor/libmobilecoin-ios-artifacts
+        working-directory: Vendor/libmobilecoin
         run: git submodule update --init --depth 1 --recursive
 
       - name: Install Gems
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
@@ -213,7 +213,7 @@ jobs:
       - name: Install Example Gems
         working-directory: ./Example
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install

@@ -29,7 +29,7 @@ extension XCTestCase {
 // swiftlint:disable superfluous_disable_command
 // swiftlint:disable multiline_parameters
 
-    @available(iOS 15.0, *)
+    @available(iOS 15.0, macOS 12.0, *)
     func testSupportedProtocols(
                 description: String,
                 timeout: Double = 120.0,

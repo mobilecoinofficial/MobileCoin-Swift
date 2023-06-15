@@ -6,6 +6,9 @@
 
 import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 @testable import MobileCoin
 
 protocol MockFogServiceProtocol: FogBlockService, FogKeyImageService, FogViewService {

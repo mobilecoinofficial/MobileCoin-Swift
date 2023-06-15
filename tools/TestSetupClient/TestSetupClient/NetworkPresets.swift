@@ -59,14 +59,25 @@ struct NetworkPresets {
     "d901b5c4960f49871a848fd157c7c0b03351253d65bb839698ddd5df138ad7b6"
     
     // v4.0.0 Enclave Values
+    static let legacy_v4_0_0_testNetConsensusMrEnclaveHex =
+        "4f3879bfffb7b9f86a33086202b6120a32da0ca159615fbbd6fbac6aa37bbf02"
+    static let legacy_v4_0_0_testNetFogViewMrEnclaveHex =
+        "f52b3dc018195eae42f543e64e976c818c06672b5489746e2bf74438d488181b"
+    static let legacy_v4_0_0_testNetFogLedgerMrEnclaveHex =
+        "23ececb2482e3b1d9e284502e2beb65ae76492f2791f3bfef50852ee64b883c3"
+    static let legacy_v4_0_0_testNetFogReportMrEnclaveHex =
+        "16d73984c2d2712156135ab69987ca78aca67a2cf4f0f2287ea584556f9d223a"
+
+
+    // v5.0.0 Enclave Values
     static let testNetConsensusMrEnclaveHex =
-    "4f3879bfffb7b9f86a33086202b6120a32da0ca159615fbbd6fbac6aa37bbf02"
+        "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
     static let testNetFogViewMrEnclaveHex =
-    "f52b3dc018195eae42f543e64e976c818c06672b5489746e2bf74438d488181b"
+        "ac292a1ad27c0338a5159d5fab2bed3917ea144536cb13b5c1226d09a2fbc648"
     static let testNetFogLedgerMrEnclaveHex =
-    "23ececb2482e3b1d9e284502e2beb65ae76492f2791f3bfef50852ee64b883c3"
+        "b61188a6c946557f32e612eff5615908abd1b72ec11d8b7070595a92d4abbbf1"
     static let testNetFogReportMrEnclaveHex =
-    "16d73984c2d2712156135ab69987ca78aca67a2cf4f0f2287ea584556f9d223a"
+        "248356aa0d3431abc45da1773cfd6191a4f2989a4a99da31f450bd7c461e312b"
 
     static func defaultAttestation(_ mrEnclaveHexs: [String]) -> Attestation {
         var mrEnclaves = [Attestation.MrEnclave]()

@@ -2,7 +2,11 @@
 //  Copyright (c) 2022 MobileCoin. All rights reserved.
 //
 
+import Foundation
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 @testable import MobileCoin
 
 extension TransferPayload {

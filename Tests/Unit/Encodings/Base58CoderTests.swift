@@ -5,6 +5,16 @@
 @testable import MobileCoin
 import XCTest
 
+extension Bundle {
+    static func getVectorPath(_ filename: String) throws -> URL {
+        #if canImport(LibMobileCoinTestVector)
+        try Bundle.testVectorModuleUrl(filename)
+        #else
+        try Bundle.url(filename, "jsonl")
+        #endif
+    }
+}
+
 class Base58CoderTests: XCTestCase {
 
     let decoder = JSONDecoder()
@@ -17,7 +27,7 @@ class Base58CoderTests: XCTestCase {
 
     func testEncodingPublicAddressWithoutFog() {
         XCTAssertNoThrow(evaluating: {
-            let path = try Bundle.url("b58_encode_public_address_without_fog", "jsonl")
+            let path = try Bundle.getVectorPath("b58_encode_public_address_without_fog")
             let text = try String(contentsOf: path, encoding: .utf8)
             for line in text.components(separatedBy: CharacterSet.newlines) where !line.isEmpty {
                 let testcase = try decoder.decode(
@@ -33,7 +43,7 @@ class Base58CoderTests: XCTestCase {
 
     func testDecodingPublicAddressWithoutFog() {
         XCTAssertNoThrow(evaluating: {
-            let path = try Bundle.url("b58_encode_public_address_without_fog", "jsonl")
+            let path = try Bundle.getVectorPath("b58_encode_public_address_without_fog")
             let text = try String(contentsOf: path, encoding: .utf8)
             for line in text.components(separatedBy: CharacterSet.newlines) where !line.isEmpty {
                 let testcase = try decoder.decode(
@@ -68,7 +78,7 @@ class Base58CoderTests: XCTestCase {
 
     func testEncodingPublicAddressWithFog() throws {
         XCTAssertNoThrow(evaluating: {
-            let path = try Bundle.url("b58_encode_public_address_with_fog", "jsonl")
+            let path = try Bundle.getVectorPath("b58_encode_public_address_with_fog")
             let text = try String(contentsOf: path, encoding: .utf8)
             for line in text.components(separatedBy: CharacterSet.newlines) where !line.isEmpty {
                 let testcase = try decoder.decode(
@@ -87,7 +97,7 @@ class Base58CoderTests: XCTestCase {
 
     func testDecodingPublicAddressWithFog() {
         XCTAssertNoThrow(evaluating: {
-            let path = try Bundle.url("b58_encode_public_address_with_fog", "jsonl")
+            let path = try Bundle.getVectorPath("b58_encode_public_address_with_fog")
             let text = try String(contentsOf: path, encoding: .utf8)
             for line in text.components(separatedBy: CharacterSet.newlines) where !line.isEmpty {
                 let testcase = try decoder.decode(

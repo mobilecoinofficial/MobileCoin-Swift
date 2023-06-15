@@ -5,6 +5,9 @@
 // swiftlint:disable todo
 
 import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+#endif
 @testable import MobileCoin
 import XCTest
 

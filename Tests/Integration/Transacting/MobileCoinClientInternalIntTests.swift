@@ -291,7 +291,7 @@ class MobileCoinClientInternalIntTests: XCTestCase {
     
 #if swift(>=5.5)
 
-    @available(iOS 15.0, *)
+    @available(iOS 15.0, macOS 12.0, *)
     func testDynamicAccountCreation() async throws {
         try XCTSkip()
         let minFee = IntegrationTestFixtures.fee

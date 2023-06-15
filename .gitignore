@@ -23,3 +23,12 @@ node_modules/
 
 # Finder
 .DS_Store
+
+# spm build folder
+.build
+
+# secrets JSON 
+Tests/Common/Secrets/secrets.json
+
+# process info JSON
+tools/TestSetupClient/TestSetupClientTests/process_info.json
