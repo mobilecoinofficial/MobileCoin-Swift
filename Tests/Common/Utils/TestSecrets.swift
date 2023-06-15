@@ -1,8 +1,5 @@
 //
-//  File.swift
-//  
-//
-//  Created by Adam Mork on 6/13/23.
+//  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
 import Foundation
