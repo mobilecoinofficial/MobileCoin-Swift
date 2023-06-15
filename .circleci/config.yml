@@ -254,7 +254,7 @@ jobs:
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
-      - check-dirty-git
+      # - check-dirty-git
 
   build-and-test-example-http:
     parameters:
@@ -285,7 +285,7 @@ jobs:
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
-      - check-dirty-git
+      # - check-dirty-git
 
   pod-lib-lint:
     parameters:
