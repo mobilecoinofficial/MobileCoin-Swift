@@ -1,3 +1,4 @@
+// swiftlint:disable:this file_name
 //
 //  Copyright (c) 2020-2023 MobileCoin. All rights reserved.
 //

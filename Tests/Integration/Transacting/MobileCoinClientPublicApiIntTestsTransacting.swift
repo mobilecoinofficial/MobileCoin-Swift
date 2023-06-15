@@ -5,6 +5,7 @@
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
 // swiftlint:disable empty_xctest_method
+// swiftlint:disable type_name
 
 import MobileCoin
 import XCTest

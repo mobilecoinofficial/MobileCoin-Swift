@@ -15,7 +15,8 @@ extension IntegrationTestFixtures {
     ) throws -> FogViewConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
+            .validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -38,7 +39,8 @@ extension IntegrationTestFixtures {
     ) throws -> FogUntrustedTxOutConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
+            .validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -61,7 +63,8 @@ extension IntegrationTestFixtures {
     ) throws -> FogMerkleProofConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
+            .validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -84,7 +87,8 @@ extension IntegrationTestFixtures {
     ) throws -> FogKeyImageConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
+            .validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
@@ -107,7 +111,8 @@ extension IntegrationTestFixtures {
     ) throws -> FogBlockConnection {
         fogUrlLoadBalancer.rotationEnabled = false
 
-        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsConsensusUrlBalancer
+        let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
+            .validUrlsConsensusUrlBalancer
 
         let networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,

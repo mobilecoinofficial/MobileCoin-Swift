@@ -47,7 +47,10 @@ class UrlLoadBalancerIntTests: XCTestCase {
         }
     }
 
-    func testUrlRotation(fixture: ServiceFixtureIntegration, with transProto: TransportProtocol) throws {
+    func testUrlRotation(
+        fixture: ServiceFixtureIntegration,
+        with transProto: TransportProtocol
+    ) throws {
         let serviceName = fixture.serviceName
         let urlType = fixture.urlTypeName
         let loadBalancer = fixture.loadBalancer
