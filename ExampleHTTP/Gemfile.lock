@@ -17,6 +17,9 @@ GIT
       public_suffix (>= 2.0.2, < 6.0)
 
 GEM
+  specs:
+
+GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.6)
@@ -312,4 +315,4 @@ DEPENDENCIES
   pkg-config!
 
 BUNDLED WITH
-   2.2.24
+   2.3.24
