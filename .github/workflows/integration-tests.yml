@@ -89,7 +89,7 @@ jobs:
 
       - name: Install Gems
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
@@ -107,7 +107,7 @@ jobs:
       - name: Install Example Gems
         working-directory: ./Example
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
@@ -195,7 +195,7 @@ jobs:
 
       - name: Install Gems
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
@@ -213,7 +213,7 @@ jobs:
       - name: Install Example Gems
         working-directory: ./Example
         run: |
-          bundle config set --local deployment 'true'
+          # bundle config set --local deployment 'true'
           bundle config set --local path '.vendor/bundle'
           bundle config set --local clean 'true'
           bundle check || bundle install
