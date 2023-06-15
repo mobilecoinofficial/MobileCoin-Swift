@@ -84,7 +84,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get Submodules
-        working-directory: Vendor/libmobilecoin-ios-artifacts
+        working-directory: Vendor/libmobilecoin
         run: git submodule update --init --depth 1 --recursive
 
       - name: Install Gems
@@ -190,7 +190,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get Submodules
-        working-directory: Vendor/libmobilecoin-ios-artifacts
+        working-directory: Vendor/libmobilecoin
         run: git submodule update --init --depth 1 --recursive
 
       - name: Install Gems
