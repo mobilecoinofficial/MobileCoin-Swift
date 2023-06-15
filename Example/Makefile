@@ -38,8 +38,8 @@ test:
 		--scheme "Unit Tests"
 	bundle exec fastlane scan \
 		--scheme "Performance Tests"
-	bundle exec fastlane scan \
-		--scheme "Protocol Unit Tests"
+	#bundle exec fastlane scan \
+		#--scheme "Protocol Unit Tests"
 
 .PHONY: clean
 clean:

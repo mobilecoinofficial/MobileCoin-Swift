@@ -85,6 +85,7 @@ Pod::Spec.new do |s|
     subspec.source_files = [
       "Sources/{Common,HTTPS}/**/*.swift",
       "CocoapodsOnly/*.{h,m,swift}",
+      "HTTPOnly/WrappedNIOSSLCertificateValidator.swift"
     ]
 
     subspec.dependency "LibMobileCoin/CoreHTTP", "~> 5.0.0"
