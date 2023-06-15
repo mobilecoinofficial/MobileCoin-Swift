@@ -66,10 +66,15 @@ struct ProcessInfoLocal: Decodable {
     static var shared = try? Self.load()
 
     static func load() throws -> Self {
-        let processInfoFileUrl = Bundle.module.url(
+        var processInfoFileUrl: URL?
+        #if canImport(LibMobileCoinHTTP)
+        processInfoFileUrl = Bundle.module.url(
             forResource: "process_info",
             withExtension: "json"
         )
+        #else
+        processInfoFileUrl = try Bundle.url("process_info", "json")
+        #endif
         
         guard
             let processInfoFileUrl = processInfoFileUrl,
@@ -101,6 +106,7 @@ extension TestingError: CustomStringConvertible {
 }
 
 extension Bundle {
+    #if canImport(LibMobileCoinHTTP)
     public static let setupclient_BundleIdentifier = Bundle.module.bundleIdentifier!
     
     public static func testSetupClientModuleUrl(_ resource: String, withExtension ext: String) throws -> URL {
@@ -111,4 +117,18 @@ extension Bundle {
         }
         return url
     }
+    #endif
 }
+
+extension Bundle {
+    static func url(_ resource: String, _ ext: String) throws -> URL {
+        guard let url = Bundle(for: BundleType.self).url(forResource: resource, withExtension: ext)
+        else {
+            throw TestingError("Failed to get url for resource: \(resource).\(ext)")
+        }
+        return url
+    }
+
+    private final class BundleType {}
+}
+
