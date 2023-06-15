@@ -69,10 +69,10 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftNIOHTTP1", "~> 2.40.0"
     subspec.dependency "SwiftProtobuf"
 
-#     subspec.test_spec 'ProtocolUnitTests' do |test_spec|
-#       test_spec.source_files = "Tests/{Common,ProtocolSpecific}/**/*.swift"
-#       test_spec.resource = "Tests/{ProtocolSpecific/Http,ProtocolSpecific/Grpc}/FixtureData/**/*"
-#     end
+    subspec.test_spec 'ProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/{Common,ProtocolSpecific}/**/*.swift"
+      test_spec.resource = "Tests/{ProtocolSpecific/Http,ProtocolSpecific/Grpc}/FixtureData/**/*"
+    end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'
@@ -92,10 +92,10 @@ Pod::Spec.new do |s|
 
     subspec.dependency "Logging", "~> 1.4"
 
-#     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
-#       test_spec.source_files = "Tests/ProtocolSpecific/Http/**/*.swift"
-#       test_spec.resource = "Tests/ProtocolSpecific/Http/FixtureData/**/*"
-#     end
+    subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
+      test_spec.source_files = "Tests/ProtocolSpecific/Http/**/*.swift"
+      test_spec.resource = "Tests/ProtocolSpecific/Http/FixtureData/**/*"
+    end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
       subspec.dependency 'SwiftLint'
