@@ -327,14 +327,24 @@ extension NetworkPreset {
         "d901b5c4960f49871a848fd157c7c0b03351253d65bb839698ddd5df138ad7b6"
 
     // v4.0.0 Enclave Values
-    private static let testNetConsensusMrEnclaveHex =
+    private static let legacy_v4_0_0_testNetConsensusMrEnclaveHex =
         "4f3879bfffb7b9f86a33086202b6120a32da0ca159615fbbd6fbac6aa37bbf02"
-    private static let testNetFogViewMrEnclaveHex =
+    private static let legacy_v4_0_0_testNetFogViewMrEnclaveHex =
         "f52b3dc018195eae42f543e64e976c818c06672b5489746e2bf74438d488181b"
-    private static let testNetFogLedgerMrEnclaveHex =
+    private static let legacy_v4_0_0_testNetFogLedgerMrEnclaveHex =
         "23ececb2482e3b1d9e284502e2beb65ae76492f2791f3bfef50852ee64b883c3"
-    private static let testNetFogReportMrEnclaveHex =
+    private static let legacy_v4_0_0_testNetFogReportMrEnclaveHex =
         "16d73984c2d2712156135ab69987ca78aca67a2cf4f0f2287ea584556f9d223a"
+
+    // v5.0.0 Enclave Values
+    private static let testNetConsensusMrEnclaveHex =
+        "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
+    private static let testNetFogViewMrEnclaveHex =
+        "ac292a1ad27c0338a5159d5fab2bed3917ea144536cb13b5c1226d09a2fbc648"
+    private static let testNetFogLedgerMrEnclaveHex =
+        "b61188a6c946557f32e612eff5615908abd1b72ec11d8b7070595a92d4abbbf1"
+    private static let testNetFogReportMrEnclaveHex =
+        "248356aa0d3431abc45da1773cfd6191a4f2989a4a99da31f450bd7c461e312b"
 
     private static let devMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
@@ -846,35 +856,45 @@ extension NetworkPreset {
     private static let devNetworkAuthUsername =
         MobileCoinKeys().devNetworkAuthUsername
 #else
-    private static let devNetworkAuthUsername = ""
+    private static let devNetworkAuthUsername = {
+        (try? TestSecrets.load().DEV_NETWORK_AUTH_USERNAME) ?? ""
+    }()
 #endif
 
 #if canImport(Keys)
     private static let devNetworkAuthPassword =
         MobileCoinKeys().devNetworkAuthPassword
 #else
-    private static let devNetworkAuthPassword = ""
+    private static let devNetworkAuthPassword = {
+        (try? TestSecrets.load().DEV_NETWORK_AUTH_PASSWORD) ?? ""
+    }()
 #endif
 
 #if canImport(Keys)
     private static let testNetTestAccountMnemonicsCommaSeparated =
         MobileCoinKeys().testNetTestAccountMnemonicsCommaSeparated
 #else
-    private static let testNetTestAccountMnemonicsCommaSeparated = ""
+    private static let testNetTestAccountMnemonicsCommaSeparated = {
+        (try? TestSecrets.load().TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED) ?? ""
+    }()
 #endif
 
 #if canImport(Keys)
     private static let mobileDevTestAccountMnemonicsCommaSeparated =
         MobileCoinKeys().mobileDevTestAccountMnemonicsCommaSeparated
 #else
-    private static let mobileDevTestAccountMnemonicsCommaSeparated = ""
+    private static let mobileDevTestAccountMnemonicsCommaSeparated = {
+        (try? TestSecrets.load().MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED) ?? ""
+    }()
 #endif
 
 #if canImport(Keys)
     private static let dynamicTestAccountSeedEntropiesCommaSeparated =
         MobileCoinKeys().dynamicTestAccountSeedEntropiesCommaSeparated
 #else
-    private static let dynamicTestAccountSeedEntropiesCommaSeparated = ""
+    private static let dynamicTestAccountSeedEntropiesCommaSeparated = {
+        (try? TestSecrets.load().DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED) ?? ""
+    }()
 #endif
 
     // swiftlint:disable force_unwrapping

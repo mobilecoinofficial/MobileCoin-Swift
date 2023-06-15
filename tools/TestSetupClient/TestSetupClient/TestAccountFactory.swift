@@ -1,11 +1,12 @@
 //
 //  Copyright (c) 2020-2023 MobileCoin. All rights reserved.
 //
+import Foundation
 @testable import MobileCoin
 
 #if swift(>=5.5)
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, *)
 
 public struct TestAccountFactory {
 

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "5.0.1"
+  s.version      = "5.0.3"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -28,21 +28,23 @@ Pod::Spec.new do |s|
   s.default_subspec = :none
 
   s.test_spec do |test_spec|
-    test_spec.source_files = "Tests/{Unit,Common,Fixtures,Mocks}/**/*.swift"
+    test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
     test_spec.resources = [
       "Tests/Common/FixtureData/**/*",
-      "Vendor/libmobilecoin-ios-artifacts/Vendor/mobilecoin/test-vectors/vectors/**/*",
+      "Vendor/libmobilecoin/Vendor/mobilecoin/test-vectors/vectors/**/*",
     ]
   end
 
   s.test_spec 'IntegrationTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/Transacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*"
+    test_spec.source_files = "Tests/{Common,Integration/Common,Integration/Transacting}/**/*.swift"
+    test_spec.resource = "Tests/Common/FixtureData/**/*",
+    test_spec.resource = "Tests/Common/Secrets/process_info.json"
   end
 
   s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
     test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/NonTransacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*"
+    test_spec.resource = "Tests/Common/FixtureData/**/*",
+    test_spec.resource = "Tests/Common/Secrets/process_info.json"
   end
 
   s.test_spec 'PerformanceTests' do |test_spec|
@@ -54,13 +56,8 @@ Pod::Spec.new do |s|
 
   s.subspec "Core" do |subspec|
     subspec.source_files = [
-      "Sources/*.{h,m,swift}",
-      "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-      "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
-      "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
-      "Sources/Network/{GRPC,HTTPS}/**/*.{h,m,swift}",
-      "Sources/Network/ProtocolSpecific/Combined/**/*.{h,m,swift}",
-      "Sources/Network/*.{h,m,swift}",
+      "Sources/{Common,GRPC,HTTPS}/**/*.swift",
+      "CocoapodsOnly/*.{h,m,swift}",
     ]
 
     subspec.dependency "LibMobileCoin/Core", "~> 5.0.0"
@@ -73,8 +70,8 @@ Pod::Spec.new do |s|
     subspec.dependency "SwiftProtobuf"
 
     subspec.test_spec 'ProtocolUnitTests' do |test_spec|
-      test_spec.source_files = "Tests/{Http,Grpc}/**/*.swift"
-      test_spec.resource = "Tests/{Http,Grpc}/FixtureData/**/*"
+      test_spec.source_files = "Tests/{Common,ProtocolSpecific}/**/*.swift"
+      test_spec.resource = "Tests/{ProtocolSpecific/Http,ProtocolSpecific/Grpc}/FixtureData/**/*"
     end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
@@ -86,13 +83,9 @@ Pod::Spec.new do |s|
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [
-      "Sources/*.{h,m,swift}",
-      "Sources/{Account,Common,Crypto,Encodings,Fog,Ledger}/**/*.{h,m,swift}",
-      "Sources/{LibMobileCoin,Mistyswap,Mnemonic,Storage,Transaction,Utils}/**/*.{h,m,swift}",
-      "Sources/Network/{Attestation,Authorization,Connection,Service,Url}/**/*.{h,m,swift}",
-      "Sources/Network/HTTPS/**/*.{h,m,swift}",
-      "Sources/Network/ProtocolSpecific/HTTPOnly/**/*.{h,m,swift}",
-      "Sources/Network/*.{h,m,swift}",
+      "Sources/{Common,HTTPS}/**/*.swift",
+      "CocoapodsOnly/*.{h,m,swift}",
+      "HTTPOnly/WrappedNIOSSLCertificateValidator.swift"
     ]
 
     subspec.dependency "LibMobileCoin/CoreHTTP", "~> 5.0.0"
@@ -100,8 +93,8 @@ Pod::Spec.new do |s|
     subspec.dependency "Logging", "~> 1.4"
 
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
-      test_spec.source_files = "Tests/Http/**/*.swift"
-      test_spec.resource = "Tests/Http/FixtureData/**/*"
+      test_spec.source_files = "Tests/ProtocolSpecific/Http/**/*.swift"
+      test_spec.resource = "Tests/ProtocolSpecific/Http/FixtureData/**/*"
     end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?

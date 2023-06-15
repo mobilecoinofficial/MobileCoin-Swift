@@ -1,27 +1,27 @@
 PODS:
   - Keys (1.0.1)
-  - LibMobileCoin/CoreHTTP (5.0.0):
+  - LibMobileCoin/CoreHTTP (5.0.3):
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
-  - MobileCoin (5.0.1)
-  - MobileCoin/CoreHTTP (5.0.1):
+  - MobileCoin (5.0.3)
+  - MobileCoin/CoreHTTP (5.0.3):
     - LibMobileCoin/CoreHTTP (~> 5.0.0)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (5.0.1):
+  - MobileCoin/CoreHTTP/HttpProtocolUnitTests (5.0.3):
     - LibMobileCoin/CoreHTTP (~> 5.0.0)
     - Logging (~> 1.4)
     - SwiftLint
-  - MobileCoin/IntegrationNonTransactingTests (5.0.1)
-  - MobileCoin/IntegrationTransactingTests (5.0.1)
-  - MobileCoin/PerformanceTests (5.0.1)
-  - MobileCoin/Tests (5.0.1)
+  - MobileCoin/IntegrationNonTransactingTests (5.0.3)
+  - MobileCoin/IntegrationTransactingTests (5.0.3)
+  - MobileCoin/PerformanceTests (5.0.3)
+  - MobileCoin/Tests (5.0.3)
   - SwiftLint (0.47.1)
   - SwiftProtobuf (1.19.0)
 
 DEPENDENCIES:
   - Keys (from `Pods/CocoaPodsKeys`)
-  - LibMobileCoin/CoreHTTP (from `../Vendor/libmobilecoin-ios-artifacts`)
+  - LibMobileCoin/CoreHTTP (from `../Vendor/libmobilecoin`)
   - MobileCoin (from `..`)
   - MobileCoin/CoreHTTP (from `..`)
   - MobileCoin/CoreHTTP/HttpProtocolUnitTests (from `..`)
@@ -42,18 +42,18 @@ EXTERNAL SOURCES:
   Keys:
     :path: Pods/CocoaPodsKeys
   LibMobileCoin:
-    :path: "../Vendor/libmobilecoin-ios-artifacts"
+    :path: "../Vendor/libmobilecoin"
   MobileCoin:
     :path: ".."
 
 SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: b1a473933091536cb87fc92a7ca35c63855451f3
+  LibMobileCoin: 5f63719229248f1e2e2367bd452561f46a91085d
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
-  MobileCoin: 45349de1dd77a21e195bddbf9dc194478ea61fa5
+  MobileCoin: a4fe28902da2e02507812e873dc1dc94cd13ed95
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftProtobuf: 6ef3f0e422ef90d6605ca20b21a94f6c1324d6b3
 
-PODFILE CHECKSUM: 7e688ed0e402899ce8718dbad0cd6d67dedcfcb5
+PODFILE CHECKSUM: 60ba6030a425dd17db33dbf638ee37401487fa08
 
 COCOAPODS: 1.12.1

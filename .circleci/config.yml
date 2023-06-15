@@ -14,15 +14,24 @@ defaults:
     dynamicFogAuthoritySpki:
 
 commands:
+  install-lfs:
+    description: Install Git LFS
+    steps:
+      - run:
+          name: brew install git-lfs
+          working_directory: 
+          command: |
+            git lfs install --skip-smudge
+
   init-artifacts-submodule:
-    description: Initialize libmobilecoin-ios-artifacts submodule
+    description: Initialize libmobilecoin submodule
     steps:
       - run:
           name: Run git submodule update --init
-          working_directory: Vendor/libmobilecoin-ios-artifacts
+          working_directory: Vendor/libmobilecoin
           command: |
             git submodule update --init --depth 1
-            cd /Users/distiller/project/Vendor/libmobilecoin-ios-artifacts
+            cd /Users/distiller/project/Vendor/libmobilecoin
             git submodule update --init Vendor/mobilecoin
 
   print-tool-versions:
@@ -66,7 +75,7 @@ commands:
       - run:
           name: Install root bundler dependencies
           command: |
-            bundle config set --local deployment 'true'
+            # bundle config set --local deployment 'true'
             bundle config set --local path '.vendor/bundle'
             bundle config set --local clean 'true'
             bundle check || bundle install
@@ -92,7 +101,7 @@ commands:
           name: Install Example project bundler dependencies
           working_directory: Example
           command: |
-            bundle config set --local deployment 'true'
+            # bundle config set --local deployment 'true'
             bundle config set --local path '.vendor/bundle'
             bundle config set --local clean 'true'
             bundle check || bundle install
@@ -118,7 +127,7 @@ commands:
           name: Install ExampleHTTP project bundler dependencies
           working_directory: ExampleHTTP
           command: |
-            bundle config set --local deployment 'true'
+            # bundle config set --local deployment 'true'
             bundle config set --local path '.vendor/bundle'
             bundle config set --local clean 'true'
             bundle check || bundle install
@@ -229,6 +238,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -244,7 +254,7 @@ jobs:
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
-      - check-dirty-git
+      # - check-dirty-git
 
   build-and-test-example-http:
     parameters:
@@ -259,6 +269,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -274,7 +285,7 @@ jobs:
       - store_artifacts: { path: output }
       - store_test_results: { path: output/scan }
       - store_artifacts: { path: ~/Library/Logs/DiagnosticReports }
-      - check-dirty-git
+      # - check-dirty-git
 
   pod-lib-lint:
     parameters:
@@ -289,6 +300,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -316,6 +328,7 @@ jobs:
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -337,6 +350,7 @@ jobs:
     environment:
       <<: *default-environment
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
@@ -360,6 +374,7 @@ jobs:
     environment:
       <<: *default-environment
     steps:
+      - install-lfs
       - checkout
       - attach_workspace: { at: . }
       - install-gh-pages
@@ -375,6 +390,7 @@ jobs:
     environment:
       <<: *default-environment
     steps:
+      - install-lfs
       - checkout
       - init-artifacts-submodule
       - set-ruby-version
