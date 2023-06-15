@@ -235,7 +235,11 @@ class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
                 transportProtocolOption: TransportProtocol.Option,
                 targetQueue: DispatchQueue?
             ) -> FogReportGrpcConnection {
-                FogReportGrpcConnection(url: url, channelManager: channelManager, targetQueue: targetQueue)
+                FogReportGrpcConnection(
+                    url: url,
+                    channelManager: channelManager,
+                    targetQueue: targetQueue
+                )
             }
 
             func makeMistyswapService(
