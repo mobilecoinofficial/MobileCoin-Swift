@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: https://github.com/sporkmonger/addressable
-  revision: b56cef3e69bb1294ac4e31dad150e910b05f607f
+  revision: e01456b27c7a41826a94ed2c5bc8c8d7ba869361
   branch: main
   specs:
     addressable (2.8.4)
