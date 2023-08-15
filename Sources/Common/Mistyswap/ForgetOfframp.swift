@@ -9,14 +9,14 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-extension Mistyswap_ForgetOfframpRequest {
+extension MistyswapOfframp_ForgetOfframpRequest {
 
     static func make(offrampID: Data) -> Result<Self, InvalidInputError> {
         // Offramp ID should be 32 bytes
         guard Data32(offrampID) != nil else {
             return .failure(InvalidInputError("offrampID should be 32 bytes"))
         }
-        var proto = Mistyswap_ForgetOfframpRequest()
+        var proto = MistyswapOfframp_ForgetOfframpRequest()
         proto.offrampID = offrampID
         return .success(proto)
     }

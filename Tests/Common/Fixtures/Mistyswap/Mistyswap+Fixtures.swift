@@ -20,13 +20,13 @@ extension Mistyswap.Fixtures {
     struct ForgetOfframp {
         let offrampID: Data32
         let badOfframpID: Data
-        let request: Mistyswap_ForgetOfframpRequest
+        let request: MistyswapOfframp_ForgetOfframpRequest
 
         init() throws {
             self.offrampID = try XCTUnwrap(Data32(Data(randomOfLength: 32)))
             self.badOfframpID = try XCTUnwrap(Data(randomOfLength: 16))
 
-            var request = Mistyswap_ForgetOfframpRequest()
+            var request = MistyswapOfframp_ForgetOfframpRequest()
             request.offrampID = offrampID.data
             self.request = request
         }
@@ -35,7 +35,7 @@ extension Mistyswap.Fixtures {
 
 extension Mistyswap.Fixtures {
     struct InitiateOfframp {
-        let request: Mistyswap_InitiateOfframpRequest
+        let request: MistyswapOfframp_InitiateOfframpRequest
         let goodJSON: String
         let badJSON: String
         let srcAssetID: String = MixinAssetID.MOB.rawValue
@@ -49,7 +49,7 @@ extension Mistyswap.Fixtures {
         init() throws {
             let goodJSON = try Self.goodJSON()
 
-            let result = Mistyswap_InitiateOfframpRequest.make(
+            let result = MistyswapOfframp_InitiateOfframpRequest.make(
                 mixinCredentialsJSON: goodJSON,
                 srcAssetID: srcAssetID,
                 srcExpectedAmount: srcExpectedAmount,
@@ -100,13 +100,13 @@ extension Mistyswap.Fixtures {
     struct GetOfframpStatus {
         let offrampID: Data32
         let badOfframpID: Data
-        let request: Mistyswap_GetOfframpStatusRequest
+        let request: MistyswapOfframp_GetOfframpStatusRequest
 
         init() throws {
             self.offrampID = try XCTUnwrap(Data32(Data(randomOfLength: 32)))
             self.badOfframpID = try XCTUnwrap(Data(randomOfLength: 16))
 
-            var request = Mistyswap_GetOfframpStatusRequest()
+            var request = MistyswapOfframp_GetOfframpStatusRequest()
             request.offrampID = offrampID.data
             self.request = request
         }
