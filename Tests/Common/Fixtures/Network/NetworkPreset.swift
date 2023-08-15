@@ -275,15 +275,15 @@ extension NetworkPreset {
 //        }
         // eran dev box on gCloud
 
-        return "insecure-mistyswap://40.112.132.134:3229/"
+        return "mistyswap://misty-swap-stage.development.mobilecoin.com"
     }
 
     static var mistyswapUrl: String {
-        "insecure-mistyswap://40.112.132.134:3229/"
+        "mistyswap://misty-swap-stage.development.mobilecoin.com"
     }
 
     private static let mistyswapMrEnclaveHex =
-        "e1004164be659a4aef2768857cd7ecc95d3afd09d6afb41ec1862adb8a4387ed"
+        "7513474793ecfdd13b573337ba3f9a8d88307eabc3d89025714ad6c4c48f7725"
     private static let mistyswapMrSignerHex =
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
 

@@ -75,24 +75,24 @@ protocol FogReportService {
 
 protocol MistyswapService {
     func initiateOfframp(
-        request: Mistyswap_InitiateOfframpRequest,
-        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void)
+        request: MistyswapOfframp_InitiateOfframpRequest,
+        completion: @escaping (Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>) -> Void)
 
     func getOfframpStatus(
-        request: Mistyswap_GetOfframpStatusRequest,
-        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void)
+        request: MistyswapOfframp_GetOfframpStatusRequest,
+        completion: @escaping (Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>) -> Void)
 
     func forgetOfframp(
-        request: Mistyswap_ForgetOfframpRequest,
-        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void)
+        request: MistyswapOfframp_ForgetOfframpRequest,
+        completion: @escaping (Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>) -> Void)
 }
 
 protocol MistyswapServiceConnection: MistyswapService, ConnectionProtocol {}
 
 // protocol MistyswapUntrustedService {
 //    func forgetOfframp(
-//        request: Mistyswap_ForgetOfframpRequest,
-//        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void)
+//        request: MistyswapOfframp_ForgetOfframpRequest,
+//        completion: @escaping (Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>) -> Void)
 // }
 //
 // protocol MistyswapUntrustedServiceConnection: MistyswapUntrustedService, ConnectionProtocol {}

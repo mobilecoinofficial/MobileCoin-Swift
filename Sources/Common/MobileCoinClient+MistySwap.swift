@@ -27,7 +27,7 @@ extension MobileCoinClient {
             return
         }
 
-        let result = Mistyswap_InitiateOfframpRequest.make(
+        let result = MistyswapOfframp_InitiateOfframpRequest.make(
             mixinCredentialsJSON: mixinCredentialsJSON,
             srcAssetID: srcAssetID,
             srcExpectedAmount: srcExpectedAmount,
@@ -67,7 +67,7 @@ extension MobileCoinClient {
             return
         }
 
-        let result = Mistyswap_GetOfframpStatusRequest.make(
+        let result = MistyswapOfframp_GetOfframpStatusRequest.make(
             offrampID: offrampID
         )
         .mapError { invalidInputError in
@@ -100,7 +100,7 @@ extension MobileCoinClient {
             return
         }
 
-        let result = Mistyswap_ForgetOfframpRequest.make(
+        let result = MistyswapOfframp_ForgetOfframpRequest.make(
             offrampID: offrampID
         )
         .mapError { invalidInputError in

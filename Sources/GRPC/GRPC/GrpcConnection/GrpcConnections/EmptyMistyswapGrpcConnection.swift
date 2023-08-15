@@ -10,7 +10,7 @@ import LibMobileCoinGRPC
 #endif
 
 final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
-    private let client: Mistyswap_MistyswapOfframpApiClient
+    private let client: MistyswapOfframp_MistyswapOfframpApiClient
 
     init(
         config: EmptyAttestedConnectionConfig,
@@ -20,7 +20,7 @@ final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapServi
         rngContext: Any? = nil
     ) {
         let channel = channelManager.channel(for: config)
-        self.client = Mistyswap_MistyswapOfframpApiClient(channel: channel)
+        self.client = MistyswapOfframp_MistyswapOfframpApiClient(channel: channel)
         super.init(
             client: Attest_AttestedApiClient(channel: channel),
             config: config,
@@ -30,8 +30,8 @@ final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapServi
     }
 
     func initiateOfframp(
-        request: Mistyswap_InitiateOfframpRequest,
-        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_InitiateOfframpRequest,
+        completion: @escaping (Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>) -> Void
     ) {
         completion(.failure(.connectionFailure(
             "Config used to intialize your client " +
@@ -40,8 +40,8 @@ final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapServi
     }
 
     func getOfframpStatus(
-        request: Mistyswap_GetOfframpStatusRequest,
-        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_GetOfframpStatusRequest,
+        completion: @escaping (Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>) -> Void
     ) {
         completion(.failure(.connectionFailure(
             "Config used to intialize your client " +
@@ -50,8 +50,8 @@ final class EmptyMistyswapGrpcConnection: AttestedGrpcConnection, MistyswapServi
     }
 
     func forgetOfframp(
-        request: Mistyswap_ForgetOfframpRequest,
-        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_ForgetOfframpRequest,
+        completion: @escaping (Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>) -> Void
     ) {
         completion(.failure(.connectionFailure(
             "Config used to intialize your client " +

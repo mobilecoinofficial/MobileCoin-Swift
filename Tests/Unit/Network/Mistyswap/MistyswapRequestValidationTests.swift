@@ -13,7 +13,7 @@ class MistyswapRequestValidationTests: XCTestCase {
     func testGoodJSON() throws {
         let fixtures = try Mistyswap.Fixtures.InitiateOfframp()
 
-        let proto = try XCTUnwrapSuccess(Mistyswap_InitiateOfframpRequest.make(
+        let proto = try XCTUnwrapSuccess(MistyswapOfframp_InitiateOfframpRequest.make(
             mixinCredentialsJSON: fixtures.goodJSON,
             srcAssetID: fixtures.srcAssetID,
             srcExpectedAmount: fixtures.srcExpectedAmount,
@@ -37,7 +37,7 @@ class MistyswapRequestValidationTests: XCTestCase {
     func testBadJSON() throws {
         let fixtures = try Mistyswap.Fixtures.InitiateOfframp()
 
-        try XCTUnwrapFailure(Mistyswap_InitiateOfframpRequest.make(
+        try XCTUnwrapFailure(MistyswapOfframp_InitiateOfframpRequest.make(
             mixinCredentialsJSON: fixtures.badJSON,
             srcAssetID: fixtures.srcAssetID,
             srcExpectedAmount: fixtures.srcExpectedAmount,
@@ -52,7 +52,7 @@ class MistyswapRequestValidationTests: XCTestCase {
     func testForgetGoodOfframpID() throws {
         let fixtures = try Mistyswap.Fixtures.ForgetOfframp()
 
-        let proto = try XCTUnwrapSuccess(Mistyswap_ForgetOfframpRequest.make(
+        let proto = try XCTUnwrapSuccess(MistyswapOfframp_ForgetOfframpRequest.make(
             offrampID: fixtures.offrampID.data
         ))
         XCTAssertEqual(proto.offrampID, fixtures.offrampID.data)
@@ -61,7 +61,7 @@ class MistyswapRequestValidationTests: XCTestCase {
     func testForgetBadOfframpID() throws {
         let fixtures = try Mistyswap.Fixtures.ForgetOfframp()
 
-        try XCTUnwrapFailure(Mistyswap_ForgetOfframpRequest.make(
+        try XCTUnwrapFailure(MistyswapOfframp_ForgetOfframpRequest.make(
             offrampID: fixtures.badOfframpID
         ))
     }
@@ -69,7 +69,7 @@ class MistyswapRequestValidationTests: XCTestCase {
     func testGetStatusGoodOfframpID() throws {
         let fixtures = try Mistyswap.Fixtures.GetOfframpStatus()
 
-        let proto = try XCTUnwrapSuccess(Mistyswap_GetOfframpStatusRequest.make(
+        let proto = try XCTUnwrapSuccess(MistyswapOfframp_GetOfframpStatusRequest.make(
             offrampID: fixtures.offrampID.data
         ))
         XCTAssertEqual(proto.offrampID, fixtures.offrampID.data)
@@ -78,7 +78,7 @@ class MistyswapRequestValidationTests: XCTestCase {
     func testGetStatusBadOfframpID() throws {
         let fixtures = try Mistyswap.Fixtures.GetOfframpStatus()
 
-        try XCTUnwrapFailure(Mistyswap_GetOfframpStatusRequest.make(
+        try XCTUnwrapFailure(MistyswapOfframp_GetOfframpStatusRequest.make(
             offrampID: fixtures.badOfframpID
         ))
     }
