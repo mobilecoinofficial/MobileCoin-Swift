@@ -1,6 +1,6 @@
 PODS:
   - Keys (1.0.1)
-  - LibMobileCoin/CoreHTTP (5.0.3):
+  - LibMobileCoin/CoreHTTP (5.0.4):
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
   - MobileCoin (5.0.4)
@@ -48,7 +48,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: 5f63719229248f1e2e2367bd452561f46a91085d
+  LibMobileCoin: e6dc327f1bfc14664dafc8c69f68c34693dd21f3
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   MobileCoin: 0d6719a2540b66c103aebfb9b6db14228da453f8
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519

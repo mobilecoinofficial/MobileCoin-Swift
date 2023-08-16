@@ -10,7 +10,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-extension Mistyswap_InitiateOfframpRequest {
+extension MistyswapOfframp_InitiateOfframpRequest {
     static func make(
         mixinCredentialsJSON: String,
         srcAssetID: String,
@@ -22,10 +22,10 @@ extension Mistyswap_InitiateOfframpRequest {
         maxFeeAmountInDstTokens: String
     ) -> Result<Self, InvalidInputError> {
         JSONSerialization.verify(jsonString: mixinCredentialsJSON).map({ () in
-            var proto = Mistyswap_InitiateOfframpRequest()
+            var proto = MistyswapOfframp_InitiateOfframpRequest()
             proto.mixinCredentialsJson = mixinCredentialsJSON
 
-            var params = Mistyswap_OfframpParams()
+            var params = MistyswapOfframp_OfframpParams()
             params.srcAssetID = srcAssetID
             params.srcExpectedAmount = srcExpectedAmount
             params.dstAssetID = dstAssetID
