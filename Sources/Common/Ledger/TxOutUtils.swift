@@ -140,18 +140,14 @@ enum TxOutUtils {
         txOutPublicKey: RistrettoPublic,
         accountKey: AccountKey
     ) -> Data66? {
-        McAccountKey.withUnsafePointer(
-            viewPrivateKey: accountKey.viewPrivateKey,
-            spendPrivateKey: accountKey.spendPrivateKey,
-            fogInfo: accountKey.fogInfo
-        ) { accountKeyPtr in
+        accountKey.viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
             encryptedMemo.asMcBuffer { eMemoPtr in
                 txOutPublicKey.asMcBuffer { publicKeyPtr in
                     switch Data66.make(withMcMutableBuffer: { bufferPtr, errorPtr in
                         mc_memo_decrypt_e_memo_payload(
                             eMemoPtr,
                             publicKeyPtr,
-                            accountKeyPtr,
+                            viewPrivateKeyPtr,
                             bufferPtr,
                             &errorPtr)
                     }) {
