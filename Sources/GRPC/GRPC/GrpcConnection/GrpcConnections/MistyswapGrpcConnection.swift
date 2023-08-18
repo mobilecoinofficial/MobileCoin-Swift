@@ -11,7 +11,7 @@ import LibMobileCoinGRPC
 #endif
 
 final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
-    private let client: Mistyswap_MistyswapOfframpApiClient
+    private let client: MistyswapOfframp_MistyswapOfframpApiClient
 
     init(
         config: AttestedConnectionConfig<MistyswapUrl>,
@@ -21,7 +21,7 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
         rngContext: Any? = nil
     ) {
         let channel = channelManager.channel(for: config)
-        self.client = Mistyswap_MistyswapOfframpApiClient(channel: channel)
+        self.client = MistyswapOfframp_MistyswapOfframpApiClient(channel: channel)
         super.init(
             client: Attest_AttestedApiClient(channel: channel),
             config: config,
@@ -31,8 +31,10 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
     }
 
     func initiateOfframp(
-        request: Mistyswap_InitiateOfframpRequest,
-        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_InitiateOfframpRequest,
+        completion: @escaping (
+            Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         performAttestedCall(
             InitiateOfframp(client: client),
@@ -41,8 +43,10 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
     }
 
     func getOfframpStatus(
-        request: Mistyswap_GetOfframpStatusRequest,
-        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_GetOfframpStatusRequest,
+        completion: @escaping (
+            Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>
+        ) -> Void
     ) {
         performAttestedCall(
             GetOfframpStatus(client: client),
@@ -51,8 +55,10 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
     }
 
     func forgetOfframp(
-        request: Mistyswap_ForgetOfframpRequest,
-        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_ForgetOfframpRequest,
+        completion: @escaping (
+            Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         performAttestedCall(
             ForgetOfframp(client: client),
@@ -64,10 +70,10 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
 
 extension MistyswapGrpcConnection {
     private struct InitiateOfframp: AttestedGrpcCallable {
-        typealias InnerRequest = Mistyswap_InitiateOfframpRequest
-        typealias InnerResponse = Mistyswap_InitiateOfframpResponse
+        typealias InnerRequest = MistyswapOfframp_InitiateOfframpRequest
+        typealias InnerResponse = MistyswapOfframp_InitiateOfframpResponse
 
-        let client: Mistyswap_MistyswapOfframpApiClient
+        let client: MistyswapOfframp_MistyswapOfframpApiClient
 
         func call(
             request: Attest_Message,
@@ -84,10 +90,10 @@ extension MistyswapGrpcConnection {
 
 extension MistyswapGrpcConnection {
     private struct GetOfframpStatus: AttestedGrpcCallable {
-        typealias InnerRequest = Mistyswap_GetOfframpStatusRequest
-        typealias InnerResponse = Mistyswap_GetOfframpStatusResponse
+        typealias InnerRequest = MistyswapOfframp_GetOfframpStatusRequest
+        typealias InnerResponse = MistyswapOfframp_GetOfframpStatusResponse
 
-        let client: Mistyswap_MistyswapOfframpApiClient
+        let client: MistyswapOfframp_MistyswapOfframpApiClient
 
         func call(
             request: Attest_Message,
@@ -104,10 +110,10 @@ extension MistyswapGrpcConnection {
 
 extension MistyswapGrpcConnection {
     private struct ForgetOfframp: AttestedGrpcCallable {
-        typealias InnerRequest = Mistyswap_ForgetOfframpRequest
-        typealias InnerResponse = Mistyswap_ForgetOfframpResponse
+        typealias InnerRequest = MistyswapOfframp_ForgetOfframpRequest
+        typealias InnerResponse = MistyswapOfframp_ForgetOfframpResponse
 
-        let client: Mistyswap_MistyswapOfframpApiClient
+        let client: MistyswapOfframp_MistyswapOfframpApiClient
 
         func call(
             request: Attest_Message,

@@ -70,8 +70,10 @@ final class MistyswapConnection: Connection<
     }
 
     func initiateOfframp(
-        request: Mistyswap_InitiateOfframpRequest,
-        completion: @escaping (Result<Mistyswap_InitiateOfframpResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_InitiateOfframpRequest,
+        completion: @escaping (
+            Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         guard config.mistyswapConfig() != nil else {
             completion(
@@ -95,8 +97,10 @@ final class MistyswapConnection: Connection<
     }
 
     func getOfframpStatus(
-        request: Mistyswap_GetOfframpStatusRequest,
-        completion: @escaping (Result<Mistyswap_GetOfframpStatusResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_GetOfframpStatusRequest,
+        completion: @escaping (
+            Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>
+        ) -> Void
     ) {
         guard config.mistyswapConfig() != nil else {
             completion(
@@ -120,8 +124,10 @@ final class MistyswapConnection: Connection<
     }
 
     func forgetOfframp(
-        request: Mistyswap_ForgetOfframpRequest,
-        completion: @escaping (Result<Mistyswap_ForgetOfframpResponse, ConnectionError>) -> Void
+        request: MistyswapOfframp_ForgetOfframpRequest,
+        completion: @escaping (
+            Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         guard config.mistyswapConfig() != nil else {
             completion(

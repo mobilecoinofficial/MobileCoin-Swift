@@ -21,7 +21,7 @@ commands:
           name: brew install git-lfs
           working_directory: 
           command: |
-            git lfs install --skip-smudge
+            git lfs install
 
   init-artifacts-submodule:
     description: Initialize libmobilecoin submodule
@@ -32,6 +32,7 @@ commands:
           command: |
             git submodule update --init --depth 1
             cd /Users/distiller/project/Vendor/libmobilecoin
+            git submodule update --init --depth 1 Artifacts
             git submodule update --init Vendor/mobilecoin
 
   print-tool-versions:
