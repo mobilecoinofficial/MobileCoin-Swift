@@ -23,21 +23,27 @@ struct Mistyswap: MistyswapService {
 
     func initiateOfframp(
         request: MistyswapOfframp_InitiateOfframpRequest,
-        completion: @escaping (Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         mistyswap?.initiateOfframp(request: request, completion: completion)
     }
 
     func getOfframpStatus(
         request: MistyswapOfframp_GetOfframpStatusRequest,
-        completion: @escaping (Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>
+        ) -> Void
     ) {
         mistyswap?.getOfframpStatus(request: request, completion: completion)
     }
 
     func forgetOfframp(
         request: MistyswapOfframp_ForgetOfframpRequest,
-        completion: @escaping (Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         mistyswap?.forgetOfframp(request: request, completion: completion)
     }

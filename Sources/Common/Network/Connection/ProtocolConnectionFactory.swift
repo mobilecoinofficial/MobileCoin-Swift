@@ -237,21 +237,27 @@ class EmptyFogReportService: FogReportService {
 class EmptyMistyswapService: MistyswapService {
     func forgetOfframp(
         request: MistyswapOfframp_ForgetOfframpRequest,
-        completion: @escaping (Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         logger.assertionFailure("Not Implemented")
     }
 
     func initiateOfframp(
         request: MistyswapOfframp_InitiateOfframpRequest,
-        completion: @escaping (Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         logger.assertionFailure("Not Implemented")
     }
 
     func getOfframpStatus(
         request: MistyswapOfframp_GetOfframpStatusRequest,
-        completion: @escaping (Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>
+        ) -> Void
     ) {
         logger.assertionFailure("Not Implemented")
     }

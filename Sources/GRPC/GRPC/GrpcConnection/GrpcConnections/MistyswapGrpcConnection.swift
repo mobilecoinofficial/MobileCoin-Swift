@@ -32,7 +32,9 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
 
     func initiateOfframp(
         request: MistyswapOfframp_InitiateOfframpRequest,
-        completion: @escaping (Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         performAttestedCall(
             InitiateOfframp(client: client),
@@ -42,7 +44,9 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
 
     func getOfframpStatus(
         request: MistyswapOfframp_GetOfframpStatusRequest,
-        completion: @escaping (Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>
+        ) -> Void
     ) {
         performAttestedCall(
             GetOfframpStatus(client: client),
@@ -52,7 +56,9 @@ final class MistyswapGrpcConnection: AttestedGrpcConnection, MistyswapService {
 
     func forgetOfframp(
         request: MistyswapOfframp_ForgetOfframpRequest,
-        completion: @escaping (Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>) -> Void
+        completion: @escaping (
+            Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>
+        ) -> Void
     ) {
         performAttestedCall(
             ForgetOfframp(client: client),
