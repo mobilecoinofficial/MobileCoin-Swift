@@ -19,7 +19,7 @@ PODS:
     - SwiftNIOTransportServices (< 2.0.0, >= 1.6.0)
     - SwiftProtobuf (< 2.0.0, >= 1.9.0)
   - Keys (1.0.1)
-  - LibMobileCoin/Core (5.0.4):
+  - LibMobileCoin/Core (5.0.5):
     - gRPC-Swift
     - SwiftProtobuf (~> 1.5)
   - Logging (1.4.0)
@@ -224,7 +224,7 @@ SPEC CHECKSUMS:
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   gRPC-Swift: 77154009a019e97f8c4bd8f2bb75fe9726801157
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
-  LibMobileCoin: e6dc327f1bfc14664dafc8c69f68c34693dd21f3
+  LibMobileCoin: fd9f9e7d90fd3097c23271351384566cac3525cb
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   MobileCoin: 05f4f591e0da5e36bd99808dc4f2523cf0f51c1f
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
