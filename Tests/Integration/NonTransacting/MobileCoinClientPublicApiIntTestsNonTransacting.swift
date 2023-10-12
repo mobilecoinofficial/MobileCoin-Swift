@@ -126,13 +126,16 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
     func printBalanceEran(
         transportProtocol: TransportProtocol
     ) async throws {
-        let rootEntropy = Data(hexEncoded: "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f")!
         let fogReportUrl = IntegrationTestFixtures.network.fogReportUrl
         let fogReportId = IntegrationTestFixtures.network.fogReportId
         let fogAuthoritySpki = try! IntegrationTestFixtures.network.fogAuthoritySpki()
         
         let key = try! AccountKey.make(
-            rootEntropy: rootEntropy,
+            mnemonic: 
+            """
+            local style spice ecology order general comfort all accuse chat hedgehog clever
+            rigid group pill enhance cake gold educate square best category couple funny
+            """,
             fogReportUrl: fogReportUrl,
             fogReportId: fogReportId,
             fogAuthoritySpki: fogAuthoritySpki
