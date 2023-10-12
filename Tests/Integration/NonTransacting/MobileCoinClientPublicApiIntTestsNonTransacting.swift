@@ -7,7 +7,7 @@
 // swiftlint:disable empty_xctest_method
 // swiftlint:disable type_name
 
-import MobileCoin
+@testable import MobileCoin
 import XCTest
 
 #if swift(>=5.5)
@@ -113,6 +113,49 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
             if let amtTestToken = try? XCTUnwrap(client.balance(for: .TestToken)) {
                 print("account index \(index) balance: \(amtTestToken)")
             }
+        }
+    }
+
+    func testPrintBalancesEran() async throws {
+        let description = "Printing account balance"
+        try await testSupportedProtocols(description: description) {
+            try await self.printBalanceEran(transportProtocol: $0)
+        }
+    }
+
+    func printBalanceEran(
+        transportProtocol: TransportProtocol
+    ) async throws {
+        let rootEntropy = Data(hexEncoded: "0aeb783f2d735b086ad6e7bbd87a85a584c6941139811dfb40d004810839514f")!
+        let fogReportUrl = IntegrationTestFixtures.network.fogReportUrl
+        let fogReportId = IntegrationTestFixtures.network.fogReportId
+        let fogAuthoritySpki = try! IntegrationTestFixtures.network.fogAuthoritySpki()
+        
+        let key = try! AccountKey.make(
+            rootEntropy: rootEntropy,
+            fogReportUrl: fogReportUrl,
+            fogReportId: fogReportId,
+            fogAuthoritySpki: fogAuthoritySpki
+        ).get()
+
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountKey: key,
+            transportProtocol: transportProtocol)
+
+        try await client.updateBalances()
+
+        print("account index \(index) public address \(key.publicAddress)")
+
+        if let amtMob = try? XCTUnwrap(client.balance(for: .MOB)) {
+            print("account index \(index) balance: \(amtMob)")
+        }
+
+        if let amtMobUSD = try? XCTUnwrap(client.balance(for: .MOBUSD)) {
+            print("account index \(index) balance: \(amtMobUSD)")
+        }
+
+        if let amtTestToken = try? XCTUnwrap(client.balance(for: .TestToken)) {
+            print("account index \(index) balance: \(amtTestToken)")
         }
     }
 
