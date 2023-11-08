@@ -36,6 +36,13 @@ struct SelectionTxOut {
 }
 
 protocol TxOutSelectionStrategy {
+    func balanceTransferable(
+        feeStrategy: FeeStrategy,
+        txOuts: [SelectionTxOut],
+        tokenId: TokenId,
+        maxInputsPerTransaction: Int
+    ) -> Result<LargeAmount, AmountTransferableError>
+
     func amountTransferable(
         feeStrategy: FeeStrategy,
         txOuts: [SelectionTxOut],
@@ -72,6 +79,16 @@ protocol TxOutSelectionStrategy {
 }
 
 extension TxOutSelectionStrategy {
+    func balanceTransferable(tokenId: TokenId, feeStrategy: FeeStrategy, txOuts: [SelectionTxOut])
+        -> Result<LargeAmount, AmountTransferableError>
+    {
+        balanceTransferable(
+            feeStrategy: feeStrategy,
+            txOuts: txOuts,
+            tokenId: tokenId,
+            maxInputsPerTransaction: McConstants.MAX_INPUTS)
+    }
+
     func amountTransferable(tokenId: TokenId, feeStrategy: FeeStrategy, txOuts: [SelectionTxOut])
         -> Result<UInt64, AmountTransferableError>
     {

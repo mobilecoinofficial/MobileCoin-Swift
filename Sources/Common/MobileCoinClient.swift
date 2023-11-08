@@ -169,6 +169,19 @@ public final class MobileCoinClient {
         ).amountTransferable(tokenId: tokenId, feeLevel: feeLevel, completion: completion)
     }
 
+    public func balanceTransferable(
+        tokenId: TokenId,
+        feeLevel: FeeLevel = .minimum,
+        completion: @escaping (Result<LargeAmount, BalanceTransferEstimationFetcherError>) -> Void
+    ) {
+        Account.TransactionEstimator(
+            account: accountLock,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            targetQueue: serialQueue
+        ).balanceTransferable(tokenId: tokenId, feeLevel: feeLevel, completion: completion)
+    }
+
     public func estimateTotalFee(
         toSendAmount amount: Amount,
         feeLevel: FeeLevel = .minimum,

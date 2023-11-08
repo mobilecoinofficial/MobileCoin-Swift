@@ -4,7 +4,14 @@
 
 import Foundation
 
-public struct Balance {
+protocol HighLowTokenAmount {
+    var amountLow: UInt64 { get }
+    var amountHigh: UInt64 { get }
+    var tokenId: TokenId { get }
+    static func highLowFrom(values: [UInt64]) -> (amountHigh: UInt64, amountLow: UInt64)
+}
+
+public struct Balance : HighLowTokenAmount {
     public let amountLow: UInt64
     public let amountHigh: UInt64
 
@@ -18,15 +25,7 @@ public struct Balance {
     let blockCount: UInt64
 
     init(values: [UInt64], blockCount: UInt64, tokenId: TokenId) {
-        var amountLow: UInt64 = 0
-        var amountHigh: UInt64 = 0
-        for value in values {
-            let (partialValue, overflow) = amountLow.addingReportingOverflow(value)
-            amountLow = partialValue
-            if overflow {
-                amountHigh += 1
-            }
-        }
+        let (amountHigh, amountLow) = Self.highLowFrom(values: values)
         self.init(
             amountLow: amountLow,
             amountHigh: amountHigh,
@@ -60,6 +59,44 @@ public struct Balance {
     @available(*, deprecated, message: "Use the new token agnostic `.amountParts`")
     public var amountMobParts: (mobInt: UInt64, picoFrac: UInt64) {
         (mobInt: amountParts.int, picoFrac: amountParts.frac)
+    }
+
+}
+
+extension HighLowTokenAmount {
+    
+    static func highLowFrom(values: [UInt64]) -> (amountHigh: UInt64, amountLow: UInt64) {
+        var amountLow: UInt64 = 0
+        var amountHigh: UInt64 = 0
+        for value in values {
+            let (partialValue, overflow) = amountLow.addingReportingOverflow(value)
+            amountLow = partialValue
+            if overflow {
+                amountHigh += 1
+            }
+        }
+        return (amountHigh: amountHigh, amountLow: amountLow)
+    }
+    
+    static func highLowFrom(values: [UInt64], minusFee fee: UInt64) -> (amountHigh: UInt64, amountLow: UInt64) {
+        var amountLow: UInt64 = 0
+        var amountHigh: UInt64 = 0
+        for value in values {
+            let (partialValue, overflow) = amountLow.addingReportingOverflow(value)
+            amountLow = partialValue
+            if overflow {
+                amountHigh += 1
+            }
+        }
+        
+        // Subtract the fee, handle overflow and wrap-around.
+        let (partialValue, overflow) = amountLow.subtractingReportingOverflow(fee)
+        amountLow = partialValue
+        if overflow {
+            amountHigh -= 1
+        }
+        
+        return (amountHigh: amountHigh, amountLow: amountLow)
     }
 
     /// Convenience accessor for balance value. `int` is the integer part of the value when
@@ -175,4 +212,45 @@ enum SIDecimalPrefix: UInt8 {
 
 extension SIDecimalPrefix {
     var name: String { String(describing: self) }
+}
+
+extension Balance {
+    static func empty(blockCount: UInt64, tokenId: TokenId) -> Balance {
+        Balance(amountLow: 0, amountHigh: 0, blockCount: blockCount, tokenId: tokenId)
+    }
+}
+
+public struct LargeAmount: HighLowTokenAmount {
+    public let amountLow: UInt64
+    public let amountHigh: UInt64
+
+    public let tokenId: TokenId
+
+    init(values: [UInt64], tokenId: TokenId) {
+        let (amountHigh, amountLow) = Self.highLowFrom(values: values)
+        self.init(
+            amountLow: amountLow,
+            amountHigh: amountHigh,
+            tokenId: tokenId)
+    }
+
+    init(values: [UInt64], minusFee fee: UInt64, tokenId: TokenId) {
+        let (amountHigh, amountLow) = Self.highLowFrom(values: values, minusFee: fee)
+        self.init(
+            amountLow: amountLow,
+            amountHigh: amountHigh,
+            tokenId: tokenId)
+    }
+
+    init(amountLow: UInt64, amountHigh: UInt64, tokenId: TokenId) {
+        self.amountLow = amountLow
+        self.amountHigh = amountHigh
+        self.tokenId = tokenId
+    }
+}
+
+extension LargeAmount {
+    static func empty(tokenId: TokenId) -> LargeAmount {
+        LargeAmount(values: [], tokenId: tokenId)
+    }
 }

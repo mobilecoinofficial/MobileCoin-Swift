@@ -64,6 +64,15 @@ final class TxOutSelector {
         self.txOutSelectionStrategy = txOutSelectionStrategy
     }
 
+    func balanceTransferable(tokenId: TokenId, feeStrategy: FeeStrategy, txOuts: [KnownTxOut])
+        -> Result<LargeAmount, AmountTransferableError>
+    {
+        txOutSelectionStrategy.balanceTransferable(
+            tokenId: tokenId,
+            feeStrategy: feeStrategy,
+            txOuts: txOuts.map(SelectionTxOut.init))
+    }
+
     func amountTransferable(tokenId: TokenId, feeStrategy: FeeStrategy, txOuts: [KnownTxOut])
         -> Result<UInt64, AmountTransferableError>
     {

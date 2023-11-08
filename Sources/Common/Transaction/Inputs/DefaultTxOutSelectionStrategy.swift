@@ -13,6 +13,34 @@ private enum SelectionFeeLevel {
 }
 
 struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
+    func balanceTransferable(
+        feeStrategy: FeeStrategy,
+        txOuts: [SelectionTxOut],
+        tokenId: TokenId,
+        maxInputsPerTransaction: Int
+    ) -> Result<LargeAmount, AmountTransferableError> {
+        let txOutValues = txOuts.map { $0.value }
+        if txOutValues.allSatisfy({ $0 == 0 }) {
+            logger.info("Calculating amountTransferable with 0 balance", logFunction: false)
+            return .success(LargeAmount.empty(tokenId: tokenId))
+        }
+
+        let totalFee = self.totalFee(
+            numTxOuts: txOuts.count,
+            selectionFeeLevel: .feeStrategy(feeStrategy),
+            maxInputsPerTransaction: maxInputsPerTransaction)
+
+        guard UInt64.safeCompare(sumOfValues: txOutValues, isGreaterThanValue: totalFee) else {
+            logger.warning(
+                "amountTransferable: Fee is equal to or greater than balance. txOut values: " +
+                    "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
+                logFunction: false)
+            return .failure(.feeExceedsBalance())
+        }
+
+        return .success(LargeAmount(values: txOutValues, minusFee: totalFee, tokenId: tokenId))
+    }
+
     func amountTransferable(
         feeStrategy: FeeStrategy,
         txOuts: [SelectionTxOut],
