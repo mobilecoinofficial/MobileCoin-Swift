@@ -38,7 +38,17 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             return .failure(.feeExceedsBalance())
         }
 
-        return .success(LargeAmount(values: txOutValues, minusFee: totalFee, tokenId: tokenId))
+        guard let largeAmount = LargeAmount(
+            values: txOutValues,
+            minusFee: totalFee,
+            tokenId: tokenId
+        ) else {
+            let msg = "LargeAmount overflowed, this is not possible with known MobileCoin tokens."
+            assertionFailure(msg)
+            return .failure(AmountTransferableError.balanceOverflow(msg))
+        }
+        
+        return .success(largeAmount)
     }
 
     func amountTransferable(
