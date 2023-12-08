@@ -10,12 +10,19 @@ public struct TokenId {
         Self.names[self] ?? "TokenId \(self.value)"
     }
 
-    public var significantDigits: UInt8 {
-        Self.significantDigits[self] ?? 12
+    public var significantDigits: SIPrefix {
+        guard let significantDigits = Self.significantDigits[self] else {
+            assertionFailure(
+                "Error: Expecting a significant digits value." +
+                "add a SignificantsDigits case value for this TokenId."
+            )
+            return SIPrefix.pico
+        }
+        return significantDigits
     }
 
     public var siPrefix: String? {
-        SIDecimalPrefix(rawValue: significantDigits)?.name
+        significantDigits.name
     }
 
     public init(_ value: UInt64) {
@@ -42,13 +49,44 @@ extension TokenId: CustomStringConvertible {
         ]
     }()
 
-    static var significantDigits: [TokenId: UInt8] = {
+    static var significantDigits: [TokenId: SIPrefix] = {
         [
-            .MOB: 12,
-            .MOBUSD: 6,
-            .TestToken: 6,
+            .MOB: .pico,
+            .MOBUSD: .micro,
+            .TestToken: .micro,
         ]
     }()
 }
 
 extension TokenId: Equatable, Hashable {}
+
+public enum SIPrefix: UInt8 {
+    case deci = 1
+    case centi = 2
+    case milli = 3
+    case micro = 6
+    case nano = 9
+    case pico = 12
+//    case femto = 15
+//    case atto = 18
+//    case zepto = 21
+//    case yocto = 24
+}
+
+extension SIPrefix {
+    var name: String { String(describing: self) }
+}
+
+//enum SignificantDigits: UInt8 {
+//    case deci = 1
+//    case centi = 2
+//    case milli = 3
+//    case micro = 6
+//    case nano = 9
+//    case pico = 12
+//    case femto = 15
+//}
+//
+//extension SignificantDigits {
+//    
+//}

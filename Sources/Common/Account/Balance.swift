@@ -160,23 +160,6 @@ extension Balance: CustomStringConvertible {
     }
 }
 
-enum SIDecimalPrefix: UInt8 {
-    case deci = 1
-    case centi = 2
-    case milli = 3
-    case micro = 6
-    case nano = 9
-    case pico = 12
-    case femto = 15
-    case atto = 18
-    case zepto = 21
-    case yocto = 24
-}
-
-extension SIDecimalPrefix {
-    var name: String { String(describing: self) }
-}
-
 extension Balance {
     static func empty(blockCount: UInt64, tokenId: TokenId) -> Balance {
         Balance(amountLow: 0, amountHigh: 0, blockCount: blockCount, tokenId: tokenId)
