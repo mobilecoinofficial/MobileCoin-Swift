@@ -29,7 +29,6 @@ class BalanceTests: XCTestCase {
         XCTAssertEqual(maxBalance.amountParts.frac, 0)
         XCTAssertEqual(maxBalance.description, fixture.balanceDescription)
     }
-
 }
 
 extension BalanceTests {
@@ -67,6 +66,11 @@ extension BalanceTests.Fixtures {
             self.maxBalanceTxoAmounts =
                 Array(repeating: txoAmountMicro, count: maxBalanceNumTxos)
         }
+    }
+    
+    struct HLAmountAdding {
+        let lowMax = UInt64.max
+        
     }
 
     static func describe(accountActivity: AccountActivity) -> String {
