@@ -69,7 +69,10 @@ class FogViewConnectionIntTests: XCTestCase {
                 XCTAssertGreaterThan(response.lastKnownBlockCumulativeTxoCount, 0)
                 guard !response.rngs.isEmpty else { expect.fulfill(); return }
 
-                success(response.rngs[0])
+                let rngsSortedByStartBlock = response.rngs.sorted(by: { a, b in
+                    a.startBlock > b.startBlock
+                })
+                success(rngsSortedByStartBlock.last!)
             }
         }
 
