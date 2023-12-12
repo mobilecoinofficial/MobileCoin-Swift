@@ -108,7 +108,7 @@ extension LargeAmountPresentable {
 
         let significantDigits = significantDigits
 
-        let divideBy = UInt64.pow(x: .ten, y: significantDigits)
+        let divideBy = UInt64.pow(x: .ten, y: significantDigits.uint4)
         let (lowInt, lowFrac) = { () -> (UInt64, UInt64) in
             let parts = amount.low.quotientAndRemainder(dividingBy: divideBy)
             return (UInt64(parts.quotient), parts.remainder)
@@ -116,7 +116,7 @@ extension LargeAmountPresentable {
 
         let (highInt, highFrac) = { () -> (UInt64, UInt64) in
             let highIntermediary = UInt64(amount.high) << (64 - significantDigits.rawValue)
-            let factored = UInt64.pow(x: .five, y: significantDigits)
+            let factored = UInt64.pow(x: .five, y: significantDigits.uint4)
             let parts = highIntermediary.quotientAndRemainder(dividingBy: factored)
             return (UInt64(parts.quotient), parts.remainder << significantDigits.rawValue)
         }()
@@ -132,61 +132,14 @@ extension LargeAmountPresentable {
 }
 
 extension UInt64 {
-    /// This pow function accepts enum's with discrete values that will not overflow a UInt64.
-    /// It has no error paths so we don't have to worry about overflow or float conversions.
-    ///
-    /// A solution that accepts arbitrary integers could be implemented if needed.
-    static func pow(x: Denominator, y: SIPrefix) -> UInt64 {
-        switch (x, y) {
-        //
-        // Denominator Five
-        //
-        case (.five, .deci):
-            // 5 ^ 1
-            return UInt64(5)
-        case (.five, .centi):
-            // 5 ^ 2
-            return UInt64(25)
-        case (.five, .milli):
-            // 5 ^ 3
-            return UInt64(125)
-        case (.five, .micro):
-            // 5 ^ 6
-            return UInt64(3125)
-        case (.five, .nano):
-            // 5 ^ 9
-            return UInt64(1953125)
-        case (.five, .pico):
-            // 5 ^ 12
-            return UInt64(244140625)
-        //
-        // Denominator Ten
-        //
-        case (.ten, .deci):
-            // 10 ^ 1
-            return UInt64(10)
-        case (.ten, .centi):
-            // 10 ^ 2
-            return UInt64(100)
-        case (.ten, .milli):
-            // 10 ^ 3
-            return UInt64(1000)
-        case (.ten, .micro):
-            // 10 ^ 6
-            return UInt64(1000000)
-        case (.ten, .nano):
-            // 10 ^ 9
-            return UInt64(1000000000)
-        case (.ten, .pico):
-            // 10 ^ 12
-            return UInt64(1000000000000)
-        }
+    /// Using a UInt4 enum here allows us to always return the partial value becuase
+    /// Uint4.max ^ Uint4.max cannot overflow in a UInt64.
+    static func pow(x: UInt4, y: UInt4) -> UInt64 {
+        return pow(x: x.rawValue, y: y.rawValue).partialValue
     }
     
-    /// Ideally we use a UInt4 type here, because we could guarantee no overflow with a UInt64
-    /// return type. The next best is to check for overflow and let the call-site handle the
-    /// optional.
-    static func pow(x: UInt8, y: UInt8) -> UInt64? {
+    /// Partial value behavior is undefined if overflow is true, making private to prevent misuse.
+    private static func pow(x: UInt8, y: UInt8) -> (partialValue: Self, overflow: Bool) {
         let initial = (partialValue: UInt64(1), overflow: false)
         let (partialValue, overflow) = Array(repeating: Int(x), count: Int(y))
             .reduce(initial, { partialResult, next in
@@ -200,17 +153,31 @@ extension UInt64 {
          
         guard overflow == false else {
             assertionFailure(
-                "Should never overflow. " +
+                "Partial value behavior undefined with overflow. " +
                 "Use another way to calculate pow() with integers"
             )
-            return nil
+            return (partialValue, true)
         }
                                                                     
-        return partialValue
+        return (partialValue, false)
     }
 }
 
-enum Denominator: UInt8 {
+enum UInt4: UInt8 {
+    case zero = 0
+    case one = 1
+    case two = 2
+    case three = 3
+    case four = 4
     case five = 5
+    case six = 6
+    case seven = 7
+    case eight = 8
+    case nine = 9
     case ten = 10
+    case eleven = 11
+    case twelve = 12
+    case thirteen = 13
+    case fourteen = 14
+    case fifteen = 15
 }

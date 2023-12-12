@@ -124,17 +124,17 @@ public struct Balance {
 
         let significantDigits = tokenId.significantDigits
 
-        let divideBy = UInt64(pow(Double(10), Double(significantDigits)))
+        let divideBy = UInt64(pow(Double(10), Double(significantDigits.rawValue)))
         let (amountLowInt, amountLowFrac) = { () -> (UInt64, UInt64) in
             let parts = amountLow.quotientAndRemainder(dividingBy: divideBy)
             return (UInt64(parts.quotient), parts.remainder)
         }()
 
         let (amountHighInt, amountHighFrac) = { () -> (UInt64, UInt64) in
-            let amountHighIntermediary = UInt64(amountHigh) << (64 - significantDigits)
-            let factored = UInt64(pow(Double(5), Double(significantDigits)))
+            let amountHighIntermediary = UInt64(amountHigh) << (64 - significantDigits.rawValue)
+            let factored = UInt64(pow(Double(5), Double(significantDigits.rawValue)))
             let parts = amountHighIntermediary.quotientAndRemainder(dividingBy: factored)
-            return (UInt64(parts.quotient), parts.remainder << significantDigits)
+            return (UInt64(parts.quotient), parts.remainder << significantDigits.rawValue)
         }()
 
         let amountFracParts = (amountLowFrac + amountHighFrac).quotientAndRemainder(
