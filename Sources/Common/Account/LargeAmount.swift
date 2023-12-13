@@ -181,3 +181,6 @@ enum UInt4: UInt8 {
     case fourteen = 14
     case fifteen = 15
 }
+
+extension LargeAmount: Equatable {}
+extension LargeAmount: Hashable {}

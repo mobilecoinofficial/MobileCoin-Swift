@@ -185,3 +185,6 @@ extension BigUInt {
     static var max = BigUInt(low: UInt64.max, high: UInt64.max)
     static var zero = BigUInt(low: 0, high: 0)
 }
+
+extension BigUInt: Equatable {}
+extension BigUInt: Hashable {}
