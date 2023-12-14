@@ -5,8 +5,14 @@
 import Foundation
 
 public struct Balance {
-    public let amountLow: UInt64
-    public let amountHigh: UInt64
+    public let largeAmount: LargeAmount
+    
+    public var amountLow: UInt64 {
+        largeAmount.amount.low
+    }
+    public var amountHigh: UInt64 {
+        largeAmount.amount.high
+    }
 
     @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amountLow`")
     public var amountPicoMobLow: UInt64 { amountLow }
@@ -14,31 +20,29 @@ public struct Balance {
     @available(*, deprecated, message: "Use the new SI prefix & token agnostic `.amountHigh`")
     public var amountPicoMobHigh: UInt64 { amountHigh }
 
-    public let tokenId: TokenId
+    public var tokenId: TokenId {
+        largeAmount.tokenId
+    }
+    
     let blockCount: UInt64
 
     init(values: [UInt64], blockCount: UInt64, tokenId: TokenId) {
-        var amountLow: UInt64 = 0
-        var amountHigh: UInt64 = 0
-        for value in values {
-            let (partialValue, overflow) = amountLow.addingReportingOverflow(value)
-            amountLow = partialValue
-            if overflow {
-                amountHigh += 1
-            }
+        let largeAmount = LargeAmount(values: values, tokenId: tokenId)
+        guard let largeAmount = largeAmount else {
+            fatalError("LargeAmount init should never be nil, this indicates overflow past" +
+                       "BigUInt.max a 128-bit number unsigned int. MobileCoin network does not " +
+                       "support values this large.")
         }
-        self.init(
-            amountLow: amountLow,
-            amountHigh: amountHigh,
-            blockCount: blockCount,
-            tokenId: tokenId)
+        
+        self.largeAmount = largeAmount
+        self.blockCount = blockCount
     }
 
     init(amountLow: UInt64, amountHigh: UInt64, blockCount: UInt64, tokenId: TokenId) {
-        self.amountLow = amountLow
-        self.amountHigh = amountHigh
+        let bigUInt = BigUInt(low: amountLow, high: amountHigh)
+        let largeAmount = LargeAmount(amount: bigUInt, tokenId: tokenId)
+        self.largeAmount = largeAmount
         self.blockCount = blockCount
-        self.tokenId = tokenId
     }
 
     /// - Returns: `nil` when the amount is too large to fit in a `UInt64`.
@@ -79,71 +83,10 @@ public struct Balance {
     /// balance is too large to fit in a single `UInt64`, when denominated in picoMOB, assuming 250
     /// million MOB in circulation and assuming a base unit of 1 picoMOB as the smallest indivisible
     /// unit of MOB.
+    ///
+    /// > Note: Implementation of amountParts has move to LargeAmount
     public var amountParts: (int: UInt64, frac: UInt64) {
-        //
-        // >> Example math with significantDigits == 12 (MOB)
-        //
-        // amount (picoMOB) = amountLow + amountHigh * 2^64
-        //
-        // >> Now expand amountLow & amountHigh to "decimal" numbers
-        //
-        // amountLowMobDec = amountLow / 10^12
-        // amountHighMobDec = amountHigh * 2^64 / 10^12
-        //
-        // >> where 10^12 is 10^(significantDigits)
-        //
-        // amountMobDec = amountLowMobDec + amountHighMobDec
-        //
-        // >> Now expand amountLowDec & amountHighDec to their Integer & Fractional parts
-        //
-        // >> amountLowDec = amountLowMobInt.amountLowPicoFrac
-        //
-        // amountLowMobInt = floor(amountLow / 10^12)
-        // amountLowPicoFrac = amountLow % 10^12
-        //
-        // >> amountHighDec = amountHighMobInt.amountHighPicoFrac
-        //
-        // amountHighMobInt = floor((amountHigh * 2^64) / 10^12)
-        //
-        //                  >> factor out common 2^12 for now
-        //                  = floor((amountHigh * (2^52 * 2^12)) / (5^12 * 2^12)
-        //
-        //                  >> bitshift by 52 (same as multiply by 2^52)
-        //                  >> ... and bitshift number == (64 - significantDigits)
-        //                  = floor((amountHigh << 52) / 5^12)
-        //
-        // amountHighPicoFrac = (amountHigh * 2^64) % 10^12
-        //
-        //                  >> re-apply the 2^12
-        //                  = ((amountHigh << 52) % 5^12) << 12
-        //
-        // amountPicoFracCarry = floor((amountLowPicoFrac + amountHighPicoFrac) / 10^12)
-        //
-        // amountMobInt = amountLowMobInt + amountHighMobInt + amountPicoFracCarry
-        // amountPicoFrac = (amountLowPicoFrac + amountHighPicoFrac) % 10^12
-
-        let significantDigits = tokenId.significantDigits
-
-        let divideBy = UInt64(pow(Double(10), Double(significantDigits)))
-        let (amountLowInt, amountLowFrac) = { () -> (UInt64, UInt64) in
-            let parts = amountLow.quotientAndRemainder(dividingBy: divideBy)
-            return (UInt64(parts.quotient), parts.remainder)
-        }()
-
-        let (amountHighInt, amountHighFrac) = { () -> (UInt64, UInt64) in
-            let amountHighIntermediary = UInt64(amountHigh) << (64 - significantDigits)
-            let factored = UInt64(pow(Double(5), Double(significantDigits)))
-            let parts = amountHighIntermediary.quotientAndRemainder(dividingBy: factored)
-            return (UInt64(parts.quotient), parts.remainder << significantDigits)
-        }()
-
-        let amountFracParts = (amountLowFrac + amountHighFrac).quotientAndRemainder(
-            dividingBy: divideBy)
-
-        let amountInt = amountLowInt + amountHighInt + UInt64(amountFracParts.quotient)
-        let amountFrac = amountFracParts.remainder
-
-        return (amountInt, amountFrac)
+        largeAmount.amountParts
     }
 }
 
@@ -154,7 +97,7 @@ extension Balance: CustomStringConvertible {
     public var description: String {
         let amount = amountParts
         return String(
-                format: "%llu.%0\(tokenId.significantDigits)llu \(tokenId.name)",
+                format: "%llu.%0\(tokenId.significantDigits.rawValue)llu \(tokenId.name)",
                 amount.int,
                 amount.frac)
     }

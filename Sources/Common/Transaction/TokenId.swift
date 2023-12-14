@@ -67,14 +67,30 @@ public enum SIPrefix: UInt8 {
     case micro = 6
     case nano = 9
     case pico = 12
-//    case femto = 15
-//    case atto = 18
-//    case zepto = 21
-//    case yocto = 24
+    case femto = 15
 }
 
 extension SIPrefix {
     var name: String { String(describing: self) }
+    
+    var uint4: UInt4 {
+        switch self {
+        case .deci:
+            return .one
+        case .centi:
+            return .two
+        case .milli:
+            return .three
+        case .micro:
+            return .six
+        case .nano:
+            return .nine
+        case .pico:
+            return .twelve
+        case .femto:
+            return .fifteen
+        }
+    }
 }
 
 //enum SignificantDigits: UInt8 {

@@ -41,6 +41,17 @@ public struct BigUInt {
         self.low = low
         self.high = high
     }
+    
+    public init(_ low: UInt64) {
+        self.low = low
+        self.high = 0
+    }
+    
+    public init?(_ low: UInt64?) {
+        guard let low = low else { return nil }
+        self.low = low
+        self.high = 0
+    }
 }
 
 /// Partial implementation of `protocol FixedWidthInteger`
@@ -185,3 +196,6 @@ extension BigUInt {
     static var max = BigUInt(low: UInt64.max, high: UInt64.max)
     static var zero = BigUInt(low: 0, high: 0)
 }
+
+extension BigUInt: Equatable {}
+extension BigUInt: Hashable {}

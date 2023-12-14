@@ -7,6 +7,10 @@ import XCTest
 
 class BalanceTests: XCTestCase {
 
+    // TODO add new large balances tests !!
+    // TODO add new large balances tests !!
+    // TODO add new large balances tests !!
+    // TODO add new large balances tests here
     func testMaxBalance() {
         let fixture = BalanceTests.Fixtures.MaxMob()
         let maxBalance = Balance(values: fixture.maxBalanceTxoAmounts, blockCount: 1, tokenId: .MOB)
