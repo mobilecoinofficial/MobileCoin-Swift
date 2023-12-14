@@ -43,6 +43,13 @@ protocol TxOutSelectionStrategy {
         maxInputsPerTransaction: Int
     ) -> Result<LargeAmount, AmountTransferableError>
 
+    func maxAmountTransferable(
+        feeStrategy: FeeStrategy,
+        txOuts: [SelectionTxOut],
+        tokenId: TokenId,
+        maxInputsPerTransaction: Int
+    ) -> Result<LargeAmount, AmountTransferableError>
+
     func amountTransferable(
         feeStrategy: FeeStrategy,
         txOuts: [SelectionTxOut],

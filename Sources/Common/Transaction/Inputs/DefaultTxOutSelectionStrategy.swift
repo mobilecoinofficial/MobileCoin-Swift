@@ -78,10 +78,12 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
         guard let transferAmount =
                 UInt64.safeSubtract(sumOfValues: txOutValues, minusValue: totalFee)
         else {
-            logger.error(
-                "amountTransferable failure: Balance minus fee exceeds UInt64.max. txOut values: " +
+            logger.info(
+                "amountTransferable: Balance minus fee exceeds UInt64.max. txOut values: " +
                     "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
                 logFunction: false)
+            
+            
             return .failure(.balanceOverflow())
         }
 
@@ -231,11 +233,24 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 numTxOuts: selectedTxOuts.count,
                 selectionFeeLevel: selectionFeeLevel,
                 maxInputsPerTransaction: maxInputsPerTransaction)
-            // Use safeCompare in case summing the input values would overflow UInt64.max.
-            if UInt64.safeCompare(
-                sumOfValues: selectedTxOuts.map { $0.1.value },
-                isGreaterThanOrEqualToSumOfValues: [amount, totalFee])
-            {
+            
+            
+            // Create BigUInt's for comparison, and error for values larger than supported
+            let selectedTxOutsValue = BigUInt(values: selectedTxOuts.map { $0.1.value })
+            let amountAndFee = BigUInt(values: [amount, totalFee])
+            
+            guard
+                let selectedTxOutsValue = selectedTxOutsValue,
+                let amountAndFee = amountAndFee
+            else {
+                let msg =
+                    "BigUInt overflowed during initialization. " +
+                    "Should never happen for known tokens."
+                logger.error(msg, logFunction: false)
+                fatalError(msg)
+            }
+            
+            if selectedTxOutsValue > amountAndFee {
                 // Success! Sum value of selectedTxOuts is enough to cover sendAmount + totalFee.
                 let requiresDefrag = selectedTxOuts.count > maxInputsPerTransaction
                 return .success((totalFee, requiresDefrag))
@@ -362,11 +377,22 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 selectionFeeLevel: selectionFeeLevel,
                 maxInputsPerTransaction: maxInputsPerTransaction)
 
-            // Use safeCompare in case summing the input values would overflow UInt64.max.
-            if UInt64.safeCompare(
-                sumOfValues: selectedTxOuts.map { $0.1.value },
-                isGreaterThanOrEqualToSumOfValues: [amountValue, totalFee])
-            {
+            // Create BigUInt's for comparison, and error for values larger than supported
+            let selectedTxOutsValue = BigUInt(values: selectedTxOuts.map { $0.1.value })
+            let amountAndFee = BigUInt(values: [amountValue, totalFee])
+            
+            guard
+                let selectedTxOutsValue = selectedTxOutsValue,
+                let amountAndFee = amountAndFee
+            else {
+                let msg =
+                    "BigUInt overflowed during initialization. " +
+                    "Should never happen for known tokens"
+                logger.error(msg, logFunction: false)
+                fatalError(msg)
+            }
+            
+            if selectedTxOutsValue > amountAndFee {
                 // Success! Sum value of selectedTxOuts is enough to cover amount + fee.
                 break
             }

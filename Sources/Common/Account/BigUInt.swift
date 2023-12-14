@@ -199,3 +199,13 @@ extension BigUInt {
 
 extension BigUInt: Equatable {}
 extension BigUInt: Hashable {}
+
+extension BigUInt: Comparable {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        if lhs.high != rhs.high {
+            return lhs.high < rhs.high
+        } else {
+            return lhs.low < rhs.low
+        }
+    }
+}
