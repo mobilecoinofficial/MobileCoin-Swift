@@ -103,44 +103,6 @@ extension Account {
             }
         }
 
-        func maxAmountTransferable(
-            tokenId: TokenId,
-            feeLevel: FeeLevel,
-            completion: @escaping (Result<LargeAmount, BalanceTransferEstimationFetcherError>) -> Void
-        ) {
-            metaFetcher.feeStrategy(for: feeLevel, tokenId: tokenId) {
-                completion($0.mapError { .connectionError($0) }
-                    .flatMap { feeStrategy in
-                        let txOuts = self.account.readSync { $0.unspentTxOuts(tokenId: tokenId) }
-                        logger.info(
-                            "Calculating amountTransferable. feeLevel: \(feeLevel), " +
-                                "tokenId: \(tokenId), " +
-                                "unspentTxOutValues: \(redacting: txOuts.map { $0.value })",
-                            logFunction: false)
-                        return self.txOutSelector
-                            .balanceTransferable(
-                                tokenId: tokenId,
-                                feeStrategy: feeStrategy,
-                                txOuts: txOuts
-                            )
-                            .mapError {
-                                switch $0 {
-                                case .feeExceedsBalance(let reason):
-                                    return .feeExceedsBalance(reason)
-                                case .balanceOverflow(let reason):
-                                    return .balanceOverflow(reason)
-                                }
-                            }
-                            .map {
-                                logger.info(
-                                    "amountTransferable: \(redacting: $0)",
-                                    logFunction: false)
-                                return $0
-                            }
-                    })
-            }
-        }
-
         func estimateTotalFee(
             toSendAmount amount: Amount,
             feeLevel: FeeLevel,

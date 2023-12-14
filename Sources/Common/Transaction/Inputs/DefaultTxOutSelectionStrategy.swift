@@ -82,27 +82,48 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             selectionFeeLevel: .feeStrategy(feeStrategy),
             maxInputsPerTransaction: maxInputsPerTransaction)
 
-        guard UInt64.safeCompare(sumOfValues: txOutValues, isGreaterThanValue: totalFee) else {
+        // Create BigUInt's for comparison, and error for values larger than supported
+        let txOutsValue = BigUInt(values: txOutValues)
+        let feeValue = BigUInt(values: [totalFee])
+        guard
+            let txOutsValue = txOutsValue,
+            let feeValue = feeValue
+        else {
+            let msg =
+                "BigUInt overflowed during initialization. " +
+                "Should never happen for known tokens."
+            logger.error(msg, logFunction: false)
+            fatalError(msg)
+        }
+        
+        guard txOutsValue > feeValue else {
             logger.warning(
                 "amountTransferable: Fee is equal to or greater than balance. txOut values: " +
                     "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
                 logFunction: false)
             return .failure(.feeExceedsBalance())
         }
-
-        guard let transferAmount =
-                UInt64.safeSubtract(sumOfValues: txOutValues, minusValue: totalFee)
-        else {
-            logger.info(
-                "amountTransferable: Balance minus fee exceeds UInt64.max. txOut values: " +
-                    "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
-                logFunction: false)
-            
-            
-            return .failure(.balanceOverflow())
+        
+        let (amount, overflow) = txOutsValue.subtractingReportingOverflow(feeValue)
+        
+        guard overflow == false else {
+            let msg = 
+                "BigUInt subtraction overflowed, this should not be possible " +
+                "with known MobileCoin tokens, also txOutsValue > feeValue see above."
+            assertionFailure(msg)
+            return .failure(AmountTransferableError.balanceOverflow(msg))
         }
-
-        return .success(transferAmount)
+        
+        guard amount <= BigUInt(UInt64.max) else {
+            // TxOutValues are greater than UInt64.max, in this case the
+            // max amount "sendable" (in one transaction) would be UInt64.max - totalFee
+            let maxTransferAmount = UInt64.max - totalFee
+            return .success(maxTransferAmount)
+        }
+        
+        // If amount had a high component above guard would catch it, so we can return the low
+        // component as the transfer amount.
+        return .success(amount.low)
     }
 
     func estimateTotalFee(
