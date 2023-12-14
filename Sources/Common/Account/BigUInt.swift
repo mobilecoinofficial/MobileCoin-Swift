@@ -41,6 +41,17 @@ public struct BigUInt {
         self.low = low
         self.high = high
     }
+    
+    public init(_ low: UInt64) {
+        self.low = low
+        self.high = 0
+    }
+    
+    public init?(_ low: UInt64?) {
+        guard let low = low else { return nil }
+        self.low = low
+        self.high = 0
+    }
 }
 
 /// Partial implementation of `protocol FixedWidthInteger`

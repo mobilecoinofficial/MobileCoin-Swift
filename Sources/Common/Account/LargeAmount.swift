@@ -16,11 +16,15 @@ public struct LargeAmount: LargeAmountPresentable {
         tokenId.significantDigits
     }
     
-    init?(values: [UInt64], minusFee: UInt64, tokenId: TokenId) {
-        // TODO
-        guard let amount = BigUInt(values: values) else {
+    init?(values: [UInt64], minusFee fee: UInt64, tokenId: TokenId) {
+        guard let valuesAmount = BigUInt(values: values) else {
             return nil
         }
+        let fee = BigUInt(low: fee, high: 0)
+        
+        let (amount, overflow) = valuesAmount.subtractingReportingOverflow(fee)
+        guard overflow == false else { return nil }
+        
         self.amount = amount
         self.tokenId = tokenId
     }
