@@ -63,32 +63,33 @@ final class TransactionBuilder {
     ) throws {
         self.tombstoneBlockIndex = context.tombstoneBlockIndex
         self.memoBuilder = context.memoBuilder
-        let result: Result<OpaquePointer, TransactionBuilderError>
-        result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
-            context.fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
-                // Safety: mc_transaction_builder_create should never return nil.
-                withMcError { errorPtr in
-                    mc_transaction_builder_create(
-                        context.fee.value,
-                        context.fee.tokenId.value,
-                        context.tombstoneBlockIndex,
-                        fogResolverPtr,
-                        memoBuilderPtr,
-                        context.blockVersion,
-                        &errorPtr)
-                }.mapError {
-                    switch $0.errorCode {
-                    case .invalidInput:
-                        return .invalidInput("\(redacting: $0.description)")
-                    default:
-                        // Safety: mc_transaction_builder_add_input should not throw
-                        // non-documented errors.
-                        logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
-                    }
-                }
-            }
-        }
-        self.ptr = try result.get()
+//        let result: Result<OpaquePointer, TransactionBuilderError>
+//        result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
+//            context.fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
+//                // Safety: mc_transaction_builder_create should never return nil.
+//                withMcError { errorPtr in
+////                    mc_transaction_builder_create(
+////                        context.fee.value,
+////                        context.fee.tokenId.value,
+////                        context.tombstoneBlockIndex,
+////                        fogResolverPtr,
+////                        memoBuilderPtr,
+////                        context.blockVersion,
+////                        &errorPtr)
+//                }.mapError {
+//                    switch $0.errorCode {
+//                    case .invalidInput:
+//                        return .invalidInput("\(redacting: $0.description)")
+//                    default:
+//                        // Safety: mc_transaction_builder_add_input should not throw
+//                        // non-documented errors.
+//                        logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
+//                    }
+//                }
+//            }
+//        }
+//        self.ptr = try result.get()
+        self.ptr = OpaquePointer(bitPattern: 8)!
     }
 
     deinit {

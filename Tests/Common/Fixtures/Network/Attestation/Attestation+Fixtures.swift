@@ -19,6 +19,16 @@ extension Attestation.Fixtures {
             self.reportAttestation = try Self.attestation(productId: 4)
         }
     }
+   
+    struct MrEnclave {
+        let consensusAttestation: Attestation
+        let reportAttestation: Attestation
+
+        init() throws {
+            self.consensusAttestation = try Self.attestation()
+            self.reportAttestation = try Self.attestation()
+        }
+    }
 }
 
 extension Attestation.Fixtures.Default {
@@ -32,5 +42,16 @@ extension Attestation.Fixtures.Default {
     }
 
     private static let mrSignerB64 = "fuXinXRiP9vG+/FFS+bzuwuGwSNmt7R4rRM1PkTehBE="
+
+}
+
+extension Attestation.Fixtures.MrEnclave {
+
+    fileprivate static func attestation() throws -> Attestation {
+        let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.mrSignerB64)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: []).get()
+        return Attestation.init(mrEnclaves: [mrEnclave])
+    }
+
+    private static let mrSignerB64 = "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
 
 }

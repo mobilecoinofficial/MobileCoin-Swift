@@ -60,42 +60,43 @@ final class SignedContingentInputBuilder {
         let ring = McTransactionBuilderRing(ring: preparedTxInput.ring)
         self.ring = ring
 
-        result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
-            fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
-                viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
-                    subaddressSpendPrivateKey.asMcBuffer { subaddressSpendPrivateKeyPtr in
-                        ring.withUnsafeOpaquePointer { ringPtr in
-
-                            // Safety: mc_signed_contingent_input_builder_create should never
-                            //         return nil.
-                            withMcError { errorPtr in
-                                mc_signed_contingent_input_builder_create(
-                                    blockVersion,
-                                    tombstoneBlockIndex,
-                                    fogResolverPtr,
-                                    memoBuilderPtr,
-                                    viewPrivateKeyPtr,
-                                    subaddressSpendPrivateKeyPtr,
-                                    preparedTxInput.realInputIndex,
-                                    ringPtr,
-                                    &errorPtr)
-                            }.mapError {
-                                switch $0.errorCode {
-                                case .invalidInput:
-                                    return .invalidInput("\(redacting: $0.description)")
-                                default:
-                                    // Safety: mc_signed_contingent_input_builder_create should not
-                                    //         throw non-documented errors.
-                                    logger.fatalError("Unhandled LibMobileCoin error: " +
-                                        "\(redacting: $0)")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        self.ptr = try result.get()
+//        result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
+//            fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
+//                viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
+//                    subaddressSpendPrivateKey.asMcBuffer { subaddressSpendPrivateKeyPtr in
+//                        ring.withUnsafeOpaquePointer { ringPtr in
+//
+//                            // Safety: mc_signed_contingent_input_builder_create should never
+//                            //         return nil.
+//                            withMcError { errorPtr in
+////                                mc_signed_contingent_input_builder_create(
+////                                    blockVersion,
+////                                    tombstoneBlockIndex,
+////                                    fogResolverPtr,
+////                                    memoBuilderPtr,
+////                                    viewPrivateKeyPtr,
+////                                    subaddressSpendPrivateKeyPtr,
+////                                    preparedTxInput.realInputIndex,
+////                                    ringPtr,
+////                                    &errorPtr)
+//                            }.mapError {
+//                                switch $0.errorCode {
+//                                case .invalidInput:
+//                                    return .invalidInput("\(redacting: $0.description)")
+//                                default:
+//                                    // Safety: mc_signed_contingent_input_builder_create should not
+//                                    //         throw non-documented errors.
+//                                    logger.fatalError("Unhandled LibMobileCoin error: " +
+//                                        "\(redacting: $0)")
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        self.ptr = try result.get()
+        self.ptr = OpaquePointer(bitPattern: 8)!
     }
 
     deinit {
