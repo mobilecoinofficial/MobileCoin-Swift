@@ -20,7 +20,7 @@ final class AttestationVerifier {
     }
 
     deinit {
-        mc_verifier_free(ptr)
+        mc_trusted_identities_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
@@ -31,7 +31,7 @@ final class AttestationVerifier {
         let ffiMrEnclaveVerifier = MrEnclaveVerifier(mrEnclave: mrEnclave)
         ffiMrEnclaveVerifier.withUnsafeOpaquePointer { ffiMrEnclaveVerifierPtr in
             // Safety: mc_verifier_add_mr_enclave should never fail.
-            withMcInfallible { mc_verifier_add_mr_enclave(ptr, ffiMrEnclaveVerifierPtr) }
+            withMcInfallible { mc_trusted_identities_add_mr_enclave(ptr, ffiMrEnclaveVerifierPtr) }
         }
     }
 
@@ -39,7 +39,7 @@ final class AttestationVerifier {
         let ffiMrSignerVerifier = MrSignerVerifier(mrSigner: mrSigner)
         ffiMrSignerVerifier.withUnsafeOpaquePointer { ffiMrSignerVerifierPtr in
             // Safety: mc_verifier_add_mr_signer should never fail.
-            withMcInfallible { mc_verifier_add_mr_signer(ptr, ffiMrSignerVerifierPtr) }
+            withMcInfallible { mc_trusted_identities_add_mr_signer(ptr, ffiMrSignerVerifierPtr) }
         }
     }
 }
@@ -48,6 +48,16 @@ private final class MrEnclaveVerifier {
     private let ptr: OpaquePointer
 
     init(mrEnclave: Attestation.MrEnclave) {
+        let configAdvisories = withMcInfallible(mc_advisories_create)
+        mrEnclave.allowedConfigAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(configAdvisories, advisory_id) }
+        }
+        
+        let hardeningAdvisories = withMcInfallible(mc_advisories_create)
+        mrEnclave.allowedHardeningAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(hardeningAdvisories, advisory_id) }
+        }
+        
         self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
             // Safety: mc_mr_enclave_verifier_create should never fail.
             withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr) }
