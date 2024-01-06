@@ -62,9 +62,6 @@ private final class MrEnclaveVerifier {
             // Safety: mc_mr_enclave_verifier_create should never fail.
             withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, configAdvisories, hardeningAdvisories) }
         }
-
-//        mrEnclave.allowedConfigAdvisories.forEach(addConfigAdvisory)
-//        mrEnclave.allowedHardeningAdvisories.forEach(addHardeningAdvisory)
     }
 
     deinit {
@@ -74,38 +71,33 @@ private final class MrEnclaveVerifier {
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
         try body(ptr)
     }
-
-    private func addConfigAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_enclave_verifier_allow_config_advisory should never fail.
-//            withMcInfallible { mc_mr_enclave_verifier_allow_config_advisory(ptr, advisoryIdPtr) }
-        }
-    }
-
-    private func addHardeningAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_enclave_verifier_allow_hardening_advisory should never fail.
-//            withMcInfallible { mc_mr_enclave_verifier_allow_hardening_advisory(ptr, advisoryIdPtr) }
-        }
-    }
 }
 
 private final class MrSignerVerifier {
     private let ptr: OpaquePointer
 
     init(mrSigner: Attestation.MrSigner) {
+        let configAdvisories = withMcInfallible(mc_advisories_create)
+        mrSigner.allowedConfigAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(configAdvisories, advisory_id) }
+        }
+        
+        let hardeningAdvisories = withMcInfallible(mc_advisories_create)
+        mrSigner.allowedHardeningAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(hardeningAdvisories, advisory_id) }
+        }
+        
         self.ptr = mrSigner.mrSigner.asMcBuffer { mrSignerPtr in
             // Safety: mc_mr_signer_verifier_create should never fail.
             withMcInfallible {
                 mc_trusted_identity_mr_signer_create(
                     mrSignerPtr,
                     mrSigner.productId,
-                    mrSigner.minimumSecurityVersion)
+                    mrSigner.minimumSecurityVersion,
+                    configAdvisories,
+                    hardeningAdvisories)
             }
         }
-
-        mrSigner.allowedConfigAdvisories.forEach(addConfigAdvisory)
-        mrSigner.allowedHardeningAdvisories.forEach(addHardeningAdvisory)
     }
 
     deinit {
@@ -114,19 +106,5 @@ private final class MrSignerVerifier {
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
         try body(ptr)
-    }
-
-    private func addConfigAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_signer_verifier_allow_config_advisory should never fail.
-//            withMcInfallible { mc_mr_signer_verifier_allow_config_advisory(ptr, advisoryIdPtr) }
-        }
-    }
-
-    private func addHardeningAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_signer_verifier_allow_hardening_advisory should never fail.
-//            withMcInfallible { mc_mr_signer_verifier_allow_hardening_advisory(ptr, advisoryIdPtr) }
-        }
     }
 }
