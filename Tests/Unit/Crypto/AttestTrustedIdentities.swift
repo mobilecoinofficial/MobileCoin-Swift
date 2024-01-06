@@ -43,10 +43,12 @@ final class AttestTrustedIdentities: XCTestCase {
             withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, mc_config_advisories, mc_hardening_advisories) }
         }
        
-        let trusted_identity_description = Data32.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
                             mc_trusted_mr_enclave_identity_to_string(ptr, bufferPtr)
-                        })
+        })
         
+        let string = String(data: trusted_identity_description, encoding: .utf8)!
+        print(string)
         print("here")
     }
 }
