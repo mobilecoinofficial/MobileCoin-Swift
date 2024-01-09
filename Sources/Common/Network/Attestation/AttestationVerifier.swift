@@ -92,10 +92,10 @@ private final class MrSignerVerifier {
             withMcInfallible {
                 mc_trusted_identity_mr_signer_create(
                     mrSignerPtr,
-                    mrSigner.productId,
-                    mrSigner.minimumSecurityVersion,
                     configAdvisories,
-                    hardeningAdvisories)
+                    hardeningAdvisories,
+                    mrSigner.productId,
+                    mrSigner.minimumSecurityVersion)
             }
         }
     }
