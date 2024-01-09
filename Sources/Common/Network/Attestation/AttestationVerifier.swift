@@ -104,7 +104,7 @@ private final class MrSignerVerifier {
     }
 
     deinit {
-        mc_mr_signer_verifier_free(ptr)
+        mc_trusted_identity_mr_signer_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
