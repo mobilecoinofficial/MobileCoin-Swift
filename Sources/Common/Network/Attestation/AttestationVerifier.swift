@@ -8,6 +8,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
+// TrustedIdentities
 final class AttestationVerifier {
     private let ptr: OpaquePointer
 
@@ -44,6 +45,7 @@ final class AttestationVerifier {
     }
 }
 
+// TrustedMrEnclaveIdentity
 private final class MrEnclaveVerifier {
     private let ptr: OpaquePointer
 
@@ -73,6 +75,7 @@ private final class MrEnclaveVerifier {
     }
 }
 
+// TrustedMrSignerIdentity
 private final class MrSignerVerifier {
     private let ptr: OpaquePointer
 
