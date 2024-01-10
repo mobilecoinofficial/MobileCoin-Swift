@@ -48,7 +48,7 @@ extension Attestation.Fixtures.Default {
 extension Attestation.Fixtures.MrEnclave {
 
     fileprivate static func attestation() throws -> Attestation {
-        let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.mrSignerB64)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615"]).get()
+        let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.mrSignerB64)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615", "INTEL-SA-00657"]).get()
         return Attestation.init(mrEnclaves: [mrEnclave])
     }
 

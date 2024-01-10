@@ -31,7 +31,7 @@ final class AttestationVerifier {
     private func addMrEnclave(_ mrEnclave: Attestation.MrEnclave) {
         let ffiMrEnclaveVerifier = MrEnclaveVerifier(mrEnclave: mrEnclave)
         ffiMrEnclaveVerifier.withUnsafeOpaquePointer { ffiMrEnclaveVerifierPtr in
-            // Safety: mc_verifier_add_mr_enclave should never fail.
+            // Safety: mc_trusted_identities_add_mr_enclave should never fail.
             withMcInfallible { mc_trusted_identities_add_mr_enclave(ptr, ffiMrEnclaveVerifierPtr) }
         }
     }
@@ -39,7 +39,7 @@ final class AttestationVerifier {
     private func addMrSigner(_ mrSigner: Attestation.MrSigner) {
         let ffiMrSignerVerifier = MrSignerVerifier(mrSigner: mrSigner)
         ffiMrSignerVerifier.withUnsafeOpaquePointer { ffiMrSignerVerifierPtr in
-            // Safety: mc_verifier_add_mr_signer should never fail.
+            // Safety: mc_trusted_identities_add_mr_signer should never fail.
             withMcInfallible { mc_trusted_identities_add_mr_signer(ptr, ffiMrSignerVerifierPtr) }
         }
     }

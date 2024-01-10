@@ -49,11 +49,12 @@ final class FogResolver {
         let serializedReportResponse = reportResponse.serializedDataInfallible
         serializedReportResponse.asMcBuffer { reportResponsePtr in
             switch withMcError({ errorPtr in
-                mc_fog_resolver_add_report_response(
+                let result = mc_fog_resolver_add_report_response(
                     ptr,
                     reportUrl.url.absoluteString,
                     reportResponsePtr,
                     &errorPtr)
+                return result
             }) {
             case .success:
                 break
