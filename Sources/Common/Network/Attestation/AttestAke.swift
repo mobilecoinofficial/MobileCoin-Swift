@@ -70,9 +70,14 @@ final class AttestAke {
         let ffi = FfiAttestAke()
         let requestData = ffi.authBeginRequestData(
             responderId: responderId,
-            rng: rng,
-            rngContext: rngContext)
+            rng: test2RngCallback,
+            rngContext: Test2Rng())
         state = .authPending(ffi)
+        
+        logger.debug("")
+        logger.debug("responderId: \(responderId)")
+        logger.debug("requestData: \(requestData.base64EncodedString())")
+        logger.debug("")
         return requestData
     }
 
@@ -91,6 +96,10 @@ final class AttestAke {
             return .failure(.invalidInput("AttestAke.authEnd called without a pending auth."))
         }
 
+        logger.debug("")
+        logger.debug("authResponseData: \(authResponseData.base64EncodedString())")
+        logger.debug("attestationVerifier: \(authResponseData.base64EncodedString())")
+        logger.debug("")
         return attestAke.authEnd(
             authResponseData: authResponseData,
             attestationVerifier: attestationVerifier
