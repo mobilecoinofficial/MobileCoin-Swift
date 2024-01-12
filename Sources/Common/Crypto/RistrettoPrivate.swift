@@ -33,7 +33,7 @@ extension RistrettoPrivate: DataConvertibleImpl {
         self.init(data32)
     }
 
-    var data: Data { data32.data }
+    public var data: Data { data32.data }
 }
 
 extension RistrettoPrivate {

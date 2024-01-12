@@ -40,6 +40,26 @@ extension PublicAddress.Fixtures {
 }
 
 extension PublicAddress.Fixtures {
+    struct TestNet {
+        let publicAddress: PublicAddress
+
+        let accountKey: AccountKey
+        let fogReportUrl: String
+        let addressHash: Data
+        var addressHashHex: String { addressHash.hexEncodedString() }
+        var addressHashBase64: String { addressHash.base64EncodedString() }
+
+        init(accountIndex: UInt8 = 0) throws {
+            let accountKeyFixture = try AccountKey.Fixtures.TestNet()
+            self.accountKey = accountKeyFixture.accountKey
+            self.publicAddress = accountKey.publicAddress
+            self.fogReportUrl = accountKeyFixture.fogReportUrl
+            self.addressHash = try XCTUnwrap(accountKeyFixture.accountKey.publicAddress.addressHash)
+        }
+    }
+}
+
+extension PublicAddress.Fixtures {
     struct DefaultZero {
         let publicAddress: PublicAddress
 

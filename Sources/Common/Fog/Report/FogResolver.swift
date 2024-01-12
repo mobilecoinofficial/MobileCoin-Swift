@@ -46,6 +46,10 @@ final class FogResolver {
 
     private func addReportResponse(reportUrl: FogUrl, reportResponse: Report_ReportResponse) {
         logger.info("")
+        logger.info("\n\n")
+        logger.info("reportUrl: \(reportUrl.description)")
+        logger.info("reportResponse base64: \(reportResponse.serializedDataInfallible.base64EncodedString())")
+        logger.info("\n\n")
         let serializedReportResponse = reportResponse.serializedDataInfallible
         serializedReportResponse.asMcBuffer { reportResponsePtr in
             switch withMcError({ errorPtr in

@@ -145,3 +145,20 @@ extension PartialTxOut {
         }
     }
 }
+
+
+extension PartialTxOut: CustomStringConvertible {
+    public var description: String {
+        """
+        PartialTxOut
+        
+        encryptedMemo: Data66 base 64 \(encryptedMemo.data.base64EncodedString())
+        maskedAmount: MaskedAmount:
+        \(maskedAmount.description)
+        
+        targetKey: RistrettoPublic base64 \(targetKey.data.base64EncodedString())
+        publicKey: RistrettoPublic base64 \(publicKey.data.base64EncodedString())
+        commitment: Data32 base64 { \(maskedAmount.commitment.data.base64EncodedString()) }
+        """
+    }
+}

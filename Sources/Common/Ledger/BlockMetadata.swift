@@ -46,3 +46,14 @@ extension BlockMetadata {
 
 extension BlockMetadata.TimestampStatus: Equatable {}
 extension BlockMetadata.TimestampStatus: Hashable {}
+
+extension BlockMetadata: CustomStringConvertible {
+    public var description: String {
+        """
+        BlockMetadata:
+        
+        index \(index)
+        timestamp unix \(timestamp?.timeIntervalSince1970)
+        """
+    }
+}

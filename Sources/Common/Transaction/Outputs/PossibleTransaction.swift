@@ -17,3 +17,7 @@ extension PossibleTransaction {
         self.changeAmount = changeAmount
     }
 }
+
+extension PossibleTransaction: CustomStringConvertible {
+    
+}
