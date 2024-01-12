@@ -188,6 +188,17 @@ extension TransactionBuilder {
         }
         logger.debug(":::PreparedTxInput")
         logger.debug("")
+        
+        logger.debug("")
+        logger.debug("tombstoneBlockIndex: \(context.tombstoneBlockIndex)")
+        logger.debug("fee: \(context.fee)")
+        logger.debug("")
+        
+        logger.debug("")
+        logger.debug("PossibleTransaction:")
+        logger.debug("\(possibleTransaction.description)")
+        logger.debug("")
+        
         guard Math.totalOutlayCheck(
                 for: possibleTransaction,
                 fee: context.fee,

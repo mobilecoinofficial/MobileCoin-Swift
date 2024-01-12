@@ -17,3 +17,14 @@ extension TransactionOutput {
         self.amount = amount
     }
 }
+
+extension TransactionOutput: CustomStringConvertible {
+    public var description: String {
+        """
+        TransactionOutput:
+        
+        recipient publicAddress base64 \(recipient.serializedData.base64EncodedString())
+        amount: \(amount.description)
+        """
+    }
+}
