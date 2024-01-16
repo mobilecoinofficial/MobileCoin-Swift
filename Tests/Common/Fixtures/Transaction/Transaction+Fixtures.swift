@@ -42,7 +42,7 @@ extension Transaction.Fixtures {
         let blockVersion = BlockVersion.minRTHEnabled
 
         init() throws {
-            let buildTxFixture = try Transaction.Fixtures.BuildTx()
+            let buildTxFixture = try Transaction.Fixtures.BuildTxTestNet()
             self.fee = buildTxFixture.fee
             self.tombstoneBlockIndex = buildTxFixture.tombstoneBlockIndex
             self.inputs = buildTxFixture.inputs
@@ -684,10 +684,10 @@ extension Transaction.Fixtures.ExactChange {
     fileprivate static func outputs() throws
         -> [TransactionOutput]
     {
-        let posAmt = try XCTUnwrap(PositiveUInt64(2499990000000000 - 10_000_000_000))
+        let posAmt = try XCTUnwrap(PositiveUInt64(605199997600 + 100))
         let output =
             TransactionOutput(
-                recipient: try PublicAddress.Fixtures.Default(accountIndex: 1).publicAddress,
+                recipient: PublicAddress.init(serializedData: Data(base64Encoded: "CiIKILJgHbpuWJZ6abjlsUrrOQb30Y1VYocTSl4mmf2W4IpQEiIKILQV1C5Bb60d0cwYIwuh5qXks7MtNe4wdL/x6KEHehMBGh1mb2c6Ly9mb2cudGVzdC5tb2JpbGVjb2luLmNvbSpA5PqNG7wSNvSF67qGDfhKujwO0x+RWzbwR7WW4qH01VXBOwPw0m+z/Z4bb8ZjoyAUaHjbtcAG7NLjSVVLR2/Niw==")!)!,
                 amount: Amount(posAmt.value, in: .MOB)
             )
         return [output]
