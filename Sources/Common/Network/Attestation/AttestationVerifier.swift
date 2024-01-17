@@ -62,7 +62,13 @@ private final class MrEnclaveVerifier {
 
         self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
             // Safety: mc_mr_enclave_verifier_create should never fail.
-            withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, configAdvisories, hardeningAdvisories) }
+            withMcInfallible {
+                mc_trusted_identity_mr_enclave_create(
+                    mrEnclavePtr,
+                    configAdvisories,
+                    hardeningAdvisories
+                )
+            }
         }
     }
 

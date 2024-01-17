@@ -26,10 +26,10 @@ extension Attestation.Fixtures {
         let reportAttestation: Attestation
         let ledgerAttestation: Attestation
         let viewAttestation: Attestation
-        
+
         let configAdvisories: [String]
         let hardeningAdvisories: [String]
-        
+
         let configAndHardeningAdvisoriesDescription: String
         let configAdvisoriesDescription: String
         let hardeningAdvisoriesDescription: String
@@ -46,14 +46,14 @@ extension Attestation.Fixtures {
             self.hardeningAdvisoriesDescription = Self.hardeningAdvisoriesDescription
         }
     }
-    
+
     struct MrSigner {
         let consensusAttestation: Attestation
         let reportAttestation: Attestation
 
         let configAdvisories: [String]
         let hardeningAdvisories: [String]
-        
+
         let configAndHardeningAdvisoriesDescription: String
         let configAdvisoriesDescription: String
         let hardeningAdvisoriesDescription: String
@@ -61,7 +61,7 @@ extension Attestation.Fixtures {
         init() throws {
             self.consensusAttestation = try Self.attestation(productId: 1)
             self.reportAttestation = try Self.attestation(productId: 4)
-            
+
             self.configAdvisories = Self.configAdvisories
             self.hardeningAdvisories = Self.hardeningAdvisories
             self.configAndHardeningAdvisoriesDescription = Self.configAndHardeningAdvisoriesDescription
@@ -94,9 +94,9 @@ extension Attestation.Fixtures.MrEnclave {
         #"IDs: {"INTEL-SA-00334", "INTEL-SA-00615"} Status: SWHardeningNeeded"#
 
     private static let configAdvisories = [ "INTEL-SA-00614" ]
-    
+
     private static let hardeningAdvisories = [ "INTEL-SA-00334", "INTEL-SA-00615" ]
-    
+
     fileprivate static func consensus() throws -> Attestation {
         let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.testNetConsensusMrEnclaveHex)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615", "INTEL-SA-00657"]).get()
         return Attestation(mrEnclaves: [mrEnclave])
@@ -136,9 +136,9 @@ extension Attestation.Fixtures.MrSigner {
         #"IDs: {"INTEL-SA-00334", "INTEL-SA-00615"} Status: SWHardeningNeeded"#
 
     private static let configAdvisories = [ "INTEL-SA-00614" ]
-    
+
     private static let hardeningAdvisories = [ "INTEL-SA-00334", "INTEL-SA-00615" ]
-    
+
     fileprivate static func attestation(productId: UInt16) throws -> Attestation {
         Attestation(
             mrSigner: try XCTUnwrap(Data32(hexEncoded: Self.mrSignerHex)),
