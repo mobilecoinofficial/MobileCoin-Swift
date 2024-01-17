@@ -512,7 +512,8 @@ extension Transaction.Fixtures.BuildTxTestNet {
                     index: 1493080,
                     timestampStatus: .known(
                         timestamp: Date(timeIntervalSince1970: 1677540712.0)))),
-            accountKey: try XCTUnwrap(AccountKey(serializedData: Data(base64Encoded: accountKeyB64)!))))
+            accountKey: try XCTUnwrap(
+                AccountKey(serializedData: Data(base64Encoded: accountKeyB64)!))))
 
         let ring_1: [(TxOut, TxOutMembershipProof)] = try [
             (
@@ -1389,7 +1390,10 @@ extension Transaction.Fixtures.BuildTxTestNet {
             )
         }
 
-        return [try PreparedTxInput.make(knownTxOut: knownTxOut_1, ring: ring_1).get(), try PreparedTxInput.make(knownTxOut: knownTxOut_2, ring: ring_2).get()]
+        return [
+            try PreparedTxInput.make(knownTxOut: knownTxOut_1, ring: ring_1).get(),
+            try PreparedTxInput.make(knownTxOut: knownTxOut_2, ring: ring_2).get(),
+        ]
     }
 
     fileprivate static func accountKey() throws -> AccountKey {
@@ -1431,7 +1435,8 @@ extension Transaction.Fixtures.BuildTxTestNet {
             bSpA5PqNG7wSNvSF67qGDfhKujwO0x+RWzbwR7WW4qH01VXBOwPw0m+z/Z4bb8ZjoyAU\
             aHjbtcAG7NLjSVVLR2/Niw==
             """
-        [
+
+        return [
             TransactionOutput(
                 recipient: PublicAddress(
                     serializedData: Data(base64Encoded: publicAddressB64)!)!,
