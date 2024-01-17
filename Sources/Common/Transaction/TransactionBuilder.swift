@@ -181,24 +181,6 @@ extension TransactionBuilder {
         possibleTransaction: PossibleTransaction,
         presignedInput: SignedContingentInput? = nil
     ) -> Result<PendingTransaction, TransactionBuilderError> {
-        logger.debug("")
-        logger.debug("PreparedTxInputs:::\n")
-        inputs.forEach { input in
-            logger.debug(input.description)
-        }
-        logger.debug(":::PreparedTxInput")
-        logger.debug("")
-        
-        logger.debug("")
-        logger.debug("tombstoneBlockIndex: \(context.tombstoneBlockIndex)")
-        logger.debug("fee: \(context.fee)")
-        logger.debug("")
-        
-        logger.debug("")
-        logger.debug("PossibleTransaction:")
-        logger.debug("\(possibleTransaction.description)")
-        logger.debug("")
-        
         guard Math.totalOutlayCheck(
                 for: possibleTransaction,
                 fee: context.fee,
