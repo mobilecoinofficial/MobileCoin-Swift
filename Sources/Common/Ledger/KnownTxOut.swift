@@ -11,8 +11,6 @@ struct KnownTxOut: TxOutProtocol {
     let subaddressIndex: UInt64
     let recoverableMemo: RecoverableMemo
     let sharedSecret: RistrettoPrivate
-    
-    private var accountKey: AccountKey
 
     init?(_ ledgerTxOut: LedgerTxOut, accountKey: AccountKey) {
         guard let amount = ledgerTxOut.amount(accountKey: accountKey),
@@ -39,7 +37,6 @@ struct KnownTxOut: TxOutProtocol {
         self.keyImage = keyImage
         self.subaddressIndex = subaddressIndex
         self.sharedSecret = sharedSecret
-        self.accountKey = accountKey
     }
 
     var value: UInt64 { amount.value }
@@ -55,17 +52,3 @@ struct KnownTxOut: TxOutProtocol {
 
 extension KnownTxOut: Equatable {}
 extension KnownTxOut: Hashable {}
-
-extension KnownTxOut: CustomStringConvertible {
-    public var description: String {
-        """
-        KnownTxOut:
-        
-        ledgerTxOut: LedgerTxOut
-        \(ledgerTxOut.description)
-        
-        accountKey serializedData base64:
-        \(accountKey.serializedData.base64EncodedString())
-        """
-    }
-}

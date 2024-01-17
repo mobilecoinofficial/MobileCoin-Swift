@@ -49,16 +49,3 @@ public class MobileCoinXoshiroRng: MobileCoinRng {
         xoshiro.next()
     }
 }
-
-func test2RngCallback(context: UnsafeMutableRawPointer!) -> UInt64 {
-    context.assumingMemoryBound(to: MobileCoinXoshiroRng.self).pointee.next()
-}
-
-typealias Test2Rng = MobileCoinXoshiroRng
-
-func test2RngSeed() -> RngSeed {
-    guard let rngSeed = MobileCoinXoshiroRng().generateRngSeed() else {
-        fatalError("Generating an RNG Seed from our Test RNG should not fail.")
-    }
-    return rngSeed
-}

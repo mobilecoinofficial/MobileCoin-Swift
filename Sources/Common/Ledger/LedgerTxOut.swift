@@ -86,20 +86,3 @@ extension LedgerTxOut {
     }
 }
 // swiftlint:enable todo
-
-
-extension LedgerTxOut: CustomStringConvertible {
-    public var description: String {
-        """
-        LedgetTxOut:
-        
-        txOut: PartialTxOut:
-        \(txOut.description)
-        
-        globalIndex: UInt64 \(globalIndex)
-        block: BlockMetadata
-        \(block.description)
-        
-        """
-    }
-}
