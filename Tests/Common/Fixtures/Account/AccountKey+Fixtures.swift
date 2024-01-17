@@ -77,6 +77,17 @@ extension AccountKey.Fixtures {
                 fogReportId: fogReportId,
                 fogAuthoritySpki: self.fogAuthoritySpki).get()
         }
+        
+        init(accountIndex: UInt32) throws {
+            self.mnemonic = Self.mnemonic()
+            self.fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: Self.fogAuthoritySpkiB64))
+            self.accountKey = try AccountKey.make(
+                mnemonic: mnemonic.phrase,
+                fogReportUrl: fogReportUrl,
+                fogReportId: fogReportId,
+                fogAuthoritySpki: self.fogAuthoritySpki,
+                accountIndex: accountIndex).get()
+        }
     }
 }
 

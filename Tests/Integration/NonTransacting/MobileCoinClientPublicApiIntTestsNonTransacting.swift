@@ -39,7 +39,9 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
     }
 
     func balances(transportProtocol: TransportProtocol) async throws {
-        let client = try IntegrationTestFixtures.createMobileCoinClient(using: transportProtocol)
+        let client = try IntegrationTestFixtures.createMobileCoinClient(
+            accountIndex: 1,
+            using: transportProtocol)
 
         let blockVersion = try await client.blockVersion()
         guard blockVersion >= 2 else {
@@ -66,7 +68,7 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
             mobBalance.amountParts.frac > 0
         )
 
-        guard let mobUSDBalance = balances.balances[.MOB] else {
+        guard let mobUSDBalance = balances.balances[.MOBUSD] else {
             XCTFail("Expected Balance")
             return
         }
