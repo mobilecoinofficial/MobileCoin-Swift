@@ -54,12 +54,12 @@ private final class MrEnclaveVerifier {
         mrEnclave.allowedConfigAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(configAdvisories, advisory_id) }
         }
-        
+
         let hardeningAdvisories = withMcInfallible(mc_advisories_create)
         mrEnclave.allowedHardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(hardeningAdvisories, advisory_id) }
         }
-        
+
         self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
             // Safety: mc_mr_enclave_verifier_create should never fail.
             withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, configAdvisories, hardeningAdvisories) }
@@ -84,12 +84,12 @@ private final class MrSignerVerifier {
         mrSigner.allowedConfigAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(configAdvisories, advisory_id) }
         }
-        
+
         let hardeningAdvisories = withMcInfallible(mc_advisories_create)
         mrSigner.allowedHardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(hardeningAdvisories, advisory_id) }
         }
-        
+
         self.ptr = mrSigner.mrSigner.asMcBuffer { mrSignerPtr in
             // Safety: mc_mr_signer_verifier_create should never fail.
             withMcInfallible {

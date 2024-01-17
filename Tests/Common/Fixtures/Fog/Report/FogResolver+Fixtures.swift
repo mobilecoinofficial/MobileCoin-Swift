@@ -55,7 +55,7 @@ extension FogResolver.Fixtures {
             self.fogResolver = try Self.fogResolver(reportUrl: reportUrl)
         }
     }
-    
+
     struct TestNet {
         let fogResolver: FogResolver
 

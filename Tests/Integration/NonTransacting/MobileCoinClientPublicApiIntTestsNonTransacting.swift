@@ -176,7 +176,7 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
             accountKey: accountKey,
             transportProtocol: transportProtocol
         )
-        
+
         _ = try await client.prepareTransaction(to: recipient,
                                                 amount: Amount(100, in: .MOB),
                                                 fee: IntegrationTestFixtures.fee)

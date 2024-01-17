@@ -52,7 +52,7 @@ extension Transaction.Fixtures {
             /*self.blockVersion = buildTxFixture.blockVersion*/
         }
     }
-    
+
     struct BuildTxTestNet {
         let inputs: [PreparedTxInput]
         let accountKey: AccountKey
@@ -547,7 +547,7 @@ extension Transaction.Fixtures.BuildTxTestNet {
             (
             "EiIKIMKlXvE3K1p9pve1gM2rJHzyJvusTp3DcQuYw7QK1Rd3GiIKINiBQtU9lixXTniMTgWkux+P3hUE6aY2nMd3v39OAsM3IlYKVHWD8AI+vBGdP+VbKzLPZpc7AcK64E/JE/NmPJpowkDMyCuO1861/pDEw55TfXsj7/aB3oNIQdw3wuEOmuC2SUriDKDCiJK+ClgdNJCj4nfjnucBACpECkLkMI6i9HXhLq3dN12gF47L7ajO8XWIUJPMf/hLIorHt0E9mX6C0SEO0ok1ouTru4QEG04CPf9wV9nT5Cz2SG72GtkyNwoiCiD0NHGtRrGncsbsEPxTh7z3aWTsKxuDgqCLZxQgNeLBbhEww7nzHg1M7xoItltPe+s50U8=",
             "CKHdlAIQ14/JAxowCgoIod2UAhCh3ZQCEiIKIFS4/5cL4tGM8kjqdsZWJiEQMju8DkDcsWfOyf0BTCq5GjAKCgig3ZQCEKDdlAISIgogvy1GklhwfRZ307EHJ/HXQO5f2xiNZ2Pvhi0yEuQPT0EaMAoKCKLdlAIQo92UAhIiCiAEqzFcrc5ZpA9l3tQ+FEV1n1mPqzrNBMv0DgGv8gKoQBowCgoIpN2UAhCn3ZQCEiIKID8zdv7ND0o/Gpy3+81sPR0ODSfSzlwjUOZIwwqvC4ccGjAKCgio3ZQCEK/dlAISIgogpncMnZCW+CwxdbFeHffdxqRQEPfWX8o2lBbhAKLH8ncaMAoKCLDdlAIQv92UAhIiCiBbyjsB1YrqaxzP47F4mQP2X40T/fcIsFgU+COfQIaa9xowCgoIgN2UAhCf3ZQCEiIKIDGc83EOoCbkDpZdqP7Gc9M2hKR04PZGH+l+/8Xl6DkQGjAKCgjA3ZQCEP/dlAISIgoggTxwcviL7TSMDl5EJPMstA3s/C+m4zKulfoCZStp7vkaMAoKCIDclAIQ/9yUAhIiCiD3hi+Xbp3EOjMZvHFjeHojWznTF6UzkDYCNo5m4cAyphowCgoIgN6UAhD/35QCEiIKIBwEw0motZtNt6XFN5D+Wo/AS8AyDGy/P7q6PRKDFN9nGjAKCgiA2JQCEP/blAISIgogZGeJNzqwbEZNyTcEAcvj8IX9V4312sDkRQSTH7gb4UQaMAoKCIDQlAIQ/9eUAhIiCiB7z29AbdZm7GATv9O5bSEzi2U9bFi2k/1M4++dXgUukRowCgoIgMCUAhD/z5QCEiIKINhEIC4bPsgEsHgEoDTPOTW74pCUcyhViMjf9WxgJRfZGjAKCgiA4JQCEP//lAISIgog1Vg9A8Jl9DnGv+GpDvCXnoprYr0IDEq3uJo0i4SKB74aMAoKCICAlAIQ/7+UAhIiCiAihgBa4TL2CNLc9dXDJ+wudr6mOE2JIr+OGiDyx7WGLxowCgoIgICVAhD//5UCEiIKIMRnrZbAi8durDbxeIlRXZAVA3KcqZajWoDybZXAX+SxGjAKCgiAgJYCEP//lwISIgogCGY3hKTok+6SQSagIjGAljuexVMH2dIpfs7zf0jJ2MwaMAoKCICAkAIQ//+TAhIiCiD3pwUiZ1G3bbQXsuFQEITMDEpjq/epchKMMpZE84RpZxowCgoIgICYAhD//58CEiIKIL2ZuHwyEjygKYxa23PalV8u6TuKScv0xkTErHvb4V6/GjAKCgiAgIACEP//jwISIgogOuWOifZLxZdnHM9cJRNxt7klsgf5RS8kBk/aVbnol8YaMAoKCICAoAIQ//+/AhIiCiBiyOUxbUKOdinjnsdLiIQLf9IcsdSXiWBNOfz7F0Ej3howCgoIgIDAAhD///8CEiIKIGdQOJFwmHWMImpOZfLnCXJt4Z4X1nEDXuaQFZQZimirGjAKCgiAgIADEP///wMSIgogrMzpmpE78e1byPLkQO5Fwx5intgbXf5t9iDReu90wc4aKwoFEP///wESIgog5ShKUJJkphosZeKgYNWqZ0XGnItivJ8FzYeNyfWka4k="
-            )
+            ),
         ].map {
             (
                 try XCTUnwrap(TxOut(serializedData: XCTUnwrap(Data(base64Encoded: $0.0)))),
@@ -632,7 +632,7 @@ extension Transaction.Fixtures.BuildTxTestNet {
             (
             "EiIKINJiIojyX64qfR1LANvkzTa4RW+021vHp3FwfygYZdQ7GiIKIObHVZcpyvwvaMscbpm6S3R7ungIL+91T7mqIPR2Yow8IlYKVEmmwBFLQ6aKBffAHbkAWL3z89JRSb3ntwhIRXI8Bx1D5jDiWyMgoHj9tkZ4Gt/fLuGVp6YvP2qejZN5HgnKYyD0HMd9wqJrceTsC9bqFflbqEABACpECkITj/Xsqev3arv513sqtR5rqJR4TvPPUoV7jhly9cNQNsnKp380OavBsnsGxHw5hJkrGtcgRHhMt1zqi53/RD7ICr8yNwoiCiC2RBg86tpDYTOGbOE/V7oXo0GWJA/PcCUM6vfVpqKRPBFHkTTGMcfkLxoI1MZUxQpkb0I=",
             "CL/clAIQ14/JAxowCgoIv9yUAhC/3JQCEiIKIB/bTC4mQzdaWUwrBJVC78YZjqs7124NO5rHlwCnuM4OGjAKCgi+3JQCEL7clAISIgog4oU0ZLUh9THG/3EcMfS5RlJAYctHxJstcPtkNjeuGbwaMAoKCLzclAIQvdyUAhIiCiDkkSboYFPHh1Gg7ZyfifCscyU02VAj8AevBdykTiVoBxowCgoIuNyUAhC73JQCEiIKINrriD9yTKKhUP8EaJ7azajeadWewTSe4JAh62SwyFClGjAKCgiw3JQCELfclAISIgogXfzVLEYCCAKv3msg2UFKTzAdYEWHO5t5Y90sRxdQz4gaMAoKCKDclAIQr9yUAhIiCiAV8/6bGofq3Z0OpMTnOBkWGqsPa4PRKA0Oxg6Ys+TGahowCgoIgNyUAhCf3JQCEiIKIJL38h3bULz8rl8WtOWcoNCAEJI6QdXiaegG+7btiybgGjAKCgjA3JQCEP/clAISIgogid4dV7iW9EuJlxGSuXTnagmXXpoH7ACvXRCADeSAp74aMAoKCIDdlAIQ/92UAhIiCiDTfLeuccfyHkaBZPfhg0YIeGWkxIlxbhx+KJKVk32ziRowCgoIgN6UAhD/35QCEiIKIBwEw0motZtNt6XFN5D+Wo/AS8AyDGy/P7q6PRKDFN9nGjAKCgiA2JQCEP/blAISIgogZGeJNzqwbEZNyTcEAcvj8IX9V4312sDkRQSTH7gb4UQaMAoKCIDQlAIQ/9eUAhIiCiB7z29AbdZm7GATv9O5bSEzi2U9bFi2k/1M4++dXgUukRowCgoIgMCUAhD/z5QCEiIKINhEIC4bPsgEsHgEoDTPOTW74pCUcyhViMjf9WxgJRfZGjAKCgiA4JQCEP//lAISIgog1Vg9A8Jl9DnGv+GpDvCXnoprYr0IDEq3uJo0i4SKB74aMAoKCICAlAIQ/7+UAhIiCiAihgBa4TL2CNLc9dXDJ+wudr6mOE2JIr+OGiDyx7WGLxowCgoIgICVAhD//5UCEiIKIMRnrZbAi8durDbxeIlRXZAVA3KcqZajWoDybZXAX+SxGjAKCgiAgJYCEP//lwISIgogCGY3hKTok+6SQSagIjGAljuexVMH2dIpfs7zf0jJ2MwaMAoKCICAkAIQ//+TAhIiCiD3pwUiZ1G3bbQXsuFQEITMDEpjq/epchKMMpZE84RpZxowCgoIgICYAhD//58CEiIKIL2ZuHwyEjygKYxa23PalV8u6TuKScv0xkTErHvb4V6/GjAKCgiAgIACEP//jwISIgogOuWOifZLxZdnHM9cJRNxt7klsgf5RS8kBk/aVbnol8YaMAoKCICAoAIQ//+/AhIiCiBiyOUxbUKOdinjnsdLiIQLf9IcsdSXiWBNOfz7F0Ej3howCgoIgIDAAhD///8CEiIKIGdQOJFwmHWMImpOZfLnCXJt4Z4X1nEDXuaQFZQZimirGjAKCgiAgIADEP///wMSIgogrMzpmpE78e1byPLkQO5Fwx5intgbXf5t9iDReu90wc4aKwoFEP///wESIgog5ShKUJJkphosZeKgYNWqZ0XGnItivJ8FzYeNyfWka4k="
-            )
+            ),
         ].map {
             (
                 try XCTUnwrap(TxOut(serializedData: XCTUnwrap(Data(base64Encoded: $0.0)))),
@@ -640,7 +640,7 @@ extension Transaction.Fixtures.BuildTxTestNet {
                     TxOutMembershipProof.make(serializedData: XCTUnwrap(Data(base64Encoded: $0.1))))
             )
         }
-        
+
         return [try PreparedTxInput.make(knownTxOut: knownTxOut_1, ring: ring_1).get(), try PreparedTxInput.make(knownTxOut: knownTxOut_2, ring: ring_2).get()]
     }
 
@@ -660,7 +660,7 @@ extension Transaction.Fixtures.BuildTxTestNet {
     {
         [
             TransactionOutput(
-                recipient: PublicAddress.init(serializedData: Data(base64Encoded: "CiIKILJgHbpuWJZ6abjlsUrrOQb30Y1VYocTSl4mmf2W4IpQEiIKILQV1C5Bb60d0cwYIwuh5qXks7MtNe4wdL/x6KEHehMBGh1mb2c6Ly9mb2cudGVzdC5tb2JpbGVjb2luLmNvbSpA5PqNG7wSNvSF67qGDfhKujwO0x+RWzbwR7WW4qH01VXBOwPw0m+z/Z4bb8ZjoyAUaHjbtcAG7NLjSVVLR2/Niw==")!)!,
+                recipient: PublicAddress(serializedData: Data(base64Encoded: "CiIKILJgHbpuWJZ6abjlsUrrOQb30Y1VYocTSl4mmf2W4IpQEiIKILQV1C5Bb60d0cwYIwuh5qXks7MtNe4wdL/x6KEHehMBGh1mb2c6Ly9mb2cudGVzdC5tb2JpbGVjb2luLmNvbSpA5PqNG7wSNvSF67qGDfhKujwO0x+RWzbwR7WW4qH01VXBOwPw0m+z/Z4bb8ZjoyAUaHjbtcAG7NLjSVVLR2/Niw==")!)!,
                 amount: Amount(100, in: .MOB)
             ),
         ]
@@ -687,7 +687,7 @@ extension Transaction.Fixtures.ExactChange {
         let posAmt = try XCTUnwrap(PositiveUInt64(605199997600 + 100))
         let output =
             TransactionOutput(
-                recipient: PublicAddress.init(serializedData: Data(base64Encoded: "CiIKILJgHbpuWJZ6abjlsUrrOQb30Y1VYocTSl4mmf2W4IpQEiIKILQV1C5Bb60d0cwYIwuh5qXks7MtNe4wdL/x6KEHehMBGh1mb2c6Ly9mb2cudGVzdC5tb2JpbGVjb2luLmNvbSpA5PqNG7wSNvSF67qGDfhKujwO0x+RWzbwR7WW4qH01VXBOwPw0m+z/Z4bb8ZjoyAUaHjbtcAG7NLjSVVLR2/Niw==")!)!,
+                recipient: PublicAddress(serializedData: Data(base64Encoded: "CiIKILJgHbpuWJZ6abjlsUrrOQb30Y1VYocTSl4mmf2W4IpQEiIKILQV1C5Bb60d0cwYIwuh5qXks7MtNe4wdL/x6KEHehMBGh1mb2c6Ly9mb2cudGVzdC5tb2JpbGVjb2luLmNvbSpA5PqNG7wSNvSF67qGDfhKujwO0x+RWzbwR7WW4qH01VXBOwPw0m+z/Z4bb8ZjoyAUaHjbtcAG7NLjSVVLR2/Niw==")!)!,
                 amount: Amount(posAmt.value, in: .MOB)
             )
         return [output]

@@ -52,7 +52,7 @@ extension AccountKey.Fixtures {
                 fogReportId: fogReportId,
                 fogAuthoritySpki: self.fogAuthoritySpki).get()
         }
-        
+
         init(accountIndex: UInt32) throws {
             self.mnemonic = Self.mnemonic()
             self.fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: Self.fogAuthoritySpkiB64))

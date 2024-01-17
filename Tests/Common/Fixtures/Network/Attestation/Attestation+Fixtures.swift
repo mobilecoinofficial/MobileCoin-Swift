@@ -19,13 +19,12 @@ extension Attestation.Fixtures {
             self.reportAttestation = try Self.attestation(productId: 4)
         }
     }
-   
+
     struct MrEnclave {
         let consensusAttestation: Attestation
         let reportAttestation: Attestation
         let ledgerAttestation: Attestation
         let viewAttestation: Attestation
-
 
         init() throws {
             self.consensusAttestation = try Self.consensus()
@@ -54,24 +53,24 @@ extension Attestation.Fixtures.MrEnclave {
 
     fileprivate static func consensus() throws -> Attestation {
         let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.testNetConsensusMrEnclaveHex)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615", "INTEL-SA-00657"]).get()
-        return Attestation.init(mrEnclaves: [mrEnclave])
+        return Attestation(mrEnclaves: [mrEnclave])
     }
 
     fileprivate static func ledger() throws -> Attestation {
         let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.testNetFogLedgerMrEnclaveHex)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615", "INTEL-SA-00657"]).get()
-        return Attestation.init(mrEnclaves: [mrEnclave])
+        return Attestation(mrEnclaves: [mrEnclave])
     }
 
     fileprivate static func view() throws -> Attestation {
         let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.testNetFogViewMrEnclaveHex)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615", "INTEL-SA-00657"]).get()
-        return Attestation.init(mrEnclaves: [mrEnclave])
+        return Attestation(mrEnclaves: [mrEnclave])
     }
 
     fileprivate static func report() throws -> Attestation {
         let mrEnclave = try Attestation.MrEnclave.make(mrEnclave: try XCTUnwrap(Data32(hexEncoded: Self.testNetFogReportMrEnclaveHex)).data, allowedConfigAdvisories: [], allowedHardeningAdvisories: ["INTEL-SA-00334", "INTEL-SA-00615", "INTEL-SA-00657"]).get()
-        return Attestation.init(mrEnclaves: [mrEnclave])
+        return Attestation(mrEnclaves: [mrEnclave])
     }
-    
+
     private static let testNetConsensusMrEnclaveHex =
         "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
     private static let testNetFogViewMrEnclaveHex =
