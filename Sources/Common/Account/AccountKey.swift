@@ -118,35 +118,6 @@ public struct AccountKey {
     func privateKeys(for index: UInt64) -> SubaddressPrivateKeys? {
         indexedPrivateKeys[index]
     }
-    
-    public func privateSpendKey() -> Data {
-        spendPrivateKey.data
-    }
-    
-    public func privateViewKey() -> Data {
-        viewPrivateKey.data
-    }
-    
-    public func fogInfoDescription() -> String {
-        fogInfo?.description ?? "FogInfo is empty"
-    }
-}
-
-extension AccountKey: CustomStringConvertible {
-    public var description: String {
-        """
-        AccountKey:
-        
-        privateSpendKey base64: \(spendPrivateKey.data.base64EncodedString())
-        privateViewdKey base64: \(viewPrivateKey.data.base64EncodedString())
-        
-        FogInfo:
-        
-        \(fogInfo?.description ?? "FogInfo is empty")
-        """
-    }
-    
-    
 }
 
 extension AccountKey: Equatable {}
@@ -249,17 +220,6 @@ extension AccountKey {
             self.reportId = reportId
             self.authoritySpki = authoritySpki
         }
-    }
-}
-
-extension AccountKey.FogInfo: CustomStringConvertible {
-    var description: String {
-        """
-        reportUrlString \(reportUrlString)
-        reportUrl \(reportUrl)
-        reportId \(reportId)
-        authoritySpki base54 \(authoritySpki.base64EncodedString())
-        """
     }
 }
 
