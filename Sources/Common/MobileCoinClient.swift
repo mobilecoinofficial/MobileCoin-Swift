@@ -274,7 +274,7 @@ public final class MobileCoinClient {
             memoType: memoType,
             amount: amount,
             fee: fee,
-            rng: MobileCoinXoshiroRng(),
+            rng: MobileCoinChaCha20Rng(),
             completion: completion)
     }
 
@@ -328,7 +328,7 @@ public final class MobileCoinClient {
             memoType: memoType,
             amount: amount,
             feeLevel: feeLevel,
-            rng: MobileCoinXoshiroRng(),
+            rng: MobileCoinChaCha20Rng(),
             completion: completion)
     }
 

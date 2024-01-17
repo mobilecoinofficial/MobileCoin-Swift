@@ -17,18 +17,3 @@ extension PossibleTransaction {
         self.changeAmount = changeAmount
     }
 }
-
-extension PossibleTransaction: CustomStringConvertible {
-    public var description: String {
-        """
-        PossibleTransaction:
-        
-        outputs:
-        \(outputs.map({ output in
-            output.description
-        }).joined(separator: "\n"))
-        
-        changeAmount: \(changeAmount.description)
-        """
-    }
-}

@@ -38,25 +38,3 @@ struct PreparedTxInput {
         self.realInputIndex = realInputIndex
     }
 }
-
-extension PreparedTxInput: CustomStringConvertible {
-    public var description: String {
-        """
-        PreparedTxInput:
-        
-        knownTxOut:
-        \(knownTxOut.description)
-        
-        ring:
-        \(ring.map({ (txOut, txOutMembershipProof) in
-            """
-            txOut serializedData base64:
-            \(txOut.serializedData.base64EncodedString())
-            
-            membershipProof base64:
-            \(txOutMembershipProof.serializedData.base64EncodedString())
-            """
-        }).joined(separator: "\n"))
-        """
-    }
-}

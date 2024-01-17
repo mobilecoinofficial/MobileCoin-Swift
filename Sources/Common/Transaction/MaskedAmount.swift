@@ -104,16 +104,8 @@ extension MaskedAmount.Version: CustomStringConvertible {
 }
 extension MaskedAmount: Hashable, Equatable, CustomStringConvertible {
     public var description: String {
-//        "maskedValue \(maskedValue) \n" +
-//        "maskedTokenId \(maskedTokenId.hexEncodedString()) \n" +
-//        "version \(version) \n"
-        return """
-        MaskedAmount:
-        
-        maskedValue: UInt64 \(maskedValue)
-        maskedTokenId: Data base64 \(maskedTokenId.base64EncodedString())
-        commitment: Data32 base64 \(commitment.base64EncodedString())
-        version: Version \(version.description)
-        """
+        "maskedValue \(maskedValue) \n" +
+        "maskedTokenId \(maskedTokenId.hexEncodedString()) \n" +
+        "version \(version) \n"
     }
 }
