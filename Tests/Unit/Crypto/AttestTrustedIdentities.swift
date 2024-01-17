@@ -19,40 +19,48 @@ final class AttestTrustedIdentities: XCTestCase {
             attestation.mrEnclaves.count,
             1)
 
-        let verifier = AttestationVerifier(attestation: attestation)
-
+        _ = AttestationVerifier(attestation: attestation)
     }
 
     func testTrustedIdentityMrEnclaveConfigAndHardeningAdvisories() throws {
+        let fixture = try Attestation.Fixtures.MrEnclave()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = ["INTEL-SA-00614"]
-        configAdvisories.forEach { advisory_id in
+        fixture.configAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
         }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = ["INTEL-SA-00334", "INTEL-SA-00615"]
-        hardeningAdvisories.forEach { advisory_id in
+        fixture.hardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrEnclave = Data(hexEncoded: "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a")!
+        let mrEnclave = fixture.consensusAttestation.mrEnclaves[0].mrEnclave.data
         let ptr: OpaquePointer = mrEnclave.asMcBuffer { mrEnclavePtr in
-            withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, mc_config_advisories, mc_hardening_advisories) }
+            withMcInfallible {
+                mc_trusted_identity_mr_enclave_create(
+                    mrEnclavePtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
-            mc_trusted_mr_enclave_identity_advisories_to_string(ptr, bufferPtr)
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
+            mc_trusted_mr_enclave_identity_advisories_to_string(
+                ptr,
+                bufferPtr
+            )
         })
 
-        let advisoryDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
-        XCTAssertEqual(#"IDs: {"INTEL-SA-00334", "INTEL-SA-00614", "INTEL-SA-00615"} Status: ConfigurationAndSWHardeningNeeded"#, advisoryDescription)
+        let advisoryDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
+        XCTAssertEqual(fixture.configAndHardeningAdvisoriesDescription, advisoryDescription)
     }
 
     func testTrustedIdentityMrEnclaveConfigAdvisories() throws {
+        let fixture = try Attestation.Fixtures.MrEnclave()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = ["INTEL-SA-00614"]
-        configAdvisories.forEach { advisory_id in
+        fixture.configAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
         }
 
@@ -62,174 +70,216 @@ final class AttestTrustedIdentities: XCTestCase {
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrEnclave = Data(hexEncoded: "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a")!
+        let mrEnclave = fixture.consensusAttestation.mrEnclaves[0].mrEnclave.data
         let ptr: OpaquePointer = mrEnclave.asMcBuffer { mrEnclavePtr in
-            withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, mc_config_advisories, mc_hardening_advisories) }
+            withMcInfallible {
+                mc_trusted_identity_mr_enclave_create(
+                    mrEnclavePtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_enclave_identity_advisories_to_string(ptr, bufferPtr)
         })
 
-        let advisoryDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
-        XCTAssertEqual(#"IDs: {"INTEL-SA-00614"} Status: ConfigurationNeeded"#, advisoryDescription)
+        let advisoryDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
+        XCTAssertEqual(fixture.configAdvisoriesDescription, advisoryDescription)
     }
 
     func testTrustedIdentityMrEnclaveHardeningAdvisories() throws {
+        let fixture = try Attestation.Fixtures.MrEnclave()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = []
-        configAdvisories.forEach { advisory_id in
-            withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
-        }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = ["INTEL-SA-00334", "INTEL-SA-00615"]
-        hardeningAdvisories.forEach { advisory_id in
+        fixture.hardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrEnclave = Data(hexEncoded: "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a")!
+        let mrEnclave = fixture.consensusAttestation.mrEnclaves[0].mrEnclave.data
         let ptr: OpaquePointer = mrEnclave.asMcBuffer { mrEnclavePtr in
-            withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, mc_config_advisories, mc_hardening_advisories) }
+            withMcInfallible {
+                mc_trusted_identity_mr_enclave_create(
+                    mrEnclavePtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_enclave_identity_advisories_to_string(ptr, bufferPtr)
         })
 
-        let advisoryDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
-        XCTAssertEqual(#"IDs: {"INTEL-SA-00334", "INTEL-SA-00615"} Status: SWHardeningNeeded"#, advisoryDescription)
+        let advisoryDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
+        XCTAssertEqual(fixture.hardeningAdvisoriesDescription, advisoryDescription)
     }
 
     func testTrustedIdentityMrEnclaveHex() throws {
+        let fixture = try Attestation.Fixtures.MrEnclave()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = ["INTEL-SA-00614"]
-        configAdvisories.forEach { advisory_id in
+        fixture.configAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
         }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = ["INTEL-SA-00334", "INTEL-SA-00615"]
-        hardeningAdvisories.forEach { advisory_id in
+        fixture.hardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrEnclaveHex = "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
-        let mrEnclave = Data(hexEncoded: mrEnclaveHex)!
+        let mrEnclave = fixture.consensusAttestation.mrEnclaves[0].mrEnclave.data
+        let mrEnclaveHex = mrEnclave.hexEncodedString()
         let ptr: OpaquePointer = mrEnclave.asMcBuffer { mrEnclavePtr in
-            withMcInfallible { mc_trusted_identity_mr_enclave_create(mrEnclavePtr, mc_config_advisories, mc_hardening_advisories) }
+            withMcInfallible {
+                mc_trusted_identity_mr_enclave_create(
+                    mrEnclavePtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_enclave_identity_to_string(ptr, bufferPtr)
         })
 
-        let enclaveDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
+        let enclaveDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
         XCTAssertEqual(mrEnclaveHex, enclaveDescription)
     }
 
     func testTrustedIdentityMrSignerConfigAndHardeningAdvisories() throws {
+        let fixture = try Attestation.Fixtures.MrSigner()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = ["INTEL-SA-00614"]
-        configAdvisories.forEach { advisory_id in
+        fixture.configAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
         }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = ["INTEL-SA-00334", "INTEL-SA-00615"]
-        hardeningAdvisories.forEach { advisory_id in
+        fixture.hardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrSigner = Data(hexEncoded: "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a")!
+        let mrSigner = fixture.consensusAttestation.mrSigners[0].mrSigner.data
         let ptr: OpaquePointer = mrSigner.asMcBuffer { mrSignerPtr in
-            withMcInfallible { mc_trusted_identity_mr_signer_create(mrSignerPtr, mc_config_advisories, mc_hardening_advisories, UInt16(0), UInt16(9)) }
+            withMcInfallible {
+                mc_trusted_identity_mr_signer_create(
+                    mrSignerPtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories,
+                    UInt16(0),
+                    UInt16(9)
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_signer_identity_advisories_to_string(ptr, bufferPtr)
         })
 
-        let advisoryDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
-        XCTAssertEqual(#"IDs: {"INTEL-SA-00334", "INTEL-SA-00614", "INTEL-SA-00615"} Status: ConfigurationAndSWHardeningNeeded"#, advisoryDescription)
+        let advisoryDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
+        XCTAssertEqual(fixture.configAndHardeningAdvisoriesDescription, advisoryDescription)
     }
 
     func testTrustedIdentityMrSignerConfigAdvisories() throws {
+        let fixture = try Attestation.Fixtures.MrSigner()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = ["INTEL-SA-00614"]
-        configAdvisories.forEach { advisory_id in
+        fixture.configAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
         }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = []
-        hardeningAdvisories.forEach { advisory_id in
-            withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
-        }
 
-        let mrSigner = Data(hexEncoded: "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a")!
+        let mrSigner = fixture.consensusAttestation.mrSigners[0].mrSigner.data
         let ptr: OpaquePointer = mrSigner.asMcBuffer { mrSignerPtr in
-            withMcInfallible { mc_trusted_identity_mr_signer_create(mrSignerPtr, mc_config_advisories, mc_hardening_advisories, UInt16(0), UInt16(9)) }
+            withMcInfallible {
+                mc_trusted_identity_mr_signer_create(
+                    mrSignerPtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories,
+                    UInt16(0),
+                    UInt16(9)
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_signer_identity_advisories_to_string(ptr, bufferPtr)
         })
 
-        let advisoryDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
-        XCTAssertEqual(#"IDs: {"INTEL-SA-00614"} Status: ConfigurationNeeded"#, advisoryDescription)
+        let advisoryDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
+        XCTAssertEqual(fixture.configAdvisoriesDescription, advisoryDescription)
     }
 
     func testTrustedIdentityMrSignerHardeningAdvisories() throws {
+        let fixture = try Attestation.Fixtures.MrSigner()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = []
-        configAdvisories.forEach { advisory_id in
-            withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
-        }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = ["INTEL-SA-00334", "INTEL-SA-00615"]
-        hardeningAdvisories.forEach { advisory_id in
+        fixture.hardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrSigner = Data(hexEncoded: "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a")!
+        let mrSigner = fixture.consensusAttestation.mrSigners[0].mrSigner.data
         let ptr: OpaquePointer = mrSigner.asMcBuffer { mrSignerPtr in
-            withMcInfallible { mc_trusted_identity_mr_signer_create(mrSignerPtr, mc_config_advisories, mc_hardening_advisories, UInt16(0), UInt16(9)) }
+            withMcInfallible {
+                mc_trusted_identity_mr_signer_create(
+                    mrSignerPtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories,
+                    UInt16(0),
+                    UInt16(9)
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_signer_identity_advisories_to_string(ptr, bufferPtr)
         })
 
-        let advisoryDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
-        XCTAssertEqual(#"IDs: {"INTEL-SA-00334", "INTEL-SA-00615"} Status: SWHardeningNeeded"#, advisoryDescription)
+        let advisoryDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
+        XCTAssertEqual(fixture.hardeningAdvisoriesDescription, advisoryDescription)
     }
 
     func testTrustedIdentityMrSignerHex() throws {
+        let fixture = try Attestation.Fixtures.MrSigner()
         let mc_config_advisories = withMcInfallible(mc_advisories_create)
-        let configAdvisories: [String] = ["INTEL-SA-00614"]
-        configAdvisories.forEach { advisory_id in
+        fixture.configAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_config_advisories, advisory_id) }
         }
 
         let mc_hardening_advisories = withMcInfallible(mc_advisories_create)
-        let hardeningAdvisories: [String] = ["INTEL-SA-00334", "INTEL-SA-00615"]
-        hardeningAdvisories.forEach { advisory_id in
+        fixture.hardeningAdvisories.forEach { advisory_id in
             withMcInfallible { mc_add_advisory(mc_hardening_advisories, advisory_id) }
         }
 
-        let mrSignerHex = "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
-        let mrSigner = Data(hexEncoded: mrSignerHex)!
+        let mrSigner = fixture.consensusAttestation.mrSigners[0].mrSigner.data
+        let mrSignerHex = mrSigner.hexEncodedString()
         let ptr: OpaquePointer = mrSigner.asMcBuffer { mrSignerPtr in
-            withMcInfallible { mc_trusted_identity_mr_signer_create(mrSignerPtr, mc_config_advisories, mc_hardening_advisories, UInt16(0), UInt16(9)) }
+            withMcInfallible {
+                mc_trusted_identity_mr_signer_create(
+                    mrSignerPtr,
+                    mc_config_advisories,
+                    mc_hardening_advisories,
+                    UInt16(0),
+                    UInt16(9)
+                )
+            }
         }
 
-        let trusted_identity_description = try Data(withMcMutableBufferInfallible: { bufferPtr in
+        let trusted_identity_description = Data(withMcMutableBufferInfallible: { bufferPtr in
             mc_trusted_mr_signer_identity_to_string(ptr, bufferPtr)
         })
 
-        let enclaveDescription = try XCTUnwrap(String(data: trusted_identity_description, encoding: .utf8))
+        let enclaveDescription = try XCTUnwrap(
+            String(data: trusted_identity_description, encoding: .utf8))
         XCTAssertEqual(mrSignerHex, enclaveDescription)
     }
 }
