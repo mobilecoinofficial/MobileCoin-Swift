@@ -88,9 +88,9 @@ class MobileCoinClientIntTestsNonTransacting: XCTestCase {
         expectation expect: XCTestExpectation
     ) throws {
         let senderClient = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 0,
+                accountIndex: 2,
                 using: transportProtocol)
-        let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 1)
+        let receiverAccountKey = try IntegrationTestFixtures.createAccountKey(accountIndex: 0)
         let receiverClient = try IntegrationTestFixtures.createMobileCoinClient(
             accountKey: receiverAccountKey,
             transportProtocol: transportProtocol)
