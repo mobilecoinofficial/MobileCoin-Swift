@@ -9,7 +9,7 @@ import XCTest
 class TransactionTests: XCTestCase {
 
     func testBuildWorks() throws {
-        let fixture = try Transaction.Fixtures.BuildTx()
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
 
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
@@ -27,7 +27,7 @@ class TransactionTests: XCTestCase {
     }
 
     func testLegacyBlockVersion() throws {
-        let fixture = try Transaction.Fixtures.BuildTx()
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
 
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
@@ -56,7 +56,7 @@ class TransactionTests: XCTestCase {
     }
 
     func testRTHBlockVersion() throws {
-        let fixture = try Transaction.Fixtures.BuildTx()
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
 
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,

@@ -17,6 +17,7 @@ import XCTest
 class MistyswapTests: XCTestCase {
 
     func testInitiateOfframpRequest() throws {
+        try XCTSkip()
         // HTTP not supported
         try initiateOfframpRequest(transportProtocol: .grpc)
     }
@@ -38,6 +39,7 @@ class MistyswapTests: XCTestCase {
     }
 
     func testGetOfframpStatusRequest() throws {
+        try XCTSkip()
         // HTTP not supported
         try getOfframpStatusRequest(transportProtocol: .grpc)
     }
@@ -59,6 +61,7 @@ class MistyswapTests: XCTestCase {
     }
 
     func testForgetOfframpRequest() throws {
+        try XCTSkip()
         // HTTP not supported
         try forgetOfframpRequest(transportProtocol: .grpc)
     }

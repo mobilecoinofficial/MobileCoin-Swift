@@ -59,7 +59,6 @@ final class SignedContingentInputBuilder {
 
         let ring = McTransactionBuilderRing(ring: preparedTxInput.ring)
         self.ring = ring
-
         result = memoBuilder.withUnsafeOpaquePointer { memoBuilderPtr in
             fogResolver.withUnsafeOpaquePointer { fogResolverPtr in
                 viewPrivateKey.asMcBuffer { viewPrivateKeyPtr in
