@@ -8,7 +8,7 @@ import XCTest
 class TransactionPerfTests: PerformanceTestCase {
 
     func testPerformanceBuild() throws {
-        let fixture = try Transaction.Fixtures.BuildTx()
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
         let context = TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: BlockVersion.legacy,

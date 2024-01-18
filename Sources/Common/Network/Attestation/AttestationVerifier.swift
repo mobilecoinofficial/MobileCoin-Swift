@@ -8,19 +8,20 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
+// TrustedIdentities
 final class AttestationVerifier {
     private let ptr: OpaquePointer
 
     init(attestation: Attestation) {
         // Safety: mc_verifier_create should never return nil.
-        self.ptr = withMcInfallible(mc_verifier_create)
+        self.ptr = withMcInfallible(mc_trusted_identities_create)
 
         attestation.mrEnclaves.forEach(addMrEnclave)
         attestation.mrSigners.forEach(addMrSigner)
     }
 
     deinit {
-        mc_verifier_free(ptr)
+        mc_trusted_identities_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
@@ -30,93 +31,89 @@ final class AttestationVerifier {
     private func addMrEnclave(_ mrEnclave: Attestation.MrEnclave) {
         let ffiMrEnclaveVerifier = MrEnclaveVerifier(mrEnclave: mrEnclave)
         ffiMrEnclaveVerifier.withUnsafeOpaquePointer { ffiMrEnclaveVerifierPtr in
-            // Safety: mc_verifier_add_mr_enclave should never fail.
-            withMcInfallible { mc_verifier_add_mr_enclave(ptr, ffiMrEnclaveVerifierPtr) }
+            // Safety: mc_trusted_identities_add_mr_enclave should never fail.
+            withMcInfallible { mc_trusted_identities_add_mr_enclave(ptr, ffiMrEnclaveVerifierPtr) }
         }
     }
 
     private func addMrSigner(_ mrSigner: Attestation.MrSigner) {
         let ffiMrSignerVerifier = MrSignerVerifier(mrSigner: mrSigner)
         ffiMrSignerVerifier.withUnsafeOpaquePointer { ffiMrSignerVerifierPtr in
-            // Safety: mc_verifier_add_mr_signer should never fail.
-            withMcInfallible { mc_verifier_add_mr_signer(ptr, ffiMrSignerVerifierPtr) }
+            // Safety: mc_trusted_identities_add_mr_signer should never fail.
+            withMcInfallible { mc_trusted_identities_add_mr_signer(ptr, ffiMrSignerVerifierPtr) }
         }
     }
 }
 
+// TrustedMrEnclaveIdentity
 private final class MrEnclaveVerifier {
     private let ptr: OpaquePointer
 
     init(mrEnclave: Attestation.MrEnclave) {
-        self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
-            // Safety: mc_mr_enclave_verifier_create should never fail.
-            withMcInfallible { mc_mr_enclave_verifier_create(mrEnclavePtr) }
+        let configAdvisories = withMcInfallible(mc_advisories_create)
+        mrEnclave.allowedConfigAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(configAdvisories, advisory_id) }
         }
 
-        mrEnclave.allowedConfigAdvisories.forEach(addConfigAdvisory)
-        mrEnclave.allowedHardeningAdvisories.forEach(addHardeningAdvisory)
+        let hardeningAdvisories = withMcInfallible(mc_advisories_create)
+        mrEnclave.allowedHardeningAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(hardeningAdvisories, advisory_id) }
+        }
+
+        self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
+            // Safety: mc_mr_enclave_verifier_create should never fail.
+            withMcInfallible {
+                mc_trusted_identity_mr_enclave_create(
+                    mrEnclavePtr,
+                    configAdvisories,
+                    hardeningAdvisories
+                )
+            }
+        }
     }
 
     deinit {
-        mc_mr_enclave_verifier_free(ptr)
+        mc_trusted_identity_mr_enclave_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
         try body(ptr)
     }
-
-    private func addConfigAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_enclave_verifier_allow_config_advisory should never fail.
-            withMcInfallible { mc_mr_enclave_verifier_allow_config_advisory(ptr, advisoryIdPtr) }
-        }
-    }
-
-    private func addHardeningAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_enclave_verifier_allow_hardening_advisory should never fail.
-            withMcInfallible { mc_mr_enclave_verifier_allow_hardening_advisory(ptr, advisoryIdPtr) }
-        }
-    }
 }
 
+// TrustedMrSignerIdentity
 private final class MrSignerVerifier {
     private let ptr: OpaquePointer
 
     init(mrSigner: Attestation.MrSigner) {
+        let configAdvisories = withMcInfallible(mc_advisories_create)
+        mrSigner.allowedConfigAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(configAdvisories, advisory_id) }
+        }
+
+        let hardeningAdvisories = withMcInfallible(mc_advisories_create)
+        mrSigner.allowedHardeningAdvisories.forEach { advisory_id in
+            withMcInfallible { mc_add_advisory(hardeningAdvisories, advisory_id) }
+        }
+
         self.ptr = mrSigner.mrSigner.asMcBuffer { mrSignerPtr in
             // Safety: mc_mr_signer_verifier_create should never fail.
             withMcInfallible {
-                mc_mr_signer_verifier_create(
+                mc_trusted_identity_mr_signer_create(
                     mrSignerPtr,
+                    configAdvisories,
+                    hardeningAdvisories,
                     mrSigner.productId,
                     mrSigner.minimumSecurityVersion)
             }
         }
-
-        mrSigner.allowedConfigAdvisories.forEach(addConfigAdvisory)
-        mrSigner.allowedHardeningAdvisories.forEach(addHardeningAdvisory)
     }
 
     deinit {
-        mc_mr_signer_verifier_free(ptr)
+        mc_trusted_identity_mr_signer_free(ptr)
     }
 
     func withUnsafeOpaquePointer<R>(_ body: (OpaquePointer) throws -> R) rethrows -> R {
         try body(ptr)
-    }
-
-    private func addConfigAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_signer_verifier_allow_config_advisory should never fail.
-            withMcInfallible { mc_mr_signer_verifier_allow_config_advisory(ptr, advisoryIdPtr) }
-        }
-    }
-
-    private func addHardeningAdvisory(advisoryId: String) {
-        advisoryId.withCString { advisoryIdPtr in
-            // Safety: mc_mr_signer_verifier_allow_hardening_advisory should never fail.
-            withMcInfallible { mc_mr_signer_verifier_allow_hardening_advisory(ptr, advisoryIdPtr) }
-        }
     }
 }

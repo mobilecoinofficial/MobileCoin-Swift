@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
@@ -26,6 +27,42 @@ extension AccountKey.Fixtures {
         init() throws {
             self.mnemonic = Self.mnemonic()
             self.fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: Self.fogAuthoritySpkiB64))
+        }
+    }
+}
+
+extension AccountKey.Fixtures {
+    struct TestNet {
+        let accountKey: AccountKey
+        let mnemonic: Mnemonic
+        var mnemonicString: String { mnemonic.phrase }
+
+        let fogReportUrl = Self.fogReportUrl
+        let fogReportId = Self.fogReportId
+        let fogAuthoritySpki: Data
+
+        let viewPrivateKey = DefaultZero.viewPrivateKey
+        let spendPrivateKey = DefaultZero.spendPrivateKey
+
+        init() throws {
+            self.mnemonic = Self.mnemonic()
+            self.fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: Self.fogAuthoritySpkiB64))
+            self.accountKey = try AccountKey.make(
+                mnemonic: mnemonic.phrase,
+                fogReportUrl: fogReportUrl,
+                fogReportId: fogReportId,
+                fogAuthoritySpki: self.fogAuthoritySpki).get()
+        }
+
+        init(accountIndex: UInt32) throws {
+            self.mnemonic = Self.mnemonic()
+            self.fogAuthoritySpki = try XCTUnwrap(Data(base64Encoded: Self.fogAuthoritySpkiB64))
+            self.accountKey = try AccountKey.make(
+                mnemonic: mnemonic.phrase,
+                fogReportUrl: fogReportUrl,
+                fogReportId: fogReportId,
+                fogAuthoritySpki: self.fogAuthoritySpki,
+                accountIndex: accountIndex).get()
         }
     }
 }
@@ -202,6 +239,28 @@ extension AccountKey.Fixtures.Init {
         AwEAAQ==
         """
 
+}
+
+extension AccountKey.Fixtures.TestNet {
+
+    fileprivate static func mnemonic(accountIndex: UInt8 = 0) -> Mnemonic {
+        Bip39Utils.mnemonic(fromEntropy: Data32(repeating: accountIndex))
+    }
+
+    fileprivate static let fogReportUrl = "fog://fog.test.mobilecoin.com"
+    fileprivate static let fogReportId = ""
+    fileprivate static let fogAuthoritySpkiB64 = """
+        MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvnB9wTbTOT5uoizRYaYbw7XIEkInl8E7MGOA\
+        Qj+xnC+F1rIXiCnc/t1+5IIWjbRGhWzo7RAwI5sRajn2sT4rRn9NXbOzZMvIqE4hmhmEzy1YQNDnfALA\
+        WNQ+WBbYGW+Vqm3IlQvAFFjVN1YYIdYhbLjAPdkgeVsWfcLDforHn6rR3QBZYZIlSBQSKRMY/tywTxeT\
+        CvK2zWcS0kbbFPtBcVth7VFFVPAZXhPi9yy1AvnldO6n7KLiupVmojlEMtv4FQkk604nal+j/dOplTAT\
+        V8a9AJBbPRBZ/yQg57EG2Y2MRiHOQifJx0S5VbNyMm9bkS8TD7Goi59aCW6OT1gyeotWwLg60JRZTfyJ\
+        7lYWBSOzh0OnaCytRpSWtNZ6barPUeOnftbnJtE8rFhF7M4F66et0LI/cuvXYecwVwykovEVBKRF4HOK\
+        9GgSm17mQMtzrD7c558TbaucOWabYR04uhdAc3s10MkuONWG0wIQhgIChYVAGnFLvSpp2/aQEq3xrRSE\
+        TxsixUIjsZyWWROkuA0IFnc8d7AmcnUBvRW7FT/5thWyk5agdYUGZ+7C1o69ihR1YxmoGh69fLMPIEOh\
+        Yh572+3ckgl2SaV4uo9Gvkz8MMGRBcMIMlRirSwhCfozV2RyT5Wn1NgPpyc8zJL7QdOhL7Qxb+5WjnCV\
+        rQYHI2cCAwEAAQ==
+        """
 }
 
 extension AccountKey.Fixtures.AlphaFog {

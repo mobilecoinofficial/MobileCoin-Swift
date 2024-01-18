@@ -30,8 +30,8 @@ class AccountTests: XCTestCase {
     }
 
     func testViewTxOuts() throws {
-        let accountKey = try Self.accountKey()
-        let txOutFixture = try TxOut.Fixtures.Default(accountKey: accountKey)
+        let accountKey = try Self.testNetAccountKey()
+        let txOutFixture = try TxOut.Fixtures.TestNet(accountKey: accountKey)
         let testFogService = ViewTestFogService(
             accountKey: accountKey,
             txOuts: [txOutFixture.txOut])
@@ -52,8 +52,8 @@ class AccountTests: XCTestCase {
     }
 
     func testMissedBlocks() throws {
-        let accountKey = try Self.accountKey()
-        let txOutFixture = try TxOut.Fixtures.Default(accountKey: accountKey)
+        let accountKey = try Self.testNetAccountKey()
+        let txOutFixture = try TxOut.Fixtures.TestNet(accountKey: accountKey)
         let testFogService = MissedBlockTestFogService(
             accountKey: accountKey,
             txOuts: [txOutFixture.txOut])
@@ -78,6 +78,10 @@ class AccountTests: XCTestCase {
 extension AccountTests {
     static func accountKey() throws -> AccountKey {
         try AccountKey.Fixtures.Default().accountKey
+    }
+
+    static func testNetAccountKey() throws -> AccountKey {
+        try AccountKey.Fixtures.TestNet().accountKey
     }
 
     static func balanceUpdater(
