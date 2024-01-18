@@ -10,10 +10,10 @@ GIT
 
 GIT
   remote: https://github.com/sporkmonger/addressable
-  revision: b56cef3e69bb1294ac4e31dad150e910b05f607f
+  revision: 7cd185ec53691ee0b8922c1ddf542725f1d54aa0
   branch: main
   specs:
-    addressable (2.8.4)
+    addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
 
 GEM
@@ -305,7 +305,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  addressable (= 2.8.4)!
+  addressable (= 2.8.5)!
   cocoapods (~> 1.0, >= 1.12.0)!
   cocoapods-binary!
   cocoapods-deintegrate (~> 1.0, >= 1.0.4)!
