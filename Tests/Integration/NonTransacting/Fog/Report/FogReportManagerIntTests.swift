@@ -24,7 +24,7 @@ class FogReportManagerIntTests: XCTestCase {
             print(reportResponse)
             XCTAssertNoThrow(evaluating: {
                 let report = try XCTUnwrap(reportResponse.reports.first)
-                let serializedVerificationReport = try report.report.serializedData()
+                let serializedVerificationReport = try report.verificationReport.serializedData()
                 print("report: \(serializedVerificationReport.base64EncodedString())")
             })
 

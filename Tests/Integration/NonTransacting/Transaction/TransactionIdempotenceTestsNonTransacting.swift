@@ -29,7 +29,7 @@ class TransactionIdempotenceTestsNonTransacting: XCTestCase {
             "d47d4f6525cee846a47106e92de3e63e5b3cb677b8ae4df7efd667e2bad15719"
 
         let client = try IntegrationTestFixtures.createMobileCoinClient(
-                accountIndex: 1,
+                accountIndex: 0,
                 using: transportProtocol)
         let rngSeed = try XCTUnwrap(RngSeed(try XCTUnwrap(Data(hexEncoded: rngSeedHex))))
         let recipientAddressData = try XCTUnwrap(Data(hexEncoded: recipientAddressHex))
