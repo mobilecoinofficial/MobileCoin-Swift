@@ -44,7 +44,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             fatalError(msg)
         }
         
-        guard txOutsValue > feeValue else {
+        guard txOutsValue >= feeValue else {
             logger.warning(
                 "amountTransferable: Fee is equal to or greater than balance. txOut values: " +
                     "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
@@ -96,7 +96,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             fatalError(msg)
         }
         
-        guard txOutsValue > feeValue else {
+        guard txOutsValue >= feeValue else {
             logger.warning(
                 "amountTransferable: Fee is equal to or greater than balance. txOut values: " +
                     "\(redacting: txOutValues), totalFee: \(redacting: totalFee)",
@@ -286,7 +286,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 fatalError(msg)
             }
             
-            if selectedTxOutsValue > amountAndFee {
+            if selectedTxOutsValue >= amountAndFee {
                 // Success! Sum value of selectedTxOuts is enough to cover sendAmount + totalFee.
                 let requiresDefrag = selectedTxOuts.count > maxInputsPerTransaction
                 return .success((totalFee, requiresDefrag))
@@ -428,7 +428,7 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 fatalError(msg)
             }
             
-            if selectedTxOutsValue > amountAndFee {
+            if selectedTxOutsValue >= amountAndFee {
                 // Success! Sum value of selectedTxOuts is enough to cover amount + fee.
                 break
             }
