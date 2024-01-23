@@ -261,6 +261,43 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
                 allowDefrag: true)
         }
     }
+    /// Estimates the total amount of fees needed in order to send the specified amount, including
+    /// the fees for any requisite defragmentation transactions.
+    fileprivate func estimateAllFees(
+        selectionFeeLevel: SelectionFeeLevel,
+        txOuts: [SelectionTxOut],
+        maxInputsPerTransaction: Int
+    ) -> Result<(totalFee: UInt64, requiresDefrag: Bool), TxOutSelectionError> {
+        var availableTxOuts = txOuts
+            .filter { $0.value > 0 }
+            .sorted { $0.value < $1.value }
+
+        let txOutsSum = BigUInt(values: availableTxOuts.map({$0.value}))
+       
+        
+        guard let txOutsSum = txOutsSum else {
+            let msg =
+                "BigUInt overflowed during initialization. " +
+                "Should never happen for known tokens."
+            logger.error(msg, logFunction: false)
+            fatalError(msg)
+        }
+        
+        if txOutsSum.high > 0 {
+            // Large balance
+            
+        } else {
+            // Balance < UInt64.max, total fees a function of max inputs & number of txOuts
+            let totalFee = self.totalFee(
+                numTxOuts: availableTxOuts.count,
+                selectionFeeLevel: selectionFeeLevel,
+                maxInputsPerTransaction: maxInputsPerTransaction)
+            
+            let requiresDefrag = availableTxOuts.count > maxInputsPerTransaction
+            
+            return .success((totalFee: totalFee, requiresDefrag: requiresDefrag))
+        }
+    }
 
     /// Estimates the total amount of fees needed in order to send the specified amount, including
     /// the fees for any requisite defragmentation transactions.
