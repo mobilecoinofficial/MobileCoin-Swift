@@ -76,14 +76,47 @@ struct DefaultTxOutSelectionStrategy: TxOutSelectionStrategy {
             logger.info("Calculating amountTransferable with 0 balance", logFunction: false)
             return .success(0)
         }
+         
+        let uint64UpperBoundResult = selectTransactionInputs(
+            amount: Amount(UInt64.max, in: .MOB),
+            feeStrategy: feeStrategy,
+            fromTxOuts: txOuts,
+            maxInputs: maxInputsPerTransaction
+        ).map { $0.inputIds.map { txOuts[$0] } }
+        
+        
+        let boundTxOutValues = {
+            switch uint64UpperBoundResult {
+                case .success(let upperBoundSelection):
+                    // User's account balance is greater than UInt64.max
+                    // AND its structured in a way where we can send:
+                    // UInt64.max - fee in one transaction
+                    // return only the txOuts needed to send UInt64.max
+                    // amount transferable == UInt64.max - fee
+                    return upperBoundSelection.map { $0.value }
+                case .failure(let error as TransactionInputSelectionError):
+                    switch error {
+                        case .defragmentationRequired(let message):
+                            // User has large balance, but Defrag required to send UInt64.max,
+                            // amount transferable will be UInt64.max - "all fees"
+                            //
+                            // note: for amounts less than UInt64.max we include all fees
+                            return txOutValues
+                        case .insufficientTxOuts(let message):
+                            // User's balance less than UInt64.max return txOutValues
+                            // previous/existing behavior
+                            return txOutValues
+                    }
+            }
+        }()
 
         let totalFee = self.totalFee(
-            numTxOuts: txOuts.count,
+            numTxOuts: boundTxOutValues.count,
             selectionFeeLevel: .feeStrategy(feeStrategy),
             maxInputsPerTransaction: maxInputsPerTransaction)
 
         // Create BigUInt's for comparison, and error for values larger than supported
-        let txOutsValue = BigUInt(values: txOutValues)
+        let txOutsValue = BigUInt(values: boundTxOutValues)
         let feeValue = BigUInt(values: [totalFee])
         guard
             let txOutsValue = txOutsValue,

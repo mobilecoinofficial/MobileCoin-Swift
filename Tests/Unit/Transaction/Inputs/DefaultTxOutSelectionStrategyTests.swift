@@ -316,74 +316,28 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
         }
     }
 
-    func testBalanceTransferable() {
+    func testAmountTransferableLargeTxOuts() {
         let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase5] = [
-            t5([], expectedAmountTransferable: BigUInt(0)),
-            t5([.init(value: minFee + 999)], expectedAmountTransferable: BigUInt(999)),
-            t5([
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-            ], maxInputsPerTransaction: 3, expectedAmountTransferable: BigUInt(100_000_000_000)),
-            t5([
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-                .init(value: (2 * minFee + 100_000_000_000) / 4),
-            ], maxInputsPerTransaction: 4, expectedAmountTransferable: BigUInt(minFee + 100_000_000_000)),
-        ]
         
-        testCases.append(contentsOf: nonDefragTestCases.map {
-            t5($0.feeLevel, $0.txOuts, maxInputsPerTransaction: $0.maxInputsPerTransaction,
-               expectedAmountTransferable: BigUInt($0.expectedAmountTransferable),
-               file: $0.file, line: $0.line)
-        })
-        testCases.append(contentsOf: defragTestCases.map {
-            t5($0.feeLevel, $0.txOuts, maxInputsPerTransaction: $0.maxInputsPerTransaction,
-               expectedAmountTransferable: BigUInt($0.expectedAmountTransferable),
-               file: $0.file, line: $0.line)
-        })
-
-        for (feeLevel, txOuts, maxInputsPerTransaction, expectedAmountTransferable, file, line) in
-            testCases
-        {
-            _ = try? {
-                let amountTransferable = try XCTUnwrapSuccess(
-                    sut.balanceTransferable(
-                        feeStrategy: feeLevel.defaultFeeStrategy,
-                        txOuts: txOuts,
-                        tokenId: TokenId.MOB,
-                        maxInputsPerTransaction: maxInputsPerTransaction),
-                    file: file, line: line)
-                if let expectedAmountTransferable = expectedAmountTransferable {
-                    XCTAssertEqual(amountTransferable.amount, expectedAmountTransferable,
-                        "amount transferable != expected amount transferable",
-                        file: file, line: line)
-                }
-            }()
-        }
-    }
-    
-    func testBalanceTransferableBigUInts() {
-        let sut = DefaultTxOutSelectionStrategy()
-        var testCases: [TestCase5] = [
-//            t5([], expectedAmountTransferable: BigUInt(0)),
-//            t5([.init(value: minFee + 999)], expectedAmountTransferable: BigUInt(999)),
-            t5([
-                .init(value: (100_000_000_000)),
-                .init(value: (100_000_000_000)),
-                .init(value: (100_000_000_000)),
-                .init(value: (2 * minFee + 100_000_000_000)),
-            ], maxInputsPerTransaction: 3, expectedAmountTransferable: BigUInt(400_000_000_000)),
-            t5([
+        let fee = minFee
+        let (maxMinusOneFee, overflow) = UInt64.max.subtractingReportingOverflow(McConstants.DEFAULT_MINIMUM_FEE)
+        guard overflow == false else { XCTFail("Overflowed calculating expected amount"); return }
+        var testCases: [TestCase2] = [
+//            t2([], expectedAmountTransferable: BigUInt(0)),
+//            t2([.init(value: minFee + 999)], expectedAmountTransferable: BigUInt(999)),
+            t2([
                 .init(value: (18_446_000_000_000_000_000)),
                 .init(value: (18_446_000_000_000_000_000)),
                 .init(value: (18_446_000_000_000_000_000)),
-                .init(value: (2 * minFee + 18_446_000_000_000_000_000)),
-            ], maxInputsPerTransaction: 3, expectedAmountTransferable: BigUInt(low: 18_443_767_778_871_345_152, high: 3)),
-//            t5([
+                .init(value: (18_446_000_000_000_000_000)),
+                .init(value: (18_446_000_000_000_000_000)),
+                .init(value: (18_446_000_000_000_000_000)),
+                .init(value: (18_446_000_000_000_000_000)),
+                .init(value: (18_446_000_000_000_000_000)),
+                .init(value: (18_446_000_000_000_000_000)),
+                .init(value: (18_446_000_000_000_000_000)),
+            ], maxInputsPerTransaction: 3, expectedAmountTransferable: maxMinusOneFee),
+//            t2([
 //                .init(value: (2 * minFee + 100_000_000_000) / 4),
 //                .init(value: (2 * minFee + 100_000_000_000) / 4),
 //                .init(value: (2 * minFee + 100_000_000_000) / 4),
@@ -401,26 +355,125 @@ class DefaultTxOutSelectionStrategyTests: XCTestCase {
 //               expectedAmountTransferable: BigUInt($0.expectedAmountTransferable),
 //               file: $0.file, line: $0.line)
 //        })
+        
+        // UInt64.max == 18_446_744_073_709_551_615
+        //               18_446_744_072_909_551_615
 
         for (feeLevel, txOuts, maxInputsPerTransaction, expectedAmountTransferable, file, line) in
             testCases
         {
             _ = try? {
                 let amountTransferable = try XCTUnwrapSuccess(
-                    sut.balanceTransferable(
+                    sut.amountTransferable(
                         feeStrategy: feeLevel.defaultFeeStrategy,
                         txOuts: txOuts,
-                        tokenId: TokenId.MOB,
                         maxInputsPerTransaction: maxInputsPerTransaction),
                     file: file, line: line)
                 if let expectedAmountTransferable = expectedAmountTransferable {
-                    XCTAssertEqual(amountTransferable.amount, expectedAmountTransferable,
+                    let diff = expectedAmountTransferable.subtractingReportingOverflow(amountTransferable)
+                    print(diff)
+                    XCTAssertEqual(amountTransferable, expectedAmountTransferable,
                         "amount transferable != expected amount transferable",
                         file: file, line: line)
                 }
             }()
         }
     }
+    
+    func testAmountTransferableManyLargeTxOuts() {
+        let sut = DefaultTxOutSelectionStrategy()
+        
+        let fee = minFee
+        let (maxMinusThreeFees, overflow) = UInt64.max.subtractingReportingOverflow(McConstants.DEFAULT_MINIMUM_FEE * 3)
+        guard overflow == false else { XCTFail("Overflowed calculating expected amount"); return }
+        var testCases: [TestCase2] = [
+//            t2([], expectedAmountTransferable: BigUInt(0)),
+//            t2([.init(value: minFee + 999)], expectedAmountTransferable: BigUInt(999)),
+            t2([
+                // 39 values, max inputs == 16, expect 3 fees to send all
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+                .init(value: (1_000_000_000_000_000_000)),
+            ], maxInputsPerTransaction: 16, expectedAmountTransferable: maxMinusThreeFees),
+//            t2([
+//                .init(value: (2 * minFee + 100_000_000_000) / 4),
+//                .init(value: (2 * minFee + 100_000_000_000) / 4),
+//                .init(value: (2 * minFee + 100_000_000_000) / 4),
+//                .init(value: (2 * minFee + 100_000_000_000) / 4),
+//            ], maxInputsPerTransaction: 4, expectedAmountTransferable: BigUInt(minFee + 100_000_000_000)),
+        ]
+        
+//        testCases.append(contentsOf: nonDefragTestCases.map {
+//            t5($0.feeLevel, $0.txOuts, maxInputsPerTransaction: $0.maxInputsPerTransaction,
+//               expectedAmountTransferable: BigUInt($0.expectedAmountTransferable),
+//               file: $0.file, line: $0.line)
+//        })
+//        testCases.append(contentsOf: defragTestCases.map {
+//            t5($0.feeLevel, $0.txOuts, maxInputsPerTransaction: $0.maxInputsPerTransaction,
+//               expectedAmountTransferable: BigUInt($0.expectedAmountTransferable),
+//               file: $0.file, line: $0.line)
+//        })
+        
+        // UInt64.max == 18_446_744_073_709_551_615
+        //               18_446_744_072_909_551_615
+
+        for (feeLevel, txOuts, maxInputsPerTransaction, expectedAmountTransferable, file, line) in
+            testCases
+        {
+            _ = try? {
+                let amountTransferable = try XCTUnwrapSuccess(
+                    sut.amountTransferable(
+                        feeStrategy: feeLevel.defaultFeeStrategy,
+                        txOuts: txOuts,
+                        maxInputsPerTransaction: maxInputsPerTransaction),
+                    file: file, line: line)
+                if let expectedAmountTransferable = expectedAmountTransferable {
+                    let diff = expectedAmountTransferable.subtractingReportingOverflow(amountTransferable)
+                    print(diff)
+                    XCTAssertEqual(amountTransferable, expectedAmountTransferable,
+                        "amount transferable != expected amount transferable",
+                        file: file, line: line)
+                }
+            }()
+        }
+    }
+    
     
     func testAmountTransferableThrowsInsufficientTxOuts() {
         let sut = DefaultTxOutSelectionStrategy()
@@ -813,34 +866,3 @@ extension SelectionTxOut {
         self.init(value: value, blockIndex: 0)
     }
 }
-
-private typealias TestCase5 = (
-    feeLevel: FeeLevel,
-    txOuts: [SelectionTxOut],
-    maxInputsPerTransaction: Int,
-    expectedAmountTransferable: BigUInt?,
-    file: StaticString,
-    line: UInt
-)
-
-private func t5(
-    _ txOuts: [SelectionTxOut],
-    maxInputsPerTransaction: Int = McConstants.MAX_INPUTS,
-    expectedAmountTransferable: BigUInt? = nil,
-    file: StaticString = #file,
-    line: UInt = #line
-) -> TestCase5 {
-    (.minimum, txOuts, maxInputsPerTransaction, expectedAmountTransferable, file, line)
-}
-
-private func t5(
-    _ feeLevel: FeeLevel,
-    _ txOuts: [SelectionTxOut],
-    maxInputsPerTransaction: Int = McConstants.MAX_INPUTS,
-    expectedAmountTransferable: BigUInt? = nil,
-    file: StaticString = #file,
-    line: UInt = #line
-) -> TestCase5 {
-    (feeLevel, txOuts, maxInputsPerTransaction, expectedAmountTransferable, file, line)
-}
-

@@ -73,15 +73,6 @@ final class TxOutSelector {
             txOuts: txOuts.map(SelectionTxOut.init))
     }
 
-    func maxAmountTransferable(tokenId: TokenId, feeStrategy: FeeStrategy, txOuts: [KnownTxOut])
-        -> Result<LargeAmount, AmountTransferableError>
-    {
-        txOutSelectionStrategy.maxAmountTransferable(
-            tokenId: tokenId,
-            feeStrategy: feeStrategy,
-            txOuts: txOuts.map(SelectionTxOut.init))
-    }
-
     func amountTransferable(tokenId: TokenId, feeStrategy: FeeStrategy, txOuts: [KnownTxOut])
         -> Result<UInt64, AmountTransferableError>
     {
