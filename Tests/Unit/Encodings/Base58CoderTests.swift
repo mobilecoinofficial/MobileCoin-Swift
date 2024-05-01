@@ -124,4 +124,29 @@ class Base58CoderTests: XCTestCase {
         })
     }
 
+    func testDecodingPublicAddressWithFogIntoSpendView() {
+        XCTAssertNoThrow(evaluating: {
+            
+            let b58Encoded =
+                """
+                2222222222222222222222222222222222222222222222222222222222222222\
+                1111111111111111111111111111111111111111111
+                """
+            
+            guard let result = Base58Coder.decode(b58Encoded) else {
+                XCTFail("B58EncodePublicAddressWithFog test case failed to decode: " +
+                    "\(b58Encoded)")
+                return
+            }
+            guard case .publicAddress(let decoded) = result else {
+                XCTFail("B58EncodePublicAddressWithFog test case didn't decode to " +
+                    "PublicAddress: \(result)")
+                return
+            }
+            
+            
+            print("b58 decoded public view key: \(decoded.viewPublicKey.hexEncodedString())")
+            print("b58 decoded public spend key: \(decoded.spendPublicKey.hexEncodedString())")
+        })
+    }
 }
