@@ -78,21 +78,22 @@ extension FogView {
                     })
                 }($0)
 
-                let transform: (FogView_QueryResponse) throws -> UInt64? = { (response: FogView_QueryResponse) throws -> UInt64? in
-                    let result = self.fogView.writeSync {
-                        $0.processQueryResponse(
-                            response,
-                            searchAttempt: searchAttempt,
-                            accountKey: self.accountKey
-                        ).map { processResult -> UInt64? in
-                            if !searchAttempt.searchKeys.isEmpty {
-                                partialResultsWithWriteLock(processResult.newTxOuts)
+                let transform: (FogView_QueryResponse) throws -> UInt64? =
+                    { (response: FogView_QueryResponse) throws -> UInt64? in
+                        let result = self.fogView.writeSync {
+                            $0.processQueryResponse(
+                                response,
+                                searchAttempt: searchAttempt,
+                                accountKey: self.accountKey
+                            ).map { processResult -> UInt64? in
+                                if !searchAttempt.searchKeys.isEmpty {
+                                    partialResultsWithWriteLock(processResult.newTxOuts)
+                                }
+                                return processResult.nextRoundTargetBlockCount
                             }
-                            return processResult.nextRoundTargetBlockCount
                         }
+                        return try result.get()
                     }
-                    return try result.get()
-                }
 
                 let result: Result<UInt64?, ConnectionError> = $0.flatMap(transform)
 
