@@ -6,7 +6,7 @@ import Foundation
 
 extension Result {
     func flatMap<NewSuccess, ExistingError>(
-        _ transform: (Success) throws(ExistingError) -> NewSuccess
+        _ transform: (Success) throws -> NewSuccess
     ) -> Result<NewSuccess, ExistingError> {
         do {
             let value = try get()

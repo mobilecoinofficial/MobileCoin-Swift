@@ -78,7 +78,7 @@ extension FogView {
                     })
                 }($0)
 
-                let transform: (FogView_QueryResponse) throws(ConnectionError) -> UInt64? = { (response: FogView_QueryResponse) throws(ConnectionError) -> UInt64? in
+                let transform: (FogView_QueryResponse) throws -> UInt64? = { (response: FogView_QueryResponse) throws -> UInt64? in
                     let result = self.fogView.writeSync {
                         $0.processQueryResponse(
                             response,
