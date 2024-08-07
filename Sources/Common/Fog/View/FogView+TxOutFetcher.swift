@@ -93,7 +93,7 @@ extension FogView {
                     }
                     return try result.get()
                 }
-                
+
                 let result: Result<UInt64?, ConnectionError> = $0.flatMap(transform)
 
                 switch result {
