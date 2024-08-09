@@ -68,7 +68,8 @@ commands:
           name: Use Ruby << parameters.ruby-version >>
           command: |
             ruby-install << parameters.ruby-version >> -- --enable-shared
-            echo 'source /usr/local/share/chruby/chruby.sh' >> $BASH_ENV
+            echo 'source /opt/homebrew/opt/chruby/share/chruby/chruby.sh' >> $BASH_ENV
+            echo 'source /opt/homebrew/opt/chruby/share/chruby/auto.sh' >> $BASH_ENV
             echo 'chruby ruby-<< parameters.ruby-version >>' >> $BASH_ENV
 
   install-gems:
