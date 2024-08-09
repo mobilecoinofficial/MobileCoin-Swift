@@ -48,6 +48,17 @@ commands:
             bundle exec pod env
             printenv
 
+  install-chruby:
+    description: Install chruby
+    steps:
+      - run:
+          name: Install chruby
+          command: |
+            wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+            tar -xzvf chruby-0.3.9.tar.gz
+            cd chruby-0.3.9/
+            sudo make install
+
   set-ruby-version:
     description: Set Ruby Version
     parameters:
@@ -58,6 +69,7 @@ commands:
       - run:
           name: Use Ruby << parameters.ruby-version >>
           command: |
+            ruby-install ruby << parameters.ruby-version >>
             echo 'source /usr/local/share/chruby/chruby.sh' >> $BASH_ENV
             echo 'chruby ruby-<< parameters.ruby-version >>' >> $BASH_ENV
 
@@ -242,6 +254,7 @@ jobs:
       - install-lfs
       - checkout
       - init-artifacts-submodule
+      - install-chruby
       - set-ruby-version
       - install-gems
       - install-example-gems
@@ -273,6 +286,7 @@ jobs:
       - install-lfs
       - checkout
       - init-artifacts-submodule
+      - install-chruby
       - set-ruby-version
       - install-gems
       - install-example-http-gems
@@ -304,6 +318,7 @@ jobs:
       - install-lfs
       - checkout
       - init-artifacts-submodule
+      - install-chruby
       - set-ruby-version
       - install-gems
       - print-tool-versions
@@ -332,6 +347,7 @@ jobs:
       - install-lfs
       - checkout
       - init-artifacts-submodule
+      - install-chruby
       - set-ruby-version
       - install-gems
       - install-example-http-gems
@@ -354,6 +370,7 @@ jobs:
       - install-lfs
       - checkout
       - init-artifacts-submodule
+      - install-chruby
       - set-ruby-version
       - install-example-gems
       - install-example-http-gems
@@ -394,6 +411,7 @@ jobs:
       - install-lfs
       - checkout
       - init-artifacts-submodule
+      - install-chruby
       - set-ruby-version
       - install-gems
       - install-example-gems
