@@ -2,7 +2,7 @@ version: 2.1
 
 defaults:
   default-xcode-version: &default-xcode-version "14.1"
-  default-ruby-version: &default-ruby-version "2.7"
+  default-ruby-version: &default-ruby-version "2.7.7"
 
   default-environment: &default-environment
     FASTLANE_SKIP_UPDATE_CHECK: "1"
