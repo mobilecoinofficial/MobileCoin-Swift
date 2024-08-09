@@ -69,7 +69,6 @@ commands:
       - run:
           name: Use Ruby << parameters.ruby-version >>
           command: |
-            ruby-install ruby << parameters.ruby-version >>
             echo 'source /usr/local/share/chruby/chruby.sh' >> $BASH_ENV
             echo 'chruby ruby-<< parameters.ruby-version >>' >> $BASH_ENV
 
