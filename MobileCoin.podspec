@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "6.0.1"
+  s.version      = "6.0.2"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -53,33 +53,6 @@ Pod::Spec.new do |s|
     test_spec.test_type = :ui
     test_spec.requires_app_host = true
   end
-
-  s.subspec "Core" do |subspec|
-    subspec.source_files = [
-      "Sources/{Common,GRPC,HTTPS}/**/*.swift",
-      "CocoapodsOnly/*.{h,m,swift}",
-    ]
-
-    subspec.dependency "LibMobileCoin/Core", "~> 6.0.0-pre1"
-
-    subspec.dependency "gRPC-Swift", "1.0.0"
-    subspec.dependency "Logging", "~> 1.4"
-    subspec.dependency "SwiftNIO", "~> 2.40.0"
-    subspec.dependency "SwiftNIOHPACK", "~> 1.16.3"
-    subspec.dependency "SwiftNIOHTTP1", "~> 2.40.0"
-    subspec.dependency "SwiftProtobuf"
-
-    subspec.test_spec 'ProtocolUnitTests' do |test_spec|
-      test_spec.source_files = "Tests/{Common,ProtocolSpecific}/**/*.swift"
-      test_spec.resource = "Tests/{ProtocolSpecific/Http,ProtocolSpecific/Grpc}/FixtureData/**/*"
-    end
-
-    unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
-      subspec.dependency 'SwiftLint'
-    end
-  end
-
-
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [

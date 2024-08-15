@@ -6,61 +6,27 @@ default: setup bootstrap build test
 .PHONY: setup
 setup:
 	bundle install
-	@$(MAKE) --directory=Example setup
 	@$(MAKE) --directory=ExampleHTTP setup
 
 .PHONY: bootstrap
 bootstrap:
-	@$(MAKE) --directory=Example bootstrap
 	@$(MAKE) --directory=ExampleHTTP bootstrap
 
 .PHONY: build
 build:
-	@$(MAKE) --directory=Example build
 	@$(MAKE) --directory=ExampleHTTP build
 
 .PHONY: test
 test:
-	@$(MAKE) --directory=Example test
 	@$(MAKE) --directory=ExampleHTTP test
 
 .PHONY: lock
 lock:
 	$(info making locks with setup & boostrap)
-	$(info Example setup)
-	@$(MAKE) --directory=Example setup
 	$(info ExampleHTTP setup)
 	@$(MAKE) --directory=ExampleHTTP setup
-	$(info Example bootstrap)
-	@$(MAKE) --directory=Example bootstrap
 	$(info ExampleHTTP bootstrap)
 	@$(MAKE) --directory=ExampleHTTP bootstrap
-
-.PHONY: clean
-clean: clean-docs
-	@$(MAKE) --directory=Example clean
-
-
-.PHONY: setup-example
-setup-example:
-	bundle install
-	@$(MAKE) --directory=Example setup
-
-.PHONY: bootstrap-example
-bootstrap-example:
-	@$(MAKE) --directory=Example bootstrap
-
-.PHONY: build-example
-build-example:
-	@$(MAKE) --directory=Example build
-
-.PHONY: test-example
-test-example:
-	@$(MAKE) --directory=Example test
-
-.PHONY: clean-example
-clean-example: clean-docs
-	@$(MAKE) --directory=Example clean
 
 .PHONY: setup-example-http
 setup-example-http:
@@ -112,22 +78,22 @@ tag-release:
 
 .PHONY: lint-locally-podspec
 lint-locally-podspec:
-	cd Example; bundle exec pod repo update;
+	cd ExampleHTTP; bundle exec pod repo update;
 	bundle exec pod lib lint MobileCoin.podspec --skip-tests --allow-warnings
 
 .PHONY: lint-locally-strict-podspec
 lint-locally-strict-podspec:
-	cd Example; bundle exec pod repo update;
+	cd ExampleHTTP; bundle exec pod repo update;
 	bundle exec pod lib lint MobileCoin.podspec --skip-tests
 
 .PHONY: lint-podspec
 lint-podspec:
-	cd Example; bundle exec pod repo update;
+	cd ExampleHTTP; bundle exec pod repo update;
 	bundle exec pod spec lint MobileCoin.podspec --skip-tests
 
 .PHONY: publish-podspec
 publish-podspec:
-	cd Example; bundle exec pod repo update;
+	cd ExampleHTTP; bundle exec pod repo update;
 	bundle exec pod trunk push MobileCoin.podspec --skip-tests
 
 # CircleCI
@@ -176,7 +142,7 @@ swiftlint:
 .PHONY: upgrade-deps
 upgrade-deps:
 	bundle update
-	$(MAKE) -C Example upgrade-deps
+	$(MAKE) -C ExampleHTTP upgrade-deps
 
 .PHONY: generate-local-process-info
 generate-local-process-info:
