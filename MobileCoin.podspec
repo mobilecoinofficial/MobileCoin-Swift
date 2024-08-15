@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "6.0.2"
+  s.version      = "6.0.3"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
