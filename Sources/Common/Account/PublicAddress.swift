@@ -40,7 +40,7 @@ public struct PublicAddress {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        guard let proto = try? External_PublicAddress(serializedData: serializedData) else {
+        guard let proto = try? External_PublicAddress(serializedBytes: serializedData) else {
             logger.warning("External_PublicAddress deserialization failed. serializedData: " +
                 "\(redacting: serializedData.base64EncodedString())")
             return nil

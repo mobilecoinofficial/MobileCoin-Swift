@@ -288,13 +288,22 @@ extension NetworkPreset {
         "7ee5e29d74623fdbc6fbf1454be6f3bb0b86c12366b7b478ad13353e44de8411"
 
     private static let mainNetConsensusMrEnclaveHex =
-        "653228afd2b02a6c28f1dc3b108b1dfa457d170b32ae8ec2978f941bd1655c83"
+        "82c14d06951a2168763c8ddb9c34174f7d2059564146650661da26ab62224b8a"
     private static let mainNetFogViewMrEnclaveHex =
-        "dd84abda7f05116e21fcd1ee6361b0ec29445fff0472131eaf37bf06255b567a"
+        "2f542dcd8f682b72e8921d87e06637c16f4aa4da27dce55b561335326731fa73"
     private static let mainNetFogLedgerMrEnclaveHex =
-        "89db0d1684fcc98258295c39f4ab68f7de5917ef30f0004d9a86f29930cebbbd"
+        "2494f1542f30a6962707d0bf2aa6c8c08d7bed35668c9db1e5c61d863a0176d1"
     private static let mainNetFogReportMrEnclaveHex =
-        "f3f7e9a674c55fb2af543513527b6a7872de305bac171783f6716a0bf6919499"
+        "34881106254a626842fa8557e27d07cdf863083e9e6f888d5a492a456720916f"
+
+    private static let testNetConsensusMrEnclaveHex =
+        "ae7930646f37e026806087d2a3725d3f6d75a8e989fb320e6ecb258eb829057a"
+    private static let testNetFogViewMrEnclaveHex =
+        "44de03c2ba34c303e6417480644f9796161eacbe5af4f2092e413b4ebf5ccf6a"
+    private static let testNetFogLedgerMrEnclaveHex =
+        "065b1e17e95f2c356d4d071d434cea7eb6b95bc797f94954146736efd47057a7"
+    private static let testNetFogReportMrEnclaveHex =
+        "4a5daa23db5efa4b18071291cfa24a808f58fb0cedce7da5de804b011e87cfde"
 
     // v1.1.0 Enclave Values
     private static let legacy_v1_1_0_testNetConsensusMrEnclaveHex =
@@ -337,13 +346,13 @@ extension NetworkPreset {
         "16d73984c2d2712156135ab69987ca78aca67a2cf4f0f2287ea584556f9d223a"
 
     // v5.0.0 Enclave Values
-    private static let testNetConsensusMrEnclaveHex =
+    private static let legacy_v5_0_0_testNetConsensusMrEnclaveHex =
         "5341c6702a3312243c0f049f87259352ff32aa80f0f6426351c3dd063d817d7a"
-    private static let testNetFogViewMrEnclaveHex =
+    private static let legacy_v5_0_0_testNetFogViewMrEnclaveHex =
         "ac292a1ad27c0338a5159d5fab2bed3917ea144536cb13b5c1226d09a2fbc648"
-    private static let testNetFogLedgerMrEnclaveHex =
+    private static let legacy_v5_0_0_testNetFogLedgerMrEnclaveHex =
         "b61188a6c946557f32e612eff5615908abd1b72ec11d8b7070595a92d4abbbf1"
-    private static let testNetFogReportMrEnclaveHex =
+    private static let legacy_v5_0_0_testNetFogReportMrEnclaveHex =
         "248356aa0d3431abc45da1773cfd6191a4f2989a4a99da31f450bd7c461e312b"
 
     private static let devMrSignerHex =

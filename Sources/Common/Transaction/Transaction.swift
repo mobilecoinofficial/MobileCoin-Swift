@@ -15,7 +15,7 @@ public struct Transaction {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        guard let proto = try? External_Tx(serializedData: serializedData) else {
+        guard let proto = try? External_Tx(serializedBytes: serializedData) else {
             logger.warning("External_Tx deserialization failed. serializedData: " +
                 "\(redacting: serializedData.base64EncodedString())")
             return nil
