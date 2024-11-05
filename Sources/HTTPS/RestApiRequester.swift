@@ -72,7 +72,7 @@ extension RestApiRequester: Requester {
 
                 let responsePayload: T.ResponsePayload? = {
                     guard let data = httpResponse.responseData,
-                          let responsePayload = try? T.ResponsePayload(serializedData: data)
+                          let responsePayload = try? T.ResponsePayload(serializedBytes: data)
                     else {
                         return nil
                     }

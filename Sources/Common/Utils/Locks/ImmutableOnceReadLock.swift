@@ -41,29 +41,29 @@ final class ImmutableOnceReadLock<Value> {
 }
 
 extension ImmutableOnceReadLock {
-    private struct Inner<Value> {
-        private var value: Value
+    private struct Inner<InnerValue> {
+        private var value: InnerValue
         private var initialized = false
 
-        init(_ value: Value) {
+        init(_ value: InnerValue) {
             self.value = value
         }
 
-        func get() -> Value? {
+        func get() -> InnerValue? {
             guard initialized else {
                 return nil
             }
             return value
         }
 
-        mutating func initializeIfNeededAndGet() -> Value {
+        mutating func initializeIfNeededAndGet() -> InnerValue {
             if !initialized {
                 initialized = true
             }
             return value
         }
 
-        mutating func set(_ value: Value) -> Bool {
+        mutating func set(_ value: InnerValue) -> Bool {
             guard !initialized else {
                 return false
             }

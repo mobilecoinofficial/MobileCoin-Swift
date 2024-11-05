@@ -61,8 +61,8 @@ extension LedgerTxOut {
 extension LedgerTxOut {
     init?(_ fogTxOutRecordBytes: Data, viewKey: RistrettoPrivate) {
         let legacy_txOutRecord = try? FogView_TxOutRecordLegacy(
-                contiguousBytes: fogTxOutRecordBytes)
-        let txOutRecord = try? FogView_TxOutRecord(contiguousBytes: fogTxOutRecordBytes)
+            serializedBytes: fogTxOutRecordBytes)
+        let txOutRecord = try? FogView_TxOutRecord(serializedBytes: fogTxOutRecordBytes)
 
         // TODO - Temporary fix for serialized data, find workaround and remove legacy proto
         switch (legacy_txOutRecord, txOutRecord) {

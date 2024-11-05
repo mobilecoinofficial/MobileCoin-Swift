@@ -17,17 +17,14 @@ let package = Package(
         // Here we define our package's external dependencies
         // and from where they can be fetched:
         .package(
-            path: "Vendor/libmobilecoin"
-        ),
-        .package(
-            url: "https://github.com/apple/swift-log.git",
-            from: "1.4.0"
+            url: "https://github.com/mobilecoinofficial/libmobilecoin.git",
+            from: "6.0.4"
         ),
         .package(
             url: "https://github.com/apple/swift-protobuf.git",
-            from: "1.5.0"
+            from: "1.28.2"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.15.0")
+        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1")
     ],
     targets: [
         .target(

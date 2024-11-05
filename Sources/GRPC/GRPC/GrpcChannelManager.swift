@@ -41,7 +41,7 @@ extension ClientConnection {
     {
         let builder: Builder
         if config.useTls {
-            let secureBuilder = ClientConnection.secure(group: group)
+            let secureBuilder = ClientConnection.usingTLSBackedByNIOSSL(on: group)
             if let trustRoots = config.trustRoots {
                 // This is our "shared" cert-pinning implementation for both HTTP and GRPC
                 // GRPC's built in verification was failing for unknown reasons. That call was:

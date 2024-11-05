@@ -32,7 +32,7 @@ enum FogViewUtils {
             ciphertext: ciphertext,
             privateKey: accountKey.subaddressViewPrivateKey
         ).flatMap { decrypted in
-            guard let txOutRecord = try? FogView_TxOutRecord(serializedData: decrypted) else {
+            guard let txOutRecord = try? FogView_TxOutRecord(serializedBytes: decrypted) else {
                 return .failure(.invalidInput("FogView_TxOutRecord deserialization failed. " +
                     "serializedData: \(redacting: decrypted.base64EncodedString())"))
             }
