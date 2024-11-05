@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "libmobilecoin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mobilecoinofficial/libmobilecoin.git",
+      "state" : {
+        "revision" : "aaef756fe293bb1036f3e2147d1c085568568ecf",
+        "version" : "6.0.4"
+      }
+    },
+    {
       "identity" : "swift-atomics",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
