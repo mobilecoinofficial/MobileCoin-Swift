@@ -100,11 +100,12 @@ extension Account {
         }
 
         func createProofOfReserveSignedContingentInput(
-            for txOutPubKeyBytes: Data,
+            txOutPubKeyBytes: Data,
             completion: @escaping (
                 Result<SignedContingentInput, SignedContingentInputCreationError>
             ) -> Void
         ) {
+
             guard let txOutPubKey = RistrettoPublic(txOutPubKeyBytes) else {
                 serialQueue.async {
                     completion(.failure(.invalidInput("Invalid TxOutPubKey")))
@@ -129,7 +130,7 @@ extension Account {
 
                     proofOfReserveSignedContingentInputCreator.createSignedContingentInput(
                         input: txOut,
-                        tombstoneBlockIndex: ledgerBlockCount + 50,
+                        fogTombstoneBlockIndex: ledgerBlockCount + 50,
                         blockVersion: blockVersion) { result in
                         serialQueue.async {
                             completion(result)

@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
+//  Copyright (c) 2020-2025 MobileCoin. All rights reserved.
 //
 
 // swiftlint:disable function_parameter_count multiline_function_chains function_body_length
@@ -36,7 +36,7 @@ struct ProofOfReserveSignedContingentInputCreator {
 
     func createSignedContingentInput(
         input: KnownTxOut,
-        tombstoneBlockIndex: UInt64,
+        fogTombstoneBlockIndex: UInt64,
         blockVersion: BlockVersion,
         completion: @escaping (
             Result<SignedContingentInput, SignedContingentInputCreationError>
@@ -45,7 +45,7 @@ struct ProofOfReserveSignedContingentInputCreator {
         performAsync(body1: { callback in
             fogResolverManager.fogResolver(
                 addresses: [selfPaymentAddress],
-                desiredMinPubkeyExpiry: tombstoneBlockIndex,
+                desiredMinPubkeyExpiry: fogTombstoneBlockIndex,
                 completion: callback)
         }, body2: { callback in
             prepareInput(input: input, completion: callback)
@@ -57,7 +57,9 @@ struct ProofOfReserveSignedContingentInputCreator {
                         accountKey: self.accountKey,
                         memoType: .recoverable,
                         amountToSend: input.amount,
+                        // UInt64.max to make this SCI not spendable
                         amountToReceive: Amount(value: UInt64.max, tokenId: input.tokenId),
+                        // Block index in the past to make this SCI not spendable
                         tombstoneBlockIndex: 1,
                         fogResolver: fogResolver,
                         blockVersion: blockVersion,

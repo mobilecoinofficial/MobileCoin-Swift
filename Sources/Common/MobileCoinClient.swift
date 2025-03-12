@@ -195,6 +195,33 @@ public final class MobileCoinClient {
         ).requiresDefragmentation(toSendAmount: amount, feeLevel: feeLevel, completion: completion)
     }
 
+    public func createProofOfReserveSignedContingentInput(
+        txOutPubKeyBytes: Data,
+        completion: @escaping (
+            Result<SignedContingentInput, SignedContingentInputCreationError>
+        ) -> Void
+    ) {
+        guard let rngSeed = defaultRng.generateRngSeed() else {
+            completion(.failure(
+                SignedContingentInputCreationError.invalidInput("Couldn't create 32byte RNG seed")))
+            return
+        }
+
+        Account.SCIOperations(
+            account: accountLock,
+            fogMerkleProofService: serviceProvider.fogMerkleProofService,
+            fogResolverManager: fogResolverManager,
+            metaFetcher: metaFetcher,
+            txOutSelectionStrategy: txOutSelectionStrategy,
+            mixinSelectionStrategy: mixinSelectionStrategy,
+            rngSeed: rngSeed,
+            targetQueue: serialQueue
+        ).createProofOfReserveSignedContingentInput(
+            txOutPubKeyBytes: txOutPubKeyBytes,
+            completion: completion
+        )
+    }
+
     public func createSignedContingentInput(
         recipient: PublicAddress,
         amountToSend: Amount,
