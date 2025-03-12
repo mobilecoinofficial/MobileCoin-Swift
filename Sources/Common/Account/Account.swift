@@ -195,7 +195,7 @@ final class Account {
         return .success(ownedTxOut)
     }
 
-    private func ownedTxOut(for txOutPublicKey: RistrettoPublic) -> KnownTxOut? {
+    func ownedTxOut(for txOutPublicKey: RistrettoPublic) -> KnownTxOut? {
         ownedTxOuts.first(where: { $0.publicKey == txOutPublicKey })
     }
 }

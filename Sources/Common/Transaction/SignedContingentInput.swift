@@ -19,7 +19,7 @@ public struct SignedContingentInput {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        guard let proto = try? External_SignedContingentInput(serializedBytes: serializedData) else {
+        guard let proto = try? External_SignedContingentInput(serializedData: serializedData) else {
             logger.warning("External_SignedContingentInput deserialization failed. " +
                 "serializedData: \(redacting: serializedData.base64EncodedString())")
             return nil

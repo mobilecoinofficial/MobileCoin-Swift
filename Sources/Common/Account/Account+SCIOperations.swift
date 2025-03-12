@@ -12,6 +12,7 @@ extension Account {
         private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
         private let signedContingentInputCreator: SignedContingentInputCreator
+        private let proofOfReserveSignedContingentInputCreator: ProofOfReserveSignedContingentInputCreator
         private let transactionPreparer: TransactionPreparer
 
         init(
@@ -35,6 +36,12 @@ extension Account {
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
                 mixinSelectionStrategy: mixinSelectionStrategy,
+                rngSeed: rngSeed,
+                targetQueue: targetQueue)
+            self.proofOfReserveSignedContingentInputCreator = ProofOfReserveSignedContingentInputCreator(
+                accountKey: account.accessWithoutLocking.accountKey,
+                fogMerkleProofService: fogMerkleProofService,
+                fogResolverManager: fogResolverManager,
                 rngSeed: rngSeed,
                 targetQueue: targetQueue)
             self.transactionPreparer = TransactionPreparer(
@@ -90,6 +97,53 @@ extension Account {
                         })
                     """,
                 logFunction: false)
+        }
+
+        func createProofOfReserveSignedContingentInput(
+            for txOutPubKeyBytes: Data,
+            completion: @escaping (
+                Result<SignedContingentInput, SignedContingentInputCreationError>
+            ) -> Void
+        ) {
+            guard let txOutPubKey = RistrettoPublic(txOutPubKeyBytes) else {
+                serialQueue.async {
+                    completion(.failure(.invalidInput("Invalid TxOutPubKey")))
+                }
+                return
+            }
+
+            let (txOut, ledgerBlockCount) = account.readSync { ($0.ownedTxOut(for: txOutPubKey), $0.knowableBlockCount) }
+            guard let txOut = txOut else {
+                serialQueue.async {
+                    completion(.failure(.invalidInput("TxOut not found")))
+                }
+                return
+            }
+
+            metaFetcher.blockVersion {
+                switch $0 {
+                case .success(let blockVersion):
+                    guard verifyBlockVersion(blockVersion, completion) else {
+                        return
+                    }
+
+                    proofOfReserveSignedContingentInputCreator.createSignedContingentInput(
+                        input: txOut,
+                        tombstoneBlockIndex: ledgerBlockCount + 50,
+                        blockVersion: blockVersion) { result in
+                        serialQueue.async {
+                            completion(result)
+                        }
+                    }
+
+                case .failure(let error):
+                    logger.info("Error: \(error)")
+
+                    serialQueue.async {
+                        completion(.failure(.connectionError(error)))
+                    }
+                }
+            }
         }
 
         func createSignedContingentInput(
