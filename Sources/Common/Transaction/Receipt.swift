@@ -44,7 +44,7 @@ public struct Receipt {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        guard let proto = try? External_Receipt(serializedBytes: serializedData) else {
+        guard let proto = try? External_Receipt(serializedData: serializedData) else {
             logger.warning(
                 "External_Receipt deserialization failed. serializedData: " +
                     "\(redacting: serializedData.base64EncodedString())",
@@ -70,7 +70,7 @@ public struct Receipt {
     func matchesTxOut(_ txOut: TxOutProtocol) -> Bool {
         txOutPublicKeyTyped == txOut.publicKey
             && commitment == txOut.commitment
-            // TODO - verify with core-eng that commitment is sufficient, 
+            // TODO - verify with core-eng that commitment is sufficient,
             // remove after confirmation
     }
     // swiftlint:enable todo

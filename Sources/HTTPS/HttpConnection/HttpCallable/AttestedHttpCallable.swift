@@ -86,7 +86,7 @@ extension AttestedHttpCallable
         return attestAkeCipher.decryptMessage(response)
             .mapError { _ in .attestationFailure() }
             .flatMap { plaintext in
-                guard let response = try? InnerResponse(serializedBytes: plaintext) else {
+                guard let response = try? InnerResponse(serializedData: plaintext) else {
                     return .failure(.connectionError(.invalidServerResponse(
                         "Failed to deserialized attested message plaintext into " +
                             "\(InnerResponse.self). plaintext: " +
@@ -126,7 +126,7 @@ extension AttestedHttpCallable
     ) -> Result < (responseAad: InnerResponseAad, response: InnerResponse),
                 AttestedHttpConnectionError>
     {
-        guard let responseAad = try? InnerResponseAad(serializedBytes: response.aad) else {
+        guard let responseAad = try? InnerResponseAad(serializedData: response.aad) else {
             return .failure(.connectionError(.invalidServerResponse(
                 "Failed to deserialized attested message aad into \(InnerResponseAad.self). aad: " +
                     "\(redacting: response.aad.base64EncodedString())")))
@@ -135,7 +135,7 @@ extension AttestedHttpCallable
         return attestAkeCipher.decryptMessage(response)
             .mapError { _ in .attestationFailure() }
             .flatMap { plaintext in
-                guard let plaintextResponse = try? InnerResponse(serializedBytes: plaintext) else {
+                guard let plaintextResponse = try? InnerResponse(serializedData: plaintext) else {
                     return .failure(.connectionError(.invalidServerResponse(
                         "Failed to deserialized attested message plaintext into " +
                             "\(InnerResponse.self). plaintext: " +

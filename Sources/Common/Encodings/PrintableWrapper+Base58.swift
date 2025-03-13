@@ -21,7 +21,7 @@ extension Printable_PrintableWrapper {
             return nil
         }
 
-        guard let printableWrapper = try? Self(serializedBytes: decodedData) else {
+        guard let printableWrapper = try? Self(serializedData: decodedData) else {
             logger.warning("Printable_PrintableWrapper deserialization failed.")
             return nil
         }
