@@ -271,10 +271,8 @@ jobs:
       SCAN_OUTPUT_TYPES: junit
     steps:
       - install-lfs
-      - install-chruby-ruby-install
       - checkout
       - init-artifacts-submodule
-      - set-ruby-version
       - install-gems
       - install-example-http-gems
       - install-example-http-pods:
@@ -303,10 +301,9 @@ jobs:
       SCAN_OUTPUT_TYPES: junit
     steps:
       - install-lfs
-      - install-chruby-ruby-install
+      - install-ruby
       - checkout
       - init-artifacts-submodule
-      - set-ruby-version
       - install-gems
       - print-tool-versions
       - install-example-gems
@@ -332,10 +329,9 @@ jobs:
       SCAN_OUTPUT_TYPES: junit
     steps:
       - install-lfs
-      - install-chruby-ruby-install
+      - install-ruby
       - checkout
       - init-artifacts-submodule
-      - set-ruby-version
       - install-gems
       - install-example-http-gems
       - install-example-http-pods:
@@ -355,10 +351,9 @@ jobs:
       <<: *default-environment
     steps:
       - install-lfs
-      - install-chruby-ruby-install
+      - install-ruby
       - checkout
       - init-artifacts-submodule
-      - set-ruby-version
       - install-example-gems
       - install-example-http-gems
       - install-example-pods:
@@ -380,7 +375,7 @@ jobs:
       <<: *default-environment
     steps:
       - install-lfs
-      - install-chruby-ruby-install
+      - install-ruby
       - checkout
       - attach_workspace: { at: . }
       - install-gh-pages
@@ -397,10 +392,9 @@ jobs:
       <<: *default-environment
     steps:
       - install-lfs
-      - install-chruby-ruby-install
+      - install-ruby
       - checkout
       - init-artifacts-submodule
-      - set-ruby-version
       - install-gems
       - install-example-gems
       - install-example-pods:
