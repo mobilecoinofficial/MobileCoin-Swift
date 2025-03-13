@@ -23,7 +23,7 @@ commands:
           command: |
             git lfs install
 
-  install-ruby-install:
+  install-ruby:
     description: Install Ruby
     steps:
       - run:
@@ -240,10 +240,9 @@ jobs:
       SCAN_OUTPUT_TYPES: junit
     steps:
       - install-lfs
-      - install-chruby-ruby-install
+      - install-ruby
       - checkout
       - init-artifacts-submodule
-      - set-ruby-version
       - install-gems
       - install-example-gems
       - install-example-pods:
