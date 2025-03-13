@@ -19,7 +19,7 @@ public struct SignedContingentInput {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        guard let proto = try? External_SignedContingentInput(serializedBytes: serializedData) else {
+        guard let proto = try? External_SignedContingentInput(serializedData: serializedData) else {
             logger.warning("External_SignedContingentInput deserialization failed. " +
                 "serializedData: \(redacting: serializedData.base64EncodedString())")
             return nil
@@ -86,7 +86,15 @@ extension SignedContingentInput {
         self.changeAmount = requiredOutputAmounts.first(where: { $0.tokenId == changeTokenId }) ??
             Amount(0, in: changeTokenId )
 
-        self.rewardAmount = Amount(pseudoOutputAmount.value - changeAmount.value, in: changeTokenId)
+        // Generally the amount we are getting from the SCI (pseudoOutputAmount) will be greater than the change
+        // amount, otherwise there is no point in using it.
+        // However, there is one special case where that is not the case: Proof of Reserve SCIs.
+        // For proof of reserve SCIs the change amount ends up being set to u64::MAX to make them unspendable,
+        // and that would make the change amount greater than the pseudo output amount and we would end up with
+        // an overflow when calculating the reward amount, so we have a conditional here to protect against that.
+        self.rewardAmount = pseudoOutputAmount.value > changeAmount.value ?
+            Amount(pseudoOutputAmount.value - changeAmount.value, in: changeTokenId) :
+            Amount(0, in: changeTokenId)
 
         self.requiredAmount = requiredOutputAmounts.first(where: { $0.tokenId != changeTokenId }) ??
         Amount(0, in: changeTokenId)
