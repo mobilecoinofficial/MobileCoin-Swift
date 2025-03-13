@@ -89,7 +89,7 @@ extension SignedContingentInput {
         // Generally the amount we are getting from the SCI (pseudoOutputAmount) will be greater than the change
         // amount, otherwise there is no point in using it.
         // However, there is one special case where that is not the case: Proof of Reserve SCIs.
-        // For proof of reserve SCIs the change amount ends up being set to u64::MAX so make them unspendable,
+        // For proof of reserve SCIs the change amount ends up being set to u64::MAX to make them unspendable,
         // and that would make the change amount greater than the pseudo output amount and we would end up with
         // an overflow when calculating the reward amount, so we have a conditional here to protect against that.
         self.rewardAmount = pseudoOutputAmount.value > changeAmount.value ?
