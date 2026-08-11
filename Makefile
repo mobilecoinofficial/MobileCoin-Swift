@@ -61,7 +61,7 @@ autocorrect:
 	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
 
 .PHONY: lint-all
-lint-all: lint lint-circleci lint-podspec lint-docs
+lint-all: lint lint-podspec lint-docs
 
 .PHONY: publish
 publish: tag-release publish-podspec
@@ -72,7 +72,7 @@ publish: tag-release publish-podspec
 tag-release:
 	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
 		git tag "v$$VERSION" && \
-		git push git@github.com:mobilecoinofficial/MobileCoin-Swift.git "refs/tags/v$$VERSION"
+		git push origin "refs/tags/v$$VERSION"
 
 # MobileCoin pod
 
@@ -95,17 +95,6 @@ lint-podspec:
 publish-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
 	bundle exec pod trunk push MobileCoin.podspec --skip-tests
-
-# CircleCI
-
-.PHONY: install-circleci
-install-circleci:
-	brew install circleci
-
-.PHONY: lint-circleci
-lint-circleci:
-	@command -v circleci >/dev/null || $(MAKE) install-circleci
-	circleci config validate
 
 # Documentation
 
@@ -135,7 +124,7 @@ lint-docs:
 
 .PHONY: swiftlint
 swiftlint:
-	@PATH="./Example/Pods/SwiftLint:$$PATH" swiftlint
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint
 
 # Maintenance
 
