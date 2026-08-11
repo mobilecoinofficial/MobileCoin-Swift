@@ -140,7 +140,7 @@ extension MistysignAttestedSessionError: CustomStringConvertible {
         "Mistysign attested session error: " + {
             switch self {
             case .notAttested:
-                return "Not attested. Complete authBegin/authEnd first."
+                return "Not attested. Complete authBeginRequestData/authEnd first."
             case .noTrustedIdentities:
                 return "Attestation named no trusted identities to verify against."
             case .attestationFailed(let reason):
