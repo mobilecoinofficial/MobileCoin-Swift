@@ -11,12 +11,12 @@ import LibMobileCoinCommon
 /// An attested channel to a Mistysign enclave whose transport is owned by the
 /// caller.
 ///
-/// `MistysignConnection` attests and dials in one step, which suits services the
-/// SDK connects to directly. Mistysign is reached through a relay instead: the
-/// application's own backend forwards the AKE handshake and the attested
-/// messages on the client's behalf, so the SDK never holds the socket. This type
-/// exposes the two halves of the handshake, plus the resulting cipher, and
-/// leaves transport entirely to the caller.
+/// The SDK's other attested services are reached through `MobileCoinClient`,
+/// which opens the connection and attests over it in one step. Mistysign is
+/// reached through a relay instead: the application's own backend forwards the
+/// AKE handshake and the attested messages on the client's behalf, so the SDK
+/// never holds the socket. This type performs the handshake and the message
+/// encryption, and leaves every network call to the caller.
 ///
 /// Usage:
 /// 1. `authBeginRequestData(responderId:)`, relay the bytes to the enclave's
@@ -33,7 +33,8 @@ public final class MistysignAttestedSession {
 
     public init() {}
 
-    /// Whether `authEnd` has completed successfully and the cipher is usable.
+    /// Whether `authEnd` has completed successfully, so that `encrypt(_:)` and
+    /// `decrypt(_:)` can be used.
     public var isAttested: Bool {
         attestAke.isAttested
     }
