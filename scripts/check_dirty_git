@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Fails if the working tree has uncommitted changes. Used by CI to catch
+# generated files (e.g. Xcode project changes from `pod install`) that should
+# have been committed.
+
+set -e
+
+if [[ -n $(git status --porcelain) ]]; then
+  echo "repo is dirty"
+  git status
+  git diff
+  exit 1
+fi
