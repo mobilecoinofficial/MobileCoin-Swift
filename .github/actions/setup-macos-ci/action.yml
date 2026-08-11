@@ -1,0 +1,132 @@
+name: Setup macOS CI
+description: >-
+  Selects Xcode, installs Ruby + bundler dependencies (root and ExampleHTTP),
+  and runs `pod install` for the ExampleHTTP workspace. Assumes the repository
+  has already been checked out with `submodules: recursive` and `lfs: true`.
+
+inputs:
+  xcode-version:
+    description: Major Xcode version to select from the runner image (e.g. "16").
+    required: false
+    default: "16"
+  ruby-version:
+    description: Ruby version to install.
+    required: false
+    default: "2.7.7"
+  install-pods:
+    description: Whether to run `pod install` for the ExampleHTTP workspace.
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    # Replaces the CircleCI `macos: { xcode: ... }` executor pin. Picks the
+    # highest installed patch of the requested major version so the workflow
+    # doesn't break when the runner image rotates patch releases.
+    - name: Select Xcode ${{ inputs.xcode-version }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        xcode_app="$(ls -d /Applications/Xcode_${{ inputs.xcode-version }}*.app 2>/dev/null | sort -V | tail -1)"
+        if [[ -z "$xcode_app" ]]; then
+          echo "::error::No Xcode ${{ inputs.xcode-version }}.x found on this runner. Installed:"
+          ls -d /Applications/Xcode*.app
+          exit 1
+        fi
+        echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
+        echo "Selected ${xcode_app}"
+
+    # The LibMobileCoin binaries live in the nested `Artifacts` submodule and are
+    # tracked with Git LFS. actions/checkout's `lfs: true` only runs
+    # `git lfs install --local` plus a fetch for the top-level repo — submodules
+    # get neither the filters nor a pull — so do it here.
+    - name: Fetch Git LFS content for submodules
+      shell: bash
+      run: git submodule foreach --recursive 'git lfs install --local && git lfs pull'
+
+    # An unresolved pointer file surfaces much later as a baffling linker error,
+    # so fail loudly here instead.
+    - name: Verify Git LFS artifacts
+      shell: bash
+      run: |
+        set -euo pipefail
+        lib="Vendor/libmobilecoin/Artifacts/LibMobileCoinLibrary.xcframework"
+        if [[ ! -d "$lib" ]]; then
+          echo "::error::$lib is missing. Did the submodules check out?"
+          exit 1
+        fi
+        while IFS= read -r archive; do
+          if head -c 100 "$archive" | grep -q 'git-lfs.github.com'; then
+            echo "::error::$archive is an unresolved Git LFS pointer."
+            exit 1
+          fi
+        done < <(find "$lib" -name '*.a')
+
+    - name: Install Ruby ${{ inputs.ruby-version }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.ruby-version }}
+        # Gems are cached per-Gemfile.lock below; there are two bundles in this
+        # repo (root and ExampleHTTP) and bundler-cache only handles one.
+        bundler-cache: false
+
+    - name: Restore root Ruby gem cache
+      uses: actions/cache@v4
+      with:
+        path: .vendor/bundle
+        key: v0-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('Gemfile.lock') }}
+        restore-keys: |
+          v0-ruby-${{ inputs.ruby-version }}-gems-
+
+    - name: Install root bundler dependencies
+      shell: bash
+      run: |
+        set -euo pipefail
+        bundle config set --local path '.vendor/bundle'
+        bundle config set --local clean 'true'
+        bundle check || bundle install --jobs 4 --retry 3
+
+    - name: Restore ExampleHTTP Ruby gem cache
+      uses: actions/cache@v4
+      with:
+        path: ExampleHTTP/.vendor/bundle
+        key: v0-example-http-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('ExampleHTTP/Gemfile.lock') }}
+        restore-keys: |
+          v0-example-http-ruby-${{ inputs.ruby-version }}-gems-
+
+    - name: Install ExampleHTTP bundler dependencies
+      shell: bash
+      working-directory: ExampleHTTP
+      run: |
+        set -euo pipefail
+        bundle config set --local path '.vendor/bundle'
+        bundle config set --local clean 'true'
+        bundle check || bundle install --jobs 4 --retry 3
+
+    - name: Restore CocoaPods cache
+      if: inputs.install-pods == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ExampleHTTP/Pods
+        key: v0-xcode-${{ inputs.xcode-version }}-example-http-pods-${{ hashFiles('ExampleHTTP/Podfile.lock') }}
+        restore-keys: |
+          v0-xcode-${{ inputs.xcode-version }}-example-http-pods-
+
+    # cocoapods-keys resolves each key from ENV before falling back to the
+    # keychain, so the caller only needs to export the key names as job env.
+    - name: Install pods for ExampleHTTP
+      if: inputs.install-pods == 'true'
+      shell: bash
+      working-directory: ExampleHTTP
+      run: bundle exec pod install --deployment
+
+    - name: Print tool versions
+      shell: bash
+      run: |
+        set -x
+        sw_vers
+        xcodebuild -version
+        ruby --version
+        bundle env
+        bundle exec pod env

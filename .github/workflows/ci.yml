@@ -1,0 +1,188 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+      - 'release/**'
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  FASTLANE_SKIP_UPDATE_CHECK: "1"
+  # cocoapods-keys resolves these from the environment before consulting the
+  # keychain, so exporting them here is enough for `pod install`.
+  devNetworkAuthUsername: ${{ secrets.DEV_NETWORK_AUTH_USERNAME }}
+  devNetworkAuthPassword: ${{ secrets.DEV_NETWORK_AUTH_PASSWORD }}
+  testNetTestAccountMnemonicsCommaSeparated: ${{ secrets.TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+  mobileDevTestAccountMnemonicsCommaSeparated: ${{ secrets.MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+  dynamicTestAccountSeedEntropiesCommaSeparated: ${{ secrets.DYNAMIC_TEST_ACCOUNT_ENTROPIES_COMMA_SEPARATED }}
+  dynamicFogAuthoritySpki: ${{ secrets.DYNAMIC_FOG_AUTHORITY_SPKI }}
+
+jobs:
+
+  build-and-test-example-http:
+    name: build-and-test-example-http (Xcode ${{ matrix.xcode-version }})
+    runs-on: macos-15
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode-version: ["16"]
+    env:
+      FL_BUILDLOG_PATH: ../output/buildlogs
+      SCAN_OUTPUT_DIRECTORY: ../output/scan
+      SCAN_OUTPUT_TYPES: junit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Setup
+        uses: ./.github/actions/setup-macos-ci
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
+
+      - name: Build
+        run: make build-example-http
+
+      - name: Test
+        run: make test-example-http
+
+      - name: Upload build and test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-http-output-xcode-${{ matrix.xcode-version }}
+          path: output
+          if-no-files-found: ignore
+
+      - name: Upload crash reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-http-diagnostics-xcode-${{ matrix.xcode-version }}
+          path: ~/Library/Logs/DiagnosticReports
+          if-no-files-found: ignore
+
+  swiftlint:
+    name: swiftlint (Xcode ${{ matrix.xcode-version }})
+    runs-on: macos-15
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode-version: ["16"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Setup
+        uses: ./.github/actions/setup-macos-ci
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
+
+      # `make lint-strict` runs the SwiftLint binary vendored into
+      # ExampleHTTP/Pods, which is why this job still needs `pod install`.
+      - name: Lint
+        run: make lint-strict
+
+      - name: Check for uncommitted changes
+        run: ./scripts/check_dirty_git
+
+  pod-lib-lint:
+    name: pod-lib-lint (Xcode ${{ matrix.xcode-version }})
+    runs-on: macos-15
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode-version: ["16"]
+    env:
+      FL_BUILDLOG_PATH: ../output/buildlogs
+      SCAN_OUTPUT_DIRECTORY: ../output/scan
+      SCAN_OUTPUT_TYPES: junit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Setup
+        uses: ./.github/actions/setup-macos-ci
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
+
+      - name: Lint podspec
+        run: make lint-locally-strict-podspec
+
+      - name: Upload lint output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pod-lib-lint-output-xcode-${{ matrix.xcode-version }}
+          path: output
+          if-no-files-found: ignore
+
+      - name: Check for uncommitted changes
+        run: ./scripts/check_dirty_git
+
+  publish-pod-release:
+    name: publish-pod-release
+    needs: [build-and-test-example-http, swiftlint, pod-lib-lint]
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/'))
+    runs-on: macos-15
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    env:
+      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+          # `make tag-release` pushes a tag using the checkout credentials.
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup
+        uses: ./.github/actions/setup-macos-ci
+
+      # CircleCI ran this job on every master push, so it failed noisily on any
+      # commit that didn't bump the podspec version. Skip instead.
+      - name: Check whether this version is already released
+        id: version
+        run: |
+          set -euo pipefail
+          version="$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" >/dev/null 2>&1; then
+            echo "Tag v${version} already exists; nothing to publish."
+            echo "should-publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should-publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set git credentials
+        if: steps.version.outputs.should-publish == 'true'
+        run: |
+          git config user.email "mobilecoin-ci@mobilecoin.com"
+          git config user.name "mobilecoin-ci"
+
+      - name: Publish pod to trunk
+        if: steps.version.outputs.should-publish == 'true'
+        run: make publish
