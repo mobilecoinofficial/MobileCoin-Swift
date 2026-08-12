@@ -10,9 +10,13 @@ inputs:
     required: false
     default: "16"
   ruby-version:
-    description: Ruby version to install.
+    description: >-
+      Ruby version to install. Must satisfy the committed Gemfile.lock files,
+      which pin activesupport 7.2.2.1 (requires Ruby >= 3.1.0). CircleCI pinned
+      2.7.7, which no longer resolves — Bundler silently downgrades activesupport
+      to 7.1.4.2 and rewrites both lockfiles.
     required: false
-    default: "2.7.7"
+    default: "3.1.4"
   install-pods:
     description: Whether to run `pod install` for the ExampleHTTP workspace.
     required: false
@@ -67,6 +71,10 @@ runs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ inputs.ruby-version }}
+        # Take Bundler from the lockfiles' `BUNDLED WITH` (this is the default,
+        # but it's load-bearing here): a different Bundler rewrites that section
+        # and trips the dirty-tree check.
+        bundler: Gemfile.lock
         # Gems are cached per-Gemfile.lock below; there are two bundles in this
         # repo (root and ExampleHTTP) and bundler-cache only handles one.
         bundler-cache: false
