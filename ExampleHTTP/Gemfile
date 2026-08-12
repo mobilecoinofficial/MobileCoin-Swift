@@ -10,5 +10,11 @@ source 'https://rubygems.org' do
   gem 'addressable', '2.8.4', :git => 'https://github.com/sporkmonger/addressable', :ref => 'b56cef3e69bb1294ac4e31dad150e910b05f607f'
   gem 'cocoapods-deintegrate', '~> 1.0', '>= 1.0.4'
   gem 'fastlane'
+  # Held at the version ExampleHTTP/Podfile.lock's SPEC CHECKSUMS were generated
+  # with. CocoaPods records the SHA1 of the generated
+  # Pods/Local Podspecs/*.podspec.json, so a change in JSON.pretty_generate
+  # output silently invalidates the lockfile and `pod install --deployment`
+  # fails even though no podspec changed.
+  gem 'json', '2.6.3'
   gem 'pkg-config'
 end

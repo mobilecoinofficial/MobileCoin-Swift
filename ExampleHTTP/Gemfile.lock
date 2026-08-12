@@ -62,7 +62,7 @@ GEM
     babosa (1.0.4)
     base64 (0.3.0)
     benchmark (0.4.0)
-    bigdecimal (3.1.9)
+    bigdecimal (4.1.2)
     claide (1.1.0)
     cocoapods (1.16.2)
       addressable (~> 2.8)
@@ -243,10 +243,10 @@ GEM
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     jmespath (1.6.2)
-    json (2.21.2)
+    json (2.6.3)
     jwt (2.10.3)
       base64
-    logger (1.6.6)
+    logger (1.7.0)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.5)
@@ -331,6 +331,7 @@ DEPENDENCIES
   cocoapods-keys!
   cocoapods-repo-update!
   fastlane!
+  json (= 2.6.3)!
   pkg-config!
 
 BUNDLED WITH
