@@ -55,12 +55,18 @@ jobs:
       - name: Test
         run: make test-example-http
 
+      # `output` holds gym's buildlogs (FL_BUILDLOG_PATH) and scan's junit
+      # (SCAN_OUTPUT_DIRECTORY); scan writes its raw xcodebuild logs to
+      # ~/Library/Logs/scan instead, which is where per-target build details
+      # (archs, module paths) live when a compile fails.
       - name: Upload build and test output
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: example-http-output-xcode-${{ matrix.xcode-version }}
-          path: output
+          path: |
+            output
+            ~/Library/Logs/scan
           if-no-files-found: ignore
 
       - name: Upload crash reports
