@@ -9,15 +9,23 @@ setup:
 bootstrap:
 	bundle exec pod install
 
-# `--skip_codesigning` passes CODE_SIGNING_ALLOWED=NO, which suppresses the
-# codesign step but not provisioning profile resolution: gym builds against
-# `generic/platform=iOS` (a device), and Xcode still resolves a profile for any
-# target left on automatic signing. The CocoaPods-generated test targets have no
-# DEVELOPMENT_TEAM, so that resolution fails before the disabled signing step is
-# ever reached. Manual signing skips resolution entirely.
+# Xcode resolves a provisioning profile for any target left on automatic signing
+# during target validation, before any signing is attempted and regardless of
+# destination — gym builds against `generic/platform=iOS`, scan against a
+# simulator, and both hit it. The CocoaPods-generated test targets have no
+# DEVELOPMENT_TEAM, so resolution fails with:
+#
+#   Signing for "MobileCoin-Unit-Tests" requires selecting either a development
+#   team or a provisioning profile.
+#
+# Manual signing skips resolution. Nothing here needs a real signature: gym only
+# compiles, and the simulator doesn't enforce code signatures.
 #
 # This can't be fixed in the Xcode UI — `pod install` regenerates Pods.xcodeproj.
-GYM_FLAGS = --skip_archive --skip_codesigning --xcargs CODE_SIGN_STYLE=Manual
+CODESIGN_XCARGS = CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+
+GYM_FLAGS = --skip_archive --skip_codesigning --xcargs "$(CODESIGN_XCARGS)"
+SCAN_FLAGS = --xcargs "$(CODESIGN_XCARGS)"
 
 .PHONY: build
 build:
@@ -40,11 +48,14 @@ build:
 .PHONY: test
 test:
 	bundle exec fastlane scan \
-		--scheme "Unit Tests"
+		--scheme "Unit Tests" \
+		$(SCAN_FLAGS)
 	bundle exec fastlane scan \
-		--scheme "Performance Tests"
+		--scheme "Performance Tests" \
+		$(SCAN_FLAGS)
 	bundle exec fastlane scan \
-		--scheme "Http Protocol Unit Tests"
+		--scheme "Http Protocol Unit Tests" \
+		$(SCAN_FLAGS)
 
 .PHONY: clean
 clean:
