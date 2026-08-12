@@ -24,8 +24,18 @@ bootstrap:
 # This can't be fixed in the Xcode UI — `pod install` regenerates Pods.xcodeproj.
 CODESIGN_XCARGS = CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
 
+# scan must be given an explicit destination. Without one xcodebuild resolves a
+# platform per target rather than one for the whole build, and because
+# MobileCoin.podspec sets SUPPORTS_MACCATALYST=YES while LibMobileCoin.podspec
+# sets it to NO, MobileCoin builds for Mac Catalyst (Debug-maccatalyst,
+# -target arm64-apple-ios*-macabi) while LibMobileCoin builds for iphoneos. The
+# result is `no such module 'LibMobileCoin'` — it's a platform split, not an
+# architecture one. gym is unaffected because it always passes
+# `-destination generic/platform=iOS`.
+IOS_SIM_DEVICE ?= iPhone 16
+
 GYM_FLAGS = --skip_archive --skip_codesigning --xcargs "$(CODESIGN_XCARGS)"
-SCAN_FLAGS = --xcargs "$(CODESIGN_XCARGS)"
+SCAN_FLAGS = --device "$(IOS_SIM_DEVICE)" --xcargs "$(CODESIGN_XCARGS)"
 
 .PHONY: build
 build:
