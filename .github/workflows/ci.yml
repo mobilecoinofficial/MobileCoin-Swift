@@ -77,6 +77,71 @@ jobs:
           path: ~/Library/Logs/DiagnosticReports
           if-no-files-found: ignore
 
+  # Deliberately does NOT use ./.github/actions/setup-macos-ci: no submodules, no
+  # LFS, no Ruby, no CocoaPods. That is the point — SPM resolves libmobilecoin
+  # (and its nested LFS-tracked Artifacts submodule) from GitHub on its own, and
+  # this job is what proves the SPM consumption path stands up without any of the
+  # CocoaPods toolchain. `swift test` is not run here: MobileCoinTests needs
+  # Tests/Common/Secrets/secrets.json, which today is produced by a script that
+  # reads an `age` identity out of the macOS login keychain.
+  build-spm:
+    name: build-spm (Xcode ${{ matrix.xcode-version }})
+    runs-on: macos-15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode-version: ["16"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ matrix.xcode-version }}
+        run: |
+          set -euo pipefail
+          xcode_app="$(ls -d /Applications/Xcode_${{ matrix.xcode-version }}*.app 2>/dev/null | sort -V | tail -1)"
+          if [[ -z "$xcode_app" ]]; then
+            echo "::error::No Xcode ${{ matrix.xcode-version }}.x found on this runner. Installed:"
+            ls -d /Applications/Xcode*.app
+            exit 1
+          fi
+          echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
+
+      - name: Restore SwiftPM cache
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: v0-xcode-${{ matrix.xcode-version }}-spm-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            v0-xcode-${{ matrix.xcode-version }}-spm-
+
+      - name: Build
+        run: make build-spm
+
+      # SwiftPM clones libmobilecoin itself; if git-lfs smudging doesn't happen
+      # in that clone the .a files arrive as pointer text and the failure shows
+      # up much later as an unrelated linker error.
+      - name: Verify SwiftPM resolved the LFS binaries
+        run: |
+          set -euo pipefail
+          lib=".build/checkouts/libmobilecoin/Artifacts/LibMobileCoinLibrary.xcframework"
+          if [[ ! -d "$lib" ]]; then
+            echo "::error::$lib is missing from the SwiftPM checkout."
+            exit 1
+          fi
+          while IFS= read -r archive; do
+            if head -c 100 "$archive" | grep -q 'git-lfs.github.com'; then
+              echo "::error::$archive is an unresolved Git LFS pointer."
+              exit 1
+            fi
+          done < <(find "$lib" -name '*.a')
+
+      # `swift build` rewrites Package.resolved if the declared dependencies and
+      # the committed resolution disagree. Adding swift-log explicitly should not
+      # move anything, since grpc-swift was already pulling it in.
+      - name: Check for uncommitted changes
+        run: ./scripts/check_dirty_git
+
   swiftlint:
     name: swiftlint (Xcode ${{ matrix.xcode-version }})
     runs-on: macos-15
@@ -105,9 +170,19 @@ jobs:
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
+  # Non-blocking: the CocoaPods distribution path is being deprecated in favour
+  # of SPM, so this is not worth fixing. It cannot pass on Xcode 16 by
+  # configuration alone — dynamic linkage hits the missing libarclite (via
+  # Logging 1.4.0, the last version swift-log published to CocoaPods trunk,
+  # which declares iOS 8.0), and --use-static-frameworks avoids that but breaks
+  # the app link, because LibMobileCoin injects its vendored Rust .a through
+  # OTHER_LDFLAGS in pod_target_xcconfig, which CocoaPods applies only to that
+  # pod's own target and a static framework is archived rather than linked.
+  # Kept running so the signal stays visible if either is ever addressed.
   pod-lib-lint:
     name: pod-lib-lint (Xcode ${{ matrix.xcode-version }})
     runs-on: macos-15
+    continue-on-error: true
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -117,6 +192,9 @@ jobs:
       FL_BUILDLOG_PATH: ../output/buildlogs
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
+      # This job is diagnostic-only now, and CocoaPods' summarised output hides
+      # the undefined symbols behind a bare "linker command failed".
+      POD_LINT_EXTRA_FLAGS: --verbose
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -145,7 +223,9 @@ jobs:
 
   publish-pod-release:
     name: publish-pod-release
-    needs: [build-and-test-example-http, swiftlint, pod-lib-lint]
+    # pod-lib-lint is deliberately not a gate here: it is continue-on-error, and
+    # a `needs` on it would still block this job when it fails.
+    needs: [build-and-test-example-http, swiftlint]
     if: >-
       github.event_name == 'push' &&
       (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/'))
