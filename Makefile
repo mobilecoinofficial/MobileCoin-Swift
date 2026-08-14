@@ -88,20 +88,25 @@ tag-release:
 # `build-and-test-example-http` is what covers the dynamic-linkage path.
 POD_LINT_FLAGS = --skip-tests --use-static-frameworks
 
+# CocoaPods summarises xcodebuild output, so a link failure surfaces only as
+# "clang: error: linker command failed" with the undefined symbols stripped out.
+# Set this to --verbose to get the raw xcodebuild log.
+POD_LINT_EXTRA_FLAGS ?=
+
 .PHONY: lint-locally-podspec
 lint-locally-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) --allow-warnings
+	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) $(POD_LINT_EXTRA_FLAGS) --allow-warnings
 
 .PHONY: lint-locally-strict-podspec
 lint-locally-strict-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS)
+	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) $(POD_LINT_EXTRA_FLAGS)
 
 .PHONY: lint-podspec
 lint-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS)
+	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS) $(POD_LINT_EXTRA_FLAGS)
 
 .PHONY: publish-podspec
 publish-podspec:
@@ -148,6 +153,14 @@ upgrade-deps:
 .PHONY: generate-local-process-info
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
+
+# Builds every target in Package.swift. Unlike `run-all-tests-spm` this needs no
+# secrets, so it is the one SPM check CI can run today. The test targets declare
+# resources (secrets.json, process_info.json) that are generated rather than
+# committed; SwiftPM only warns about those at build time.
+.PHONY: build-spm
+build-spm:
+	swift build
 
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:
