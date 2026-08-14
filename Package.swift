@@ -24,12 +24,21 @@ let package = Package(
             url: "https://github.com/apple/swift-protobuf.git",
             from: "1.28.2"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1")
+        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1"),
+        // Declared explicitly because Sources/Common/Shared/MobileCoinLogging.swift
+        // does `import Logging`. It previously resolved only because grpc-swift
+        // happens to depend on swift-log transitively, so the build would break
+        // if that ever changed.
+        .package(url: "https://github.com/apple/swift-log", from: "1.4.0")
     ],
     targets: [
         .target(
             name: "MobileCoin",
-            dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf"), .product(name: "LibMobileCoinCore", package: "libmobilecoin")],
+            dependencies: [
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+                .product(name: "LibMobileCoinCore", package: "libmobilecoin"),
+                .product(name: "Logging", package: "swift-log"),
+            ],
             path: "Sources"
          ),
         .testTarget(
