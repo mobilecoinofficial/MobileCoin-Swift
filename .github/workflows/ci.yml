@@ -129,12 +129,21 @@ jobs:
             echo "::error::$lib is missing from the SwiftPM checkout."
             exit 1
           fi
+          count=0
           while IFS= read -r archive; do
             if head -c 100 "$archive" | grep -q 'git-lfs.github.com'; then
               echo "::error::$archive is an unresolved Git LFS pointer."
               exit 1
             fi
+            echo "ok: $archive ($(du -h "$archive" | cut -f1))"
+            count=$((count + 1))
           done < <(find "$lib" -name '*.a')
+          # Without this the check passes vacuously if the xcframework layout
+          # ever changes and `find` matches nothing.
+          if [[ "$count" -eq 0 ]]; then
+            echo "::error::Found no .a archives under $lib."
+            exit 1
+          fi
 
       # `swift build` rewrites Package.resolved if the declared dependencies and
       # the committed resolution disagree. Adding swift-log explicitly should not
