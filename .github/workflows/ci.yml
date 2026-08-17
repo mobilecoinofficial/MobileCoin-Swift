@@ -12,6 +12,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# The floor for every job; publish-pod-release raises its own.
+permissions:
+  contents: read
+
 env:
   FASTLANE_SKIP_UPDATE_CHECK: "1"
   # cocoapods-keys resolves these from the environment before consulting the
