@@ -83,9 +83,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: .vendor/bundle
-        key: v0-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('Gemfile.lock') }}
+        key: v0-xcode-${{ inputs.xcode-version }}-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('Gemfile.lock') }}
         restore-keys: |
-          v0-ruby-${{ inputs.ruby-version }}-gems-
+          v0-xcode-${{ inputs.xcode-version }}-ruby-${{ inputs.ruby-version }}-gems-
 
     - name: Install root bundler dependencies
       shell: bash
@@ -99,9 +99,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: ExampleHTTP/.vendor/bundle
-        key: v0-example-http-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('ExampleHTTP/Gemfile.lock') }}
+        key: v0-xcode-${{ inputs.xcode-version }}-example-http-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('ExampleHTTP/Gemfile.lock') }}
         restore-keys: |
-          v0-example-http-ruby-${{ inputs.ruby-version }}-gems-
+          v0-xcode-${{ inputs.xcode-version }}-example-http-ruby-${{ inputs.ruby-version }}-gems-
 
     - name: Install ExampleHTTP bundler dependencies
       shell: bash
