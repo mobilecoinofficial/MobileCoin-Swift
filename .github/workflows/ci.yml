@@ -107,14 +107,12 @@ jobs:
           fi
           echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
 
-      - name: Restore SwiftPM cache
-        uses: actions/cache@v4
-        with:
-          path: .build
-          key: v0-xcode-${{ matrix.xcode-version }}-spm-${{ hashFiles('Package.resolved') }}
-          restore-keys: |
-            v0-xcode-${{ matrix.xcode-version }}-spm-
-
+      # Not cached on purpose. `.build` came to 5.2 GB — 94% of the repository's
+      # 10 GB Actions cache budget — because SwiftPM keeps a bare clone *and* a
+      # checkout of libmobilecoin, whose LFS artifacts are ~330 MB on their own.
+      # Every Package.resolved change would mint another 5 GB entry and evict the
+      # small gem and Pods caches the slower jobs depend on. A cold build is
+      # ~8 minutes against ~3 warm; that is a cheap trade on the fastest job here.
       - name: Build
         run: make build-spm
 
