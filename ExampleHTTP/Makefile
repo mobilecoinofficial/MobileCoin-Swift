@@ -35,7 +35,9 @@ CODESIGN_XCARGS = CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=NO CODE_SIGNING_RE
 IOS_SIM_DEVICE ?= iPhone 16
 
 GYM_FLAGS = --skip_archive --skip_codesigning --xcargs "$(CODESIGN_XCARGS)"
-SCAN_FLAGS = --device "$(IOS_SIM_DEVICE)" --xcargs "$(CODESIGN_XCARGS)"
+# Without ensure_devices_found a device mismatch falls back to scan's
+# default_os_version lookup, which crashes opaquely on Xcode 26.
+SCAN_FLAGS = --device "$(IOS_SIM_DEVICE)" --ensure_devices_found --xcargs "$(CODESIGN_XCARGS)"
 
 .PHONY: build
 build:

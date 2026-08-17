@@ -36,16 +36,24 @@ jobs:
     strategy:
       fail-fast: false
       # One Xcode major per macOS runner image, so the runner rides along.
+      # The device is pinned per leg with an explicit OS version: a versionless
+      # name sends fastlane 2.225 through scan's default_os_version lookup,
+      # which crashes on Xcode 26 (fixed upstream, but cocoapods-binary's
+      # xcpretty pin caps fastlane below the fix). Update it when the image
+      # rotates its simulators.
       matrix:
         include:
           - xcode-version: "16"
             runner: macos-15
+            ios-sim-device: "iPhone 16 (18.5)"
           - xcode-version: "26"
             runner: macos-26
+            ios-sim-device: "iPhone 17 (26.5)"
     env:
       FL_BUILDLOG_PATH: ../output/buildlogs
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
+      IOS_SIM_DEVICE: ${{ matrix.ios-sim-device }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
