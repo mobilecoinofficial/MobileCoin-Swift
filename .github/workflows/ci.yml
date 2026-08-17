@@ -31,12 +31,17 @@ jobs:
 
   build-and-test-example-http:
     name: build-and-test-example-http (Xcode ${{ matrix.xcode-version }})
-    runs-on: macos-15
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
     strategy:
       fail-fast: false
+      # One Xcode major per macOS runner image, so the runner rides along.
       matrix:
-        xcode-version: ["16"]
+        include:
+          - xcode-version: "16"
+            runner: macos-15
+          - xcode-version: "26"
+            runner: macos-26
     env:
       FL_BUILDLOG_PATH: ../output/buildlogs
       SCAN_OUTPUT_DIRECTORY: ../output/scan
@@ -90,12 +95,17 @@ jobs:
   # reads an `age` identity out of the macOS login keychain.
   build-spm:
     name: build-spm (Xcode ${{ matrix.xcode-version }})
-    runs-on: macos-15
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
+      # One Xcode major per macOS runner image, so the runner rides along.
       matrix:
-        xcode-version: ["16"]
+        include:
+          - xcode-version: "16"
+            runner: macos-15
+          - xcode-version: "26"
+            runner: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
