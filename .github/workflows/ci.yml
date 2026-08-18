@@ -92,17 +92,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode 26
-        run: |
-          set -euo pipefail
-          xcode_app="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
-          if [[ -z "$xcode_app" ]]; then
-            echo "::error::No Xcode 26.x found on this runner. Installed:"
-            ls -d /Applications/Xcode*.app
-            exit 1
-          fi
-          echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
-
       # `.build` is not cached on purpose: SwiftPM keeps both a bare clone and
       # a checkout of libmobilecoin's LFS artifacts, so each entry would fill
       # most of the repo's Actions cache budget and evict the gem and Pods

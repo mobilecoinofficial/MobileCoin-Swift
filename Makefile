@@ -77,6 +77,7 @@ tag-release:
 # MobileCoin pod
 
 # Dynamic linkage, matching what `pod trunk push` validates at release time.
+# pod lint strips linker errors from xcodebuild output; add --verbose to see them.
 POD_LINT_FLAGS = --skip-tests
 
 .PHONY: lint-locally-podspec

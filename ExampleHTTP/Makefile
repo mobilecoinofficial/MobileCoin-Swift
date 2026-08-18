@@ -10,9 +10,10 @@ bootstrap:
 	bundle exec pod install
 
 # The CocoaPods-generated test targets have no DEVELOPMENT_TEAM, so Xcode's
-# automatic-signing profile resolution fails during target validation for both
-# gym and scan. Manual signing skips resolution, and nothing here needs a real
-# signature: gym only compiles and the simulator doesn't enforce signatures.
+# automatic-signing profile resolution fails target validation for gym and scan
+# ("requires selecting either a development team or a provisioning profile").
+# Manual signing skips resolution, and nothing here needs a real signature:
+# gym only compiles and the simulator doesn't enforce signatures.
 # Not fixable in the Xcode UI because `pod install` regenerates Pods.xcodeproj.
 CODESIGN_XCARGS = CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
 

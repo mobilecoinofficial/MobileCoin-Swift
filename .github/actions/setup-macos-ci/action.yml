@@ -1,14 +1,11 @@
 name: Setup macOS CI
 description: >-
-  Selects Xcode, installs Ruby + bundler dependencies (root and ExampleHTTP),
-  and runs `pod install` for the ExampleHTTP workspace. Assumes the repository
-  has already been checked out with `submodules: recursive` and `lfs: true`.
+  Installs Ruby + bundler dependencies (root and ExampleHTTP) and runs
+  `pod install` for the ExampleHTTP workspace. Assumes the repository has
+  already been checked out with `submodules: recursive` and `lfs: true`,
+  and uses the runner image's default Xcode.
 
 inputs:
-  xcode-version:
-    description: Major Xcode version to select from the runner image (e.g. "26").
-    required: false
-    default: "26"
   ruby-version:
     description: >-
       Ruby version to install. Must satisfy the committed Gemfile.lock files,
@@ -24,21 +21,6 @@ inputs:
 runs:
   using: composite
   steps:
-    # Picks the highest installed patch of the requested major version so the
-    # workflow doesn't break when the runner image rotates patch releases.
-    - name: Select Xcode ${{ inputs.xcode-version }}
-      shell: bash
-      run: |
-        set -euo pipefail
-        xcode_app="$(ls -d /Applications/Xcode_${{ inputs.xcode-version }}*.app 2>/dev/null | sort -V | tail -1)"
-        if [[ -z "$xcode_app" ]]; then
-          echo "::error::No Xcode ${{ inputs.xcode-version }}.x found on this runner. Installed:"
-          ls -d /Applications/Xcode*.app
-          exit 1
-        fi
-        echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
-        echo "Selected ${xcode_app}"
-
     # The LibMobileCoin binaries live in the nested `Artifacts` submodule and
     # are tracked with Git LFS. actions/checkout's `lfs: true` only fetches LFS
     # content for the top-level repo, not for submodules, so do it here.
@@ -80,9 +62,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: .vendor/bundle
-        key: v0-xcode-${{ inputs.xcode-version }}-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('Gemfile.lock') }}
+        key: v1-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('Gemfile.lock') }}
         restore-keys: |
-          v0-xcode-${{ inputs.xcode-version }}-ruby-${{ inputs.ruby-version }}-gems-
+          v1-ruby-${{ inputs.ruby-version }}-gems-
 
     - name: Install root bundler dependencies
       shell: bash
@@ -96,9 +78,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: ExampleHTTP/.vendor/bundle
-        key: v0-xcode-${{ inputs.xcode-version }}-example-http-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('ExampleHTTP/Gemfile.lock') }}
+        key: v1-example-http-ruby-${{ inputs.ruby-version }}-gems-${{ hashFiles('ExampleHTTP/Gemfile.lock') }}
         restore-keys: |
-          v0-xcode-${{ inputs.xcode-version }}-example-http-ruby-${{ inputs.ruby-version }}-gems-
+          v1-example-http-ruby-${{ inputs.ruby-version }}-gems-
 
     - name: Install ExampleHTTP bundler dependencies
       shell: bash
@@ -114,9 +96,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: ExampleHTTP/Pods
-        key: v0-xcode-${{ inputs.xcode-version }}-example-http-pods-${{ hashFiles('ExampleHTTP/Podfile.lock') }}
+        key: v1-example-http-pods-${{ hashFiles('ExampleHTTP/Podfile.lock') }}
         restore-keys: |
-          v0-xcode-${{ inputs.xcode-version }}-example-http-pods-
+          v1-example-http-pods-
 
     # cocoapods-keys resolves each key from ENV before falling back to the
     # keychain, so the caller only needs to export the key names as job env.
