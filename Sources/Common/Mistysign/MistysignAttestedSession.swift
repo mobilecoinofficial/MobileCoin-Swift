@@ -83,7 +83,7 @@ public final class MistysignAttestedSession {
         switch cipher.encryptMessage(aad: Data(), plaintext: plaintext) {
         case .success(let message):
             do {
-                return try message.serializedData()
+                return try message.serializedBytes()
             } catch {
                 throw MistysignAttestedSessionError.encryptionFailed("\(error)")
             }
@@ -101,7 +101,7 @@ public final class MistysignAttestedSession {
 
         let message: Attest_Message
         do {
-            message = try Attest_Message(serializedData: messageData)
+            message = try Attest_Message(serializedBytes: messageData)
         } catch {
             throw MistysignAttestedSessionError.decryptionFailed("\(error)")
         }
