@@ -44,7 +44,7 @@ public struct Receipt {
 
     /// - Returns: `nil` when the input is not deserializable.
     public init?(serializedData: Data) {
-        guard let proto = try? External_Receipt(serializedData: serializedData) else {
+        guard let proto = try? External_Receipt(serializedBytes: serializedData) else {
             logger.warning(
                 "External_Receipt deserialization failed. serializedData: " +
                     "\(redacting: serializedData.base64EncodedString())",
