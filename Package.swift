@@ -55,16 +55,20 @@ let package = Package(
             exclude: [
                 "Assets.xcassets",
                 "Preview Content/Preview Assets.xcassets",
+            ],
+            swiftSettings: [
+                .define("SPM_BUILD"),
             ]
          ),
         .testTarget(
             name: "TestSetupClientTests",
             dependencies: ["TestSetupClient"],
             path: "tools/TestSetupClient/TestSetupClientTests",
-            exclude: [
-                "process_info.json.sample",
-            ],
             resources: [
+                // The committed sample keeps Bundle.module synthesized before the
+                // generator writes process_info.json. With every declared resource
+                // missing, SwiftPM emits no accessor and the target cannot compile.
+                .copy("process_info.json.sample"),
                 .copy("process_info.json"),
             ]
          ),
