@@ -143,8 +143,8 @@ jobs:
           fi
 
       # `swift build` rewrites Package.resolved if the declared dependencies and
-      # the committed resolution disagree. Adding swift-log explicitly should not
-      # move anything, since grpc-swift was already pulling it in.
+      # the committed resolution disagree. Dropping the explicit swift-log
+      # dependency moves nothing, since grpc-swift still pulls it in.
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
@@ -170,23 +170,12 @@ jobs:
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
-  # Non-blocking: CocoaPods distribution is deprecated in favour of SPM, and
-  # neither linkage mode passes. Dynamic dies on libarclite (Logging 1.4.0
-  # declares iOS 8.0); --use-static-frameworks fails the lint App's link because
-  # LibMobileCoin injects its vendored .a via pod_target_xcconfig OTHER_LDFLAGS,
-  # which does not propagate out of a static framework. Verified on Xcode 26.6.
+  # Lints dynamically, the same validation `pod trunk push` runs at release
+  # time, so a green run here means the publish job's lint will also pass.
   pod-lib-lint:
     name: CocoaPods podspec lint
     runs-on: macos-26
-    continue-on-error: true
     timeout-minutes: 120
-    env:
-      FL_BUILDLOG_PATH: ../output/buildlogs
-      SCAN_OUTPUT_DIRECTORY: ../output/scan
-      SCAN_OUTPUT_TYPES: junit
-      # This job is diagnostic-only now, and CocoaPods' summarised output hides
-      # the undefined symbols behind a bare "linker command failed".
-      POD_LINT_EXTRA_FLAGS: --verbose
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -200,22 +189,14 @@ jobs:
       - name: Lint podspec
         run: make lint-locally-strict-podspec
 
-      - name: Upload lint output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pod-lib-lint-output
-          path: output
-          if-no-files-found: ignore
-
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
   publish-pod-release:
     name: Publish pod release
-    # pod-lib-lint is deliberately not a gate here: it is continue-on-error, and
-    # a `needs` on it would still block this job when it fails.
-    needs: [build-and-test-example-http, swiftlint]
+    # pod-lib-lint runs the same validation `pod trunk push` performs, so it
+    # gates the publish to fail fast before tagging.
+    needs: [build-and-test-example-http, swiftlint, pod-lib-lint]
     if: >-
       github.event_name == 'push' &&
       (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/'))

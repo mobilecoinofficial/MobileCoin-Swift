@@ -76,17 +76,8 @@ tag-release:
 
 # MobileCoin pod
 
-# `--use-static-frameworks` is required on Xcode >= 14.3, which no longer ships
-# libarclite. Our `Logging` (swift-log) dependency is pinned at 1.4.0 — the last
-# version published to CocoaPods trunk — and declares a deployment target of
-# iOS 8.0. Building it as a *dynamic* framework triggers a link step that wants
-# libarclite and fails. Static frameworks are archived rather than linked, so
-# only the App target links, at the podspec's own iOS 12.2 target.
-#
-# ExampleHTTP consumes the pod dynamically and works around the same problem
-# with an IPHONEOS_DEPLOYMENT_TARGET override in its Podfile `post_install`;
-# `build-and-test-example-http` is what covers the dynamic-linkage path.
-POD_LINT_FLAGS = --skip-tests --use-static-frameworks
+# Dynamic linkage, matching what `pod trunk push` validates at release time.
+POD_LINT_FLAGS = --skip-tests
 
 # CocoaPods summarises xcodebuild output, so a link failure surfaces only as
 # "clang: error: linker command failed" with the undefined symbols stripped out.
