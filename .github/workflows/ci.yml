@@ -30,30 +30,18 @@ env:
 jobs:
 
   build-and-test-example-http:
-    name: build-and-test-example-http (Xcode ${{ matrix.xcode-version }})
-    runs-on: ${{ matrix.runner }}
+    name: Example app integration tests
+    runs-on: macos-26
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      # One Xcode major per macOS runner image, so the runner rides along.
-      # The device is pinned per leg with an explicit OS version: a versionless
-      # name sends fastlane 2.225 through scan's default_os_version lookup,
-      # which crashes on Xcode 26 (fixed upstream, but cocoapods-binary's
-      # xcpretty pin caps fastlane below the fix). Update it when the image
-      # rotates its simulators.
-      matrix:
-        include:
-          - xcode-version: "16"
-            runner: macos-15
-            ios-sim-device: "iPhone 16 (18.5)"
-          - xcode-version: "26"
-            runner: macos-26
-            ios-sim-device: "iPhone 17 (26.5)"
     env:
       FL_BUILDLOG_PATH: ../output/buildlogs
       SCAN_OUTPUT_DIRECTORY: ../output/scan
       SCAN_OUTPUT_TYPES: junit
-      IOS_SIM_DEVICE: ${{ matrix.ios-sim-device }}
+      # Pinned with an explicit OS version: a versionless name sends fastlane
+      # 2.225 through scan's default_os_version lookup, which crashes on
+      # Xcode 26 (fixed upstream, but cocoapods-binary's xcpretty pin caps
+      # fastlane below the fix). Update it when the image rotates simulators.
+      IOS_SIM_DEVICE: "iPhone 17 (26.5)"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,8 +51,6 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup-macos-ci
-        with:
-          xcode-version: ${{ matrix.xcode-version }}
 
       - name: Build
         run: make build-example-http
@@ -80,7 +66,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: example-http-output-xcode-${{ matrix.xcode-version }}
+          name: example-http-output
           path: |
             output
             ~/Library/Logs/scan
@@ -90,7 +76,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: example-http-diagnostics-xcode-${{ matrix.xcode-version }}
+          name: example-http-diagnostics
           path: ~/Library/Logs/DiagnosticReports
           if-no-files-found: ignore
 
@@ -102,28 +88,19 @@ jobs:
   # Tests/Common/Secrets/secrets.json, which today is produced by a script that
   # reads an `age` identity out of the macOS login keychain.
   build-spm:
-    name: build-spm (Xcode ${{ matrix.xcode-version }})
-    runs-on: ${{ matrix.runner }}
+    name: Swift package build
+    runs-on: macos-26
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      # One Xcode major per macOS runner image, so the runner rides along.
-      matrix:
-        include:
-          - xcode-version: "16"
-            runner: macos-15
-          - xcode-version: "26"
-            runner: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode ${{ matrix.xcode-version }}
+      - name: Select Xcode 26
         run: |
           set -euo pipefail
-          xcode_app="$(ls -d /Applications/Xcode_${{ matrix.xcode-version }}*.app 2>/dev/null | sort -V | tail -1)"
+          xcode_app="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
           if [[ -z "$xcode_app" ]]; then
-            echo "::error::No Xcode ${{ matrix.xcode-version }}.x found on this runner. Installed:"
+            echo "::error::No Xcode 26.x found on this runner. Installed:"
             ls -d /Applications/Xcode*.app
             exit 1
           fi
@@ -172,13 +149,9 @@ jobs:
         run: ./scripts/check_dirty_git
 
   swiftlint:
-    name: swiftlint (Xcode ${{ matrix.xcode-version }})
-    runs-on: macos-15
+    name: SwiftLint
+    runs-on: macos-26
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        xcode-version: ["16"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -188,8 +161,6 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup-macos-ci
-        with:
-          xcode-version: ${{ matrix.xcode-version }}
 
       # `make lint-strict` runs the SwiftLint binary vendored into
       # ExampleHTTP/Pods, which is why this job still needs `pod install`.
@@ -199,24 +170,16 @@ jobs:
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
-  # Non-blocking: the CocoaPods distribution path is being deprecated in favour
-  # of SPM, so this is not worth fixing. It cannot pass on Xcode 16 by
-  # configuration alone — dynamic linkage hits the missing libarclite (via
-  # Logging 1.4.0, the last version swift-log published to CocoaPods trunk,
-  # which declares iOS 8.0), and --use-static-frameworks avoids that but breaks
-  # the app link, because LibMobileCoin injects its vendored Rust .a through
-  # OTHER_LDFLAGS in pod_target_xcconfig, which CocoaPods applies only to that
-  # pod's own target and a static framework is archived rather than linked.
-  # Kept running so the signal stays visible if either is ever addressed.
+  # Non-blocking: CocoaPods distribution is deprecated in favour of SPM, and
+  # neither linkage mode passes. Dynamic dies on libarclite (Logging 1.4.0
+  # declares iOS 8.0); --use-static-frameworks fails the lint App's link because
+  # LibMobileCoin injects its vendored .a via pod_target_xcconfig OTHER_LDFLAGS,
+  # which does not propagate out of a static framework. Verified on Xcode 26.6.
   pod-lib-lint:
-    name: pod-lib-lint (Xcode ${{ matrix.xcode-version }})
-    runs-on: macos-15
+    name: CocoaPods podspec lint
+    runs-on: macos-26
     continue-on-error: true
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        xcode-version: ["16"]
     env:
       FL_BUILDLOG_PATH: ../output/buildlogs
       SCAN_OUTPUT_DIRECTORY: ../output/scan
@@ -233,8 +196,6 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup-macos-ci
-        with:
-          xcode-version: ${{ matrix.xcode-version }}
 
       - name: Lint podspec
         run: make lint-locally-strict-podspec
@@ -243,7 +204,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pod-lib-lint-output-xcode-${{ matrix.xcode-version }}
+          name: pod-lib-lint-output
           path: output
           if-no-files-found: ignore
 
@@ -251,14 +212,14 @@ jobs:
         run: ./scripts/check_dirty_git
 
   publish-pod-release:
-    name: publish-pod-release
+    name: Publish pod release
     # pod-lib-lint is deliberately not a gate here: it is continue-on-error, and
     # a `needs` on it would still block this job when it fails.
     needs: [build-and-test-example-http, swiftlint]
     if: >-
       github.event_name == 'push' &&
       (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/'))
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     permissions:
       contents: write

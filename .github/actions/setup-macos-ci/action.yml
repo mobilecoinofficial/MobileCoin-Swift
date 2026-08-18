@@ -6,9 +6,9 @@ description: >-
 
 inputs:
   xcode-version:
-    description: Major Xcode version to select from the runner image (e.g. "16").
+    description: Major Xcode version to select from the runner image (e.g. "26").
     required: false
-    default: "16"
+    default: "26"
   ruby-version:
     description: >-
       Ruby version to install. Must satisfy the committed Gemfile.lock files,
