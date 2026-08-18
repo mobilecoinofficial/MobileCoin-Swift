@@ -1,6 +1,6 @@
 // swift-tools-version:5.7
-import PackageDescription
 import Foundation
+import PackageDescription
 
 let package = Package(
     name: "MobileCoin",
@@ -25,11 +25,6 @@ let package = Package(
             from: "1.28.2"
         ),
         .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1"),
-        // Declared explicitly because Sources/Common/Shared/MobileCoinLogging.swift
-        // does `import Logging`. It previously resolved only because grpc-swift
-        // happens to depend on swift-log transitively, so the build would break
-        // if that ever changed.
-        .package(url: "https://github.com/apple/swift-log", from: "1.4.0")
     ],
     targets: [
         .target(
@@ -37,21 +32,20 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
                 .product(name: "LibMobileCoinCore", package: "libmobilecoin"),
-                .product(name: "Logging", package: "swift-log"),
             ],
             path: "Sources"
          ),
         .testTarget(
             name: "MobileCoinTests",
-            dependencies: ["MobileCoin"], 
+            dependencies: ["MobileCoin"],
             path: "Tests",
             exclude: [
-                "Common/Secrets/secrets.json.sample"
+                "Common/Secrets/secrets.json.sample",
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),
                 .copy("Common/Secrets/secrets.json"),
-                .copy("Common/Secrets/process_info.json")
+                .copy("Common/Secrets/process_info.json"),
             ]
         ),
         .target(
@@ -60,7 +54,7 @@ let package = Package(
             path: "tools/TestSetupClient/TestSetupClient",
             exclude: [
                 "Assets.xcassets",
-                "Preview Content/Preview Assets.xcassets"
+                "Preview Content/Preview Assets.xcassets",
             ]
          ),
         .testTarget(
@@ -68,11 +62,11 @@ let package = Package(
             dependencies: ["TestSetupClient"],
             path: "tools/TestSetupClient/TestSetupClientTests",
             exclude: [
-                "process_info.json.sample"
+                "process_info.json.sample",
             ],
             resources: [
-                .copy("process_info.json")
+                .copy("process_info.json"),
             ]
-         )
+         ),
     ]
 )

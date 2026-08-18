@@ -1,11 +1,10 @@
 //
-//  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
+//  Copyright (c) 2020-2026 MobileCoin. All rights reserved.
 //
 
-// swiftlint:disable function_parameter_count prefixed_toplevel_constant
+// swiftlint:disable prefixed_toplevel_constant
 
 import Foundation
-import Logging
 
 public enum MobileCoinLogging {
     public static var logSensitiveData = false {
@@ -16,68 +15,211 @@ public enum MobileCoinLogging {
             }
         }
     }
+
+    /// Minimum level the SDK prints. Replaces the swift-log bootstrap used before v6.0.6.
+    public static var logLevel = Level.info
+
+    public enum Level: Int, Comparable {
+        case trace
+        case debug
+        case info
+        case notice
+        case warning
+        case error
+        case critical
+
+        public static func < (lhs: Level, rhs: Level) -> Bool {
+            lhs.rawValue < rhs.rawValue
+        }
+    }
 }
 
-internal let logger = Logger(label: "com.mobilecoin", factory: ContextPrefixLogHandler.init)
+internal let logger = Logger(label: "com.mobilecoin")
 
-private struct ContextPrefixLogHandler: LogHandler {
-    static let ENABLE_LOG_FUNCTION_METADATA_KEY = "LOG_FUNCTION_METADATA_KEY"
+// The value of `logSensitiveDataInternal` gets locked in place upon first read.
+private let logSensitiveDataInternal = ImmutableOnceReadLock(false)
 
-    private var logger: Logger
+internal struct Logger {
+    let label: String
 
-    subscript(metadataKey metadataKey: String) -> Logger.Metadata.Value? {
-        get { logger[metadataKey: metadataKey] }
-        set { logger[metadataKey: metadataKey] = newValue }
+    var logLevel: MobileCoinLogging.Level {
+        get { MobileCoinLogging.logLevel }
+        nonmutating set { MobileCoinLogging.logLevel = newValue }
     }
 
-    init(label: String) {
-        self.logger = Logger(label: label)
-    }
-
-    // `metadata` isn't currently accessible via `logger`, so there's not much we can do.
-    // Fortunately, it's not accessed by `Logger` either, so we're just going to ignore it.
-    var metadata: Logger.Metadata {
-        get { [:] }
-        set { _ = newValue }
-    }
-
-    var logLevel: Logger.Level {
-        get { logger.logLevel }
-        set { logger.logLevel = newValue }
-    }
-
-    func log(
-        level: Logger.Level,
-        message: Logger.Message,
-        metadata: Logger.Metadata?,
-        source: String,
-        file: String,
-        function: String,
-        line: UInt
+    func trace(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
     ) {
-        var (message, metadata) = (message, metadata)
-
-        // Remove log function metadata entry and add file/line/function name if it was enabled.
-        if metadata?
-            .removeValue(forKey: ContextPrefixLogHandler.ENABLE_LOG_FUNCTION_METADATA_KEY) != nil
-        {
-            let filename = URL(fileURLWithPath: file, isDirectory: false).lastPathComponent
-            message = "\(filename):\(line):\(function) - \(message)"
-        }
-
-        logger.log(
-            level: level,
-            message,
-            metadata: metadata,
-            source: source,
+        log(
+            .trace,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
             file: file,
             function: function,
             line: line)
     }
+
+    func debug(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            .debug,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
+            file: file,
+            function: function,
+            line: line)
+    }
+
+    func info(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            .info,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
+            file: file,
+            function: function,
+            line: line)
+    }
+
+    func notice(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            .notice,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
+            file: file,
+            function: function,
+            line: line)
+    }
+
+    func warning(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            .warning,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
+            file: file,
+            function: function,
+            line: line)
+    }
+
+    func error(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            .error,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
+            file: file,
+            function: function,
+            line: line)
+    }
+
+    func critical(
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            .critical,
+            message(),
+            sensitive: sensitive,
+            logFunction: logFunction,
+            file: file,
+            function: function,
+            line: line)
+    }
+
+    func log(
+        _ level: MobileCoinLogging.Level,
+        _ message: @autoclosure () -> String,
+        sensitive: Bool = false,
+        logFunction: Bool = true,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        guard level >= MobileCoinLogging.logLevel else { return }
+        guard !sensitive || logSensitiveDataInternal.get() else { return }
+
+        var message = message()
+        if logFunction {
+            let filename = URL(fileURLWithPath: file, isDirectory: false).lastPathComponent
+            message = "\(filename):\(line):\(function) - \(message)"
+        }
+        print("\(Self.timestampFormatter.string(from: Date())) \(level) \(label) : \(message)")
+    }
+
+    private static let timestampFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
 }
 
-// The value of `logSensitiveDataInternal` gets locked in place upon first read.
-private let logSensitiveDataInternal = ImmutableOnceReadLock(false)
+extension MobileCoinLogging.Level: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .trace:
+            return "trace"
+        case .debug:
+            return "debug"
+        case .info:
+            return "info"
+        case .notice:
+            return "notice"
+        case .warning:
+            return "warning"
+        case .error:
+            return "error"
+        case .critical:
+            return "critical"
+        }
+    }
+}
 
 extension Logger {
     func assert(
@@ -135,317 +277,6 @@ extension Logger {
         let message = message()
         critical("\(message)", file: "\(file)", function: function, line: line)
         return Swift.fatalError(message, file: file, line: line)
-    }
-}
-
-extension Logger {
-    func trace(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        trace(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func debug(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        debug(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func info(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        info(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func notice(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        notice(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func warning(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        warning(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func error(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        error(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func critical(
-        _ message: @autoclosure () -> Logger.Message,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        guard !sensitive || logSensitiveDataInternal.get() else { return }
-
-        let metadata = logFunction ? { Self.addingLogFunctionKey(metadata()) } : metadata
-        critical(
-            message(),
-            metadata: metadata(),
-            source: source(),
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    private static func addingLogFunctionKey(_ metadata: Logger.Metadata?) -> Logger.Metadata {
-        var metadata = metadata ?? Logger.Metadata()
-        metadata[ContextPrefixLogHandler.ENABLE_LOG_FUNCTION_METADATA_KEY] = "1"
-        return metadata
-    }
-}
-
-extension Logger {
-    func trace(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        trace(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func debug(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        debug(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func info(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        info(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func notice(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        notice(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func warning(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        warning(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func error(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        error(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
-    }
-
-    func critical(
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
-        source: @autoclosure () -> String? = nil,
-        sensitive: Bool = false,
-        logFunction: Bool = true,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line
-    ) {
-        critical(
-            Message(stringLiteral: message()),
-            metadata: metadata(),
-            source: source(),
-            sensitive: sensitive,
-            logFunction: logFunction,
-            file: file,
-            function: function,
-            line: line)
     }
 }
 
