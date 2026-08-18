@@ -5,6 +5,9 @@
 //  Created by Cary Bakker on 4/18/23.
 //
 
+// In SPM the target is a library linked into the unified test runner, whose
+// own entry point collides with @main; only the xcodeproj builds the real app.
+#if !SPM_BUILD
 import SwiftUI
 
 @available(iOS 14.0, *)
@@ -16,3 +19,4 @@ struct TestSetupClientApp: App {
         }
     }
 }
+#endif
