@@ -18,7 +18,7 @@ Pods/
 node_modules/
 /package-lock.json
 
-# CircleCI-only
+# CI-only
 /output/
 
 # Finder

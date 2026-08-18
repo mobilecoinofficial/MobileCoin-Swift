@@ -1,6 +1,6 @@
 ![MobileCoin logo](https://raw.githubusercontent.com/mobilecoinofficial/mobilecoin/master/img/mobilecoin_logo.png)
 
-[![CircleCI](https://img.shields.io/circleci/build/gh/mobilecoinofficial/MobileCoin-Swift?token=da755dc2814021ad04ee7b31a129b41e6c7161ac)](https://circleci.com/gh/mobilecoinofficial/MobileCoin-Swift/tree/master) [![Documentation](https://img.shields.io/badge/docs-latest-blue)](https://mobilecoinofficial.github.io/MobileCoin-Swift/)
+[![ci](https://github.com/mobilecoinofficial/MobileCoin-Swift/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/mobilecoinofficial/MobileCoin-Swift/actions/workflows/ci.yml) [![Documentation](https://img.shields.io/badge/docs-latest-blue)](https://mobilecoinofficial.github.io/MobileCoin-Swift/)
 
 # MobileCoin Swift
 

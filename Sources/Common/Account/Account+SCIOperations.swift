@@ -12,7 +12,7 @@ extension Account {
         private let metaFetcher: BlockchainMetaFetcher
         private let txOutSelector: TxOutSelector
         private let signedContingentInputCreator: SignedContingentInputCreator
-        private let proofOfReserveSignedContingentInputCreator: ProofOfReserveSignedContingentInputCreator
+        private let proofOfReserveSCICreator: ProofOfReserveSCICreator
         private let transactionPreparer: TransactionPreparer
 
         init(
@@ -38,7 +38,7 @@ extension Account {
                 mixinSelectionStrategy: mixinSelectionStrategy,
                 rngSeed: rngSeed,
                 targetQueue: targetQueue)
-            self.proofOfReserveSignedContingentInputCreator = ProofOfReserveSignedContingentInputCreator(
+            self.proofOfReserveSCICreator = ProofOfReserveSCICreator(
                 accountKey: account.accessWithoutLocking.accountKey,
                 fogMerkleProofService: fogMerkleProofService,
                 fogResolverManager: fogResolverManager,
@@ -113,7 +113,9 @@ extension Account {
                 return
             }
 
-            let (txOut, ledgerBlockCount) = account.readSync { ($0.ownedTxOut(for: txOutPubKey), $0.knowableBlockCount) }
+            let (txOut, ledgerBlockCount) = account.readSync {
+                ($0.ownedTxOut(for: txOutPubKey), $0.knowableBlockCount)
+            }
             guard let txOut = txOut else {
                 serialQueue.async {
                     completion(.failure(.invalidInput("TxOut not found")))
@@ -128,7 +130,7 @@ extension Account {
                         return
                     }
 
-                    proofOfReserveSignedContingentInputCreator.createSignedContingentInput(
+                    proofOfReserveSCICreator.createSignedContingentInput(
                         input: txOut,
                         fogTombstoneBlockIndex: ledgerBlockCount + 50,
                         blockVersion: blockVersion) { result in
