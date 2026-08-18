@@ -1,6 +1,6 @@
 // swift-tools-version:5.7
-import PackageDescription
 import Foundation
+import PackageDescription
 
 let package = Package(
     name: "MobileCoin",
@@ -24,25 +24,28 @@ let package = Package(
             url: "https://github.com/apple/swift-protobuf.git",
             from: "1.28.2"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1")
+        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1"),
     ],
     targets: [
         .target(
             name: "MobileCoin",
-            dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf"), .product(name: "LibMobileCoinCore", package: "libmobilecoin")],
+            dependencies: [
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+                .product(name: "LibMobileCoinCore", package: "libmobilecoin"),
+            ],
             path: "Sources"
          ),
         .testTarget(
             name: "MobileCoinTests",
-            dependencies: ["MobileCoin"], 
+            dependencies: ["MobileCoin"],
             path: "Tests",
             exclude: [
-                "Common/Secrets/secrets.json.sample"
+                "Common/Secrets/secrets.json.sample",
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),
                 .copy("Common/Secrets/secrets.json"),
-                .copy("Common/Secrets/process_info.json")
+                .copy("Common/Secrets/process_info.json"),
             ]
         ),
         .target(
@@ -51,7 +54,7 @@ let package = Package(
             path: "tools/TestSetupClient/TestSetupClient",
             exclude: [
                 "Assets.xcassets",
-                "Preview Content/Preview Assets.xcassets"
+                "Preview Content/Preview Assets.xcassets",
             ]
          ),
         .testTarget(
@@ -59,11 +62,11 @@ let package = Package(
             dependencies: ["TestSetupClient"],
             path: "tools/TestSetupClient/TestSetupClientTests",
             exclude: [
-                "process_info.json.sample"
+                "process_info.json.sample",
             ],
             resources: [
-                .copy("process_info.json")
+                .copy("process_info.json"),
             ]
-         )
+         ),
     ]
 )

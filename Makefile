@@ -61,7 +61,7 @@ autocorrect:
 	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
 
 .PHONY: lint-all
-lint-all: lint lint-circleci lint-podspec lint-docs
+lint-all: lint lint-podspec lint-docs
 
 .PHONY: publish
 publish: tag-release publish-podspec
@@ -72,40 +72,33 @@ publish: tag-release publish-podspec
 tag-release:
 	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
 		git tag "v$$VERSION" && \
-		git push git@github.com:mobilecoinofficial/MobileCoin-Swift.git "refs/tags/v$$VERSION"
+		git push origin "refs/tags/v$$VERSION"
 
 # MobileCoin pod
+
+# Dynamic linkage, matching what `pod trunk push` validates at release time.
+# pod lint strips linker errors from xcodebuild output; add --verbose to see them.
+POD_LINT_FLAGS = --skip-tests
 
 .PHONY: lint-locally-podspec
 lint-locally-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec --skip-tests --allow-warnings
+	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) --allow-warnings
 
 .PHONY: lint-locally-strict-podspec
 lint-locally-strict-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec --skip-tests
+	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS)
 
 .PHONY: lint-podspec
 lint-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod spec lint MobileCoin.podspec --skip-tests
+	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS)
 
 .PHONY: publish-podspec
 publish-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
 	bundle exec pod trunk push MobileCoin.podspec --skip-tests
-
-# CircleCI
-
-.PHONY: install-circleci
-install-circleci:
-	brew install circleci
-
-.PHONY: lint-circleci
-lint-circleci:
-	@command -v circleci >/dev/null || $(MAKE) install-circleci
-	circleci config validate
 
 # Documentation
 
@@ -135,7 +128,7 @@ lint-docs:
 
 .PHONY: swiftlint
 swiftlint:
-	@PATH="./Example/Pods/SwiftLint:$$PATH" swiftlint
+	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint
 
 # Maintenance
 
@@ -147,6 +140,14 @@ upgrade-deps:
 .PHONY: generate-local-process-info
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
+
+# Builds every target in Package.swift. Unlike `run-all-tests-spm` this needs no
+# secrets, so it is the one SPM check CI can run today. The test targets declare
+# resources (secrets.json, process_info.json) that are generated rather than
+# committed; SwiftPM only warns about those at build time.
+.PHONY: build-spm
+build-spm:
+	swift build
 
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:

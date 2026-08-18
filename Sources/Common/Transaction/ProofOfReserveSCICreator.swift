@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ProofOfReserveSignedContingentInputCreator {
+struct ProofOfReserveSCICreator {
     private let serialQueue: DispatchQueue
     private let accountKey: AccountKey
     private let selfPaymentAddress: PublicAddress
