@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
+//  Copyright (c) 2020-2026 MobileCoin. All rights reserved.
 //
 
 import Foundation
@@ -27,7 +27,8 @@ import LibMobileCoinCommon
 /// The plaintext passed to `encrypt(_:)` is the serialized request proto itself
 /// -- an `attest.Message` is the *output* of encryption, never a wrapper placed
 /// around the plaintext beforehand. Wrapping first would leave the enclave
-/// parsing an `attest.Message` where it expects the request.
+/// parsing an `attest.Message` where it expects the request. Not thread-safe:
+/// the caller owning the transport must also serialize access to the session.
 public final class MistysignAttestedSession {
     private let attestAke = AttestAke()
 
