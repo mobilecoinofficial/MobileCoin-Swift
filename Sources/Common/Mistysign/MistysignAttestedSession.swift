@@ -31,8 +31,21 @@ import LibMobileCoinCommon
 /// the caller owning the transport must also serialize access to the session.
 public final class MistysignAttestedSession {
     private let attestAke = AttestAke()
+    private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
+    private let rngContext: Any?
 
-    public init() {}
+    public convenience init() {
+        self.init(rng: securityRNG, rngContext: nil)
+    }
+
+    // Test hook: a deterministic rng lets unit tests replay the canned handshake.
+    init(
+        rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?,
+        rngContext: Any?
+    ) {
+        self.rng = rng
+        self.rngContext = rngContext
+    }
 
     /// Whether `authEnd` has completed successfully, so that `encrypt(_:)` and
     /// `decrypt(_:)` can be used.
@@ -47,7 +60,7 @@ public final class MistysignAttestedSession {
     /// launched with. It is bound into the handshake, so a mismatch surfaces as
     /// a failure in `authEnd`.
     public func authBeginRequestData(responderId: String) -> Data {
-        attestAke.authBeginRequestData(responderId: responderId, rng: securityRNG)
+        attestAke.authBeginRequestData(responderId: responderId, rng: rng, rngContext: rngContext)
     }
 
     /// Completes the handshake with the enclave's serialized `attest.AuthMessage`
