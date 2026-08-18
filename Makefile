@@ -79,25 +79,20 @@ tag-release:
 # Dynamic linkage, matching what `pod trunk push` validates at release time.
 POD_LINT_FLAGS = --skip-tests
 
-# CocoaPods summarises xcodebuild output, so a link failure surfaces only as
-# "clang: error: linker command failed" with the undefined symbols stripped out.
-# Set this to --verbose to get the raw xcodebuild log.
-POD_LINT_EXTRA_FLAGS ?=
-
 .PHONY: lint-locally-podspec
 lint-locally-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) $(POD_LINT_EXTRA_FLAGS) --allow-warnings
+	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) --allow-warnings
 
 .PHONY: lint-locally-strict-podspec
 lint-locally-strict-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) $(POD_LINT_EXTRA_FLAGS)
+	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS)
 
 .PHONY: lint-podspec
 lint-podspec:
 	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS) $(POD_LINT_EXTRA_FLAGS)
+	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS)
 
 .PHONY: publish-podspec
 publish-podspec:

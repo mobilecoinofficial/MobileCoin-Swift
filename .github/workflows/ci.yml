@@ -80,13 +80,10 @@ jobs:
           path: ~/Library/Logs/DiagnosticReports
           if-no-files-found: ignore
 
-  # Deliberately does NOT use ./.github/actions/setup-macos-ci: no submodules, no
-  # LFS, no Ruby, no CocoaPods. That is the point — SPM resolves libmobilecoin
-  # (and its nested LFS-tracked Artifacts submodule) from GitHub on its own, and
-  # this job is what proves the SPM consumption path stands up without any of the
-  # CocoaPods toolchain. `swift test` is not run here: MobileCoinTests needs
-  # Tests/Common/Secrets/secrets.json, which today is produced by a script that
-  # reads an `age` identity out of the macOS login keychain.
+  # Proves SPM consumers can resolve libmobilecoin (with its LFS-tracked
+  # Artifacts submodule) without the CocoaPods toolchain, so this job skips
+  # the setup action on purpose. `swift test` is not run: generating
+  # Tests/Common/Secrets/secrets.json needs a macOS-keychain identity.
   build-spm:
     name: Swift package build
     runs-on: macos-26
@@ -106,12 +103,10 @@ jobs:
           fi
           echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
 
-      # Not cached on purpose. `.build` came to 5.2 GB — 94% of the repository's
-      # 10 GB Actions cache budget — because SwiftPM keeps a bare clone *and* a
-      # checkout of libmobilecoin, whose LFS artifacts are ~330 MB on their own.
-      # Every Package.resolved change would mint another 5 GB entry and evict the
-      # small gem and Pods caches the slower jobs depend on. A cold build is
-      # ~8 minutes against ~3 warm; that is a cheap trade on the fastest job here.
+      # `.build` is not cached on purpose: SwiftPM keeps both a bare clone and
+      # a checkout of libmobilecoin's LFS artifacts, so each entry would fill
+      # most of the repo's Actions cache budget and evict the gem and Pods
+      # caches the slower jobs depend on.
       - name: Build
         run: make build-spm
 
@@ -142,9 +137,8 @@ jobs:
             exit 1
           fi
 
-      # `swift build` rewrites Package.resolved if the declared dependencies and
-      # the committed resolution disagree. Dropping the explicit swift-log
-      # dependency moves nothing, since grpc-swift still pulls it in.
+      # `swift build` rewrites Package.resolved when the declared dependencies
+      # and the committed resolution disagree.
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
@@ -219,11 +213,9 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup-macos-ci
 
-      # CircleCI ran this job on every master push, so it failed noisily on any
-      # commit that didn't bump the podspec version. Skip instead. Trunk is the
-      # source of truth here: checking only the git tag would skip the publish
-      # forever after a run that pushed the tag and then failed before the
-      # trunk push landed.
+      # Skip commits that don't bump the podspec version. Trunk is the source
+      # of truth: a git-tag check would skip the publish forever after a run
+      # that pushed the tag and then failed before the trunk push landed.
       - name: Check whether this version is already released
         id: version
         run: |

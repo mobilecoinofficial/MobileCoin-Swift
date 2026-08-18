@@ -12,9 +12,8 @@ inputs:
   ruby-version:
     description: >-
       Ruby version to install. Must satisfy the committed Gemfile.lock files,
-      which pin activesupport 7.2.2.1 (requires Ruby >= 3.1.0). CircleCI pinned
-      2.7.7, which no longer resolves — Bundler silently downgrades activesupport
-      to 7.1.4.2 and rewrites both lockfiles.
+      which pin activesupport 7.2.2.1 (requires Ruby >= 3.1.0). An older Ruby
+      makes Bundler silently downgrade activesupport and rewrite both lockfiles.
     required: false
     default: "3.1.4"
   install-pods:
@@ -25,9 +24,8 @@ inputs:
 runs:
   using: composite
   steps:
-    # Replaces the CircleCI `macos: { xcode: ... }` executor pin. Picks the
-    # highest installed patch of the requested major version so the workflow
-    # doesn't break when the runner image rotates patch releases.
+    # Picks the highest installed patch of the requested major version so the
+    # workflow doesn't break when the runner image rotates patch releases.
     - name: Select Xcode ${{ inputs.xcode-version }}
       shell: bash
       run: |
@@ -41,10 +39,9 @@ runs:
         echo "DEVELOPER_DIR=${xcode_app}/Contents/Developer" >> "$GITHUB_ENV"
         echo "Selected ${xcode_app}"
 
-    # The LibMobileCoin binaries live in the nested `Artifacts` submodule and are
-    # tracked with Git LFS. actions/checkout's `lfs: true` only runs
-    # `git lfs install --local` plus a fetch for the top-level repo — submodules
-    # get neither the filters nor a pull — so do it here.
+    # The LibMobileCoin binaries live in the nested `Artifacts` submodule and
+    # are tracked with Git LFS. actions/checkout's `lfs: true` only fetches LFS
+    # content for the top-level repo, not for submodules, so do it here.
     - name: Fetch Git LFS content for submodules
       shell: bash
       run: git submodule foreach --recursive 'git lfs install --local && git lfs pull'

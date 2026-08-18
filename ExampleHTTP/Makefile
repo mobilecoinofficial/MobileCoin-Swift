@@ -9,29 +9,18 @@ setup:
 bootstrap:
 	bundle exec pod install
 
-# Xcode resolves a provisioning profile for any target left on automatic signing
-# during target validation, before any signing is attempted and regardless of
-# destination — gym builds against `generic/platform=iOS`, scan against a
-# simulator, and both hit it. The CocoaPods-generated test targets have no
-# DEVELOPMENT_TEAM, so resolution fails with:
-#
-#   Signing for "MobileCoin-Unit-Tests" requires selecting either a development
-#   team or a provisioning profile.
-#
-# Manual signing skips resolution. Nothing here needs a real signature: gym only
-# compiles, and the simulator doesn't enforce code signatures.
-#
-# This can't be fixed in the Xcode UI — `pod install` regenerates Pods.xcodeproj.
+# The CocoaPods-generated test targets have no DEVELOPMENT_TEAM, so Xcode's
+# automatic-signing profile resolution fails during target validation for both
+# gym and scan. Manual signing skips resolution, and nothing here needs a real
+# signature: gym only compiles and the simulator doesn't enforce signatures.
+# Not fixable in the Xcode UI because `pod install` regenerates Pods.xcodeproj.
 CODESIGN_XCARGS = CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
 
-# scan must be given an explicit destination. Without one xcodebuild resolves a
-# platform per target rather than one for the whole build, and because
-# MobileCoin.podspec sets SUPPORTS_MACCATALYST=YES while LibMobileCoin.podspec
-# sets it to NO, MobileCoin builds for Mac Catalyst (Debug-maccatalyst,
-# -target arm64-apple-ios*-macabi) while LibMobileCoin builds for iphoneos. The
-# result is `no such module 'LibMobileCoin'` — it's a platform split, not an
-# architecture one. gym is unaffected because it always passes
-# `-destination generic/platform=iOS`.
+# scan needs an explicit destination. Without one xcodebuild resolves a
+# platform per target, and the SUPPORTS_MACCATALYST mismatch between the
+# MobileCoin and LibMobileCoin podspecs splits the build across Mac Catalyst
+# and iphoneos, failing with `no such module 'LibMobileCoin'`. gym always
+# passes `-destination generic/platform=iOS`, so it is unaffected.
 IOS_SIM_DEVICE ?= iPhone 16
 
 GYM_FLAGS = --skip_archive --skip_codesigning --xcargs "$(CODESIGN_XCARGS)"

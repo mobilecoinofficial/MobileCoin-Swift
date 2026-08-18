@@ -16,7 +16,7 @@ public enum MobileCoinLogging {
         }
     }
 
-    /// Minimum level the SDK prints. Replaces the swift-log bootstrap used before v6.0.6.
+    /// Minimum level the SDK prints to stdout.
     public static var logLevel = Level.info
 
     public enum Level: Int, Comparable {
@@ -41,11 +41,6 @@ private let logSensitiveDataInternal = ImmutableOnceReadLock(false)
 
 internal struct Logger {
     let label: String
-
-    var logLevel: MobileCoinLogging.Level {
-        get { MobileCoinLogging.logLevel }
-        nonmutating set { MobileCoinLogging.logLevel = newValue }
-    }
 
     func trace(
         _ message: @autoclosure () -> String,
@@ -198,27 +193,6 @@ internal struct Logger {
         formatter.formatOptions = [.withInternetDateTime]
         return formatter
     }()
-}
-
-extension MobileCoinLogging.Level: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .trace:
-            return "trace"
-        case .debug:
-            return "debug"
-        case .info:
-            return "info"
-        case .notice:
-            return "notice"
-        case .warning:
-            return "warning"
-        case .error:
-            return "error"
-        case .critical:
-            return "critical"
-        }
-    }
 }
 
 extension Logger {
