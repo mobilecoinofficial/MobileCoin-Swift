@@ -91,14 +91,8 @@ runs:
         bundle config set --local clean 'true'
         bundle check || bundle install --jobs 4 --retry 3
 
-    - name: Restore CocoaPods cache
-      if: inputs.install-pods == 'true'
-      uses: actions/cache@v4
-      with:
-        path: ExampleHTTP/Pods
-        key: v1-example-http-pods-${{ hashFiles('ExampleHTTP/Podfile.lock') }}
-        restore-keys: |
-          v1-example-http-pods-
+    # `Pods/CocoaPodsKeys` holds the generated test credentials, so no cache may
+    # carry it: a cache saved on master is restorable by a fork pull request.
 
     # cocoapods-keys resolves each key from ENV before falling back to the
     # keychain, so the caller only needs to export the key names as job env.
