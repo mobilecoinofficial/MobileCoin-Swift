@@ -49,6 +49,25 @@ jobs:
           submodules: recursive
           lfs: true
 
+      # A blank secret reaches the build as an empty key rather than an error,
+      # so this runs ahead of everything that consumes one.
+      - name: Report test credential availability
+        run: |
+          set -euo pipefail
+          missing=""
+          for key in devNetworkAuthUsername devNetworkAuthPassword \
+                     testNetTestAccountMnemonicsCommaSeparated \
+                     mobileDevTestAccountMnemonicsCommaSeparated \
+                     dynamicTestAccountSeedEntropiesCommaSeparated \
+                     dynamicFogAuthoritySpki; do
+            if [[ -z "${!key:-}" ]]; then
+              missing="${missing:+${missing}, }${key}"
+            fi
+          done
+          if [[ -n "${missing}" ]]; then
+            echo "::notice title=Blank test credentials::${missing}"
+          fi
+
       - name: Setup
         uses: ./.github/actions/setup-macos-ci
 
