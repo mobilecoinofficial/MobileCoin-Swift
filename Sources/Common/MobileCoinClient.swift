@@ -395,6 +395,90 @@ public final class MobileCoinClient {
         }
     }
 
+    /// Derives the payload and change TxOut public keys a transaction built
+    /// with `rng` would produce, without building one.
+    ///
+    /// Intended for learning a TxOut public key before the transaction exists
+    /// — for instance to tell a third party which output to expect. Passing
+    /// the same `rng` to `prepareTransaction` later produces the same keys.
+    ///
+    /// No balance is required: inputs are what need funds, and none are added.
+    /// Fog reports and the block version are fetched, so this makes network
+    /// calls and can fail like any other fog operation.
+    ///
+    /// `amount` and `fee` are what the eventual transaction will carry. They
+    /// do not affect the keys, but the recipient does, and so does `memoType`
+    /// insofar as it must match what the transaction is built with.
+    public func txOutContexts(
+        to recipient: PublicAddress,
+        memoType: MemoType = .recoverable,
+        amount: Amount,
+        fee: UInt64,
+        rng: MobileCoinRng,
+        completion: @escaping (
+            Result<(payload: TxOutContext, change: TxOutContext), TransactionPreparationError>
+        ) -> Void
+    ) {
+        guard let rngSeed = rng.generateRngSeed() else {
+            completion(.failure(
+                TransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
+            return
+        }
+
+        let (accountKey, ledgerBlockCount) = accountLock.readSync {
+            ($0.accountKey, $0.knowableBlockCount)
+        }
+
+        // Same overload and arguments the real path uses in
+        // TransactionPreparer: the expiry decides which fog pubkeys resolve,
+        // and that decides whether each output draws a real hint or a fake
+        // one, which are different numbers of draws.
+        let tombstoneBlockIndex = ledgerBlockCount + 50
+
+        fogResolverManager.fogResolver(
+            addresses: [recipient, accountKey.publicAddress],
+            desiredMinPubkeyExpiry: tombstoneBlockIndex
+        ) { fogResolverResult in
+            switch fogResolverResult {
+            case .failure(let error):
+                self.callbackQueue.async {
+                    completion(.failure(.connectionError(error)))
+                }
+            case .success(let fogResolver):
+                self.metaFetcher.blockVersion { blockVersionResult in
+                    switch blockVersionResult {
+                    case .failure(let error):
+                        self.callbackQueue.async {
+                            completion(.failure(.connectionError(error)))
+                        }
+                    case .success(let blockVersion):
+                        let context = TransactionBuilder.Context(
+                            accountKey: accountKey,
+                            blockVersion: blockVersion,
+                            fogResolver: fogResolver,
+                            memoType: memoType,
+                            tombstoneBlockIndex: tombstoneBlockIndex,
+                            fee: Amount(fee, in: amount.tokenId),
+                            rngSeed: rngSeed)
+
+                        let result = TransactionBuilder.txOutContexts(
+                            context: context,
+                            recipient: recipient,
+                            amount: amount
+                        ).mapError { error in
+                            TransactionPreparationError.invalidInput(
+                                error.localizedDescription)
+                        }
+
+                        self.callbackQueue.async {
+                            completion(result)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public func prepareDefragmentationStepTransactions(
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,

@@ -191,19 +191,11 @@ extension TransactionBuilder {
         }
 
         let builder: TransactionBuilder
-        do {
-            builder = try TransactionBuilder(
-                context: InnerContext(
-                    blockVersion: context.blockVersion,
-                    fogResolver: context.fogResolver,
-                    memoBuilder: context.memoType.createMemoBuilder(accountKey: context.accountKey),
-                    tombstoneBlockIndex: context.tombstoneBlockIndex,
-                    fee: context.fee))
-        } catch {
-            guard let error = error as? TransactionBuilderError else {
-                return .failure(.invalidInput("Unknown Error"))
-            }
+        switch makeBuilder(context: context) {
+        case .failure(let error):
             return .failure(error)
+        case .success(let made):
+            builder = made
         }
 
         for input in inputs {
@@ -215,19 +207,10 @@ extension TransactionBuilder {
 
         let seededRng = MobileCoinChaCha20Rng(rngSeed: context.rngSeed)
 
-        let payloadContexts = possibleTransaction.outputs.map { output in
-            builder.addOutput(
-                publicAddress: output.recipient,
-                amount: output.amount,
-                rng: seededRng
-            )
-        }
-
-        let changeContext = changeContext(
-            blockVersion: context.blockVersion,
-            accountKey: context.accountKey,
+        let (payloadContexts, changeContext) = addOutputs(
+            context: context,
             builder: builder,
-            changeAmount: possibleTransaction.changeAmount,
+            possibleTransaction: possibleTransaction,
             rng: seededRng)
 
         var presignedIncomeTxOutContexts = [TxOutContext]()
@@ -265,6 +248,110 @@ extension TransactionBuilder {
                 }
             }
         }
+    }
+
+    /// Derives the payload and change outputs a transaction built with
+    /// `context` would produce, without adding inputs or building one.
+    ///
+    /// Building the same transaction later with the same `context.rngSeed`
+    /// yields the same keys: inputs are added before the seeded RNG exists and
+    /// consume none of it, so they cannot move the outputs. That is also why
+    /// no balance is required here — inputs are what need funds.
+    ///
+    /// `amount` is what the eventual transaction will send. It does not affect
+    /// the keys, and neither does the change amount, which is zero here
+    /// because with no inputs there is no remainder to return.
+    static func txOutContexts(
+        context: TransactionBuilder.Context,
+        recipient: PublicAddress,
+        amount: Amount
+    ) -> Result<(payload: TxOutContext, change: TxOutContext), TransactionBuilderError> {
+        let builder: TransactionBuilder
+        switch makeBuilder(context: context) {
+        case .failure(let error):
+            return .failure(error)
+        case .success(let made):
+            builder = made
+        }
+
+        let possibleTransaction = PossibleTransaction(
+            [TransactionOutput(recipient: recipient, amount: amount)],
+            Amount(0, in: context.fee.tokenId))
+
+        let (payloadContexts, changeContext) = addOutputs(
+            context: context,
+            builder: builder,
+            possibleTransaction: possibleTransaction,
+            rng: MobileCoinChaCha20Rng(rngSeed: context.rngSeed))
+
+        return payloadContexts.collectResult().flatMap { payloads in
+            guard let payload = payloads.first else {
+                return .failure(.invalidInput("No payload output produced"))
+            }
+            return changeContext.map { change in (payload: payload, change: change) }
+        }
+    }
+
+    /// Builds the `TransactionBuilder` for `context`.
+    ///
+    /// Shared so that `build` and `txOutContexts` cannot construct it
+    /// differently: the fog resolver decides whether each output draws a real
+    /// fog hint or a fake one, and the block version decides where change is
+    /// sent, so a builder made two ways could produce two sets of keys.
+    private static func makeBuilder(
+        context: TransactionBuilder.Context
+    ) -> Result<TransactionBuilder, TransactionBuilderError> {
+        do {
+            return .success(try TransactionBuilder(
+                context: InnerContext(
+                    blockVersion: context.blockVersion,
+                    fogResolver: context.fogResolver,
+                    memoBuilder: context.memoType.createMemoBuilder(accountKey: context.accountKey),
+                    tombstoneBlockIndex: context.tombstoneBlockIndex,
+                    fee: context.fee)))
+        } catch {
+            guard let error = error as? TransactionBuilderError else {
+                return .failure(.invalidInput("Unknown Error"))
+            }
+            return .failure(error)
+        }
+    }
+
+    /// Adds the payload and change outputs to `builder`, in this order.
+    ///
+    /// Every draw the transaction makes from `rng` before it is built happens
+    /// here, so a given seed always produces the same outputs. `build` and
+    /// `txOutContexts` both route through this rather than adding outputs
+    /// themselves, so the keys one derives cannot drift from the keys the
+    /// other builds.
+    ///
+    /// Amounts do not influence the keys — nothing between the draws consumes
+    /// randomness — but the recipients do, because the fog hint drawn ahead of
+    /// each output's private key differs for an address with a fog report and
+    /// one without.
+    private static func addOutputs(
+        context: TransactionBuilder.Context,
+        builder: TransactionBuilder,
+        possibleTransaction: PossibleTransaction,
+        rng: MobileCoinRng
+    ) -> ([Result<TxOutContext, TransactionBuilderError>],
+          Result<TxOutContext, TransactionBuilderError>) {
+        let payloadContexts = possibleTransaction.outputs.map { output in
+            builder.addOutput(
+                publicAddress: output.recipient,
+                amount: output.amount,
+                rng: rng
+            )
+        }
+
+        let changeContext = changeContext(
+            blockVersion: context.blockVersion,
+            accountKey: context.accountKey,
+            builder: builder,
+            changeAmount: possibleTransaction.changeAmount,
+            rng: rng)
+
+        return (payloadContexts, changeContext)
     }
 
     private static func changeContext(
