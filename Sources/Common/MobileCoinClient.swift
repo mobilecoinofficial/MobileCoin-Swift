@@ -406,14 +406,13 @@ public final class MobileCoinClient {
     /// Fog reports and the block version are fetched, so this makes network
     /// calls and can fail like any other fog operation.
     ///
-    /// `amount` and `fee` are what the eventual transaction will carry. They
-    /// do not affect the keys, but the recipient does, and so does `memoType`
-    /// insofar as it must match what the transaction is built with.
+    /// Takes only what a key depends on. A TxOut public key is `r * D`: `r`
+    /// comes from `rng` and the order of the builder's draws, `D` from the
+    /// recipient's subaddress. Amounts, fees and memos reach neither, so they
+    /// are not parameters — passing the ones the eventual transaction carries
+    /// would not change the answer.
     public func txOutContexts(
         to recipient: PublicAddress,
-        memoType: MemoType = .recoverable,
-        amount: Amount,
-        fee: UInt64,
         rng: MobileCoinRng,
         completion: @escaping (
             Result<(payload: TxOutContext, change: TxOutContext), TransactionPreparationError>
@@ -456,15 +455,16 @@ public final class MobileCoinClient {
                             accountKey: accountKey,
                             blockVersion: blockVersion,
                             fogResolver: fogResolver,
-                            memoType: memoType,
+                            memoType: .recoverable,
                             tombstoneBlockIndex: tombstoneBlockIndex,
-                            fee: Amount(fee, in: amount.tokenId),
+                            // No amount reaches a draw, so any fee gives the
+                            // same keys; zero avoids implying otherwise.
+                            fee: Amount(0, in: .MOB),
                             rngSeed: rngSeed)
 
                         let result = TransactionBuilder.txOutContexts(
                             context: context,
-                            recipient: recipient,
-                            amount: amount
+                            recipient: recipient
                         ).mapError { error in
                             TransactionPreparationError.invalidInput(
                                 error.localizedDescription)

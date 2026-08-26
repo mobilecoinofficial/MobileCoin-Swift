@@ -27,16 +27,15 @@ class TxOutContextsDerivationTests: XCTestCase {
 
         let derived = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: context,
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
 
         XCTAssertEqual(derived.payload.txOutPublicKey, built.payloadTxOutContext.txOutPublicKey)
         XCTAssertEqual(derived.change.txOutPublicKey, built.changeTxOutContext.txOutPublicKey)
     }
 
-    /// The derivation reports no change amount, because with no inputs there is
-    /// nothing left over. The change key still has to match the built
-    /// transaction's, which it can only do if amounts never reach the RNG.
+    /// The derivation names no amounts at all — it has no parameter for them —
+    /// while the built transaction carries real ones. The keys still match,
+    /// which is what shows no amount reaches a draw.
     func testChangeAmountDoesNotMoveTheChangeKey() throws {
         let fixture = try Transaction.Fixtures.BuildTxTestNet()
         let context = Self.context(fixture: fixture, rngSeed: testRngSeed())
@@ -50,8 +49,7 @@ class TxOutContextsDerivationTests: XCTestCase {
 
         let derived = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: context,
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
 
         // Guards the test itself: if the built change were also zero there
         // would be nothing to distinguish the amounts.
@@ -67,12 +65,10 @@ class TxOutContextsDerivationTests: XCTestCase {
 
         let first = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: Self.context(fixture: fixture, rngSeed: seed),
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
         let second = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: Self.context(fixture: fixture, rngSeed: seed),
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
 
         XCTAssertEqual(first.payload.txOutPublicKey, second.payload.txOutPublicKey)
         XCTAssertEqual(first.change.txOutPublicKey, second.change.txOutPublicKey)
@@ -84,15 +80,51 @@ class TxOutContextsDerivationTests: XCTestCase {
 
         let first = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: Self.context(fixture: fixture, rngSeed: testRngSeed()),
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
         let second = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: Self.context(fixture: fixture, rngSeed: Self.otherRngSeed),
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
 
         XCTAssertNotEqual(first.payload.txOutPublicKey, second.payload.txOutPublicKey)
         XCTAssertNotEqual(first.change.txOutPublicKey, second.change.txOutPublicKey)
+    }
+
+    /// Same reasoning for the fee: the derivation is given one that no real
+    /// transaction would use, and the keys are unaffected.
+    func testFeeDoesNotMoveTheKeys() throws {
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
+        let seed = testRngSeed()
+        let output = try XCTUnwrap(fixture.outputs.first)
+
+        let realFee = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(fixture: fixture, rngSeed: seed),
+            recipient: output.recipient))
+        let absurdFee = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(
+                fixture: fixture,
+                rngSeed: seed,
+                fee: Amount(999_999_999, in: fixture.fee.tokenId)),
+            recipient: output.recipient))
+
+        XCTAssertEqual(realFee.payload.txOutPublicKey, absurdFee.payload.txOutPublicKey)
+        XCTAssertEqual(realFee.change.txOutPublicKey, absurdFee.change.txOutPublicKey)
+    }
+
+    /// And the memo, which is what a payment request id would select.
+    func testMemoTypeDoesNotMoveTheKeys() throws {
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
+        let seed = testRngSeed()
+        let output = try XCTUnwrap(fixture.outputs.first)
+
+        let recoverable = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(fixture: fixture, rngSeed: seed),
+            recipient: output.recipient))
+        let unused = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(fixture: fixture, rngSeed: seed, memoType: .unused),
+            recipient: output.recipient))
+
+        XCTAssertEqual(recoverable.payload.txOutPublicKey, unused.payload.txOutPublicKey)
+        XCTAssertEqual(recoverable.change.txOutPublicKey, unused.change.txOutPublicKey)
     }
 
     /// The public key is `r * D`, so the recipient is as much an input to it as
@@ -104,12 +136,10 @@ class TxOutContextsDerivationTests: XCTestCase {
 
         let toRecipient = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: Self.context(fixture: fixture, rngSeed: seed),
-            recipient: output.recipient,
-            amount: output.amount))
+            recipient: output.recipient))
         let toSelf = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: Self.context(fixture: fixture, rngSeed: seed),
-            recipient: fixture.accountKey.publicAddress,
-            amount: output.amount))
+            recipient: fixture.accountKey.publicAddress))
 
         XCTAssertNotEqual(toRecipient.payload.txOutPublicKey, toSelf.payload.txOutPublicKey)
     }
@@ -120,15 +150,17 @@ class TxOutContextsDerivationTests: XCTestCase {
 
     private static func context(
         fixture: Transaction.Fixtures.BuildTxTestNet,
-        rngSeed: RngSeed
+        rngSeed: RngSeed,
+        fee: Amount? = nil,
+        memoType: MemoType = .recoverable
     ) -> TransactionBuilder.Context {
         TransactionBuilder.Context(
             accountKey: fixture.accountKey,
             blockVersion: fixture.blockVersion,
             fogResolver: fixture.fogResolver,
-            memoType: .recoverable,
+            memoType: memoType,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-            fee: fixture.fee,
+            fee: fee ?? fixture.fee,
             rngSeed: rngSeed)
     }
 
