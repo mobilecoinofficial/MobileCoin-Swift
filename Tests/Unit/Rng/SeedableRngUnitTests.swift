@@ -48,6 +48,8 @@ class SeedableRngUnitTests: XCTestCase {
 
         let builderSeed = try XCTUnwrap(MobileCoinChaCha20Rng(rngSeed: seed).generateRngSeed())
 
-        XCTAssertEqual(builderSeed.data.hexEncodedString(), "7606151ea291727acfbea41cc1e71d57b1e219e3aeb8accfa3a9bcbc190bc3f5")
+        XCTAssertEqual(
+            builderSeed.data.hexEncodedString(),
+            "7606151ea291727acfbea41cc1e71d57b1e219e3aeb8accfa3a9bcbc190bc3f5")
     }
 }
