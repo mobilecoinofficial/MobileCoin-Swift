@@ -83,11 +83,11 @@ class TxOutContextsDerivationTests: XCTestCase {
         let output = try XCTUnwrap(fixture.outputs.first)
 
         let first = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
-            context: Self.context(fixture: fixture, rngSeed: RngSeed()),
+            context: Self.context(fixture: fixture, rngSeed: testRngSeed()),
             recipient: output.recipient,
             amount: output.amount))
         let second = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
-            context: Self.context(fixture: fixture, rngSeed: RngSeed()),
+            context: Self.context(fixture: fixture, rngSeed: Self.otherRngSeed),
             recipient: output.recipient,
             amount: output.amount))
 
@@ -113,6 +113,10 @@ class TxOutContextsDerivationTests: XCTestCase {
 
         XCTAssertNotEqual(toRecipient.payload.txOutPublicKey, toSelf.payload.txOutPublicKey)
     }
+
+    /// A second seed, fixed so a failure can be re-run. Differs from
+    /// `testRngSeed()` in its last byte.
+    private static let otherRngSeed = RngSeed(Data(repeating: 0, count: 31) + Data([1]))!
 
     private static func context(
         fixture: Transaction.Fixtures.BuildTxTestNet,
