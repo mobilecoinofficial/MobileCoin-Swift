@@ -266,6 +266,13 @@ extension TransactionBuilder {
         recipient: PublicAddress,
         amount: Amount
     ) -> Result<(payload: TxOutContext, change: TxOutContext), TransactionBuilderError> {
+        // build reaches the same conclusion through its outlay math, which
+        // this path skips along with the inputs. Without it a caller could
+        // derive keys for a transaction that could never be built.
+        guard amount.tokenId == context.fee.tokenId else {
+            return .failure(.invalidInput("Mixed token type transactions not supported"))
+        }
+
         let builder: TransactionBuilder
         switch makeBuilder(context: context) {
         case .failure(let error):
