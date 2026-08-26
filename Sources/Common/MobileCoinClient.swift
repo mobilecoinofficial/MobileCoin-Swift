@@ -440,43 +440,60 @@ public final class MobileCoinClient {
         ) { fogResolverResult in
             switch fogResolverResult {
             case .failure(let error):
-                self.callbackQueue.async {
-                    completion(.failure(.connectionError(error)))
-                }
+                self.finish(.failure(.connectionError(error)), completion)
             case .success(let fogResolver):
-                self.metaFetcher.blockVersion { blockVersionResult in
-                    switch blockVersionResult {
-                    case .failure(let error):
-                        self.callbackQueue.async {
-                            completion(.failure(.connectionError(error)))
-                        }
-                    case .success(let blockVersion):
-                        let context = TransactionBuilder.Context(
-                            accountKey: accountKey,
-                            blockVersion: blockVersion,
-                            fogResolver: fogResolver,
-                            memoType: .recoverable,
-                            tombstoneBlockIndex: tombstoneBlockIndex,
-                            // No amount reaches a draw, so any fee gives the
-                            // same keys; zero avoids implying otherwise.
-                            fee: Amount(0, in: .MOB),
-                            rngSeed: rngSeed)
-
-                        let result = TransactionBuilder.txOutContexts(
-                            context: context,
-                            recipient: recipient
-                        ).mapError { error in
-                            TransactionPreparationError.invalidInput(
-                                error.localizedDescription)
-                        }
-
-                        self.callbackQueue.async {
-                            completion(result)
-                        }
-                    }
-                }
+                self.deriveTxOutContexts(
+                    to: recipient,
+                    accountKey: accountKey,
+                    fogResolver: fogResolver,
+                    tombstoneBlockIndex: tombstoneBlockIndex,
+                    rngSeed: rngSeed,
+                    completion: completion)
             }
         }
+    }
+
+    private func deriveTxOutContexts(
+        to recipient: PublicAddress,
+        accountKey: AccountKey,
+        fogResolver: FogResolver,
+        tombstoneBlockIndex: UInt64,
+        rngSeed: RngSeed,
+        completion: @escaping (
+            Result<(payload: TxOutContext, change: TxOutContext), TransactionPreparationError>
+        ) -> Void
+    ) {
+        metaFetcher.blockVersion { blockVersionResult in
+            switch blockVersionResult {
+            case .failure(let error):
+                self.finish(.failure(.connectionError(error)), completion)
+            case .success(let blockVersion):
+                let context = TransactionBuilder.Context(
+                    accountKey: accountKey,
+                    blockVersion: blockVersion,
+                    fogResolver: fogResolver,
+                    memoType: .recoverable,
+                    tombstoneBlockIndex: tombstoneBlockIndex,
+                    // No amount reaches a draw, so any fee gives the same
+                    // keys; zero avoids implying otherwise.
+                    fee: Amount(0, in: .MOB),
+                    rngSeed: rngSeed)
+
+                self.finish(
+                    TransactionBuilder.txOutContexts(context: context, recipient: recipient)
+                        .mapError {
+                            TransactionPreparationError.invalidInput($0.localizedDescription)
+                        },
+                    completion)
+            }
+        }
+    }
+
+    private func finish<T>(
+        _ result: Result<T, TransactionPreparationError>,
+        _ completion: @escaping (Result<T, TransactionPreparationError>) -> Void
+    ) {
+        callbackQueue.async { completion(result) }
     }
 
     public func prepareDefragmentationStepTransactions(
