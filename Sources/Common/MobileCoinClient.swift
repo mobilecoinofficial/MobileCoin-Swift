@@ -444,7 +444,6 @@ public final class MobileCoinClient {
             case .success(let fogResolver):
                 self.deriveTxOutContexts(
                     to: recipient,
-                    accountKey: accountKey,
                     fogResolver: fogResolver,
                     tombstoneBlockIndex: tombstoneBlockIndex,
                     rngSeed: rngSeed,
@@ -455,7 +454,6 @@ public final class MobileCoinClient {
 
     private func deriveTxOutContexts(
         to recipient: PublicAddress,
-        accountKey: AccountKey,
         fogResolver: FogResolver,
         tombstoneBlockIndex: UInt64,
         rngSeed: RngSeed,
@@ -469,7 +467,7 @@ public final class MobileCoinClient {
                 self.finish(.failure(.connectionError(error)), completion)
             case .success(let blockVersion):
                 let context = TransactionBuilder.Context(
-                    accountKey: accountKey,
+                    accountKey: self.accountLock.readSync { $0.accountKey },
                     blockVersion: blockVersion,
                     fogResolver: fogResolver,
                     memoType: .recoverable,
