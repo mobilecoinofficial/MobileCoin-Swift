@@ -437,10 +437,21 @@ public final class MobileCoinClient {
             ($0.accountKey, $0.knowableBlockCount)
         }
 
-        // Same overload and arguments the real path uses in
-        // TransactionPreparer: the expiry decides which fog pubkeys resolve,
-        // and that decides whether each output draws a real hint or a fake
-        // one, which are different numbers of draws.
+        // An expiry is needed to resolve fog and to fill the builder context,
+        // but it does not reach the keys, so it does not have to match the one
+        // the send later computes from a higher block count.
+        //
+        // add_output draws exactly twice: create_fog_hint, then `r`, with only
+        // a token-id check between them. create_fog_hint branches on whether
+        // the recipient has a fog report url rather than on the expiry, and
+        // returns the pubkey expiry as a value rather than spending it on the
+        // rng. So a different pubkey resolving changes what the hint encrypts
+        // to and nothing else — `r`, and the key built from it, are the same.
+        // An expiry nothing can satisfy fails resolution outright rather than
+        // quietly moving a draw.
+        //
+        // This uses the same overload the real path does so resolution behaves
+        // the same way, not because the keys depend on it.
         let tombstoneBlockIndex = ledgerBlockCount + 50
 
         fogResolverManager.fogResolver(
