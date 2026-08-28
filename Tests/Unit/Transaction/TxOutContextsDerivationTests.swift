@@ -110,6 +110,40 @@ class TxOutContextsDerivationTests: XCTestCase {
         XCTAssertEqual(realFee.change.txOutPublicKey, absurdFee.change.txOutPublicKey)
     }
 
+    /// The token id is its own question, separate from the value.
+    /// `txOutContexts` takes both zero amounts from `context.fee.tokenId`, and
+    /// `MobileCoinClient` pins that to `.MOB`, so a caller deriving for a
+    /// non-MOB transaction runs the builder with a token id the real send will
+    /// not use. This pins that it makes no difference to the keys.
+    ///
+    /// Both sides run at block version two because that is the first version
+    /// accepting a token id other than MOB — at the fixture's own version the
+    /// non-MOB build fails with `TokenIdNotSupportedAtBlockVersion` rather
+    /// than producing keys to compare.
+    func testTokenIdDoesNotMoveTheKeys() throws {
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
+        let seed = testRngSeed()
+        let output = try XCTUnwrap(fixture.outputs.first)
+
+        let inMob = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(
+                fixture: fixture,
+                rngSeed: seed,
+                fee: Amount(fixture.fee.value, in: .MOB),
+                blockVersion: .versionTwo),
+            recipient: output.recipient))
+        let inMobUsd = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(
+                fixture: fixture,
+                rngSeed: seed,
+                fee: Amount(fixture.fee.value, in: .MOBUSD),
+                blockVersion: .versionTwo),
+            recipient: output.recipient))
+
+        XCTAssertEqual(inMob.payload.txOutPublicKey, inMobUsd.payload.txOutPublicKey)
+        XCTAssertEqual(inMob.change.txOutPublicKey, inMobUsd.change.txOutPublicKey)
+    }
+
     /// And the memo, which is what a payment request id would select.
     func testMemoTypeDoesNotMoveTheKeys() throws {
         let fixture = try Transaction.Fixtures.BuildTxTestNet()
@@ -152,11 +186,12 @@ class TxOutContextsDerivationTests: XCTestCase {
         fixture: Transaction.Fixtures.BuildTxTestNet,
         rngSeed: RngSeed,
         fee: Amount? = nil,
-        memoType: MemoType = .recoverable
+        memoType: MemoType = .recoverable,
+        blockVersion: BlockVersion? = nil
     ) -> TransactionBuilder.Context {
         TransactionBuilder.Context(
             accountKey: fixture.accountKey,
-            blockVersion: fixture.blockVersion,
+            blockVersion: blockVersion ?? fixture.blockVersion,
             fogResolver: fixture.fogResolver,
             memoType: memoType,
             tombstoneBlockIndex: fixture.tombstoneBlockIndex,
