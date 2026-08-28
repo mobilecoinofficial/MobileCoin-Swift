@@ -395,30 +395,39 @@ public final class MobileCoinClient {
         }
     }
 
-    /// Derives the payload and change TxOut public keys a transaction built
-    /// with `rng` would produce, without building one.
+    /// Derives the payload and change TxOut public keys the transaction built
+    /// from `rngSeed` will produce, without building one.
     ///
     /// Intended for learning a TxOut public key before the transaction exists
-    /// — for instance to tell a third party which output to expect. Passing
-    /// the same `rng` to `prepareTransaction` later produces the same keys.
+    /// — for instance to tell a third party which output to expect.
+    ///
+    /// Takes the seed rather than an rng on purpose. `prepareTransaction`
+    /// derives its builder seed by consuming four draws from the rng it is
+    /// given, so handing one instance to both calls would advance it in
+    /// between and derive two different seeds — the transaction would carry
+    /// keys other than the ones reported here, with nothing failing on either
+    /// side. Send with `prepareTransaction(rng: MobileCoinChaCha20Rng(rngSeed:
+    /// seed))` on this same seed and the keys match.
     ///
     /// No balance is required: inputs are what need funds, and none are added.
     /// Fog reports and the block version are fetched, so this makes network
     /// calls and can fail like any other fog operation.
     ///
     /// Takes only what a key depends on. A TxOut public key is `r * D`: `r`
-    /// comes from `rng` and the order of the builder's draws, `D` from the
+    /// comes from the seed and the order of the builder's draws, `D` from the
     /// recipient's subaddress. Amounts, fees and memos reach neither, so they
     /// are not parameters — passing the ones the eventual transaction carries
     /// would not change the answer.
     public func txOutContexts(
         to recipient: PublicAddress,
-        rng: MobileCoinRng,
+        rngSeed: RngSeed,
         completion: @escaping (
             Result<(payload: TxOutContext, change: TxOutContext), TransactionPreparationError>
         ) -> Void
     ) {
-        guard let rngSeed = rng.generateRngSeed() else {
+        // The same hop prepareTransaction makes, on a fresh rng, so the two
+        // reach the same builder seed from the same caller seed.
+        guard let builderSeed = MobileCoinChaCha20Rng(rngSeed: rngSeed).generateRngSeed() else {
             completion(.failure(
                 TransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
             return
@@ -446,7 +455,7 @@ public final class MobileCoinClient {
                     to: recipient,
                     fogResolver: fogResolver,
                     tombstoneBlockIndex: tombstoneBlockIndex,
-                    rngSeed: rngSeed,
+                    rngSeed: builderSeed,
                     completion: completion)
             }
         }
