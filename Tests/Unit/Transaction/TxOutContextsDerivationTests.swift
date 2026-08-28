@@ -110,6 +110,27 @@ class TxOutContextsDerivationTests: XCTestCase {
         XCTAssertEqual(realFee.change.txOutPublicKey, absurdFee.change.txOutPublicKey)
     }
 
+    /// The derivation fetches the block version at derive time, and the send
+    /// fetches it again later. If the network advanced in between, the two
+    /// would build at different versions — so this pins that the version does
+    /// not move the keys either, and a caller need not derive and send close
+    /// together to be safe.
+    func testBlockVersionDoesNotMoveTheKeys() throws {
+        let fixture = try Transaction.Fixtures.BuildTxTestNet()
+        let seed = testRngSeed()
+        let output = try XCTUnwrap(fixture.outputs.first)
+
+        let atOne = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(fixture: fixture, rngSeed: seed, blockVersion: .versionOne),
+            recipient: output.recipient))
+        let atTwo = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
+            context: Self.context(fixture: fixture, rngSeed: seed, blockVersion: .versionTwo),
+            recipient: output.recipient))
+
+        XCTAssertEqual(atOne.payload.txOutPublicKey, atTwo.payload.txOutPublicKey)
+        XCTAssertEqual(atOne.change.txOutPublicKey, atTwo.change.txOutPublicKey)
+    }
+
     /// The token id is its own question, separate from the value.
     /// `txOutContexts` takes both zero amounts from `context.fee.tokenId`, and
     /// `MobileCoinClient` pins that to `.MOB`, so a caller deriving for a
