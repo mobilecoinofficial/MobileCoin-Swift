@@ -500,7 +500,10 @@ public final class MobileCoinClient {
                 self.finish(
                     TransactionBuilder.txOutContexts(context: context, recipient: recipient)
                         .mapError {
-                            TransactionPreparationError.invalidInput($0.localizedDescription)
+                            // TransactionBuilderError is CustomStringConvertible
+                            // and not LocalizedError, so localizedDescription
+                            // would drop the reason for a Foundation default.
+                            TransactionPreparationError.invalidInput(String(describing: $0))
                         },
                     completion)
             }
