@@ -395,6 +395,128 @@ public final class MobileCoinClient {
         }
     }
 
+    /// Derives the payload and change TxOut public keys the transaction built
+    /// from `rngSeed` will produce, without building one.
+    ///
+    /// Intended for learning a TxOut public key before the transaction exists
+    /// — for instance to tell a third party which output to expect.
+    ///
+    /// Takes the seed rather than an rng on purpose. `prepareTransaction`
+    /// derives its builder seed by consuming four draws from the rng it is
+    /// given, so handing one instance to both calls would advance it in
+    /// between and derive two different seeds — the transaction would carry
+    /// keys other than the ones reported here, with nothing failing on either
+    /// side. Send with `prepareTransaction(rng: MobileCoinChaCha20Rng(rngSeed:
+    /// seed))` on this same seed and the keys match.
+    ///
+    /// No balance is required: inputs are what need funds, and none are added.
+    /// Fog reports and the block version are fetched, so this makes network
+    /// calls and can fail like any other fog operation.
+    ///
+    /// Takes only what a key depends on. A TxOut public key is `r * D`: `r`
+    /// comes from the seed and the order of the builder's draws, `D` from the
+    /// recipient's subaddress. Amounts, fees and memos reach neither, so they
+    /// are not parameters — passing the ones the eventual transaction carries
+    /// would not change the answer.
+    public func txOutContexts(
+        to recipient: PublicAddress,
+        rngSeed: RngSeed,
+        completion: @escaping (
+            Result<(payload: TxOutContext, change: TxOutContext), TransactionPreparationError>
+        ) -> Void
+    ) {
+        // The same hop prepareTransaction makes, on a fresh rng, so the two
+        // reach the same builder seed from the same caller seed.
+        guard let builderSeed = MobileCoinChaCha20Rng(rngSeed: rngSeed).generateRngSeed() else {
+            completion(.failure(
+                TransactionPreparationError.invalidInput("Could not create 32-byte RNG seed")))
+            return
+        }
+
+        let (accountKey, ledgerBlockCount) = accountLock.readSync {
+            ($0.accountKey, $0.knowableBlockCount)
+        }
+
+        // An expiry is needed to resolve fog and to fill the builder context,
+        // but it does not reach the keys, so it does not have to match the one
+        // the send later computes from a higher block count.
+        //
+        // add_output draws exactly twice: create_fog_hint, then `r`, with only
+        // a token-id check between them. create_fog_hint branches on whether
+        // the recipient has a fog report url rather than on the expiry, and
+        // returns the pubkey expiry as a value rather than spending it on the
+        // rng. So a different pubkey resolving changes what the hint encrypts
+        // to and nothing else — `r`, and the key built from it, are the same.
+        // An expiry nothing can satisfy fails resolution outright rather than
+        // quietly moving a draw.
+        //
+        // This uses the same overload the real path does so resolution behaves
+        // the same way, not because the keys depend on it.
+        let tombstoneBlockIndex = ledgerBlockCount + 50
+
+        fogResolverManager.fogResolver(
+            addresses: [recipient, accountKey.publicAddress],
+            desiredMinPubkeyExpiry: tombstoneBlockIndex
+        ) { fogResolverResult in
+            switch fogResolverResult {
+            case .failure(let error):
+                self.finish(.failure(.connectionError(error)), completion)
+            case .success(let fogResolver):
+                self.deriveTxOutContexts(
+                    to: recipient,
+                    fogResolver: fogResolver,
+                    tombstoneBlockIndex: tombstoneBlockIndex,
+                    rngSeed: builderSeed,
+                    completion: completion)
+            }
+        }
+    }
+
+    private func deriveTxOutContexts(
+        to recipient: PublicAddress,
+        fogResolver: FogResolver,
+        tombstoneBlockIndex: UInt64,
+        rngSeed: RngSeed,
+        completion: @escaping (
+            Result<(payload: TxOutContext, change: TxOutContext), TransactionPreparationError>
+        ) -> Void
+    ) {
+        metaFetcher.blockVersion { blockVersionResult in
+            switch blockVersionResult {
+            case .failure(let error):
+                self.finish(.failure(.connectionError(error)), completion)
+            case .success(let blockVersion):
+                let context = TransactionBuilder.Context(
+                    accountKey: self.accountLock.readSync { $0.accountKey },
+                    blockVersion: blockVersion,
+                    fogResolver: fogResolver,
+                    memoType: .recoverable,
+                    tombstoneBlockIndex: tombstoneBlockIndex,
+                    // No amount reaches a draw, so any fee gives the same
+                    // keys; zero avoids implying otherwise.
+                    fee: Amount(0, in: .MOB),
+                    rngSeed: rngSeed)
+
+                self.finish(
+                    TransactionBuilder.txOutContexts(context: context, recipient: recipient)
+                        .mapError {
+                            // TransactionBuilderError is CustomStringConvertible
+                            // and not LocalizedError, so localizedDescription
+                            // would drop the reason for a Foundation default.
+                            TransactionPreparationError.invalidInput(String(describing: $0))
+                        },
+                    completion)
+            }
+        }
+    }
+
+    private func finish<T>(
+        _ result: Result<T, TransactionPreparationError>,
+        _ completion: @escaping (Result<T, TransactionPreparationError>) -> Void
+    ) {
+        callbackQueue.async { completion(result) }
+    }
+
     public func prepareDefragmentationStepTransactions(
         toSendAmount amount: Amount,
         recoverableMemo: Bool = false,
