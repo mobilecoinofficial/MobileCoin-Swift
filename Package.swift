@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "MobileCoin",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v13),
         .macOS(.v11),
@@ -24,16 +25,24 @@ let package = Package(
             url: "https://github.com/apple/swift-protobuf.git",
             from: "1.28.2"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1"),
     ],
     targets: [
+        // HTTP only, which is what the pod chain ships and what production runs.
+        // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
+        // left out rather than guarded: its files import GRPC and NIO
+        // unconditionally.
         .target(
             name: "MobileCoin",
             dependencies: [
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-                .product(name: "LibMobileCoinCore", package: "libmobilecoin"),
+                .product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin"),
             ],
-            path: "Sources"
+            path: ".",
+            sources: [
+                "Sources/Common",
+                "Sources/HTTPS",
+                "HTTPOnly/WrappedNIOSSLCertificateValidator.swift",
+            ]
          ),
         .testTarget(
             name: "MobileCoinTests",
