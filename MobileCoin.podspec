@@ -62,8 +62,9 @@ Pod::Spec.new do |s|
 
     subspec.dependency "LibMobileCoin/CoreHTTP", "~> 6.0.0-pre1"
 
-    # Floor for init(serializedBytes:); LibMobileCoin alone allows back to 1.5.
-    subspec.dependency "SwiftProtobuf", "~> 1.28"
+    # Matches the LibMobileCoin floor: its generated sources call runtime API
+    # that arrived in 1.36.
+    subspec.dependency "SwiftProtobuf", "~> 1.36"
 
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/ProtocolSpecific/Http/**/*.swift"
