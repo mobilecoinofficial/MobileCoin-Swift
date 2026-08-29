@@ -19,6 +19,10 @@ import Foundation
 /// blocks are executed in the order that the `readSync` and`writeSync` methods are called. Note
 /// that this only means they are started in order. They can still finish out of order, depending on
 /// how long each block takes to finish.
+// The queue is what guards `value`, which the compiler cannot see. Note that
+// `accessWithoutLocking` and `mapLockWithoutLocking` step around that guard.
+extension ReadWriteDispatchLock: @unchecked Sendable where Value: Sendable { }
+
 final class ReadWriteDispatchLock<Value> {
     private var value: Value
 

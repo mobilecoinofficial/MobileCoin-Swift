@@ -7,17 +7,10 @@ import Foundation
 /// `ImmutableOnceReadLock` is a Dispatch-based lock that is mutable before being read and immutable
 /// afterwards. This is useful in situations where you want to lock in a value and know that it
 /// won't change once you start using it, but you still want to freely allow setting it before then.
+extension ImmutableOnceReadLock: @unchecked Sendable where Value: Sendable { }
+
 final class ImmutableOnceReadLock<Value> {
     private let inner: ReadWriteDispatchLock<Inner<Value>>
-
-    // `value` gets locked in place upon first use. Although it's declared `var`, we only ever read
-    // it.
-    private lazy var value: Value = {
-        guard let value = inner.readSync({ $0.get() }) else {
-            return inner.writeSync { $0.initializeIfNeededAndGet() }
-        }
-        return value
-    }()
 
     init(_ value: Value) {
         self.inner = .init(Inner(value))
@@ -25,11 +18,13 @@ final class ImmutableOnceReadLock<Value> {
 
     /// Gets the contained value and makes it immutable to further changes.
     func get() -> Value {
-        // `value` is marked `lazy`, so the first time we read it, the variable initializer is
-        // called. All subsequent reads will just read the variable directly. Even though `value` is
-        // marked `var`, we don't ever modify it, so we're able to treat it as if it's immutable,
-        // and therefore thread-safe.
-        value
+        // Every read goes through the lock. This used to cache into a `lazy var`,
+        // which made concurrent first reads a race, because lazy initialization
+        // carries no synchronization of its own.
+        guard let value = inner.readSync({ $0.get() }) else {
+            return inner.writeSync { $0.initializeIfNeededAndGet() }
+        }
+        return value
     }
 
     /// Sets the contained value if it hasn't been read yet, and returns whether the assignment took
