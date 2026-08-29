@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "6.0.6"
+  s.version      = "6.1.0"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -61,7 +61,10 @@ Pod::Spec.new do |s|
       "HTTPOnly/WrappedNIOSSLCertificateValidator.swift"
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 6.0.0-pre1"
+    # 6.1.0 or newer. `~> 6.0.0-pre1` caps below 6.1.0, and only 6.1.0 carries
+    # the matching iOS 13.0 floor. CocoaPods refuses a dependency whose
+    # deployment target is above the dependent's.
+    subspec.dependency "LibMobileCoin/CoreHTTP", ">= 6.1.0", "< 7.0"
 
     # Floor for init(serializedBytes:); LibMobileCoin alone allows back to 1.5.
     subspec.dependency "SwiftProtobuf", "~> 1.28"
