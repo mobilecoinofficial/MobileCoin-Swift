@@ -18,7 +18,7 @@ let package = Package(
         // and from where they can be fetched:
         .package(
             url: "https://github.com/mobilecoinofficial/libmobilecoin.git",
-            from: "6.0.4"
+            from: "6.1.0"
         ),
         .package(
             url: "https://github.com/apple/swift-protobuf.git",
@@ -45,9 +45,15 @@ let package = Package(
                 "HTTPS",
             ]
          ),
+        // LibMobileCoinTestVector is its own product from 6.1.0. It used to ride
+        // along inside the Core products, so the tests picked it up through
+        // MobileCoin without asking.
         .testTarget(
             name: "MobileCoinTests",
-            dependencies: ["MobileCoin"],
+            dependencies: [
+                "MobileCoin",
+                .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
+            ],
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",
