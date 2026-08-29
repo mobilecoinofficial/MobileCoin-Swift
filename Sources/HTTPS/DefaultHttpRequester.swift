@@ -9,9 +9,8 @@ import LibMobileCoinCommon
 import LibMobileCoinHTTP
 #endif
 
-// Final because URLSessionDelegate requires Sendable, which a non-final class
-// cannot conform to. The pinning delegate is a separate object, so the session
-// can be a `let` built in init rather than a racy `lazy var`.
+// The pinning delegate is a separate object now, so the session is a `let`
+// built in init rather than a racy `lazy var`.
 public final class DefaultHttpRequester: NSObject, HttpRequester {
     private let pinningDelegate = CertificatePinningDelegate()
     private let session: URLSession

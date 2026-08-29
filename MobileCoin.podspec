@@ -62,9 +62,9 @@ Pod::Spec.new do |s|
 
     subspec.dependency "LibMobileCoin/CoreHTTP", "~> 6.0.0-pre1"
 
-    # Matches the LibMobileCoin floor: its generated sources call runtime API
-    # that arrived in 1.36.
-    subspec.dependency "SwiftProtobuf", "~> 1.36"
+    # Mirrors the LibMobileCoin floor. The ceiling holds 1.38 out, because it
+    # emits `nonisolated extension`, which pre-Swift-6.1 toolchains reject.
+    subspec.dependency "SwiftProtobuf", ">= 1.36", "< 1.38"
 
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/ProtocolSpecific/Http/**/*.swift"

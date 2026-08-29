@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct SecSSLCertificates: SSLCertificates {
+public struct SecSSLCertificates: SSLCertificates, Sendable {
     public let trustRootsBytes: [Data]
     public let publicKeys: [SecKey]
 
