@@ -4,7 +4,6 @@ import PackageDescription
 
 let package = Package(
     name: "MobileCoin",
-    defaultLocalization: "en",
     platforms: [
         .iOS(.v13),
         .macOS(.v11),
@@ -30,18 +29,20 @@ let package = Package(
         // HTTP only, which is what the pod chain ships and what production runs.
         // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
         // left out rather than guarded: its files import GRPC and NIO
-        // unconditionally.
+        // unconditionally, and so do the tests excluded below.
         .target(
             name: "MobileCoin",
             dependencies: [
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
                 .product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin"),
             ],
-            path: ".",
+            path: "Sources",
+            // GRPC is excluded as well as left out of sources, otherwise
+            // SwiftPM warns about its 25 files on every graph load.
+            exclude: ["GRPC"],
             sources: [
-                "Sources/Common",
-                "Sources/HTTPS",
-                "HTTPOnly/WrappedNIOSSLCertificateValidator.swift",
+                "Common",
+                "HTTPS",
             ]
          ),
         .testTarget(
@@ -50,6 +51,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",
+                "ProtocolSpecific/Grpc",
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),

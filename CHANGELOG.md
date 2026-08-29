@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- The SwiftPM `MobileCoinCore` product is now HTTP only. It consumes
+  `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
+  the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
+
+### Removed
+
+- `TransportProtocol.grpc` is no longer usable from SwiftPM. Calls made with it
+  now fail with a `connectionFailure` instead of never calling back. CocoaPods
+  consumers are unaffected; the pod already had no grpc subspec.
+- `TransportProtocol.supportedProtocols` returns `[.http]` rather than
+  `[.grpc, .http]` for SwiftPM consumers.
+
 ## [4.0.1] - 2023-03-02
 
 ### Added
