@@ -1,6 +1,6 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, '12.2'
+platform :ios, '13.0'
 
 plugin 'cocoapods-repo-update'
 plugin 'cocoapods-keys', {
@@ -90,9 +90,11 @@ post_install do |installer|
     end
   end
 
+  # Must not drop below the floor LibMobileCoin declares, which is 13.0 from
+  # 6.1.0 on. A lower value here silently undercuts its binary.
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "12.2"
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
     end
   end
 end
