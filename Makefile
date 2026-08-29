@@ -144,19 +144,22 @@ generate-local-process-info:
 # Builds every target in Package.swift, test targets included. Plain `swift
 # build` skips those, so a test target that cannot compile still goes green.
 # Unlike `run-all-tests-spm` this needs no secrets, so it is the one SPM check
-# CI can run today. The test targets declare generated rather than committed
-# resources, and SwiftPM only warns about those at build time.
+# CI can run today. The test targets declare generated resources, which from
+# tools 6.0 must exist before the build, hence the ensure step.
 .PHONY: build-spm
 build-spm:
+	tools/ensure_test_resources.sh
 	swift build --build-tests
 
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:
+	tools/ensure_test_resources.sh
 	tools/generate_process_info_jsons.sh
 	swift test --filter "TestSetupClientTests"
 
 .PHONY: run-all-tests-spm
 run-all-tests-spm:
+	tools/ensure_test_resources.sh
 	tools/generate_process_info_jsons.sh
 	tools/generate_secrets_json.sh
 	swift test --filter "MobileCoinTests"

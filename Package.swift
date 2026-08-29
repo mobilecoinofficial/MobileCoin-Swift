@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:6.1
 import Foundation
 import PackageDescription
 
@@ -63,7 +63,12 @@ let package = Package(
                 .copy("Common/FixtureData/Transaction"),
                 .copy("Common/Secrets/secrets.json"),
                 .copy("Common/Secrets/process_info.json"),
-            ]
+            ],
+            // The test targets stay in Swift 5 mode. Migrating them means
+            // restructuring how every async XCTestCase captures self, which is
+            // its own piece of work and changes nothing a consumer compiles.
+            swiftSettings: [.swiftLanguageMode(.v5)]
+
         ),
         .target(
             name: "TestSetupClient",
@@ -87,7 +92,12 @@ let package = Package(
                 // missing, SwiftPM emits no accessor and the target cannot compile.
                 .copy("process_info.json.sample"),
                 .copy("process_info.json"),
-            ]
+            ],
+            // The test targets stay in Swift 5 mode. Migrating them means
+            // restructuring how every async XCTestCase captures self, which is
+            // its own piece of work and changes nothing a consumer compiles.
+            swiftSettings: [.swiftLanguageMode(.v5)]
+
          ),
     ]
 )
