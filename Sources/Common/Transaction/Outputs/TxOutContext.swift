@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct TxOutContext {
+public struct TxOutContext: Sendable {
     let txOut: TxOut
     public let receipt: Receipt
     let sharedSecret: RistrettoPublic

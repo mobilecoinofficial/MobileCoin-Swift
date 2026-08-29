@@ -8,7 +8,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-public struct SignedContingentInput {
+public struct SignedContingentInput: Sendable {
     fileprivate let proto: External_SignedContingentInput
 
     public let requiredOutputAmounts: [Amount]

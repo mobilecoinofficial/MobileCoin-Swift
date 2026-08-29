@@ -8,7 +8,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-struct LibMobileCoinError: Error {
+struct LibMobileCoinError: Error, Sendable {
     static func make(consuming error: UnsafeMutablePointer<McError>)
         -> Result<LibMobileCoinError, InvalidInputError>
     {

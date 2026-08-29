@@ -13,7 +13,7 @@ import LibMobileCoinCommon
 import LibMobileCoinGRPC
 #endif
 
-enum AttestedGrpcConnectionError: Error {
+enum AttestedGrpcConnectionError: Error, Sendable {
     case connectionError(ConnectionError)
     case attestationFailure(String = String())
 }

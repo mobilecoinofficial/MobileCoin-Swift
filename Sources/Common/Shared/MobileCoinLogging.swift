@@ -7,7 +7,9 @@
 import Foundation
 
 public enum MobileCoinLogging {
-    public static var logSensitiveData = false {
+    // Both knobs are meant to be set once at startup, before any SDK call. There
+    // is no lock, so setting one while the SDK is running is a data race.
+    nonisolated(unsafe) public static var logSensitiveData = false {
         willSet {
             guard logSensitiveDataInternal.set(newValue) else {
                 logger.preconditionFailure(
@@ -17,7 +19,7 @@ public enum MobileCoinLogging {
     }
 
     /// Minimum level the SDK prints to stdout.
-    public static var logLevel = Level.info
+    nonisolated(unsafe) public static var logLevel = Level.info
 
     public enum Level: Int, Comparable {
         case trace
@@ -188,7 +190,9 @@ internal struct Logger {
         print("\(Self.timestampFormatter.string(from: Date())) \(level) \(label) : \(message)")
     }
 
-    private static let timestampFormatter: ISO8601DateFormatter = {
+    // ISO8601DateFormatter is not Sendable, but formatting is thread safe and
+    // this instance is never reconfigured after it is built.
+    nonisolated(unsafe) private static let timestampFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter

@@ -49,7 +49,7 @@ func performAsync<Value1, Value2, Failure: Error>(
 // swiftlint:disable multiline_parameters
 
 @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
-public func withTimeout<T>(
+public func withTimeout<T: Sendable>(
     seconds: TimeInterval,
     block: @escaping @Sendable () async throws -> T
 ) async throws -> T {

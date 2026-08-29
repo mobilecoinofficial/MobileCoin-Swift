@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct BlockMetadata {
+public struct BlockMetadata: Sendable {
     public let index: UInt64
 
     let timestampStatus: TimestampStatus?
