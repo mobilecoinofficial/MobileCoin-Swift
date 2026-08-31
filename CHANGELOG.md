@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.7] - 2026-08-31
+
+### Added
+
+- `MobileCoinClient.txOutContexts(to:rngSeed:)` derives the payload and change
+  TxOut public keys a transaction will carry, from an RNG seed alone, without
+  building or submitting one. Send with
+  `prepareTransaction(rng: MobileCoinChaCha20Rng(rngSeed: seed))` on the same
+  seed and the transaction carries the keys it reported.
+
 ## [4.0.1] - 2023-03-02
 
 ### Added
