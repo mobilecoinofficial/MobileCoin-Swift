@@ -2,19 +2,20 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
-@testable import MobileCoin
-import XCTest
-
 #if canImport(LibMobileCoinTestVector)
 import LibMobileCoinTestVector
+#else
+import LibMobileCoin
 #endif
+@testable import MobileCoin
+import XCTest
 
 extension Bundle {
     static func getVectorPath(_ filename: String) throws -> URL {
         #if canImport(LibMobileCoinTestVector)
         try Bundle.testVectorModuleUrl(filename)
         #else
-        try Bundle.url(filename, "jsonl")
+        try Bundle.testVectorUrl(filename)
         #endif
     }
 }
