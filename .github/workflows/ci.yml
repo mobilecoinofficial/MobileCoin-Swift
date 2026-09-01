@@ -81,8 +81,8 @@ jobs:
           if-no-files-found: ignore
 
   # Proves SPM consumers can resolve libmobilecoin without the CocoaPods
-  # toolchain, so this job skips the setup action on purpose. `swift test` is
-  # not run: generating Tests/Common/Secrets/secrets.json needs a
+  # toolchain, so this job skips the setup action on purpose. Test targets are
+  # compiled but not run: generating Tests/Common/Secrets/secrets.json needs a
   # macOS-keychain identity.
   build-spm:
     name: Swift package build
