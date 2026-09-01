@@ -29,11 +29,11 @@ target 'Example' do
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['ProtocolUnitTests']
 
-  # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin'
-  # pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin'
-  pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin'
-  # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin/LibMobileCoin.podspec'
-  # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin.git'
+  # Trunk tops out at 6.0.2 and MobileCoin.podspec needs 6.1.0 or newer, so
+  # this pins the tag. The podspec downloads its xcframework from the release.
+  pod 'LibMobileCoin/CoreHTTP',
+      git: 'https://github.com/mobilecoinofficial/libmobilecoin.git',
+      tag: 'v6.1.0'
 
   pod 'SwiftProtobuf'
   pod 'SwiftLint'

@@ -13,8 +13,7 @@ Pod::Spec.new do |s|
 
   s.source       = {
     :git => "https://github.com/mobilecoinofficial/MobileCoin-Swift.git",
-    :tag => "v#{s.version}",
-    :submodules => true
+    :tag => "v#{s.version}"
   }
 
 
@@ -27,11 +26,13 @@ Pod::Spec.new do |s|
 
   s.default_subspec = :none
 
+  # LibMobileCoin/TestVectors carries the .jsonl vectors in LibMobileCoin's
+  # framework bundle, which is where Bundle.testVectorUrl looks for them.
   s.test_spec do |test_spec|
+    test_spec.dependency "LibMobileCoin/TestVectors", ">= 6.1.0", "< 7.0"
     test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
     test_spec.resources = [
       "Tests/Common/FixtureData/**/*",
-      "Vendor/libmobilecoin/Vendor/mobilecoin/test-vectors/vectors/**/*",
     ]
   end
 
