@@ -5,6 +5,10 @@
 @testable import MobileCoin
 import XCTest
 
+#if canImport(LibMobileCoinTestVector)
+import LibMobileCoinTestVector
+#endif
+
 extension Bundle {
     static func getVectorPath(_ filename: String) throws -> URL {
         #if canImport(LibMobileCoinTestVector)
