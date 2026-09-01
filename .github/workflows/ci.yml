@@ -80,10 +80,10 @@ jobs:
           path: ~/Library/Logs/DiagnosticReports
           if-no-files-found: ignore
 
-  # Proves SPM consumers can resolve libmobilecoin (with its LFS-tracked
-  # Artifacts submodule) without the CocoaPods toolchain, so this job skips
-  # the setup action on purpose. `swift test` is not run: generating
-  # Tests/Common/Secrets/secrets.json needs a macOS-keychain identity.
+  # Proves SPM consumers can resolve libmobilecoin without the CocoaPods
+  # toolchain, so this job skips the setup action on purpose. `swift test` is
+  # not run: generating Tests/Common/Secrets/secrets.json needs a
+  # macOS-keychain identity.
   build-spm:
     name: Swift package build
     runs-on: macos-26
@@ -92,39 +92,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # `.build` is not cached on purpose: SwiftPM keeps both a bare clone and
-      # a checkout of libmobilecoin's LFS artifacts, so each entry would fill
-      # most of the repo's Actions cache budget and evict the gem and Pods
-      # caches the slower jobs depend on.
+      # `.build` is not cached on purpose: an entry would carry the binary
+      # target's 333 MiB unpacked xcframework, more than every cache this repo
+      # currently holds put together.
+      #
+      # SwiftPM verifies the binary target's SHA-256 and fails the resolve on a
+      # mismatch, which covers a corrupt or substituted download. It does not
+      # check what the release job put in the archive.
       - name: Build
         run: make build-spm
-
-      # SwiftPM clones libmobilecoin itself; if git-lfs smudging doesn't happen
-      # in that clone the .a files arrive as pointer text and the failure shows
-      # up much later as an unrelated linker error.
-      - name: Verify SwiftPM resolved the LFS binaries
-        run: |
-          set -euo pipefail
-          lib=".build/checkouts/libmobilecoin/Artifacts/LibMobileCoinLibrary.xcframework"
-          if [[ ! -d "$lib" ]]; then
-            echo "::error::$lib is missing from the SwiftPM checkout."
-            exit 1
-          fi
-          count=0
-          while IFS= read -r archive; do
-            if head -c 100 "$archive" | grep -q 'git-lfs.github.com'; then
-              echo "::error::$archive is an unresolved Git LFS pointer."
-              exit 1
-            fi
-            echo "ok: $archive ($(du -h "$archive" | cut -f1))"
-            count=$((count + 1))
-          done < <(find "$lib" -name '*.a')
-          # Without this the check passes vacuously if the xcframework layout
-          # ever changes and `find` matches nothing.
-          if [[ "$count" -eq 0 ]]; then
-            echo "::error::Found no .a archives under $lib."
-            exit 1
-          fi
 
       # `swift build` rewrites Package.resolved when the declared dependencies
       # and the committed resolution disagree.
