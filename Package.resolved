@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mobilecoinofficial/libmobilecoin.git",
       "state" : {
-        "revision" : "aaef756fe293bb1036f3e2147d1c085568568ecf",
-        "version" : "6.0.4"
+        "revision" : "87d4793bcf5fd8fca9985f306b823bb24e7e27d4",
+        "version" : "6.1.0"
       }
     },
     {
@@ -93,10 +93,10 @@
     {
       "identity" : "swift-protobuf",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-protobuf",
+      "location" : "https://github.com/apple/swift-protobuf.git",
       "state" : {
-        "revision" : "ebc7251dd5b37f627c93698e4374084d98409633",
-        "version" : "1.28.2"
+        "revision" : "81558271e243f8f47dfe8e9fdd55f3c2b5413f68",
+        "version" : "1.37.0"
       }
     },
     {

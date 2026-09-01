@@ -18,7 +18,7 @@ let package = Package(
         // and from where they can be fetched:
         .package(
             url: "https://github.com/mobilecoinofficial/libmobilecoin.git",
-            from: "6.0.4"
+            from: "6.1.0"
         ),
         .package(
             url: "https://github.com/apple/swift-protobuf.git",
