@@ -17,17 +17,9 @@ MobileCoin is a privacy-preserving payments network designed for use on mobile d
 
 # `libmobilecoin` moved
 
-A fresh `libmobilecoin` repository took over the name. Its history starts at
-v6.1.0, so every older commit hash resolves only in
-[`libmobilecoin-archive`](https://github.com/mobilecoinofficial/libmobilecoin-archive).
-The `Vendor/libmobilecoin` submodule points there until the CocoaPods
-migration removes it.
+A fresh `libmobilecoin` repository took over the name. Its history starts at v6.1.0, so every older commit hash resolves only in [`libmobilecoin-archive`](https://github.com/mobilecoinofficial/libmobilecoin-archive). The `Vendor/libmobilecoin` submodule points there until the CocoaPods migration removes it. An existing clone needs `git submodule sync --recursive` to pick up the new URL.
 
-Both repositories carry a `v6.1.0` tag, and `libmobilecoin.git` served the
-archive's one before the rename. SwiftPM records the fingerprint it first
-resolved for a URL and refuses a different one. A machine that saw the
-archive's tag needs `~/.swiftpm/security/fingerprints/libmobilecoin-*.json`
-deleted once.
+Both repositories carry a `v6.1.0` tag, and `libmobilecoin.git` served the archive's one before the rename. SwiftPM records the fingerprint it first resolved for a URL and refuses a different one. A machine that saw the archive's tag needs `~/.swiftpm/security/fingerprints/libmobilecoin-*.json` deleted once.
 
 # Table of Contents
 - [License](#license)

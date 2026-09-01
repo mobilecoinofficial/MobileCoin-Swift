@@ -141,11 +141,8 @@ upgrade-deps:
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
 
-# Builds every target in Package.swift, test targets included. Unlike
-# `run-all-tests-spm` this needs no secrets, so it is the one SPM check CI can
-# run today. The test targets declare resources (secrets.json,
-# process_info.json) that are generated rather than committed. SwiftPM only
-# warns about those at build time.
+# Builds every target including tests. The one SPM check CI can run without
+# secrets; the generated resource files are absent, so SwiftPM warns.
 .PHONY: build-spm
 build-spm:
 	swift build --build-tests
