@@ -14,7 +14,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mobilecoinofficial/libmobilecoin.git",
       "state" : {
-        "revision" : "87d4793bcf5fd8fca9985f306b823bb24e7e27d4",
+        "revision" : "ed3669985753477b4d57959400bd21156833a77c",
         "version" : "6.1.0"
       }
     },
