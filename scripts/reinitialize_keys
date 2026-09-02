@@ -11,8 +11,5 @@ echo "----------------------------"
 echo "Re-initializing keys"
 echo "----------------------------"
 
-set_secrets "Example"
-generate_and_rename_cocoapodkeys "Example"
-
 set_secrets "ExampleHTTP"
 generate_and_rename_cocoapodkeys "ExampleHTTP"
