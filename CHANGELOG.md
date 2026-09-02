@@ -12,8 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The SwiftPM `MobileCoinCore` product is now HTTP only. It consumes
   `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
-- The library compiles in the Swift 6 language mode. The two test targets hold
-  at Swift 5.
+- The library and both test targets compile in the Swift 6 language mode. The
+  package declares no per-target language mode.
 - The two routes now have different toolchain floors. SwiftPM needs Swift 6.1,
   Xcode 16.3 or newer, because the manifest declares
   `swift-tools-version:6.1` and SwiftPM rejects it outright below that.
