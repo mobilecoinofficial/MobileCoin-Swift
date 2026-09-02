@@ -36,20 +36,20 @@ class TestWalletCreator: ObservableObject {
                 name: "3_GRPC_testTransactionDoubleSubmissionFails_Recipient",
                 txData: [:]),
 
-            // testTransactionStatusFailsWhenInputsAlreadySpent
+            // testTransactionStatusFailsWhenInputIsAlreadySpent
             TestAccountFactory.TestAccountConfig(
-                name: "4_HTTP_testTransactionStatusFailsWhenInputsAlreadySpent_Client",
+                name: "4_HTTP_testTransactionStatusFailsWhenInputIsAlreadySpent_Client",
                 txData:
                     [.MOB: [100 + minFee]]),
             TestAccountFactory.TestAccountConfig(
-                name: "5_HTTP_testTransactionStatusFailsWhenInputsAlreadySpent_Recipient",
+                name: "5_HTTP_testTransactionStatusFailsWhenInputIsAlreadySpent_Recipient",
                 txData: [:]),
             TestAccountFactory.TestAccountConfig(
-                name: "6_GRPC_testTransactionStatusFailsWhenInputsAlreadySpent_Client",
+                name: "6_GRPC_testTransactionStatusFailsWhenInputIsAlreadySpent_Client",
                 txData:
                     [.MOB: [100 + minFee]]),
             TestAccountFactory.TestAccountConfig(
-                name: "7_GRPC_testTransactionStatusFailsWhenInputsAlreadySpent_Recipient",
+                name: "7_GRPC_testTransactionStatusFailsWhenInputIsAlreadySpent_Recipient",
                 txData: [:]),
 
             // testSubmitTransaction
@@ -94,21 +94,21 @@ class TestWalletCreator: ObservableObject {
                 name: "19_GRPC_testCancelSignedContingentInput_Consumer",
                 txData: [:]),
 
-            // testSubmitSignedContingentInput
+            // testSubmitSignedContingentInputTransaction
             TestAccountFactory.TestAccountConfig(
-                name: "20_HTTP_testSubmitSignedContingentInput_Creator",
+                name: "20_HTTP_testSubmitSignedContingentInputTransaction_Creator",
                 txData: [.MOB: [100 + minFee]]),
             TestAccountFactory.TestAccountConfig(
-                name: "21_HTTP_testSubmitSignedContingentInput_Consumer",
+                name: "21_HTTP_testSubmitSignedContingentInputTransaction_Consumer",
                 txData: [
                     .MOB: [minFee],
                     .MOBUSD: [10],
                 ]),
             TestAccountFactory.TestAccountConfig(
-                name: "22_GRPC_testSubmitSignedContingentInput_Creator",
+                name: "22_GRPC_testSubmitSignedContingentInputTransaction_Creator",
                 txData: [.MOB: [100 + minFee]]),
             TestAccountFactory.TestAccountConfig(
-                name: "23_GRPC_testSubmitSignedContingentInput_Consumer",
+                name: "23_GRPC_testSubmitSignedContingentInputTransaction_Consumer",
                 txData: [
                     .MOB: [minFee],
                     .MOBUSD: [10],
@@ -197,7 +197,7 @@ class TestWalletCreator: ObservableObject {
                 name: "46_GRPC_testExtraConsensusTrustRootWorks_Client",
                 txData: [.MOB: [100 + minFee]]),
             TestAccountFactory.TestAccountConfig(
-                name: "47_GRPC_testConsensusTrustRootWorks_Recipient",
+                name: "47_GRPC_testExtraConsensusTrustRootWorks_Recipient",
                 txData: [:]),
 
             // testWrongConsensusTrustRootReturnsError
