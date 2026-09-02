@@ -51,9 +51,22 @@ Please check your country's laws before downloading or using this software.
 
 ## Build Instructions
 
+### Toolchain
+
+The two routes have different compiler floors, and neither manifest expresses them:
+
+|Route |Minimum |Why |
+| :-- | :-- | :-- |
+| SwiftPM | Swift 6.1, Xcode 16.3 | `Package.swift` declares `swift-tools-version:6.1`, which an older SwiftPM rejects before it reads anything else. |
+| CocoaPods | Swift 5.10, Xcode 15.3 | `MobileCoinLogging` uses `nonisolated(unsafe)`, which no earlier compiler parses. |
+
+The podspec's `swift_version` is a language mode rather than a compiler floor, so it enforces neither.
+
+### Setup
+
 The workspace can be built with `make`.
 
-1. Install Ruby 2.7.x
+1. Install Ruby 3.1.x
 
 1. Install the gem bundler
 
