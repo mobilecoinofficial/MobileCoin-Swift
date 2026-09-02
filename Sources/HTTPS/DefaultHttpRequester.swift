@@ -137,6 +137,8 @@ final class CertificatePinningDelegate: NSObject {
             return
         }
 
+        // `validateAgainst` matches public keys and never evaluates trust, so a
+        // pinned chain is accepted whether or not the system would accept it.
         trust.validateAgainst(pinnedKeys: pinnedKeys) { result in
             switch result {
             case .success(let message):

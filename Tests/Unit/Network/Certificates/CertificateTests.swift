@@ -48,41 +48,30 @@ class CertificateTests: XCTestCase {
         }
     }
 
-    // Pinning runs off the session delegate. Dropping `URLSessionDelegate` is a
-    // build failure, because the session initializer demands it, but dropping
-    // `URLSessionTaskDelegate` still compiles and silently sends every
-    // task-level challenge to default handling.
-    func testRequesterInstallsThePinningDelegate() {
-        let delegate = DefaultHttpRequester().session.delegate
+    // The four below drive both delegate shims and each covers one of `handle`'s
+    // outcomes.
 
-        XCTAssertTrue(delegate is CertificatePinningDelegate)
-        XCTAssertTrue(delegate is URLSessionTaskDelegate)
-    }
-
-    // The four below enter at the task delegate, the hop a served request takes,
-    // and each covers one of `handle`'s outcomes.
-
-    // The fixture chain is expired. `validateAgainst` matches public keys and
-    // never evaluates trust, so pinning replaces system validation here.
+    // The fixture chain is expired, and pinning accepts it anyway.
     func testServerTrustMatchingAPinnedKeyIsAccepted() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
         requester.setFogTrustRoots(try alphaNetCertificates(.valid))
 
-        XCTAssertEqual(
-            try disposition(of: requester, against: fixture.secTrust),
-            .useCredential)
+        let result = try answer(of: requester, against: fixture.secTrust)
+
+        XCTAssertEqual(result.disposition, .useCredential)
+        XCTAssertNotNil(result.credential)
     }
 
-    // The consensus root carries this one, so a validation path that reads only
-    // the fog root fails here.
+    // The consensus root carries this one, so both roots take part in a
+    // challenge.
     func testServerTrustMatchingNoPinnedKeyIsCancelled() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
         requester.setConsensusTrustRoots(try alphaNetCertificates(.wrong))
 
         XCTAssertEqual(
-            try disposition(of: requester, against: fixture.secTrust),
+            try answer(of: requester, against: fixture.secTrust).disposition,
             .cancelAuthenticationChallenge)
     }
 
@@ -92,15 +81,34 @@ class CertificateTests: XCTestCase {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
 
         XCTAssertEqual(
-            try disposition(of: DefaultHttpRequester(), against: fixture.secTrust),
+            try answer(of: DefaultHttpRequester(), against: fixture.secTrust).disposition,
             .performDefaultHandling)
     }
 
-    // A challenge carrying no server trust at all is refused outright.
     func testChallengeWithoutServerTrustIsCancelled() throws {
         XCTAssertEqual(
-            try disposition(of: DefaultHttpRequester(), against: nil),
+            try answer(of: DefaultHttpRequester(), against: nil).disposition,
             .cancelAuthenticationChallenge)
+    }
+
+    // A URLSession holds its delegate until it is invalidated, so a requester
+    // that goes out of scope without invalidating leaves its delegate behind.
+    func testRequesterReleasesItsDelegateWhenItGoesOutOfScope() {
+        weak var delegate: CertificatePinningDelegate?
+        autoreleasepool {
+            let requester = DefaultHttpRequester()
+            delegate = requester.session.delegate as? CertificatePinningDelegate
+            XCTAssertNotNil(delegate)
+        }
+
+        // Invalidation is asynchronous, so the release lands on the session's own
+        // queue rather than on this one.
+        let deadline = Date().addingTimeInterval(5)
+        while delegate != nil && Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        XCTAssertNil(delegate)
     }
 
     // `pinnedKeys` reads fog before consensus, so distinct certificates and an
@@ -148,12 +156,12 @@ class CertificateTests: XCTestCase {
         try XCTUnwrap(requester.session.delegate as? CertificatePinningDelegate)
     }
 
-    // A served request enters at the task delegate. `validateAgainst` calls back
-    // on the calling thread, so the disposition is set before this returns.
-    private func disposition(
+    // Server trust is a session-level challenge. `validateAgainst` calls back on
+    // the calling thread, so both shims answer before this returns.
+    private func answer(
         of requester: DefaultHttpRequester,
         against trust: SecTrust?
-    ) throws -> URLSession.AuthChallengeDisposition? {
+    ) throws -> (disposition: URLSession.AuthChallengeDisposition?, credential: URLCredential?) {
         let space: URLProtectionSpace
         if let trust = trust {
             space = TrustingProtectionSpace(trust: trust)
@@ -177,11 +185,20 @@ class CertificateTests: XCTestCase {
         let url = try XCTUnwrap(URL(string: "https://example.com"))
         let task = requester.session.dataTask(with: url)
 
-        var disposition: URLSession.AuthChallengeDisposition?
-        delegate.urlSession(requester.session, task: task, didReceive: challenge) { result, _ in
-            disposition = result
+        var sessionDisposition: URLSession.AuthChallengeDisposition?
+        var credential: URLCredential?
+        delegate.urlSession(requester.session, didReceive: challenge) { result, resultCredential in
+            sessionDisposition = result
+            credential = resultCredential
         }
-        return disposition
+
+        var taskDisposition: URLSession.AuthChallengeDisposition?
+        delegate.urlSession(requester.session, task: task, didReceive: challenge) { result, _ in
+            taskDisposition = result
+        }
+
+        XCTAssertEqual(sessionDisposition, taskDisposition)
+        return (sessionDisposition, credential)
     }
 }
 
