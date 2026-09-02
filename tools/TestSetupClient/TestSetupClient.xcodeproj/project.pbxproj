@@ -42,7 +42,7 @@
 		AE41B7C129EF018A00ED338A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AE41B7C729EF018A00ED338A /* TestSetupClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestSetupClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE41B7CB29EF018A00ED338A /* TestSetupClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSetupClientTests.swift; sourceTree = "<group>"; };
-		AE41B7E429EF027800ED338A /* UInt64+Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt64+Data.swift; sourceTree = "<group>"; };
+		AE41B7E429EF027800ED338A /* UInt64+Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UInt64+Data.swift"; sourceTree = "<group>"; };
 		AE41B7E529EF027800ED338A /* TestAccountFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestAccountFactory.swift; sourceTree = "<group>"; };
 		AE41B7E629EF027800ED338A /* TestWalletCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestWalletCreator.swift; sourceTree = "<group>"; };
 		AE41B7E729EF027800ED338A /* NetworkPresets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkPresets.swift; sourceTree = "<group>"; };
