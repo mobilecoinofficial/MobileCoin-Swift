@@ -59,10 +59,11 @@ class CertificateTests: XCTestCase {
         XCTAssertTrue(delegate is URLSessionTaskDelegate)
     }
 
-    // The test above asserts wiring. The four below drive a challenge through
-    // the requester's own delegate, which is the only path a served request
-    // takes, and each covers one of `handle`'s outcomes.
+    // The four below enter at the task delegate, the hop a served request takes,
+    // and each covers one of `handle`'s outcomes.
 
+    // The fixture chain is expired. `validateAgainst` matches public keys and
+    // never evaluates trust, so pinning replaces system validation here.
     func testServerTrustMatchingAPinnedKeyIsAccepted() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
@@ -73,10 +74,12 @@ class CertificateTests: XCTestCase {
             .useCredential)
     }
 
+    // The consensus root carries this one, so a validation path that reads only
+    // the fog root fails here.
     func testServerTrustMatchingNoPinnedKeyIsCancelled() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
-        requester.setFogTrustRoots(try alphaNetCertificates(.wrong))
+        requester.setConsensusTrustRoots(try alphaNetCertificates(.wrong))
 
         XCTAssertEqual(
             try disposition(of: requester, against: fixture.secTrust),
@@ -100,9 +103,8 @@ class CertificateTests: XCTestCase {
             .cancelAuthenticationChallenge)
     }
 
-    // The two roots are separate fields, and `pinnedKeys` reads fog before
-    // consensus. Distinct certificates and an ordered comparison are what make
-    // a swap of the two setters visible.
+    // `pinnedKeys` reads fog before consensus, so distinct certificates and an
+    // ordered comparison are what make a swap of the two setters visible.
     func testEachTrustRootSetterWritesItsOwnField() throws {
         let requester = DefaultHttpRequester()
         let delegate = try pinningDelegate(of: requester)
@@ -116,6 +118,9 @@ class CertificateTests: XCTestCase {
 
         requester.setConsensusTrustRoots(consensus)
         XCTAssertEqual(delegate.pinnedKeys, fog.publicKeys + consensus.publicKeys)
+
+        requester.setFogTrustRoots(nil)
+        XCTAssertEqual(delegate.pinnedKeys, consensus.publicKeys)
     }
 
     private enum AlphaNetIntermediate {
@@ -143,8 +148,8 @@ class CertificateTests: XCTestCase {
         try XCTUnwrap(requester.session.delegate as? CertificatePinningDelegate)
     }
 
-    // `validateAgainst` calls back on the calling thread, so the disposition is
-    // set by the time `handle` returns and no expectation is needed.
+    // A served request enters at the task delegate. `validateAgainst` calls back
+    // on the calling thread, so the disposition is set before this returns.
     private func disposition(
         of requester: DefaultHttpRequester,
         against trust: SecTrust?
@@ -168,8 +173,12 @@ class CertificateTests: XCTestCase {
             error: nil,
             sender: NullChallengeSender())
 
+        let delegate = try pinningDelegate(of: requester)
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        let task = requester.session.dataTask(with: url)
+
         var disposition: URLSession.AuthChallengeDisposition?
-        try pinningDelegate(of: requester).handle(challenge: challenge) { result, _ in
+        delegate.urlSession(requester.session, task: task, didReceive: challenge) { result, _ in
             disposition = result
         }
         return disposition
@@ -178,7 +187,7 @@ class CertificateTests: XCTestCase {
 
 // `URLProtectionSpace` builds its own `serverTrust` from a live TLS handshake,
 // so a fixture chain reaches the delegate only through an override.
-private final class TrustingProtectionSpace: URLProtectionSpace {
+private final class TrustingProtectionSpace: URLProtectionSpace, @unchecked Sendable {
     private let trust: SecTrust
 
     init(trust: SecTrust) {
