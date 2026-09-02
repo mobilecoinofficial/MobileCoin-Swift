@@ -9,6 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class BlockchainMetaFetcherTests: XCTestCase {
 
     func testFetchMinimumFeeReturnsDefaultWithLegacyService() throws {

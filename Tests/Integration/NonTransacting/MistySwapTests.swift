@@ -14,6 +14,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class MistyswapTests: XCTestCase {
 
     func testInitiateOfframpRequest() throws {

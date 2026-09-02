@@ -9,6 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class FogKeyImageConnectionIntTests: XCTestCase {
     func testCheckKeyImagesReturnsNotSpentForFakeKeyImage() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in

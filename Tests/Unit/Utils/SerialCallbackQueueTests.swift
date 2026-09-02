@@ -5,15 +5,18 @@
 @testable import MobileCoin
 import XCTest
 
-private class Container {
+// These boxes exist to be mutated from several queues at once. That is what the
+// queue under test is meant to serialize, so the checking is the test's job.
+private class Container: @unchecked Sendable {
     var counter: Int = 0
 }
 
-private class Container2 {
+private class Container2: @unchecked Sendable {
     var counter1: Int = 0
     var counter2: Int = 0
 }
 
+@MainActor
 class SerialCallbackQueueTests: XCTestCase {
 
     func testInit() {
@@ -156,7 +159,10 @@ class SerialCallbackQueueTests: XCTestCase {
 
         let expect = expectation(description: "SerialCallbackQueue async access")
         let group = DispatchGroup()
-        var c = 0
+        // A captured `var` cannot be mutated from the queue's callbacks under
+        // Swift 6. The counter moves into a box, the same shape `obj` already
+        // uses.
+        let c = Container()
         for _ in (0..<100) {
             group.enter()
             DispatchQueue.global().async {
@@ -165,8 +171,8 @@ class SerialCallbackQueueTests: XCTestCase {
                     obj.counter1 += 1
 
                     queue.append { callback in
-                        XCTAssertEqual(obj.counter2, 2 * c)
-                        c += 1
+                        XCTAssertEqual(obj.counter2, 2 * c.counter)
+                        c.counter += 1
 
                         let val2 = obj.counter2
                         obj.counter2 += 1
@@ -184,8 +190,8 @@ class SerialCallbackQueueTests: XCTestCase {
                         obj.counter1 += 1
 
                         queue.append { callback in
-                            XCTAssertEqual(obj.counter2, 2 * c)
-                            c += 1
+                            XCTAssertEqual(obj.counter2, 2 * c.counter)
+                            c.counter += 1
 
                             let val2 = obj.counter2
                             obj.counter2 += 1

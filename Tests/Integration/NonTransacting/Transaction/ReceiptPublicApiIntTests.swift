@@ -5,6 +5,7 @@
 import MobileCoin
 import XCTest
 
+@MainActor
 class ReceiptPublicApiIntTests: XCTestCase {
 
     func testSerializedData() throws {

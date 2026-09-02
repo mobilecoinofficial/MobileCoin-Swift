@@ -9,6 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class AccountTests: XCTestCase {
 
     func testNoTxOuts() throws {

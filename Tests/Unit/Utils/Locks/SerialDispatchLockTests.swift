@@ -9,6 +9,7 @@ private class Container {
     var counter = 0
 }
 
+@MainActor
 class SerialDispatchLockTests: XCTestCase {
 
     func testInit() {

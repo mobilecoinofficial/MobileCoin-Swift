@@ -9,6 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class UrlLoadBalancerIntTests: XCTestCase {
 
     func testConsensusDoesNotRotate() throws {

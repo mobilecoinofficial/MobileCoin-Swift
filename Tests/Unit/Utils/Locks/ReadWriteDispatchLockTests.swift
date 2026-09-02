@@ -15,6 +15,7 @@ private class Container2 {
     var counter2 = 0
 }
 
+@MainActor
 class ReadWriteDispatchLockTests: XCTestCase {
 
     func testInit() {

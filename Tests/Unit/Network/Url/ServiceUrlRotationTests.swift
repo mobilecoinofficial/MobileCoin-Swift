@@ -9,6 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class ServiceUrlRotationTests: XCTestCase {
 
     func testUrlRotation(fixture: ServiceFixture, loadBalancer: MockUrlLoadBalancer) throws {

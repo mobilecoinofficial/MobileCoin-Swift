@@ -11,6 +11,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
+@MainActor
 class FogViewConnectionIntTests: XCTestCase {
     func testEnclaveRequest() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
