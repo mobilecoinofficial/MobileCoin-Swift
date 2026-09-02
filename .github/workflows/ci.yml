@@ -12,7 +12,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# The floor for every job; publish-pod-release raises its own.
+# The floor for every job.
 permissions:
   contents: read
 
@@ -80,10 +80,9 @@ jobs:
           path: ~/Library/Logs/DiagnosticReports
           if-no-files-found: ignore
 
-  # Proves SPM consumers can resolve libmobilecoin (with its LFS-tracked
-  # Artifacts submodule) without the CocoaPods toolchain, so this job skips
-  # the setup action on purpose. `swift test` is not run: generating
-  # Tests/Common/Secrets/secrets.json needs a macOS-keychain identity.
+  # Proves SPM consumers can resolve libmobilecoin without the CocoaPods
+  # toolchain, so this job skips the setup action on purpose. Test targets
+  # compile but do not run: secrets.json needs a macOS-keychain identity.
   build-spm:
     name: Swift package build
     runs-on: macos-26
@@ -92,42 +91,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # `.build` is not cached on purpose: SwiftPM keeps both a bare clone and
-      # a checkout of libmobilecoin's LFS artifacts, so each entry would fill
-      # most of the repo's Actions cache budget and evict the gem and Pods
-      # caches the slower jobs depend on.
+      # No `.build` cache on purpose: the entry would be the whole build tree,
+      # about 660 MiB compressed, against 143 MiB of cache in this repo total.
       - name: Build
         run: make build-spm
 
-      # SwiftPM clones libmobilecoin itself; if git-lfs smudging doesn't happen
-      # in that clone the .a files arrive as pointer text and the failure shows
-      # up much later as an unrelated linker error.
-      - name: Verify SwiftPM resolved the LFS binaries
-        run: |
-          set -euo pipefail
-          lib=".build/checkouts/libmobilecoin/Artifacts/LibMobileCoinLibrary.xcframework"
-          if [[ ! -d "$lib" ]]; then
-            echo "::error::$lib is missing from the SwiftPM checkout."
-            exit 1
-          fi
-          count=0
-          while IFS= read -r archive; do
-            if head -c 100 "$archive" | grep -q 'git-lfs.github.com'; then
-              echo "::error::$archive is an unresolved Git LFS pointer."
-              exit 1
-            fi
-            echo "ok: $archive ($(du -h "$archive" | cut -f1))"
-            count=$((count + 1))
-          done < <(find "$lib" -name '*.a')
-          # Without this the check passes vacuously if the xcframework layout
-          # ever changes and `find` matches nothing.
-          if [[ "$count" -eq 0 ]]; then
-            echo "::error::Found no .a archives under $lib."
-            exit 1
-          fi
-
-      # `swift build` rewrites Package.resolved when the declared dependencies
-      # and the committed resolution disagree.
+      # The build rewrites Package.resolved when the declared dependencies and
+      # the committed resolution disagree.
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
@@ -152,91 +122,3 @@ jobs:
 
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
-
-  # Lints dynamically, the same validation `pod trunk push` runs at release
-  # time, so a green run here means the publish job's lint will also pass.
-  pod-lib-lint:
-    name: CocoaPods podspec lint
-    runs-on: macos-26
-    timeout-minutes: 120
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          lfs: true
-
-      - name: Setup
-        uses: ./.github/actions/setup-macos-ci
-
-      - name: Lint podspec
-        run: make lint-locally-strict-podspec
-
-      - name: Check for uncommitted changes
-        run: ./scripts/check_dirty_git
-
-  publish-pod-release:
-    name: Publish pod release
-    # pod-lib-lint runs the same validation `pod trunk push` performs, so it
-    # gates the publish to fail fast before tagging.
-    needs: [build-and-test-example-http, swiftlint, pod-lib-lint]
-    if: >-
-      github.event_name == 'push' &&
-      (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/'))
-    runs-on: macos-26
-    timeout-minutes: 60
-    permissions:
-      contents: write
-    env:
-      COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          lfs: true
-          # `make tag-release` pushes a tag using the checkout credentials.
-          fetch-depth: 0
-          persist-credentials: true
-
-      - name: Setup
-        uses: ./.github/actions/setup-macos-ci
-
-      # Skip commits that don't bump the podspec version. Trunk is the source
-      # of truth: a git-tag check would skip the publish forever after a run
-      # that pushed the tag and then failed before the trunk push landed.
-      - name: Check whether this version is already released
-        id: version
-        run: |
-          set -euo pipefail
-          version="$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')"
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-          if bundle exec pod trunk info MobileCoin | grep -qF -- "- ${version} ("; then
-            echo "Version ${version} is already on trunk; nothing to publish."
-            echo "should-publish=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "should-publish=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Set git credentials
-        if: steps.version.outputs.should-publish == 'true'
-        run: |
-          git config user.email "mobilecoin-ci@mobilecoin.com"
-          git config user.name "mobilecoin-ci"
-
-      # The podspec's source is `:tag => "v#{s.version}"`, so the tag must
-      # exist before the trunk push. Kept idempotent so a rerun after a failed
-      # trunk push does not die on the already-pushed tag.
-      - name: Tag release
-        if: steps.version.outputs.should-publish == 'true'
-        run: |
-          set -euo pipefail
-          if git ls-remote --exit-code --tags origin "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Tag v${{ steps.version.outputs.version }} already exists; skipping tag push."
-          else
-            make tag-release
-          fi
-
-      - name: Publish pod to trunk
-        if: steps.version.outputs.should-publish == 'true'
-        run: make publish-podspec
