@@ -16,8 +16,12 @@ struct TestBlockchainService: BlockchainService {
         completion: @escaping
             (Result<ConsensusCommon_LastBlockInfoResponse, ConnectionError>) -> Void
     ) {
+        // `BlockchainService` declares its completion without `@Sendable`, so
+        // it cannot cross onto the main queue on its own.
+        nonisolated(unsafe) let completion = completion
+        let result = self.result
         DispatchQueue.main.async {
-            completion(self.result)
+            completion(result)
         }
     }
 }

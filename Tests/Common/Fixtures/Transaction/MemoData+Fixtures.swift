@@ -191,7 +191,7 @@ extension MemoData.Fixtures.DefaultDestinationMemo {
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
     }
 
-    static var validMemoDataHexBytes: String =
+    static let validMemoDataHexBytes: String =
         """
         ccb5a98f0c0c42f68491e5e0c936245201000000000000040000000000000064\
         0000000000000000000000000000000000000000000000000000000000000000
@@ -208,7 +208,7 @@ extension MemoData.Fixtures.DestinationZeroOutlayMemo {
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
     }
 
-    static var validMemoDataHexBytes: String =
+    static let validMemoDataHexBytes: String =
         """
         ccb5a98f0c0c42f68491e5e0c936245201000000000000040000000000000064\
         0000000000000000000000000000000000000000000000000000000000000000
@@ -221,7 +221,7 @@ extension MemoData.Fixtures.SenderMemo {
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
     }
 
-    static var validMemoDataHexBytes: String =
+    static let validMemoDataHexBytes: String =
         """
         ccb5a98f0c0c42f68491e5e0c936245200000000000000000000000000000000\
         00000000000000000000000000000000bf2eef7c5c35df8f909e40fbd118e426
@@ -246,7 +246,7 @@ extension MemoData.Fixtures.InvalidSenderMemo {
                         XCTUnwrap(Data(hexEncoded: invalidMemoDataHexBytes))))
     }
 
-    static var invalidMemoDataHexBytes: String =
+    static let invalidMemoDataHexBytes: String =
         """
         c3e69cb8953ce920ffbee21e0142eaf440aab016859ea320e4131d6a60e98c59\
         1eff7121e85fe09fc6fc70c818e2f7b6bacf94237a3a0d9549f5bb5708f14a15
@@ -262,7 +262,7 @@ extension MemoData.Fixtures.SenderWithPaymentRequestMemo {
                         XCTUnwrap(Data(hexEncoded: validMemoDataHexBytes))))
     }
 
-    static var validMemoDataHexBytes: String =
+    static let validMemoDataHexBytes: String =
         """
         ccb5a98f0c0c42f68491e5e0c936245200000000000042760000000000000000\
         0000000000000000000000000000000007c61e75690f221bf0834b22e6833820
@@ -278,7 +278,7 @@ extension MemoData.Fixtures.InvalidSenderWithPaymentRequestMemo {
                         XCTUnwrap(Data(hexEncoded: invalidMemoDataHexBytes))))
     }
 
-    static var invalidMemoDataHexBytes: String =
+    static let invalidMemoDataHexBytes: String =
         """
         1478a1c0825ebd274f7a59cb58ab78351a88a3c01fbda4b58f6a3b7226b19bcb\
         7e0ddcc68bc1413e489ba6d15dd1699f538e1e462a6dcebcd0752728074cd05b

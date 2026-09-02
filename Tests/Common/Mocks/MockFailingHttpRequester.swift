@@ -9,20 +9,7 @@ import LibMobileCoinHTTP
 @testable import MobileCoin
 import XCTest
 
-public class MockFailingHttpRequester: NSObject, HttpRequester {
-
-    private static let operationQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.underlyingQueue = .global()
-        return queue
-    }()
-
-    private lazy var session: URLSession = {
-       URLSession(
-            configuration: URLSessionConfiguration.default,
-            delegate: self,
-            delegateQueue: Self.operationQueue)
-    }()
+public final class MockFailingHttpRequester: NSObject, HttpRequester {
 
     override public init() { }
 

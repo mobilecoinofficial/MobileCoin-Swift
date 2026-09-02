@@ -16,8 +16,12 @@ struct TestConsensusService: ConsensusService {
         _ tx: External_Tx,
         completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void
     ) {
+        // `ConsensusService` declares its completion without `@Sendable`, so it
+        // cannot cross onto the main queue on its own.
+        nonisolated(unsafe) let completion = completion
+        let result = self.result
         DispatchQueue.main.async {
-            completion(self.result)
+            completion(result)
         }
     }
 }
