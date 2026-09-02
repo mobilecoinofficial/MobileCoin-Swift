@@ -34,7 +34,7 @@ extension XCTestCase {
                 description: String,
                 timeout: Double = 120.0,
                 interval: UInt64 = 20,
-                _ testCase: @escaping (TransportProtocol) async throws -> Void
+                _ testCase: @escaping @Sendable (TransportProtocol) async throws -> Void
     ) async throws {
         let supportedProtocols = TransportProtocol.supportedProtocols
         for transportProtocol in supportedProtocols {

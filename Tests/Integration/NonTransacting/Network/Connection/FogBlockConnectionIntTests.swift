@@ -11,7 +11,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-class FogBlockConnectionIntTests: XCTestCase {
+class FogBlockConnectionIntTests: XCTestCase, @unchecked Sendable {
     func testGetBlocks() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try getBlocks(transportProtocol: transportProtocol)

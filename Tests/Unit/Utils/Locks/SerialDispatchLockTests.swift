@@ -9,7 +9,7 @@ private class Container {
     var counter = 0
 }
 
-class SerialDispatchLockTests: XCTestCase {
+class SerialDispatchLockTests: XCTestCase, @unchecked Sendable {
 
     func testInit() {
         _ = SerialDispatchLock(0, targetQueue: nil)

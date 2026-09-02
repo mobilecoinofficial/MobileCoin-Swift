@@ -12,15 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The SwiftPM `MobileCoinCore` product is now HTTP only. It consumes
   `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
-- The library compiles in the Swift 6 language mode. The two test targets hold
-  at Swift 5.
+- Every target in the package compiles in the Swift 6 language mode. No target
+  declares a language mode of its own. The test targets reach it by asserting
+  `@unchecked Sendable` on their `XCTestCase` subclasses rather than by
+  restructuring how async tests capture `self`. XCTest gives each test method
+  its own instance, so the assertion holds for the suite as written.
 - The two routes now have different toolchain floors. SwiftPM needs Swift 6.1,
   Xcode 16.3 or newer, because the manifest declares
   `swift-tools-version:6.1` and SwiftPM rejects it outright below that.
   CocoaPods needs Swift 5.10, Xcode 15.3 or newer, because
-  `MobileCoinLogging` uses `nonisolated(unsafe)` and no earlier compiler
-  parses it. The podspec's `swift_version` is a language mode and does not
-  express either floor.
+  `MobileCoinLogging` and the shared test mocks use `nonisolated(unsafe)` and
+  no earlier compiler parses it. The podspec's `swift_version` is a language
+  mode and does not express either floor.
 - `DefaultHttpRequester` is `final` and no longer conforms to
   `URLSessionDelegate` or `URLSessionTaskDelegate`. Certificate pinning moved
   to an internal delegate holding both trust roots behind one lock. Subclassing

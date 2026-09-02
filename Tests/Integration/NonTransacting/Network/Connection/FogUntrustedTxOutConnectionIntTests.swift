@@ -9,7 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-class FogUntrustedTxOutConnectionIntTests: XCTestCase {
+class FogUntrustedTxOutConnectionIntTests: XCTestCase, @unchecked Sendable {
     func testGetTxOutsReturnsNoResultsWithoutPubkeys() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try getTxOutsReturnsNoResultsWithoutPubkeys(transportProtocol: transportProtocol)

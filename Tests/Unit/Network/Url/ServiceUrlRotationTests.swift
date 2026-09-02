@@ -9,7 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-class ServiceUrlRotationTests: XCTestCase {
+class ServiceUrlRotationTests: XCTestCase, @unchecked Sendable {
 
     func testUrlRotation(fixture: ServiceFixture, loadBalancer: MockUrlLoadBalancer) throws {
         let serviceName = fixture.serviceName

@@ -105,7 +105,7 @@ extension Transaction.Fixtures {
 }
 
 extension Transaction.Fixtures.BuildTx {
-    fileprivate static var defaultBlockVersion = BlockVersion.minRTHEnabled
+    fileprivate static let defaultBlockVersion = BlockVersion.minRTHEnabled
 
     fileprivate static func inputs() throws -> [PreparedTxInput] {
         let knownTxOut = try XCTUnwrap(KnownTxOut(
@@ -467,7 +467,7 @@ extension Transaction.Fixtures.BuildTx {
 }
 
 extension Transaction.Fixtures.BuildTxTestNet {
-    fileprivate static var defaultBlockVersion = BlockVersion.minRTHEnabled
+    fileprivate static let defaultBlockVersion = BlockVersion.minRTHEnabled
 
     fileprivate static func inputs() throws -> [PreparedTxInput] {
         let encryptedMemo =
@@ -1546,6 +1546,6 @@ extension Transaction.Fixtures.Commitment {
                 Data(base64Encoded: "gW54IsiCGiBKupPtPRQnoCZNqEz1jmS6IF2gazK50ws=")!)!
     }
 
-    fileprivate static var crc32: UInt32 = 2481745913
+    fileprivate static let crc32: UInt32 = 2481745913
 
 }

@@ -88,7 +88,7 @@ extension DynamicNetworkConfig {
 }
 
 extension DynamicNetworkConfig {
-    static var developmentNetworkTrustRootsB64 = [
+    static let developmentNetworkTrustRootsB64 = [
         """
         MIIFjDCCA3SgAwIBAgINAgO8UKMnU/CRgCLt8TANBgkqhkiG9w0BAQsFADBHMQsw\
         CQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExMQzEU\

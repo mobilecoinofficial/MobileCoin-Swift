@@ -13,7 +13,7 @@ import XCTest
 #if swift(>=5.5)
 
 @available(iOS 15.0, macOS 12.0, *)
-class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
+class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase, @unchecked Sendable {
 
     func testBalance() async throws {
         let description = "Updating account balance"
@@ -337,7 +337,7 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
                         return
                     }
                     print("Sleeping 2s before re-checking...")
-                    Thread.sleep(forTimeInterval: 2)
+                    try await Task.sleep(nanoseconds: 2_000_000_000)
                 case .accepted(block: let block):
                     print("Transaction accepted in block index: \(block.index)")
                     XCTAssertGreaterThan(block.index, 0)
@@ -374,7 +374,7 @@ class MobileCoinClientPublicApiIntTestsNonTransacting: XCTestCase {
                         return
                     }
                     print("Sleeping 2s before re-checking...")
-                    Thread.sleep(forTimeInterval: 2)
+                    try await Task.sleep(nanoseconds: 2_000_000_000)
                 case .received(block: let block):
                     print("Received in block index: \(block.index)")
                     XCTAssertGreaterThan(block.index, 0)

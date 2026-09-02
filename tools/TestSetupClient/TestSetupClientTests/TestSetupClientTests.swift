@@ -60,7 +60,7 @@ struct ProcessInfoLocal: Decodable {
     let testAccountSeed: String
     let srcAcctEntropyString: String
 
-    static var shared = try? Self.load()
+    static let shared = try? Self.load()
 
     static func load() throws -> Self {
         var processInfoFileUrl: URL?
