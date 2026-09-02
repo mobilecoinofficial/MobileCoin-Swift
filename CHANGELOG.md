@@ -12,6 +12,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The SwiftPM `MobileCoinCore` product is now HTTP only. It consumes
   `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
+- The library compiles in the Swift 6 language mode. The two test targets hold
+  at Swift 5.
+- Building this SDK now needs a Swift 5.10 compiler, Xcode 15.3 or newer, on
+  both routes. `MobileCoinLogging` uses `nonisolated(unsafe)`, which no earlier
+  compiler parses. The podspec's `swift_version` is a language mode and does
+  not express this.
+- `DefaultHttpRequester` is `final` and no longer conforms to
+  `URLSessionDelegate` or `URLSessionTaskDelegate`. Certificate pinning moved
+  to an internal delegate holding both trust roots behind one lock. Subclassing
+  the requester, calling its `urlSession(_:didReceive:completionHandler:)`
+  methods, or passing it where a `URLSessionDelegate` is expected, no longer
+  compiles.
+- `withTimeout(seconds:block:)` constrains its return type to `Sendable`.
+- `TokenId.MOB`, `TokenId.MOBUSD` and `TokenId.TestToken` are `let` rather than
+  `var`.
+- The podspec bounds SwiftProtobuf at `>= 1.36, < 1.38` and the package floor is
+  1.36.1. 1.38 emits `nonisolated extension`, which pre-Swift-6.1 toolchains
+  reject.
 
 ### Removed
 

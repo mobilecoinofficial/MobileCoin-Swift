@@ -47,4 +47,13 @@ class CertificateTests: XCTestCase {
             XCTAssertFailure(result)
         }
     }
+
+    // Pinning runs off the session delegate. Drop the delegate or its
+    // conformance and every challenge falls through to default handling, which
+    // is a silent loss of pinning rather than a build failure.
+    func testRequesterInstallsThePinningDelegate() {
+        let requester = DefaultHttpRequester()
+
+        XCTAssertTrue(requester.session.delegate is CertificatePinningDelegate)
+    }
 }

@@ -7,8 +7,6 @@ import Foundation
 /// `ImmutableOnceReadLock` is a Dispatch-based lock that is mutable before being read and immutable
 /// afterwards. This is useful in situations where you want to lock in a value and know that it
 /// won't change once you start using it, but you still want to freely allow setting it before then.
-extension ImmutableOnceReadLock: @unchecked Sendable where Value: Sendable { }
-
 final class ImmutableOnceReadLock<Value> {
     private let inner: ReadWriteDispatchLock<Inner<Value>>
 
@@ -34,6 +32,9 @@ final class ImmutableOnceReadLock<Value> {
         inner.writeSync { $0.set(value) }
     }
 }
+
+// `inner` is the only stored property and it carries its own queue.
+extension ImmutableOnceReadLock: @unchecked Sendable where Value: Sendable { }
 
 extension ImmutableOnceReadLock {
     private struct Inner<InnerValue> {

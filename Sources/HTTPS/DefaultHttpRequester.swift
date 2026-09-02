@@ -13,7 +13,7 @@ import LibMobileCoinHTTP
 // built in init rather than a racy `lazy var`.
 public final class DefaultHttpRequester: NSObject, HttpRequester {
     private let pinningDelegate = CertificatePinningDelegate()
-    private let session: URLSession
+    let session: URLSession
 
     static let certPinningEnabled = true
 
@@ -36,6 +36,12 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
             delegate: pinningDelegate,
             delegateQueue: Self.operationQueue)
         super.init()
+    }
+
+    // A URLSession holds its delegate until it is invalidated, so without this
+    // every requester that goes out of scope leaves its delegate behind.
+    deinit {
+        session.finishTasksAndInvalidate()
     }
 
     public func request(
