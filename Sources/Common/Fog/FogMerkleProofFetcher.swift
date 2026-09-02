@@ -11,7 +11,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-enum FogMerkleProofFetcherError: Error {
+enum FogMerkleProofFetcherError: Error, Sendable {
     case connectionError(ConnectionError)
     case outOfBounds(blockCount: UInt64, ledgerTxOutCount: UInt64)
 }

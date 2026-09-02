@@ -7,7 +7,7 @@ import Foundation
 // Either means GrpcChannelManager is compiled in and can supply the timeout.
 #if canImport(LibMobileCoinGRPC) || canImport(GRPC)
 extension TransportProtocol {
-    static var grpcTimeout: Double = {
+    static let grpcTimeout: Double = {
         guard let timeout = GrpcChannelManager.Defaults.callOptionsTimeLimit.timeout else {
             logger.error("No GrpcTimeout value !")
             return Double(0)
@@ -15,7 +15,7 @@ extension TransportProtocol {
         return Double(timeout.nanoseconds) / 1.0e9
     }()
 
-    static var httpTimeout: Double = {
+    static let httpTimeout: Double = {
         DefaultHttpRequester.defaultConfiguration.timeoutIntervalForRequest
     }()
 
@@ -30,9 +30,9 @@ extension TransportProtocol {
 }
 #else
 extension TransportProtocol {
-    static var grpcTimeout: Double = 0
+    static let grpcTimeout: Double = 0
 
-    static var httpTimeout: Double = {
+    static let httpTimeout: Double = {
         DefaultHttpRequester.defaultConfiguration.timeoutIntervalForRequest
     }()
 

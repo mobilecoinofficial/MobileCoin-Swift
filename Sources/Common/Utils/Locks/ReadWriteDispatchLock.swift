@@ -72,3 +72,7 @@ final class ReadWriteDispatchLock<Value> {
             concurrentExclusionQueue: concurrentExclusionQueue)
     }
 }
+
+// The queue is what guards `value`, which the compiler cannot see. Note that
+// `accessWithoutLocking` and `mapLockWithoutLocking` step around that guard.
+extension ReadWriteDispatchLock: @unchecked Sendable where Value: Sendable { }

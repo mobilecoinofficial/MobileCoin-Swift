@@ -3,8 +3,11 @@
 //
 
 import Foundation
+// `SecKey` is a CoreFoundation type with no Sendable conformance. It is only
+// read after init here, and Security's own APIs take it across threads.
+@preconcurrency import Security
 
-public struct SecSSLCertificates: SSLCertificates {
+public struct SecSSLCertificates: SSLCertificates, Sendable {
     public let trustRootsBytes: [Data]
     public let publicKeys: [SecKey]
 

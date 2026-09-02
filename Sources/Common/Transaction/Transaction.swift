@@ -8,7 +8,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-public struct Transaction {
+public struct Transaction: Sendable {
     fileprivate let proto: External_Tx
     let inputKeyImagesTyped: Set<KeyImage>
     let outputs: Set<TxOut>

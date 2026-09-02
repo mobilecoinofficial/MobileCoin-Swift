@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct Balances {
+public struct Balances: Sendable {
     public let balances: [TokenId: Balance]
     public var tokenIds: Set<TokenId> {
         Set(balances.keys)

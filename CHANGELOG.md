@@ -12,6 +12,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The SwiftPM `MobileCoinCore` product is now HTTP only. It consumes
   `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
+- The library compiles in the Swift 6 language mode. The two test targets hold
+  at Swift 5.
+- The two routes now have different toolchain floors. SwiftPM needs Swift 6.1,
+  Xcode 16.3 or newer, because the manifest declares
+  `swift-tools-version:6.1` and SwiftPM rejects it outright below that.
+  CocoaPods needs Swift 5.10, Xcode 15.3 or newer, because
+  `MobileCoinLogging` uses `nonisolated(unsafe)` and no earlier compiler
+  parses it. The podspec's `swift_version` is a language mode and does not
+  express either floor.
+- `DefaultHttpRequester` is `final` and no longer conforms to
+  `URLSessionDelegate` or `URLSessionTaskDelegate`. Certificate pinning moved
+  to an internal delegate holding both trust roots behind one lock. Subclassing
+  the requester, calling its `urlSession(_:didReceive:completionHandler:)`
+  methods, or passing it where a `URLSessionDelegate` is expected, no longer
+  compiles.
+- `DefaultHttpRequester` invalidates its session on `deinit` with
+  `finishTasksAndInvalidate`, so a requester no longer leaks its delegate. The
+  session stays alive until its in-flight tasks drain, so a consumer that
+  releases a requester mid-request still gets that request's completion
+  callback after the requester is gone.
+- 51 types under `Sources` conform to `Sendable`, 36 of them public. A consumer
+  that wrote a retroactive conformance as a Swift 6 workaround now gets a
+  duplicate-conformance warning and should drop theirs.
+- `withTimeout(seconds:block:)` constrains its return type to `Sendable`.
+- `TokenId.MOB`, `TokenId.MOBUSD` and `TokenId.TestToken` are `let` rather than
+  `var`.
+- The podspec bounds SwiftProtobuf at `>= 1.36, < 1.38` and the package floor is
+  1.36.1. 1.38 emits `nonisolated extension`, which pre-Swift-6.1 toolchains
+  reject.
 - The iOS deployment target is now 13.0. LibMobileCoin 6.1.0 declares that
   floor, and CocoaPods refuses a dependency whose deployment target is above
   the dependent's.

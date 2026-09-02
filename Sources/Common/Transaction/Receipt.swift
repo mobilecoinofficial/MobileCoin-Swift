@@ -22,7 +22,7 @@ import LibMobileCoinCommon
 /// represents. Therefore, care should be taken to ensure that only the sender and the recipient
 /// have access to the `Receipt`, otherwise the recipient could be tricked into misattributing which
 /// party sent them a particular `TxOut`.
-public struct Receipt {
+public struct Receipt: Sendable {
     let txOutPublicKeyTyped: RistrettoPublic
     let maskedAmount: MaskedAmount
     let confirmationNumber: TxOutConfirmationNumber

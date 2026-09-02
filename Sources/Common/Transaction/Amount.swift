@@ -8,7 +8,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-public struct Amount {
+public struct Amount: Sendable {
     public let value: UInt64
     public let tokenId: TokenId
 }

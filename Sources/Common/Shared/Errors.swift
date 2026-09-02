@@ -6,7 +6,7 @@
 
 import Foundation
 
-public struct InvalidInputError: Error {
+public struct InvalidInputError: Error, Sendable {
     let reason: String
 
     init(_ reason: String) {
@@ -26,7 +26,7 @@ extension InvalidInputError: LocalizedError {
     }
 }
 
-public enum BalanceUpdateError: Error {
+public enum BalanceUpdateError: Error, Sendable {
     case connectionError(ConnectionError)
     case fogSyncError(FogSyncError)
 }
@@ -37,7 +37,7 @@ extension BalanceUpdateError: LocalizedError {
     }
 }
 
-public enum ConnectionError: Error {
+public enum ConnectionError: Error, Sendable {
     case connectionFailure(String)
     case authorizationFailure(String)
     case invalidServerResponse(String)
@@ -73,7 +73,7 @@ extension ConnectionError: LocalizedError {
     }
 }
 
-public enum BalanceTransferEstimationFetcherError: Error {
+public enum BalanceTransferEstimationFetcherError: Error, Sendable {
     case feeExceedsBalance(String = String())
     case balanceOverflow(String = String())
     case connectionError(ConnectionError)
@@ -100,7 +100,7 @@ extension BalanceTransferEstimationFetcherError: LocalizedError {
     }
 }
 
-public enum TransactionEstimationFetcherError: Error {
+public enum TransactionEstimationFetcherError: Error, Sendable {
     case invalidInput(String)
     case insufficientBalance(String = String())
     case connectionError(ConnectionError)
@@ -127,7 +127,7 @@ extension TransactionEstimationFetcherError: LocalizedError {
     }
 }
 
-public enum SignedContingentInputCreationError: Error {
+public enum SignedContingentInputCreationError: Error, Sendable {
     case invalidInput(String)
     case insufficientBalance(String = String())
     case defragmentationRequired(String = String())
@@ -188,7 +188,7 @@ extension SignedContingentInputCreationError: LocalizedError {
     }
 }
 
-public enum SignedContingentInputCancelationError: Error {
+public enum SignedContingentInputCancelationError: Error, Sendable {
     case invalidSCI
     case inputError(String = String())
     case alreadySpent(String = String())
@@ -228,7 +228,7 @@ extension SignedContingentInputCancelationError: LocalizedError {
     }
 }
 
-public enum TransactionPreparationError: Error {
+public enum TransactionPreparationError: Error, Sendable {
     case invalidInput(String)
     case insufficientBalance(String = String())
     case defragmentationRequired(String = String())
@@ -258,7 +258,7 @@ extension TransactionPreparationError: LocalizedError {
     }
 }
 
-public enum DefragTransactionPreparationError: Error {
+public enum DefragTransactionPreparationError: Error, Sendable {
     case invalidInput(String)
     case insufficientBalance(String = String())
     case connectionError(ConnectionError)
@@ -285,7 +285,7 @@ extension DefragTransactionPreparationError: LocalizedError {
     }
 }
 
-public enum SCITransactionPreparationError: Error {
+public enum SCITransactionPreparationError: Error, Sendable {
     case invalidInput(String)
     case insufficientBalance(String = String())
     case defragmentationRequired(String = String())
@@ -318,7 +318,7 @@ extension SCITransactionPreparationError: LocalizedError {
     }
 }
 
-public struct SubmitTransactionError: Error {
+public struct SubmitTransactionError: Error, Sendable {
     public let submissionError: TransactionSubmissionError
     public let consensusBlockCount: UInt64?
 }
@@ -337,7 +337,7 @@ extension SubmitTransactionError: LocalizedError {
     }
 }
 
-public enum TransactionSubmissionError: Error {
+public enum TransactionSubmissionError: Error, Sendable {
     case connectionError(ConnectionError)
     case invalidTransaction(String = String())
     case feeError(String = String())
@@ -377,7 +377,7 @@ extension TransactionSubmissionError: LocalizedError {
 }
 
 @available(*, deprecated)
-public enum BalanceTransferEstimationError: Error {
+public enum BalanceTransferEstimationError: Error, Sendable {
     case feeExceedsBalance(String = String())
     case balanceOverflow(String = String())
 }
@@ -404,7 +404,7 @@ extension BalanceTransferEstimationError: LocalizedError {
 }
 
 @available(*, deprecated)
-public enum TransactionEstimationError: Error {
+public enum TransactionEstimationError: Error, Sendable {
     case invalidInput(String)
     case insufficientBalance(String = String())
 }
@@ -430,7 +430,7 @@ extension TransactionEstimationError: LocalizedError {
     }
 }
 
-public struct SecurityError: Error {
+public struct SecurityError: Error, Sendable {
     let status: OSStatus?
     let message: String?
 
@@ -441,7 +441,7 @@ public struct SecurityError: Error {
 }
 
 extension SecurityError: CustomStringConvertible {
-    static var nilPublicKey = """
+    static let nilPublicKey = """
         the public key could not be extracted \
         (this can happen if the public key algorithm is not supported).
     """
@@ -463,7 +463,7 @@ extension SecurityError: LocalizedError {
     }
 }
 
-public struct TimedOutError: Error {
+public struct TimedOutError: Error, Sendable {
 }
 
 extension TimedOutError: CustomStringConvertible {
@@ -478,7 +478,7 @@ extension TimedOutError: LocalizedError {
     }
 }
 
-public struct SSLTrustError: Error {
+public struct SSLTrustError: Error, Sendable {
     let reason: String
 
     init(_ reason: String) {
@@ -498,7 +498,7 @@ extension SSLTrustError: LocalizedError {
     }
 }
 
-public enum MistyswapError: Error {
+public enum MistyswapError: Error, Sendable {
     case invalidInput(InvalidInputError)
     case connectionError(ConnectionError)
     case notInitialized(String)

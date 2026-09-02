@@ -5,5 +5,5 @@
 import Foundation
 
 extension UInt32 {
-    static var emptyCrc32: UInt32 = 0
+    static let emptyCrc32: UInt32 = 0
 }

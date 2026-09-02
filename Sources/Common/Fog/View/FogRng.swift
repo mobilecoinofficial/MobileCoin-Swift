@@ -10,7 +10,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-enum FogRngError: Error {
+enum FogRngError: Error, Sendable {
     case invalidKey(String)
     case unsupportedCryptoBoxVersion(String)
 }

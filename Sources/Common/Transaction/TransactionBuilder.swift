@@ -11,7 +11,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-enum TransactionBuilderError: Error {
+enum TransactionBuilderError: Error, Sendable {
     case invalidInput(String)
     case invalidBlockVersion(String)
     case attestationVerificationFailed(String)
