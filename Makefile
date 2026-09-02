@@ -61,44 +61,20 @@ autocorrect:
 	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
 
 .PHONY: lint-all
-lint-all: lint lint-podspec lint-docs
-
-.PHONY: publish
-publish: tag-release publish-podspec
+lint-all: lint lint-docs
 
 # Release
 
+# The podspec is the version source for the tag.
 .PHONY: tag-release
 tag-release:
 	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
-		git tag "v$$VERSION" && \
-		git push origin "refs/tags/v$$VERSION"
-
-# MobileCoin pod
-
-# Dynamic linkage, matching what `pod trunk push` validates at release time.
-# pod lint strips linker errors from xcodebuild output; add --verbose to see them.
-POD_LINT_FLAGS = --skip-tests
-
-.PHONY: lint-locally-podspec
-lint-locally-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) --allow-warnings
-
-.PHONY: lint-locally-strict-podspec
-lint-locally-strict-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS)
-
-.PHONY: lint-podspec
-lint-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS)
-
-.PHONY: publish-podspec
-publish-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod trunk push MobileCoin.podspec --skip-tests
+		if git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null 2>&1; then \
+			echo "Tag v$$VERSION already exists."; \
+		else \
+			git tag "v$$VERSION" && \
+			git push origin "refs/tags/v$$VERSION"; \
+		fi
 
 # Documentation
 
@@ -141,11 +117,8 @@ upgrade-deps:
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
 
-# Builds every target in Package.swift, test targets included. Plain `swift
-# build` skips those, so a test target that cannot compile still goes green.
-# Unlike `run-all-tests-spm` this needs no secrets, so it is the one SPM check
-# CI can run today. The test targets declare generated rather than committed
-# resources, and SwiftPM only warns about those at build time.
+# Builds every target including tests. The one SPM check CI can run without
+# secrets; the generated resource files are absent, so SwiftPM warns.
 .PHONY: build-spm
 build-spm:
 	swift build --build-tests

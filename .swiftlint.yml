@@ -98,6 +98,9 @@ included: # paths to include during linting. Ignored if `--path` is present unle
   - GRPCOnly
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - "Sources/Network/HTTPS/HttpConnection/HttpConnections/HttpProtoGenerated"
+  # SwiftPM fixes the manifest's shape. `let package` cannot take a `k` prefix,
+  # and the file header rule wants a header the manifest does not carry.
+  - "Package.swift"
 # configurable rules can be customized from this configuration file
 # binary rules can set their severity level
 force_cast: warning # implicitly

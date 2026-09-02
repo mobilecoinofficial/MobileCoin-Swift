@@ -18,7 +18,7 @@ let package = Package(
         // and from where they can be fetched:
         .package(
             url: "https://github.com/mobilecoinofficial/libmobilecoin.git",
-            from: "6.0.4"
+            from: "6.1.0"
         ),
         .package(
             url: "https://github.com/apple/swift-protobuf.git",
@@ -47,7 +47,14 @@ let package = Package(
          ),
         .testTarget(
             name: "MobileCoinTests",
-            dependencies: ["MobileCoin"],
+            // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
+            // does not carry them, so the test target asks for them by name.
+            // Without this `canImport(LibMobileCoinTestVector)` is false and the
+            // tests read vectors this target never copies.
+            dependencies: [
+                "MobileCoin",
+                .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
+            ],
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",

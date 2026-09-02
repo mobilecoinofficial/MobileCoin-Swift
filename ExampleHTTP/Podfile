@@ -1,6 +1,6 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, '12.2'
+platform :ios, '13.0'
 
 plugin 'cocoapods-repo-update'
 plugin 'cocoapods-keys', {
@@ -29,11 +29,11 @@ target 'Example' do
   # pod 'MobileCoin', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git'
   # pod 'MobileCoin/Core', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift.git', testspecs: ['ProtocolUnitTests']
 
-  # pod 'LibMobileCoin', path: '../Vendor/libmobilecoin'
-  # pod 'LibMobileCoin/Core', path: '../Vendor/libmobilecoin'
-  pod 'LibMobileCoin/CoreHTTP', path: '../Vendor/libmobilecoin'
-  # pod 'LibMobileCoin', podspec: '../Vendor/libmobilecoin/LibMobileCoin.podspec'
-  # pod 'LibMobileCoin', git: 'https://github.com/the-real-adammork/libmobilecoin.git'
+  # Trunk tops out at 6.0.2 and MobileCoin.podspec needs 6.1.0 or newer, so
+  # this pins the tag. The podspec downloads its xcframework from the release.
+  pod 'LibMobileCoin/CoreHTTP',
+      git: 'https://github.com/mobilecoinofficial/libmobilecoin.git',
+      tag: 'v6.1.0'
 
   pod 'SwiftProtobuf'
   pod 'SwiftLint'
@@ -90,9 +90,11 @@ post_install do |installer|
     end
   end
 
+  # Must not drop below the floor LibMobileCoin declares, which is 13.0 from
+  # 6.1.0 on. A lower value here silently undercuts its binary.
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "12.2"
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
     end
   end
 end
