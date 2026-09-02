@@ -17,7 +17,7 @@ MobileCoin is a privacy-preserving payments network designed for use on mobile d
 
 # `libmobilecoin` moved
 
-A fresh `libmobilecoin` repository took over the name. Its history starts at v6.1.0, so every older commit hash resolves only in [`libmobilecoin-archive`](https://github.com/mobilecoinofficial/libmobilecoin-archive). The `Vendor/libmobilecoin` submodule points there until the CocoaPods migration removes it. An existing clone needs `git submodule sync --recursive` to pick up the new URL.
+A fresh `libmobilecoin` repository took over the name. Its history starts at v6.1.0, so every older commit hash resolves only in [`libmobilecoin-archive`](https://github.com/mobilecoinofficial/libmobilecoin-archive).
 
 Both repositories carry a `v6.1.0` tag, and `libmobilecoin.git` served the archive's one before the rename. SwiftPM records the fingerprint it first resolved for a URL and refuses a different one. A machine that saw the archive's tag needs `~/.swiftpm/security/fingerprints/libmobilecoin-*.json` deleted once.
 
@@ -48,17 +48,10 @@ Please check your country's laws before downloading or using this software.
 | [secrets](./secrets) | Secrets file for contributors, and their public keys. |
 | [Sources](./Sources) | Sources for the MobileCoin Swift SDK. |
 | [Tests](./Tests) | Tests. |
-| [Vendor](./Vendor) | iOS Artifacts. |
 
 ## Build Instructions
 
 The workspace can be built with `make`.
-
-1. Initialize or update submodules
-
-    ```
-    git submodule update --init --recursive
-    ```
 
 1. Install Ruby 2.7.x
 
@@ -81,7 +74,7 @@ The workspace can be built with `make`.
     make
     ```
 
-Note: To build libmobilecoin, run `make` in [libmobilecoin-ios-artifacts](./Vendor/libmobilecoin-ios-artifacts).
+Note: `LibMobileCoin` resolves from the [libmobilecoin](https://github.com/mobilecoinofficial/libmobilecoin) release, so no local build of it is needed.
 
 ## Secrets
 
