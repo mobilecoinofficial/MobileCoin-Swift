@@ -59,41 +59,107 @@ class CertificateTests: XCTestCase {
         XCTAssertTrue(delegate is URLSessionTaskDelegate)
     }
 
-    // The test above asserts wiring. These three assert that the wiring pins,
-    // because each of the regressions below leaves the wiring intact.
+    // The test above asserts wiring. The four below drive a challenge through
+    // the requester's own delegate, which is the only path a served request
+    // takes, and each covers one of `handle`'s outcomes.
 
-    // Flipping this constant turns pinning off everywhere.
-    func testCertificatePinningIsEnabled() {
-        XCTAssertTrue(DefaultHttpRequester.certPinningEnabled)
+    func testServerTrustMatchingAPinnedKeyIsAccepted() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let requester = DefaultHttpRequester()
+        requester.setFogTrustRoots(try alphaNetCertificates(.valid))
+
+        XCTAssertEqual(
+            try disposition(of: requester, against: fixture.secTrust),
+            .useCredential)
     }
 
-    // The trust root setters are the seam this branch introduced. A setter that
-    // reverts to a no-op leaves the delegate holding no keys, and `handle` then
-    // falls through to default handling with nothing to show for it.
-    func testTrustRootsReachThePinnedKeys() throws {
-        let trustRoots = try NetworkPreset.trustRootsBytes()
-        let certificates = try XCTUnwrap(try SecSSLCertificates(trustRootBytes: trustRoots))
-        let delegate = CertificatePinningDelegate()
+    func testServerTrustMatchingNoPinnedKeyIsCancelled() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let requester = DefaultHttpRequester()
+        requester.setFogTrustRoots(try alphaNetCertificates(.wrong))
+
+        XCTAssertEqual(
+            try disposition(of: requester, against: fixture.secTrust),
+            .cancelAuthenticationChallenge)
+    }
+
+    // With no roots set there is nothing to pin against, so the challenge goes
+    // to the system rather than being refused.
+    func testServerTrustWithoutPinnedKeysFallsThroughToDefaultHandling() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+
+        XCTAssertEqual(
+            try disposition(of: DefaultHttpRequester(), against: fixture.secTrust),
+            .performDefaultHandling)
+    }
+
+    // A challenge carrying no server trust at all is refused outright.
+    func testChallengeWithoutServerTrustIsCancelled() throws {
+        XCTAssertEqual(
+            try disposition(of: DefaultHttpRequester(), against: nil),
+            .cancelAuthenticationChallenge)
+    }
+
+    // The two roots are separate fields, and `pinnedKeys` reads fog before
+    // consensus. Distinct certificates and an ordered comparison are what make
+    // a swap of the two setters visible.
+    func testEachTrustRootSetterWritesItsOwnField() throws {
+        let requester = DefaultHttpRequester()
+        let delegate = try pinningDelegate(of: requester)
+        let fog = try alphaNetCertificates(.valid)
+        let consensus = try alphaNetCertificates(.wrong)
 
         XCTAssertTrue(delegate.pinnedKeys.isEmpty)
 
-        delegate.setFogTrustRoots(certificates)
-        let afterFog = delegate.pinnedKeys.count
-        XCTAssertGreaterThan(afterFog, 0)
+        requester.setFogTrustRoots(fog)
+        XCTAssertEqual(delegate.pinnedKeys, fog.publicKeys)
 
-        delegate.setConsensusTrustRoots(certificates)
-        XCTAssertGreaterThan(delegate.pinnedKeys.count, afterFog)
+        requester.setConsensusTrustRoots(consensus)
+        XCTAssertEqual(delegate.pinnedKeys, fog.publicKeys + consensus.publicKeys)
     }
 
-    // A challenge carrying no server trust must be cancelled. Gutting `handle`
-    // to plain default handling passes every other test in this file.
-    func testChallengeWithoutServerTrustIsCancelled() {
-        let space = URLProtectionSpace(
-            host: "example.com",
-            port: 443,
-            protocol: NSURLProtectionSpaceHTTPS,
-            realm: nil,
-            authenticationMethod: NSURLAuthenticationMethodServerTrust)
+    private enum AlphaNetIntermediate {
+        case valid
+        case wrong
+    }
+
+    private func alphaNetCertificates(
+        _ intermediate: AlphaNetIntermediate
+    ) throws -> SecSSLCertificates {
+        let base64: String
+        switch intermediate {
+        case .valid:
+            base64 = SecCertificateTests.Fixtures.AlphaNet.intermediateCertificateBase64
+        case .wrong:
+            base64 = SecCertificateTests.Fixtures.AlphaNet.wrongIntermediateCertificateBase64
+        }
+        let bytes = try XCTUnwrap(Data(base64Encoded: base64))
+        return try XCTUnwrap(try SecSSLCertificates(trustRootBytes: [bytes]))
+    }
+
+    private func pinningDelegate(
+        of requester: DefaultHttpRequester
+    ) throws -> CertificatePinningDelegate {
+        try XCTUnwrap(requester.session.delegate as? CertificatePinningDelegate)
+    }
+
+    // `validateAgainst` calls back on the calling thread, so the disposition is
+    // set by the time `handle` returns and no expectation is needed.
+    private func disposition(
+        of requester: DefaultHttpRequester,
+        against trust: SecTrust?
+    ) throws -> URLSession.AuthChallengeDisposition? {
+        let space: URLProtectionSpace
+        if let trust = trust {
+            space = TrustingProtectionSpace(trust: trust)
+        } else {
+            space = URLProtectionSpace(
+                host: "example.com",
+                port: 443,
+                protocol: NSURLProtectionSpaceHTTPS,
+                realm: nil,
+                authenticationMethod: NSURLAuthenticationMethodServerTrust)
+        }
         let challenge = URLAuthenticationChallenge(
             protectionSpace: space,
             proposedCredential: nil,
@@ -103,12 +169,32 @@ class CertificateTests: XCTestCase {
             sender: NullChallengeSender())
 
         var disposition: URLSession.AuthChallengeDisposition?
-        CertificatePinningDelegate().handle(challenge: challenge) { result, _ in
+        try pinningDelegate(of: requester).handle(challenge: challenge) { result, _ in
             disposition = result
         }
-
-        XCTAssertEqual(disposition, .cancelAuthenticationChallenge)
+        return disposition
     }
+}
+
+// `URLProtectionSpace` builds its own `serverTrust` from a live TLS handshake,
+// so a fixture chain reaches the delegate only through an override.
+private final class TrustingProtectionSpace: URLProtectionSpace {
+    private let trust: SecTrust
+
+    init(trust: SecTrust) {
+        self.trust = trust
+        super.init(
+            host: "example.com",
+            port: 443,
+            protocol: NSURLProtectionSpaceHTTPS,
+            realm: nil,
+            authenticationMethod: NSURLAuthenticationMethodServerTrust)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError("unused") }
+
+    override var serverTrust: SecTrust? { trust }
 }
 
 // URLAuthenticationChallenge demands a sender. Nothing under test calls back

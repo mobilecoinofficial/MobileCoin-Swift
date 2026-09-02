@@ -102,8 +102,8 @@ final class CertificatePinningDelegate: NSObject {
 
     private let trustRoots = ReadWriteDispatchLock(TrustRoots())
 
-    // Internal rather than private so a test can prove the setters actually
-    // store. A no-op setter leaves this empty and turns pinning off silently.
+    // Internal so a test can prove each setter writes its own field. `handle`
+    // merges the two, so nothing downstream can tell a swap apart.
     var pinnedKeys: [SecKey] {
         trustRoots.readSync { [$0.fog, $0.consensus] }
             .compactMap { $0?.publicKeys }
