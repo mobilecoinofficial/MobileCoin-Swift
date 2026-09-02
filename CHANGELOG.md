@@ -27,6 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the requester, calling its `urlSession(_:didReceive:completionHandler:)`
   methods, or passing it where a `URLSessionDelegate` is expected, no longer
   compiles.
+- `DefaultHttpRequester` invalidates its session on `deinit` with
+  `finishTasksAndInvalidate`, so a requester no longer leaks its delegate. The
+  session stays alive until its in-flight tasks drain, so a consumer that
+  releases a requester mid-request still gets that request's completion
+  callback after the requester is gone.
+- 51 types under `Sources` conform to `Sendable`, 36 of them public. A consumer
+  that wrote a retroactive conformance as a Swift 6 workaround now gets a
+  duplicate-conformance warning and should drop theirs.
 - `withTimeout(seconds:block:)` constrains its return type to `Sendable`.
 - `TokenId.MOB`, `TokenId.MOBUSD` and `TokenId.TestToken` are `let` rather than
   `var`.
