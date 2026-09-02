@@ -42,7 +42,6 @@ Please check your country's laws before downloading or using this software.
 |Directory |Description |
 | :-- | :-- |
 | [Docs](./docs) | Integration Guide. |
-| [Example](./Example) | Example application. |
 | [ExampleHTTP](./ExampleHTTP) | Example "HTTP Only" application. |
 | [scripts](./scripts) | Scripts used by this repo. |
 | [secrets](./secrets) | Secrets file for contributors, and their public keys. |
@@ -53,14 +52,14 @@ Please check your country's laws before downloading or using this software.
 
 ### Toolchain
 
-The two routes have different compiler floors, and neither manifest expresses them:
+The two routes have different compiler floors, and only SwiftPM's manifest enforces its own:
 
 |Route |Minimum |Why |
 | :-- | :-- | :-- |
 | SwiftPM | Swift 6.1, Xcode 16.3 | `Package.swift` declares `swift-tools-version:6.1`, which an older SwiftPM rejects before it reads anything else. |
 | CocoaPods | Swift 5.10, Xcode 15.3 | `MobileCoinLogging` uses `nonisolated(unsafe)`, which no earlier compiler parses. |
 
-The podspec's `swift_version` is a language mode rather than a compiler floor, so it enforces neither.
+The podspec's `swift_version` is a language mode rather than a compiler floor. An `#error` guard in `MobileCoinLogging` reports the CocoaPods floor rather than setting it.
 
 ### Setup
 
