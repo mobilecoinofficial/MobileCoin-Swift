@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.name         = "MobileCoin"
-  s.version      = "6.0.6"
+  s.version      = "6.1.0"
   s.summary      = "A library for communicating with MobileCoin network"
 
   s.author       = "MobileCoin"
@@ -13,25 +13,26 @@ Pod::Spec.new do |s|
 
   s.source       = {
     :git => "https://github.com/mobilecoinofficial/MobileCoin-Swift.git",
-    :tag => "v#{s.version}",
-    :submodules => true
+    :tag => "v#{s.version}"
   }
 
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-  s.platform     = :ios, "12.2"
+  s.platform     = :ios, "13.0"
 
 
   # ――― Subspecs ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
   s.default_subspec = :none
 
+  # LibMobileCoin/TestVectors carries the .jsonl vectors in LibMobileCoin's
+  # framework bundle, which is where Bundle.testVectorUrl looks for them.
   s.test_spec do |test_spec|
+    test_spec.dependency "LibMobileCoin/TestVectors", ">= 6.1.0", "< 7.0"
     test_spec.source_files = "Tests/{Unit,Common}/**/*.swift"
     test_spec.resources = [
       "Tests/Common/FixtureData/**/*",
-      "Vendor/libmobilecoin/Vendor/mobilecoin/test-vectors/vectors/**/*",
     ]
   end
 
@@ -60,7 +61,9 @@ Pod::Spec.new do |s|
       "CocoapodsOnly/*.{h,m,swift}"
     ]
 
-    subspec.dependency "LibMobileCoin/CoreHTTP", "~> 6.0.0-pre1"
+    # CocoaPods refuses a dependency whose deployment target is above the
+    # dependent's. LibMobileCoin 6.1.0 declares iOS 13.0, matching this spec.
+    subspec.dependency "LibMobileCoin/CoreHTTP", ">= 6.1.0", "< 7.0"
 
     # Mirrors the LibMobileCoin floor. The ceiling holds 1.38 out, because it
     # emits `nonisolated extension`, which pre-Swift-6.1 toolchains reject.

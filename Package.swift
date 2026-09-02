@@ -45,11 +45,12 @@ let package = Package(
                 "HTTPS",
             ]
          ),
-        // LibMobileCoinTestVector is its own product from 6.1.0. It used to ride
-        // along inside the Core products, so the tests picked it up through
-        // MobileCoin without asking.
         .testTarget(
             name: "MobileCoinTests",
+            // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
+            // does not carry them, so the test target asks for them by name.
+            // Without this `canImport(LibMobileCoinTestVector)` is false and the
+            // tests read vectors this target never copies.
             dependencies: [
                 "MobileCoin",
                 .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),

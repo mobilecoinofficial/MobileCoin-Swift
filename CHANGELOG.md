@@ -21,6 +21,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TransportProtocol.supportedProtocols` returns `[.http]` rather than
   `[.grpc, .http]` for SwiftPM consumers.
 
+## [6.1.0] - 2026-09-01
+
+### Changed
+
+- The iOS deployment target is now 13.0. LibMobileCoin 6.1.0 declares that
+  floor, and CocoaPods refuses a dependency whose deployment target is above
+  the dependent's.
+- `LibMobileCoin/CoreHTTP` now resolves at 6.1.0 or newer.
+
+### Removed
+
+- The `Vendor/libmobilecoin` submodule. SwiftPM takes libmobilecoin from its
+  checksummed release asset and CocoaPods takes it from the tagged repository,
+  so a build needs neither a submodule checkout nor git-lfs.
+
+## [6.0.7] - 2026-08-31
+
+### Added
+
+- `MobileCoinClient.txOutContexts(to:rngSeed:)` derives the payload and change
+  TxOut public keys a transaction will carry, from an RNG seed alone, without
+  building or submitting one. Send with
+  `prepareTransaction(rng: MobileCoinChaCha20Rng(rngSeed: seed))` on the same
+  seed and the transaction carries the keys it reported.
+
 ## [4.0.1] - 2023-03-02
 
 ### Added
