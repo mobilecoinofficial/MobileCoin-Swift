@@ -13,7 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
 - Every target in the package compiles in the Swift 6 language mode. No target
-  declares a language mode of its own.
+  declares a language mode of its own. The test targets reach it by asserting
+  `@unchecked Sendable` on their `XCTestCase` subclasses rather than by
+  restructuring how async tests capture `self`. XCTest gives each test method
+  its own instance, so the assertion holds for the suite as written.
 - The two routes now have different toolchain floors. SwiftPM needs Swift 6.1,
   Xcode 16.3 or newer, because the manifest declares
   `swift-tools-version:6.1` and SwiftPM rejects it outright below that.
