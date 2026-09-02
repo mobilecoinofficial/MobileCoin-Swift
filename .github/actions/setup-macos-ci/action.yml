@@ -1,9 +1,8 @@
 name: Setup macOS CI
 description: >-
   Installs Ruby + bundler dependencies (root and ExampleHTTP) and runs
-  `pod install` for the ExampleHTTP workspace. Assumes the repository has
-  already been checked out with `submodules: recursive` and `lfs: true`,
-  and uses the runner image's default Xcode.
+  `pod install` for the ExampleHTTP workspace, using the runner image's
+  default Xcode.
 
 inputs:
   ruby-version:
@@ -21,31 +20,6 @@ inputs:
 runs:
   using: composite
   steps:
-    # The LibMobileCoin binaries live in the nested `Artifacts` submodule and
-    # are tracked with Git LFS. actions/checkout's `lfs: true` only fetches LFS
-    # content for the top-level repo, not for submodules, so do it here.
-    - name: Fetch Git LFS content for submodules
-      shell: bash
-      run: git submodule foreach --recursive 'git lfs install --local && git lfs pull'
-
-    # An unresolved pointer file surfaces much later as a baffling linker error,
-    # so fail loudly here instead.
-    - name: Verify Git LFS artifacts
-      shell: bash
-      run: |
-        set -euo pipefail
-        lib="Vendor/libmobilecoin/Artifacts/LibMobileCoinLibrary.xcframework"
-        if [[ ! -d "$lib" ]]; then
-          echo "::error::$lib is missing. Did the submodules check out?"
-          exit 1
-        fi
-        while IFS= read -r archive; do
-          if head -c 100 "$archive" | grep -q 'git-lfs.github.com'; then
-            echo "::error::$archive is an unresolved Git LFS pointer."
-            exit 1
-          fi
-        done < <(find "$lib" -name '*.a')
-
     - name: Install Ruby ${{ inputs.ruby-version }}
       uses: ruby/setup-ruby@v1
       with:

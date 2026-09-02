@@ -27,4 +27,29 @@ class SeedableRngUnitTests: XCTestCase {
             XCTAssertEqual(rng1.next(), rng2.next(), "Same-seed RNGs should gen matching values")
         }
     }
+
+    /// The seed a `TransactionBuilder` runs on is derived from the caller's
+    /// RNG, and the two platforms derive it differently: this takes four
+    /// `next()` UInt64s reduced into `Data`, where android-sdk takes
+    /// `nextBytes(32)`. Both should yield the same 32 bytes off the same
+    /// stream, because `next_u64` combines two u32 words as `w[i+1] << 32 |
+    /// w[i]` and its little-endian bytes are exactly what `fill_bytes` writes
+    /// for those words.
+    ///
+    /// Nothing else in the derivation is platform-specific — the builder's own
+    /// stream and `add_output` are the same Rust through FFI — so this hop is
+    /// the only place iOS and Android can disagree about a TxOut public key.
+    /// `TxOutContextsTest#testBuilderSeedIsPlatformIndependent` in android-sdk
+    /// asserts the same seed against the same expected bytes.
+    func testBuilderSeedIsPlatformIndependent() throws {
+        // "goto https://buy.mobilecoin.com\0", the seed android-sdk's
+        // TxOutContextsTest uses, so both assert against one stream.
+        let seed = try XCTUnwrap(RngSeed(Data("goto https://buy.mobilecoin.com\0".utf8)))
+
+        let builderSeed = try XCTUnwrap(MobileCoinChaCha20Rng(rngSeed: seed).generateRngSeed())
+
+        XCTAssertEqual(
+            builderSeed.data.hexEncodedString(),
+            "7606151ea291727acfbea41cc1e71d57b1e219e3aeb8accfa3a9bcbc190bc3f5")
+    }
 }
