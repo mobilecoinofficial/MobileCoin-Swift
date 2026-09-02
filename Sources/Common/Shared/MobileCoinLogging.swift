@@ -7,8 +7,10 @@
 import Foundation
 
 public enum MobileCoinLogging {
-    // Both knobs are meant to be set once at startup, before any SDK call. There
-    // is no lock, so setting one while the SDK is running is a data race.
+    // Both knobs are meant to be set once at startup, before any SDK call.
+    // Only `logSensitiveData` enforces that, by trapping on a second write.
+    // `logLevel` takes any number of writes and holds no lock, so setting it
+    // while the SDK is running is a data race.
     nonisolated(unsafe) public static var logSensitiveData = false {
         willSet {
             guard logSensitiveDataInternal.set(newValue) else {

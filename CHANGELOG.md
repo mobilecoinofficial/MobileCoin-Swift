@@ -14,10 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
 - The library compiles in the Swift 6 language mode. The two test targets hold
   at Swift 5.
-- Building this SDK now needs a Swift 5.10 compiler, Xcode 15.3 or newer, on
-  both routes. `MobileCoinLogging` uses `nonisolated(unsafe)`, which no earlier
-  compiler parses. The podspec's `swift_version` is a language mode and does
-  not express this.
+- The two routes now have different toolchain floors. SwiftPM needs Swift 6.1,
+  Xcode 16.3 or newer, because the manifest declares
+  `swift-tools-version:6.1` and SwiftPM rejects it outright below that.
+  CocoaPods needs Swift 5.10, Xcode 15.3 or newer, because
+  `MobileCoinLogging` uses `nonisolated(unsafe)` and no earlier compiler
+  parses it. The podspec's `swift_version` is a language mode and does not
+  express either floor.
 - `DefaultHttpRequester` is `final` and no longer conforms to
   `URLSessionDelegate` or `URLSessionTaskDelegate`. Certificate pinning moved
   to an internal delegate holding both trust roots behind one lock. Subclassing

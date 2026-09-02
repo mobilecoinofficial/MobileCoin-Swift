@@ -48,12 +48,14 @@ class CertificateTests: XCTestCase {
         }
     }
 
-    // Pinning runs off the session delegate. Drop the delegate or its
-    // conformance and every challenge falls through to default handling, which
-    // is a silent loss of pinning rather than a build failure.
+    // Pinning runs off the session delegate. Dropping `URLSessionDelegate` is a
+    // build failure, because the session initializer demands it, but dropping
+    // `URLSessionTaskDelegate` still compiles and silently sends every
+    // task-level challenge to default handling.
     func testRequesterInstallsThePinningDelegate() {
-        let requester = DefaultHttpRequester()
+        let delegate = DefaultHttpRequester().session.delegate
 
-        XCTAssertTrue(requester.session.delegate is CertificatePinningDelegate)
+        XCTAssertTrue(delegate is CertificatePinningDelegate)
+        XCTAssertTrue(delegate is URLSessionTaskDelegate)
     }
 }
