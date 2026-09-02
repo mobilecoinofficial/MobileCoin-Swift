@@ -5,13 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [6.1.0] - 2026-09-01
 
 ### Changed
 
 - The SwiftPM `MobileCoinCore` product is now HTTP only. It consumes
   `LibMobileCoinCoreHTTP` and no longer compiles `Sources/GRPC`. This matches
   the CocoaPods chain, whose only subspec has been `CoreHTTP` for some time.
+- The iOS deployment target is now 13.0. LibMobileCoin 6.1.0 declares that
+  floor, and CocoaPods refuses a dependency whose deployment target is above
+  the dependent's.
+- `LibMobileCoin/CoreHTTP` now resolves at 6.1.0 or newer.
 
 ### Removed
 
@@ -20,18 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   consumers are unaffected; the pod already had no grpc subspec.
 - `TransportProtocol.supportedProtocols` returns `[.http]` rather than
   `[.grpc, .http]` for SwiftPM consumers.
-
-## [6.1.0] - 2026-09-01
-
-### Changed
-
-- The iOS deployment target is now 13.0. LibMobileCoin 6.1.0 declares that
-  floor, and CocoaPods refuses a dependency whose deployment target is above
-  the dependent's.
-- `LibMobileCoin/CoreHTTP` now resolves at 6.1.0 or newer.
-
-### Removed
-
 - The `Vendor/libmobilecoin` submodule. SwiftPM takes libmobilecoin from its
   checksummed release asset and CocoaPods takes it from the tagged repository,
   so a build needs neither a submodule checkout nor git-lfs.
