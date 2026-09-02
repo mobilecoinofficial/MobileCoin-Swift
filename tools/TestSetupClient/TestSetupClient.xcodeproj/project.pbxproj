@@ -13,7 +13,7 @@
 		AE41B7BF29EF018A00ED338A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE41B7BE29EF018A00ED338A /* Assets.xcassets */; };
 		AE41B7C229EF018A00ED338A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE41B7C129EF018A00ED338A /* Preview Assets.xcassets */; };
 		AE41B7CC29EF018A00ED338A /* TestSetupClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE41B7CB29EF018A00ED338A /* TestSetupClientTests.swift */; };
-		AE41B7E829EF027800ED338A /* DataUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE41B7E429EF027800ED338A /* DataUtils.swift */; };
+		AE41B7E829EF027800ED338A /* UInt64+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE41B7E429EF027800ED338A /* UInt64+Data.swift */; };
 		AE41B7E929EF027800ED338A /* TestAccountFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE41B7E529EF027800ED338A /* TestAccountFactory.swift */; };
 		AE41B7EA29EF027800ED338A /* TestWalletCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE41B7E629EF027800ED338A /* TestWalletCreator.swift */; };
 		AE41B7EB29EF027800ED338A /* NetworkPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE41B7E729EF027800ED338A /* NetworkPresets.swift */; };
@@ -42,7 +42,7 @@
 		AE41B7C129EF018A00ED338A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AE41B7C729EF018A00ED338A /* TestSetupClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestSetupClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE41B7CB29EF018A00ED338A /* TestSetupClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSetupClientTests.swift; sourceTree = "<group>"; };
-		AE41B7E429EF027800ED338A /* DataUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataUtils.swift; sourceTree = "<group>"; };
+		AE41B7E429EF027800ED338A /* UInt64+Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt64+Data.swift; sourceTree = "<group>"; };
 		AE41B7E529EF027800ED338A /* TestAccountFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestAccountFactory.swift; sourceTree = "<group>"; };
 		AE41B7E629EF027800ED338A /* TestWalletCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestWalletCreator.swift; sourceTree = "<group>"; };
 		AE41B7E729EF027800ED338A /* NetworkPresets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkPresets.swift; sourceTree = "<group>"; };
@@ -102,7 +102,7 @@
 		AE41B7B929EF018800ED338A /* TestSetupClient */ = {
 			isa = PBXGroup;
 			children = (
-				AE41B7E429EF027800ED338A /* DataUtils.swift */,
+				AE41B7E429EF027800ED338A /* UInt64+Data.swift */,
 				AE41B7E729EF027800ED338A /* NetworkPresets.swift */,
 				AE41B7E529EF027800ED338A /* TestAccountFactory.swift */,
 				AE41B7E629EF027800ED338A /* TestWalletCreator.swift */,
@@ -330,7 +330,7 @@
 				AE41B7E929EF027800ED338A /* TestAccountFactory.swift in Sources */,
 				AE41B7BD29EF018800ED338A /* ContentView.swift in Sources */,
 				AE41B7EB29EF027800ED338A /* NetworkPresets.swift in Sources */,
-				AE41B7E829EF027800ED338A /* DataUtils.swift in Sources */,
+				AE41B7E829EF027800ED338A /* UInt64+Data.swift in Sources */,
 				AE41B7BB29EF018800ED338A /* TestSetupClientApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

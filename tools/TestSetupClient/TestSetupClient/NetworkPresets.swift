@@ -5,7 +5,7 @@
 import Foundation
 import MobileCoin
 
-struct NetworkPresets {
+enum NetworkPresets {
 
     static let fogAuthoritySpkiB64Encoded = """
     MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvnB9wTbTOT5uoizRYaYbw7XIEkInl8E7MGOA\
@@ -19,7 +19,7 @@ struct NetworkPresets {
     Yh572+3ckgl2SaV4uo9Gvkz8MMGRBcMIMlRirSwhCfozV2RyT5Wn1NgPpyc8zJL7QdOhL7Qxb+5WjnCV\
     rQYHI2cCAwEAAQ==
     """
-    
+
     static let fogUrl = "fog://fog.test.mobilecoin.com"
 
     private static let allowedHardeiningAdvisories = [
@@ -27,7 +27,7 @@ struct NetworkPresets {
         "INTEL-SA-00615",
         "INTEL-SA-00657",
     ]
-    
+
     // v1.1.0 Enclave Values
     static let legacy_v1_1_0_testNetConsensusMrEnclaveHex =
     "9659ea738275b3999bf1700398b60281be03af5cb399738a89b49ea2496595af"
@@ -37,7 +37,7 @@ struct NetworkPresets {
     "768f7bea6171fb83d775ee8485e4b5fcebf5f664ca7e8b9ceef9c7c21e9d9bf3"
     static let legacy_v1_1_0_testNetFogReportMrEnclaveHex =
     "a4764346f91979b4906d4ce26102228efe3aba39216dec1e7d22e6b06f919f11"
-    
+
     // v2.0.0 Enclave Values
     static let legacy_v2_0_0_testNetConsensusMrEnclaveHex =
     "01746f4dd25f8623d603534425ed45833687eca2b3ba25bdd87180b9471dac28"
@@ -47,7 +47,7 @@ struct NetworkPresets {
     "92fb35d0f603ceb5eaf2988b24a41d4a4a83f8fb9cd72e67c3bc37960d864ad6"
     static let legacy_v2_0_0_testNetFogReportMrEnclaveHex =
     "3e9bf61f3191add7b054f0e591b62f832854606f6594fd63faef1e2aedec4021"
-    
+
     // v3.0.0 Enclave Values
     static let legacy_v3_0_0_testNetConsensusMrEnclaveHex =
     "5fe2b72fe5f01c269de0a3678728e7e97d823a953b053e43fbf934f439d290e6"
@@ -57,7 +57,7 @@ struct NetworkPresets {
     "d5159ba907066384fae65842b5311f853b028c5ee4594f3b38dfc02acddf6fe3"
     static let legacy_v3_0_0_testNetFogReportMrEnclaveHex =
     "d901b5c4960f49871a848fd157c7c0b03351253d65bb839698ddd5df138ad7b6"
-    
+
     // v4.0.0 Enclave Values
     static let legacy_v4_0_0_testNetConsensusMrEnclaveHex =
         "4f3879bfffb7b9f86a33086202b6120a32da0ca159615fbbd6fbac6aa37bbf02"
@@ -67,7 +67,6 @@ struct NetworkPresets {
         "23ececb2482e3b1d9e284502e2beb65ae76492f2791f3bfef50852ee64b883c3"
     static let legacy_v4_0_0_testNetFogReportMrEnclaveHex =
         "16d73984c2d2712156135ab69987ca78aca67a2cf4f0f2287ea584556f9d223a"
-
 
     // v5.0.0 Enclave Values
     static let testNetConsensusMrEnclaveHex =
@@ -85,14 +84,15 @@ struct NetworkPresets {
             if let data = Data(base64Encoded: mrEnclaveHex) {
                 if let mrEnclave = try? Attestation.MrEnclave.make(
                     mrEnclave: data,
-                    allowedHardeningAdvisories: NetworkPresets.allowedHardeiningAdvisories).get() {
+                    allowedHardeningAdvisories: NetworkPresets.allowedHardeiningAdvisories)
+                    .get() {
                     mrEnclaves.append(mrEnclave)
                 }
             }
         }
         return Attestation(mrEnclaves: mrEnclaves)
     }
-    
+
     static func consensusAttestation() -> Attestation {
         defaultAttestation([
             NetworkPresets.testNetConsensusMrEnclaveHex,

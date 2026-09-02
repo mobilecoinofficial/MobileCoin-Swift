@@ -1,12 +1,9 @@
 //
-//  TestSetupClientTests.swift
-//  TestSetupClientTests
-//
-//  Created by Cary Bakker on 4/18/23.
+//  Copyright (c) 2020-2023 MobileCoin. All rights reserved.
 //
 
-import XCTest
 @testable import TestSetupClient
+import XCTest
 
 @available(iOS 15.0, macOS 12.0, *)
 final class TestSetupClientTests: XCTestCase {
@@ -27,7 +24,7 @@ final class TestSetupClientTests: XCTestCase {
         let result = await TestWalletCreator().createAccounts(
             srcAcctEntropyString: srcAcctEntropyString,
             testAccountSeed: testAccountSeed)
-        
+
         switch result {
         case .success:
             print("Test accounts created successfully")
@@ -54,7 +51,7 @@ extension ProcessInfo {
                 return nil
             }
         }
-        
+
         return value
     }
 }
@@ -75,7 +72,7 @@ struct ProcessInfoLocal: Decodable {
         #else
         processInfoFileUrl = try Bundle.url("process_info", "json")
         #endif
-        
+
         guard
             let processInfoFileUrl = processInfoFileUrl,
             let processInfoFileData = try? Data(contentsOf: processInfoFileUrl)
@@ -86,7 +83,7 @@ struct ProcessInfoLocal: Decodable {
                 "Or, make duplicate `process_info.json.sample` and remove the `.sample` extension."
             )
         }
-        
+
         return try JSONDecoder().decode(Self.self, from: processInfoFileData)
     }
 }
@@ -106,21 +103,6 @@ extension TestingError: CustomStringConvertible {
 }
 
 extension Bundle {
-    #if canImport(LibMobileCoinHTTP)
-    public static let setupclient_BundleIdentifier = Bundle.module.bundleIdentifier!
-    
-    public static func testSetupClientModuleUrl(_ resource: String, withExtension ext: String) throws -> URL {
-        guard
-            let url = Bundle.module.url(forResource: resource, withExtension: ext)
-        else {
-            throw TestingError("Failed to get url for resource: \(resource).\(ext)")
-        }
-        return url
-    }
-    #endif
-}
-
-extension Bundle {
     static func url(_ resource: String, _ ext: String) throws -> URL {
         guard let url = Bundle(for: BundleType.self).url(forResource: resource, withExtension: ext)
         else {
@@ -131,4 +113,3 @@ extension Bundle {
 
     private final class BundleType {}
 }
-

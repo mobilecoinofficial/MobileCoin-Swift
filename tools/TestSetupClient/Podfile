@@ -1,10 +1,19 @@
+source 'https://cdn.cocoapods.org/'
+
 platform :ios, '14.0'
 use_frameworks!
 
-target 'TestSetupClient' do
-  pod 'MobileCoin/Core'
-end
+abstract_target 'TestSetupClientPods' do
+  # The podspec's only subspec is CoreHTTP, and its default_subspec is :none,
+  # so a bare `MobileCoin` or a `MobileCoin/Core` does not resolve.
+  pod 'MobileCoin/CoreHTTP', path: '../..'
 
-target 'TestSetupClientTests' do
- pod 'MobileCoin/Core'
+  # Trunk tops out at 6.0.2 and MobileCoin.podspec needs 6.1.0 or newer, so
+  # this pins the tag. The podspec downloads its xcframework from the release.
+  pod 'LibMobileCoin/CoreHTTP',
+      git: 'https://github.com/mobilecoinofficial/libmobilecoin.git',
+      tag: 'v6.1.0'
+
+  target 'TestSetupClient'
+  target 'TestSetupClientTests'
 end
