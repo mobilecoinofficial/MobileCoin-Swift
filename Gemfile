@@ -1,5 +1,5 @@
 source 'https://rubygems.org' do
-  gem 'cocoapods', '~> 1.0', '>= 1.16.2'
+  gem 'cocoapods', '~> 1.17'
   # Pinned to the ref both lockfiles already held. Upstream main moved to
   # 2.9.0, so the 2.8.4 requirement no longer resolves against a branch.
   gem 'addressable', '2.8.4', :git => 'https://github.com/sporkmonger/addressable', :ref => 'b56cef3e69bb1294ac4e31dad150e910b05f607f'
