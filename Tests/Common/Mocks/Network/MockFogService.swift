@@ -21,8 +21,7 @@ protocol MockFogServiceProtocol: FogBlockService, FogKeyImageService, FogViewSer
 }
 
 // The service protocols in Sources declare their completions without
-// `@Sendable`, so neither the mock nor its completion can cross onto the main
-// queue on its own. The mock is only ever driven from one test at a time.
+// `@Sendable`. The main queue is serial, so one call runs at a time.
 extension MockFogServiceProtocol {
     func query(
         requestAad: FogView_QueryRequestAAD,

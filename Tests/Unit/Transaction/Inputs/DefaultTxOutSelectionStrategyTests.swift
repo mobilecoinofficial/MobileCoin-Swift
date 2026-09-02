@@ -14,8 +14,7 @@ private let minFee: UInt64 = 400_000_000
 class DefaultTxOutSelectionStrategyTests: XCTestCase {
 
     // Test vectors from the Rust fog-sample-paykit. `SelectionTxOut` is not
-    // Sendable, so these two constants need the marker even though nothing
-    // mutates them.
+    // Sendable, so both constants carry the marker.
     nonisolated(unsafe) static let inputs = [1, 1, 1, 4, 9, 1, 1, 1, 19, 2, 1].enumerated()
         .map { SelectionTxOut(value: $0.element, blockIndex: UInt64($0.offset)) }
     nonisolated(unsafe) fileprivate static let payKitTestCases = [
