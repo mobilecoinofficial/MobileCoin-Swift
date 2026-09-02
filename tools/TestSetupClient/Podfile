@@ -20,3 +20,14 @@ target 'TestSetupClient' do
     inherit! :search_paths
   end
 end
+
+post_install do |installer|
+  # Same clamp as ExampleHTTP/Podfile. Must not drop below the floor
+  # LibMobileCoin declares, which is 13.0 from 6.1.0 on. A lower value here
+  # silently undercuts its binary, and SwiftProtobuf still ships 11.0.
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+    end
+  end
+end
