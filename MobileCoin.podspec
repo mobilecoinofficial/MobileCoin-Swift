@@ -57,9 +57,7 @@ Pod::Spec.new do |s|
 
   s.subspec "CoreHTTP" do |subspec|
     subspec.source_files = [
-      "Sources/{Common,HTTPS}/**/*.swift",
-      "CocoapodsOnly/*.{h,m,swift}",
-      "HTTPOnly/WrappedNIOSSLCertificateValidator.swift"
+      "Sources/{Common,HTTPS}/**/*.swift"
     ]
 
     # CocoaPods refuses a dependency whose deployment target is above the

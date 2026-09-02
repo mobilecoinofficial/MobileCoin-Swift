@@ -55,7 +55,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Keys: a576f4c9c1c641ca913a959a9c62ed3f215a8de9
   LibMobileCoin: 966c1694581ebd50da6623c499ed18c0e1bbe211
-  MobileCoin: d315a37ac85a2a31e1ddcb74fb88bdc4a0974d8a
+  MobileCoin: d365e240bd971ecbb1aaf7d179d5f3d40726c068
   SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
   SwiftProtobuf: 3fafd1b2fb97e6d95ad9c8adb2215da9afec7c83
 

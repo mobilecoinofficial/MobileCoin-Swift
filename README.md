@@ -42,7 +42,6 @@ Please check your country's laws before downloading or using this software.
 |Directory |Description |
 | :-- | :-- |
 | [Docs](./docs) | Integration Guide. |
-| [Example](./Example) | Example application. |
 | [ExampleHTTP](./ExampleHTTP) | Example "HTTP Only" application. |
 | [scripts](./scripts) | Scripts used by this repo. |
 | [secrets](./secrets) | Secrets file for contributors, and their public keys. |

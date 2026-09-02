@@ -24,16 +24,26 @@ let package = Package(
             url: "https://github.com/apple/swift-protobuf.git",
             from: "1.28.2"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1"),
     ],
     targets: [
+        // HTTP only, which is what the pod chain ships and what production runs.
+        // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
+        // left out rather than guarded: its files import GRPC and NIO
+        // unconditionally, and so do the tests excluded below.
         .target(
             name: "MobileCoin",
             dependencies: [
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-                .product(name: "LibMobileCoinCore", package: "libmobilecoin"),
+                .product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin"),
             ],
-            path: "Sources"
+            path: "Sources",
+            // GRPC is excluded as well as left out of sources, otherwise
+            // SwiftPM warns about its 25 files on every graph load.
+            exclude: ["GRPC"],
+            sources: [
+                "Common",
+                "HTTPS",
+            ]
          ),
         .testTarget(
             name: "MobileCoinTests",
@@ -48,6 +58,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",
+                "ProtocolSpecific/Grpc",
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),

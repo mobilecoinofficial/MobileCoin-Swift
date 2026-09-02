@@ -152,12 +152,17 @@ extension ProtocolConnectionFactory {
     }
 }
 
+// These stand-ins back the empty GrpcProtocolConnectionFactory in builds with
+// no grpc transport. They used to call assertionFailure and return, which is a
+// no-op in release, so the completion never fired and the caller hung forever.
+private let kGrpcUnavailable = "GRPC transport is not compiled into this build"
+
 class EmptyConsensusService: ConsensusService, ConnectionProtocol, ConsensusServiceConnection {
     func proposeTx(
         _ tx: External_Tx,
         completion: @escaping (Result<ConsensusCommon_ProposeTxResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -166,7 +171,7 @@ class EmptyBlockchainService: BlockchainService, ConnectionProtocol, BlockchainS
     func getLastBlockInfo(
         completion: @escaping (LastBlockInfoRespResult) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -176,7 +181,7 @@ class EmptyFogViewService: FogViewService, ConnectionProtocol, FogViewServiceCon
         request: FogView_QueryRequest,
         completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -188,7 +193,7 @@ class EmptyFogMerkleProofService: FogMerkleProofService,
         request: FogLedger_GetOutputsRequest,
         completion: @escaping (Result<FogLedger_GetOutputsResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -200,7 +205,7 @@ class EmptyFogKeyImageService: FogKeyImageService,
         request: FogLedger_CheckKeyImagesRequest,
         completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -209,7 +214,7 @@ class EmptyFogBlockService: FogBlockService, ConnectionProtocol, FogBlockService
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -221,7 +226,7 @@ class EmptyFogUntrustedTxOutService: FogUntrustedTxOutService,
         request: FogLedger_TxOutRequest,
         completion: @escaping (Result<FogLedger_TxOutResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -230,7 +235,7 @@ class EmptyFogReportService: FogReportService {
         request: Report_ReportRequest,
         completion: @escaping (Result<Report_ReportResponse, ConnectionError>) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
@@ -241,7 +246,7 @@ class EmptyMistyswapService: MistyswapService {
             Result<MistyswapOfframp_ForgetOfframpResponse, ConnectionError>
         ) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 
     func initiateOfframp(
@@ -250,7 +255,7 @@ class EmptyMistyswapService: MistyswapService {
             Result<MistyswapOfframp_InitiateOfframpResponse, ConnectionError>
         ) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 
     func getOfframpStatus(
@@ -259,7 +264,7 @@ class EmptyMistyswapService: MistyswapService {
             Result<MistyswapOfframp_GetOfframpStatusResponse, ConnectionError>
         ) -> Void
     ) {
-        logger.assertionFailure("Not Implemented")
+        completion(.failure(.connectionFailure(kGrpcUnavailable)))
     }
 }
 
