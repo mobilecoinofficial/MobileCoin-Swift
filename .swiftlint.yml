@@ -95,6 +95,7 @@ opt_in_rules: # some rules are only opt-in
 included: # paths to include during linting. Ignored if `--path` is present unless `--force-exclude` is specified.
   - Sources
   - Tests
+  - tools
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - "Sources/Network/HTTPS/HttpConnection/HttpConnections/HttpProtoGenerated"
   # SwiftPM fixes the manifest's shape. `let package` cannot take a `k` prefix,

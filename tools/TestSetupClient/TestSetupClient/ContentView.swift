@@ -1,8 +1,5 @@
 //
-//  ContentView.swift
-//  TestSetupClient
-//
-//  Created by Cary Bakker on 4/18/23.
+//  Copyright (c) 2020-2023 MobileCoin. All rights reserved.
 //
 
 import SwiftUI
