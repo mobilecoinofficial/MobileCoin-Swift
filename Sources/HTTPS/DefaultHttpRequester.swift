@@ -102,7 +102,9 @@ final class CertificatePinningDelegate: NSObject {
 
     private let trustRoots = ReadWriteDispatchLock(TrustRoots())
 
-    private var pinnedKeys: [SecKey] {
+    // Internal so a test can prove each setter writes its own field. `handle`
+    // merges the two, so nothing downstream can tell a swap apart.
+    var pinnedKeys: [SecKey] {
         trustRoots.readSync { [$0.fog, $0.consensus] }
             .compactMap { $0?.publicKeys }
             .flatMap { $0 }
@@ -135,6 +137,8 @@ final class CertificatePinningDelegate: NSObject {
             return
         }
 
+        // `validateAgainst` matches public keys and never evaluates trust, so a
+        // pinned chain is accepted whether or not the system would accept it.
         trust.validateAgainst(pinnedKeys: pinnedKeys) { result in
             switch result {
             case .success(let message):
