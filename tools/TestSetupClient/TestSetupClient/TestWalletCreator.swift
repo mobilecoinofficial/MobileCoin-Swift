@@ -45,11 +45,11 @@ class TestWalletCreator: ObservableObject {
                 name: "5_HTTP_testTransactionStatusFailsWhenInputsAlreadySpent_Recipient",
                 txData: [:]),
             TestAccountFactory.TestAccountConfig(
-                name: "6_testTransactionStatusFailsWhenInputsAlreadySpent_Client",
+                name: "6_GRPC_testTransactionStatusFailsWhenInputsAlreadySpent_Client",
                 txData:
                     [.MOB: [100 + minFee]]),
             TestAccountFactory.TestAccountConfig(
-                name: "7_testTransactionStatusFailsWhenInputsAlreadySpent_Recipient",
+                name: "7_GRPC_testTransactionStatusFailsWhenInputsAlreadySpent_Recipient",
                 txData: [:]),
 
             // testSubmitTransaction
