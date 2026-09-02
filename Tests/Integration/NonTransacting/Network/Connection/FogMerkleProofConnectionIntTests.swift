@@ -9,8 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-@MainActor
-class FogMerkleProofConnectionIntTests: XCTestCase {
+class FogMerkleProofConnectionIntTests: XCTestCase, @unchecked Sendable {
     func testGetOutputsRequest() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try getOutputsRequest(transportProtocol: transportProtocol)

@@ -9,8 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-@MainActor
-class AccountTests: XCTestCase {
+class AccountTests: XCTestCase, @unchecked Sendable {
 
     func testNoTxOuts() throws {
         let accountKey = try Self.accountKey()

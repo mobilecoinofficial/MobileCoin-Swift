@@ -9,8 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-@MainActor
-class UrlLoadBalancerIntTests: XCTestCase {
+class UrlLoadBalancerIntTests: XCTestCase, @unchecked Sendable {
 
     func testConsensusDoesNotRotate() throws {
         try TransportProtocol.supportedProtocols.forEach { transProtocol in

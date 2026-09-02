@@ -9,8 +9,7 @@ private class Container {
     var counter = 0
 }
 
-@MainActor
-class SerialCallbackLockTests: XCTestCase {
+class SerialCallbackLockTests: XCTestCase, @unchecked Sendable {
 
     func testInit() {
         _ = SerialCallbackLock(0, targetQueue: nil)

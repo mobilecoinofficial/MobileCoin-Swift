@@ -14,8 +14,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-@MainActor
-class MistyswapTests: XCTestCase {
+class MistyswapTests: XCTestCase, @unchecked Sendable {
 
     func testInitiateOfframpRequest() throws {
         try XCTSkip()

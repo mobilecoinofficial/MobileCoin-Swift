@@ -16,8 +16,7 @@ private class Container2: @unchecked Sendable {
     var counter2: Int = 0
 }
 
-@MainActor
-class SerialCallbackQueueTests: XCTestCase {
+class SerialCallbackQueueTests: XCTestCase, @unchecked Sendable {
 
     func testInit() {
         _ = SerialCallbackQueue(targetQueue: nil)
@@ -33,6 +32,9 @@ class SerialCallbackQueueTests: XCTestCase {
         group.enter()
         queue.append { callback in
             obj.counter = 10
+            // The queue declares its continuation without `@Sendable`. It runs
+            // one task at a time, so only one of these hops is ever live.
+            nonisolated(unsafe) let callback = callback
             DispatchQueue.main.async {
                 XCTAssertEqual(obj.counter, 10)
                 obj.counter = 20
@@ -46,6 +48,7 @@ class SerialCallbackQueueTests: XCTestCase {
         queue.append { callback in
             XCTAssertEqual(obj.counter, 20)
             obj.counter = 30
+            nonisolated(unsafe) let callback = callback
             DispatchQueue.main.async {
                 XCTAssertEqual(obj.counter, 30)
                 obj.counter = 40
@@ -159,9 +162,8 @@ class SerialCallbackQueueTests: XCTestCase {
 
         let expect = expectation(description: "SerialCallbackQueue async access")
         let group = DispatchGroup()
-        // A captured `var` cannot be mutated from the queue's callbacks under
-        // Swift 6. The counter moves into a box, the same shape `obj` already
-        // uses.
+        // The callbacks mutate this counter from several queues, so it lives
+        // in a box rather than in the frame.
         let c = Container()
         for _ in (0..<100) {
             group.enter()

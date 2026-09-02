@@ -9,8 +9,7 @@ import LibMobileCoinCommon
 @testable import MobileCoin
 import XCTest
 
-@MainActor
-class ConsensusConnectionIntTests: XCTestCase {
+class ConsensusConnectionIntTests: XCTestCase, @unchecked Sendable {
     func testAttestationWorks() throws {
        try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try attestationWorks(transportProtocol: transportProtocol)

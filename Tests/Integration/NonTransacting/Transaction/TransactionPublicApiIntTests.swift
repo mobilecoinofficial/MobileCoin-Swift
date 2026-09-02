@@ -5,8 +5,7 @@
 import MobileCoin
 import XCTest
 
-@MainActor
-class TransactionPublicApiIntTests: XCTestCase {
+class TransactionPublicApiIntTests: XCTestCase, @unchecked Sendable {
 
     func testSerializedData() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
