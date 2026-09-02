@@ -61,7 +61,9 @@ autocorrect:
 	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
 
 .PHONY: lint-all
-lint-all: lint lint-podspec lint-docs
+# `lint-docs` is out of this list because the Gemfile keeps jazzy commented out,
+# so it cannot generate the output it checks.
+lint-all: lint lint-podspec
 
 .PHONY: publish
 publish: tag-release publish-podspec
@@ -102,23 +104,27 @@ publish-podspec:
 
 # Documentation
 
+# Where jazzy writes, matching `output` in `.jazzy.yaml`. Never `docs/`, which is
+# the authored GitBook guide and is tracked.
+API_DOCS = output/api-docs
+
 .PHONY: docs
 docs:
 	bundle exec jazzy
 
 .PHONY: clean-docs
 clean-docs:
-	@[ ! -e docs ] || rm -r docs
+	@[ ! -e $(API_DOCS) ] || rm -r $(API_DOCS)
 
 .PHONY: lint-docs
 lint-docs:
-	@[ -e docs ] || $(MAKE) docs
+	@[ -e $(API_DOCS) ] || $(MAKE) docs
 
 	@# Check that there are no categories that start with `Other `, since that signifies that a new public
 	@# type was added but was not added to a category in `.jazzy.yaml`
 	@[[ "$$( \
 		name_regex='^Other (?:Classes|Constants|Enumerations|Extensions|Functions|Protocols|Structures|Type Aliases|Type Definitions)$$'; \
-		cat docs/search.json | jq ".[] \
+		cat $(API_DOCS)/search.json | jq ".[] \
 			| select(has(\"parent_name\") | not) \
 			| select(has(\"name\")) \
 			| select(.name | test(\"$$name_regex\"))" \
