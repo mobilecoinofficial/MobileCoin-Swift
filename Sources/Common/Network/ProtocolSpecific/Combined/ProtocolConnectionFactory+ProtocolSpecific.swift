@@ -5,17 +5,8 @@
 
 import Foundation
 
-// HTTP-Only
-// Cannot import GRPC, can import HTTP == HTTP-only
-#if canImport(LibMobileCoinGRPC)
-#else
-
-    #if canImport(LibMobileCoinHTTP)
-    class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {}
-    #else
-    #endif
-
-#endif
+// The HTTP-only stand-in for GrpcProtocolConnectionFactory lives with every
+// other declaration of that type, in GrpcProtocolConnectionFactory+HTTPonly.swift.
 
 // GRPC-Only
 // Cannot import HTTP, can import GRPC == GRPC-only

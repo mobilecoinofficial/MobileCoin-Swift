@@ -4,7 +4,7 @@
 
 import Foundation
 
-enum AttestedCallError: Error {
+enum AttestedCallError: Error, Sendable {
     case aeadError(AeadError)
     case invalidInput(String)
 }

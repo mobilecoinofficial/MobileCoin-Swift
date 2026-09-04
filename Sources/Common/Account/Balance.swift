@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct Balance {
+public struct Balance: Sendable {
     public let amountLow: UInt64
     public let amountHigh: UInt64
 

@@ -134,7 +134,7 @@ public final class MistysignAttestedSession {
     }
 }
 
-public enum MistysignAttestedSessionError: Error {
+public enum MistysignAttestedSessionError: Error, Sendable {
     case notAttested
     case noTrustedIdentities
     case attestationFailed(String)

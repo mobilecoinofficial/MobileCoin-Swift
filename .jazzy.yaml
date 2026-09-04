@@ -12,7 +12,7 @@ github_file_prefix: https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/
 swift_build_tool: xcodebuild
 build_tool_arguments:
   - -workspace
-  - ../Example/Example.xcworkspace
+  - ../ExampleHTTP/Example.xcworkspace
   - -scheme
   - Unit Tests
 clean: true

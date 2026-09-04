@@ -5,7 +5,7 @@
 @testable import MobileCoin
 import XCTest
 
-class FogResolverManagerIntTests: XCTestCase {
+class FogResolverManagerIntTests: XCTestCase, @unchecked Sendable {
     func testFogReport() throws {
         try TransportProtocol.supportedProtocols.forEach { transportProtocol in
             try fogReport(transportProtocol: transportProtocol)

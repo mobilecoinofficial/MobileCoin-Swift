@@ -1,8 +1,5 @@
 //
-//  TestSetupClientApp.swift
-//  TestSetupClient
-//
-//  Created by Cary Bakker on 4/18/23.
+//  Copyright (c) 2020-2023 MobileCoin. All rights reserved.
 //
 
 // In SPM the target is a library linked into the unified test runner, whose

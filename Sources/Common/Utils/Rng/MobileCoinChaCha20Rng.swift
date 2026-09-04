@@ -108,7 +108,7 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
                     logger.fatalError(
                         "LibMobileCoin panic error: \(redacting: error.description)")
                 default:
-                    // Safety: mc_chacha20_set_word_pos should not throw
+                    // Safety: mc_chacha20_rng_set_word_pos should not throw
                     // non-documented errors.
                     logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
                 }

@@ -27,6 +27,9 @@ node_modules/
 # spm build folder
 .build
 
+# stale submodule checkout an existing clone still holds
+/Vendor/
+
 # secrets JSON 
 Tests/Common/Secrets/secrets.json
 

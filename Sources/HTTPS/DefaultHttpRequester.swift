@@ -9,15 +9,11 @@ import LibMobileCoinCommon
 import LibMobileCoinHTTP
 #endif
 
-public class DefaultHttpRequester: NSObject, HttpRequester {
-    private var fogTrustRoots: SecSSLCertificates?
-    private var consensusTrustRoots: SecSSLCertificates?
-
-    private var pinnedKeys: [SecKey] {
-        [fogTrustRoots, consensusTrustRoots]
-            .compactMap { $0?.publicKeys }
-            .flatMap { $0 }
-    }
+// The pinning delegate is a separate object now, so the session is a `let`
+// built in init rather than a racy `lazy var`.
+public final class DefaultHttpRequester: NSObject, HttpRequester {
+    private let pinningDelegate = CertificatePinningDelegate()
+    let session: URLSession
 
     static let certPinningEnabled = true
 
@@ -34,14 +30,19 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
         return queue
     }()
 
-    private lazy var session: URLSession = {
-       URLSession(
+    override public init() {
+        session = URLSession(
             configuration: DefaultHttpRequester.defaultConfiguration,
-            delegate: self,
+            delegate: pinningDelegate,
             delegateQueue: Self.operationQueue)
-    }()
+        super.init()
+    }
 
-    override public init() { }
+    // A URLSession holds its delegate until it is invalidated, so without this
+    // every requester that goes out of scope leaves its delegate behind.
+    deinit {
+        session.finishTasksAndInvalidate()
+    }
 
     public func request(
         url: URL,
@@ -74,11 +75,11 @@ public class DefaultHttpRequester: NSObject, HttpRequester {
     }
 
     public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
-        consensusTrustRoots = trustRoots
+        pinningDelegate.setConsensusTrustRoots(trustRoots)
     }
 
     public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
-        fogTrustRoots = trustRoots
+        pinningDelegate.setFogTrustRoots(trustRoots)
     }
 }
 
@@ -89,9 +90,37 @@ extension DefaultHttpRequester {
         URLCredential?
     ) -> Void
 
-    func urlSession(
-        didReceive challenge: URLAuthenticationChallenge,
-        completionHandler: @escaping URLAuthenticationChallengeCompletion
+}
+
+// URLSession calls this back on its own queue while the SDK can be setting
+// trust roots from another thread, so both roots sit behind one lock.
+final class CertificatePinningDelegate: NSObject {
+    private struct TrustRoots {
+        var fog: SecSSLCertificates?
+        var consensus: SecSSLCertificates?
+    }
+
+    private let trustRoots = ReadWriteDispatchLock(TrustRoots())
+
+    // Internal so a test can prove each setter writes its own field. `handle`
+    // merges the two, so nothing downstream can tell a swap apart.
+    var pinnedKeys: [SecKey] {
+        trustRoots.readSync { [$0.fog, $0.consensus] }
+            .compactMap { $0?.publicKeys }
+            .flatMap { $0 }
+    }
+
+    func setFogTrustRoots(_ certificates: SecSSLCertificates?) {
+        trustRoots.writeSync { $0.fog = certificates }
+    }
+
+    func setConsensusTrustRoots(_ certificates: SecSSLCertificates?) {
+        trustRoots.writeSync { $0.consensus = certificates }
+    }
+
+    func handle(
+        challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping DefaultHttpRequester.URLAuthenticationChallengeCompletion
     ) {
         guard
             let trust = challenge.protectionSpace.serverTrust,
@@ -102,11 +131,14 @@ extension DefaultHttpRequester {
             return
         }
 
-        guard Self.certPinningEnabled && pinnedKeys.isNotEmpty else {
+        let pinnedKeys = self.pinnedKeys
+        guard DefaultHttpRequester.certPinningEnabled && pinnedKeys.isNotEmpty else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
 
+        // `validateAgainst` matches public keys and never evaluates trust, so a
+        // pinned chain is accepted whether or not the system would accept it.
         trust.validateAgainst(pinnedKeys: pinnedKeys) { result in
             switch result {
             case .success(let message):
@@ -118,30 +150,29 @@ extension DefaultHttpRequester {
             }
         }
     }
-
 }
 
-extension DefaultHttpRequester: URLSessionDelegate {
+extension CertificatePinningDelegate: URLSessionDelegate {
 
-    public func urlSession(
+    func urlSession(
         _ session: URLSession,
         didReceive challenge: URLAuthenticationChallenge,
-        completionHandler: @escaping URLAuthenticationChallengeCompletion
+        completionHandler: @escaping DefaultHttpRequester.URLAuthenticationChallengeCompletion
     ) {
-        urlSession(didReceive: challenge, completionHandler: completionHandler)
+        handle(challenge: challenge, completionHandler: completionHandler)
     }
 
 }
 
-extension DefaultHttpRequester: URLSessionTaskDelegate {
+extension CertificatePinningDelegate: URLSessionTaskDelegate {
 
-    public func urlSession(
+    func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
         didReceive challenge: URLAuthenticationChallenge,
-        completionHandler: @escaping URLAuthenticationChallengeCompletion
+        completionHandler: @escaping DefaultHttpRequester.URLAuthenticationChallengeCompletion
     ) {
-        urlSession(didReceive: challenge, completionHandler: completionHandler)
+        handle(challenge: challenge, completionHandler: completionHandler)
     }
 
 }

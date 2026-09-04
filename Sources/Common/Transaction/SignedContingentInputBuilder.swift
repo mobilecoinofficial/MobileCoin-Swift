@@ -9,7 +9,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-enum SignedContingentInputBuilderError: Error {
+enum SignedContingentInputBuilderError: Error, Sendable {
     case invalidInput(String)
     case requiresBlockVersion3(String)
     case attestationVerificationFailed(String)

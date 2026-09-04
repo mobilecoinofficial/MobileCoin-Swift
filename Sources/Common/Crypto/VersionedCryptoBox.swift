@@ -10,7 +10,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-public enum VersionedCryptoBoxError: Error {
+public enum VersionedCryptoBoxError: Error, Sendable {
     case invalidInput(String)
     case unsupportedVersion(String)
 }

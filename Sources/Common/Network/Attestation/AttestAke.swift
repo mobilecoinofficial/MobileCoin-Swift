@@ -10,7 +10,7 @@ import LibMobileCoin
 import LibMobileCoinCommon
 #endif
 
-enum AttestAkeError: Error {
+enum AttestAkeError: Error, Sendable {
     case invalidInput(String)
     case attestationVerificationFailed(String)
 }
@@ -28,7 +28,7 @@ extension AttestAkeError: CustomStringConvertible {
     }
 }
 
-enum AeadError: Error {
+enum AeadError: Error, Sendable {
     case aead(String)
     case cipher(String)
 }

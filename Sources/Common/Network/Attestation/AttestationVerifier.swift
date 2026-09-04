@@ -13,7 +13,7 @@ final class AttestationVerifier {
     private let ptr: OpaquePointer
 
     init(attestation: Attestation) {
-        // Safety: mc_verifier_create should never return nil.
+        // Safety: mc_trusted_identities_create should never return nil.
         self.ptr = withMcInfallible(mc_trusted_identities_create)
 
         attestation.mrEnclaves.forEach(addMrEnclave)
@@ -61,7 +61,7 @@ private final class MrEnclaveVerifier {
         }
 
         self.ptr = mrEnclave.mrEnclave.asMcBuffer { mrEnclavePtr in
-            // Safety: mc_mr_enclave_verifier_create should never fail.
+            // Safety: mc_trusted_identity_mr_enclave_create should never fail.
             withMcInfallible {
                 mc_trusted_identity_mr_enclave_create(
                     mrEnclavePtr,
@@ -97,7 +97,7 @@ private final class MrSignerVerifier {
         }
 
         self.ptr = mrSigner.mrSigner.asMcBuffer { mrSignerPtr in
-            // Safety: mc_mr_signer_verifier_create should never fail.
+            // Safety: mc_trusted_identity_mr_signer_create should never fail.
             withMcInfallible {
                 mc_trusted_identity_mr_signer_create(
                     mrSignerPtr,

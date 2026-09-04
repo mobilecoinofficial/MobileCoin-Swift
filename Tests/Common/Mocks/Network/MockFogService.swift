@@ -20,14 +20,18 @@ protocol MockFogServiceProtocol: FogBlockService, FogKeyImageService, FogViewSer
         -> Result<FogLedger_CheckKeyImagesResponse, ConnectionError>
 }
 
+// The service protocols in Sources declare their completions without
+// `@Sendable`. The main queue is serial, so one call runs at a time.
 extension MockFogServiceProtocol {
     func query(
         requestAad: FogView_QueryRequestAAD,
         request: FogView_QueryRequest,
         completion: @escaping (Result<FogView_QueryResponse, ConnectionError>) -> Void
     ) {
+        nonisolated(unsafe) let service = self
+        nonisolated(unsafe) let completion = completion
         DispatchQueue.main.async {
-            completion(self.query(requestAad: requestAad, request: request))
+            completion(service.query(requestAad: requestAad, request: request))
         }
     }
 
@@ -35,14 +39,18 @@ extension MockFogServiceProtocol {
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
-        DispatchQueue.main.async { completion(self.getBlocks(request: request)) }
+        nonisolated(unsafe) let service = self
+        nonisolated(unsafe) let completion = completion
+        DispatchQueue.main.async { completion(service.getBlocks(request: request)) }
     }
 
     func checkKeyImages(
         request: FogLedger_CheckKeyImagesRequest,
         completion: @escaping (Result<FogLedger_CheckKeyImagesResponse, ConnectionError>) -> Void
     ) {
-        DispatchQueue.main.async { completion(self.checkKeyImages(request: request)) }
+        nonisolated(unsafe) let service = self
+        nonisolated(unsafe) let completion = completion
+        DispatchQueue.main.async { completion(service.checkKeyImages(request: request)) }
     }
 }
 

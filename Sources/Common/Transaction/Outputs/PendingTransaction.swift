@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct PendingTransaction {
+public struct PendingTransaction: Sendable {
     public let transaction: Transaction
     public let payloadTxOutContexts: [TxOutContext]
     public var changeTxOutContext: TxOutContext
@@ -32,7 +32,7 @@ public struct PendingTransaction {
     }
 }
 
-public struct PendingSinglePayloadTransaction {
+public struct PendingSinglePayloadTransaction: Sendable {
     public let transaction: Transaction
     public let payloadTxOutContext: TxOutContext
     public var changeTxOutContext: TxOutContext
@@ -42,7 +42,7 @@ public struct PendingSinglePayloadTransaction {
     }
 }
 
-public struct PendingPresignedInputPayloadTransaction {
+public struct PendingPresignedInputPayloadTransaction: Sendable {
     public let transaction: Transaction
     public let payloadTxOutContext: TxOutContext
     public var changeTxOutContext: TxOutContext

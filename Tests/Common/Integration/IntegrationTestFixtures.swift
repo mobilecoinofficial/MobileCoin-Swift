@@ -455,7 +455,7 @@ extension ProcessInfo {
 struct ProcessInfoLocal: Decodable {
     let testAccountSeed: String
 
-    static var shared = try? Self.load()
+    static let shared = try? Self.load()
 
     static func load() throws -> Self {
         // We're using SPM

@@ -4,7 +4,7 @@
 
 import Foundation
 
-public enum TransactionStatus {
+public enum TransactionStatus: Sendable {
     case unknown
     case accepted(block: BlockMetadata)
     case failed

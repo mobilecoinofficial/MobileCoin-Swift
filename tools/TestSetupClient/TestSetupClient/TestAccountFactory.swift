@@ -54,7 +54,7 @@ public struct TestAccountFactory {
     ) async throws -> [TestAccount] {
 
         let seed32: Data32
-        
+
         if let b64Seed = testAccountSeed {
             guard let seedData = Data(base64Encoded: b64Seed) else {
                 fatalError("Unable to create seedData from b64Seed")
@@ -69,9 +69,9 @@ public struct TestAccountFactory {
             }
             seed32 = rndSeed32
         }
-        
-        let rng = MobileCoinChaCha20Rng(seed32:seed32)
-        
+
+        let rng = MobileCoinChaCha20Rng(seed32: seed32)
+
         var testAccounts = [TestAccount]()
         for config in testAccountConfigs {
             let acct = try await self.createNewFundedAccount(
@@ -89,7 +89,7 @@ public struct TestAccountFactory {
         testAccountConfig: TestAccountConfig,
         acctRng: MobileCoinRng
     ) async throws -> TestAccount {
-        
+
         // get 32 bytes of data from MobileCoinRng
         var entropyData = Data()
         entropyData.append(acctRng.next().data)

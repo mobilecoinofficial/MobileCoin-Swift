@@ -200,8 +200,9 @@ class TxOutContextsDerivationTests: XCTestCase {
     }
 
     /// A second seed, fixed so a failure can be re-run. Differs from
-    /// `testRngSeed()` in its last byte.
-    private static let otherRngSeed = RngSeed(Data(repeating: 0, count: 31) + Data([1]))!
+    /// `testRngSeed()` in its last byte. `RngSeed` is not Sendable.
+    nonisolated(unsafe) private static let otherRngSeed =
+        RngSeed(Data(repeating: 0, count: 31) + Data([1]))!
 
     private static func context(
         fixture: Transaction.Fixtures.BuildTxTestNet,

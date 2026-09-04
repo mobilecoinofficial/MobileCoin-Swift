@@ -8,7 +8,7 @@ import XCTest
 #if swift(>=5.5)
 
 @available(iOS 15.0, macOS 12.0, *)
-class TransactionIdempotenceTestsTransacting: XCTestCase {
+class TransactionIdempotenceTestsTransacting: XCTestCase, @unchecked Sendable {
 
     func testIdempotenceDoubleSubmissionFailure() async throws {
         let description = "Testing idempotence submission failure"

@@ -6,7 +6,7 @@
 
 import Foundation
 
-enum AmountTransferableError: Error {
+enum AmountTransferableError: Error, Sendable {
     case feeExceedsBalance(String = String())
     case balanceOverflow(String = String())
 }
@@ -24,7 +24,7 @@ extension AmountTransferableError: CustomStringConvertible {
     }
 }
 
-enum TxOutSelectionError: Error {
+enum TxOutSelectionError: Error, Sendable {
     case insufficientTxOuts(String = String())
 }
 
@@ -39,7 +39,7 @@ extension TxOutSelectionError: CustomStringConvertible {
     }
 }
 
-enum TransactionInputSelectionError: Error {
+enum TransactionInputSelectionError: Error, Sendable {
     case insufficientTxOuts(String = String())
     case defragmentationRequired(String = String())
 }

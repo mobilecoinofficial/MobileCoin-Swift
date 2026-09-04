@@ -35,8 +35,8 @@ extension RecoverableMemo.Fixtures {
 }
 
 extension RecoverableMemo.Fixtures.SingleSenderMemoTx {
-    static var receivedBlock = BlockMetadata(index: 10000, timestamp: nil)
-    static var spentBlock = BlockMetadata(index: 20000, timestamp: nil)
+    static let receivedBlock = BlockMetadata(index: 10000, timestamp: nil)
+    static let spentBlock = BlockMetadata(index: 20000, timestamp: nil)
 }
 
 extension RecoverableMemo.Fixtures {

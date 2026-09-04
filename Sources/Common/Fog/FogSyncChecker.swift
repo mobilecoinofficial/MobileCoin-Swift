@@ -87,7 +87,7 @@ class FogSyncChecker: FogSyncCheckable {
     }
 }
 
-public enum FogSyncError: Error {
+public enum FogSyncError: Error, Sendable {
     case viewLedgerOutOfSync(UInt64, UInt64)
     case consensusOutOfSync(UInt64, UInt64)
 }

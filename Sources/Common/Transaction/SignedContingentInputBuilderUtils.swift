@@ -195,7 +195,7 @@ enum SignedContingentInputBuilderUtils {
                     logger.warning("error: \(redacting: error)")
                     return false
                 default:
-                    // Safety: mc_memo_sender_with_payment_request_memo_is_valid
+                    // Safety: mc_signed_contingent_input_data_is_valid
                     // should not throw non-documented errors.
                     logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                     return false

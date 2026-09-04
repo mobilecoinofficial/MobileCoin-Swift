@@ -15,7 +15,7 @@ private class Container2 {
     var counter2 = 0
 }
 
-class ReadWriteDispatchLockTests: XCTestCase {
+class ReadWriteDispatchLockTests: XCTestCase, @unchecked Sendable {
 
     func testInit() {
         _ = ReadWriteDispatchLock(0)

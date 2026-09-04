@@ -70,37 +70,16 @@ publish: tag-release publish-podspec
 
 # Release
 
+# The podspec is the version source for the tag.
 .PHONY: tag-release
 tag-release:
 	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
-		git tag "v$$VERSION" && \
-		git push origin "refs/tags/v$$VERSION"
-
-# MobileCoin pod
-
-# Dynamic linkage, matching what `pod trunk push` validates at release time.
-# pod lint strips linker errors from xcodebuild output; add --verbose to see them.
-POD_LINT_FLAGS = --skip-tests
-
-.PHONY: lint-locally-podspec
-lint-locally-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS) --allow-warnings
-
-.PHONY: lint-locally-strict-podspec
-lint-locally-strict-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod lib lint MobileCoin.podspec $(POD_LINT_FLAGS)
-
-.PHONY: lint-podspec
-lint-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod spec lint MobileCoin.podspec $(POD_LINT_FLAGS)
-
-.PHONY: publish-podspec
-publish-podspec:
-	cd ExampleHTTP; bundle exec pod repo update;
-	bundle exec pod trunk push MobileCoin.podspec --skip-tests
+		if git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null 2>&1; then \
+			echo "Tag v$$VERSION already exists."; \
+		else \
+			git tag "v$$VERSION" && \
+			git push origin "refs/tags/v$$VERSION"; \
+		fi
 
 # Documentation
 
@@ -147,21 +126,25 @@ upgrade-deps:
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
 
-# Builds every target in Package.swift. Unlike `run-all-tests-spm` this needs no
-# secrets, so it is the one SPM check CI can run today. The test targets declare
-# resources (secrets.json, process_info.json) that are generated rather than
-# committed; SwiftPM only warns about those at build time.
+# Builds every target in Package.swift, test targets included. Plain `swift
+# build` skips those, so a test target that cannot compile still goes green.
+# Unlike `run-all-tests-spm` this needs no secrets, so it is the one SPM check
+# CI can run today. The test targets declare generated resources, which from
+# tools 6.0 must exist before the build, hence the ensure step.
 .PHONY: build-spm
 build-spm:
-	swift build
+	tools/ensure_test_resources.sh
+	swift build --build-tests
 
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:
+	tools/ensure_test_resources.sh
 	tools/generate_process_info_jsons.sh
 	swift test --filter "TestSetupClientTests"
 
 .PHONY: run-all-tests-spm
 run-all-tests-spm:
+	tools/ensure_test_resources.sh
 	tools/generate_process_info_jsons.sh
 	tools/generate_secrets_json.sh
 	swift test --filter "MobileCoinTests"

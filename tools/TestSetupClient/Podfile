@@ -1,10 +1,33 @@
+source 'https://cdn.cocoapods.org/'
+
 platform :ios, '14.0'
 use_frameworks!
 
 target 'TestSetupClient' do
-  pod 'MobileCoin/Core'
+  # The podspec's only subspec is CoreHTTP, and its default_subspec is :none,
+  # so a bare `MobileCoin` or a `MobileCoin/Core` does not resolve.
+  pod 'MobileCoin/CoreHTTP', path: '../..'
+
+  # Trunk tops out at 6.0.2 and MobileCoin.podspec needs 6.1.0 or newer, so
+  # this pins the tag. The podspec downloads its xcframework from the release.
+  pod 'LibMobileCoin/CoreHTTP',
+      git: 'https://github.com/mobilecoinofficial/libmobilecoin.git',
+      tag: 'v6.1.0'
+
+  # TestSetupClientTests runs inside the app as its TEST_HOST, so it needs the
+  # search paths but not a second copy of every framework.
+  target 'TestSetupClientTests' do
+    inherit! :search_paths
+  end
 end
 
-target 'TestSetupClientTests' do
- pod 'MobileCoin/Core'
+post_install do |installer|
+  # Same clamp as ExampleHTTP/Podfile. Must not drop below the floor
+  # LibMobileCoin declares, which is 13.0 from 6.1.0 on. A lower value here
+  # silently undercuts its binary, and SwiftProtobuf still ships 11.0.
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+    end
+  end
 end

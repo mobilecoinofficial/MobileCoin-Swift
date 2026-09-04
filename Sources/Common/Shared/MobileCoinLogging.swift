@@ -2,12 +2,25 @@
 //  Copyright (c) 2020-2026 MobileCoin. All rights reserved.
 //
 
+// `nonisolated(unsafe)` below sets the CocoaPods floor, and the syntax error an
+// older compiler raises names neither the cause nor the requirement.
+#if compiler(<5.10)
+#error("""
+MobileCoin needs Swift 5.10 with Xcode 15.3 through CocoaPods, \
+or Swift 6.1 with Xcode 16.3 through SwiftPM.
+""")
+#endif
+
 // swiftlint:disable prefixed_toplevel_constant
 
 import Foundation
 
 public enum MobileCoinLogging {
-    public static var logSensitiveData = false {
+    // Both knobs are meant to be set once at startup, before any SDK call.
+    // Only `logSensitiveData` enforces that, by trapping on a second write.
+    // `logLevel` takes any number of writes and holds no lock, so setting it
+    // while the SDK is running is a data race.
+    nonisolated(unsafe) public static var logSensitiveData = false {
         willSet {
             guard logSensitiveDataInternal.set(newValue) else {
                 logger.preconditionFailure(
@@ -17,7 +30,7 @@ public enum MobileCoinLogging {
     }
 
     /// Minimum level the SDK prints to stdout.
-    public static var logLevel = Level.info
+    nonisolated(unsafe) public static var logLevel = Level.info
 
     public enum Level: Int, Comparable {
         case trace
@@ -188,7 +201,9 @@ internal struct Logger {
         print("\(Self.timestampFormatter.string(from: Date())) \(level) \(label) : \(message)")
     }
 
-    private static let timestampFormatter: ISO8601DateFormatter = {
+    // ISO8601DateFormatter is not Sendable, but formatting is thread safe and
+    // this instance is never reconfigured after it is built.
+    nonisolated(unsafe) private static let timestampFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter

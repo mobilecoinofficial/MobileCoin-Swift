@@ -2,6 +2,11 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
+#if canImport(LibMobileCoinTestVector)
+import LibMobileCoinTestVector
+#else
+import LibMobileCoin
+#endif
 @testable import MobileCoin
 import XCTest
 
@@ -10,7 +15,7 @@ extension Bundle {
         #if canImport(LibMobileCoinTestVector)
         try Bundle.testVectorModuleUrl(filename)
         #else
-        try Bundle.url(filename, "jsonl")
+        try Bundle.testVectorUrl(filename)
         #endif
     }
 }

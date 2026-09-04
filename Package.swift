@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:6.1
 import Foundation
 import PackageDescription
 
@@ -18,29 +18,47 @@ let package = Package(
         // and from where they can be fetched:
         .package(
             url: "https://github.com/mobilecoinofficial/libmobilecoin.git",
-            from: "6.0.4"
+            from: "6.1.0"
         ),
         .package(
             url: "https://github.com/apple/swift-protobuf.git",
-            from: "1.28.2"
+            from: "1.36.1"
         ),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.24.1"),
     ],
     targets: [
+        // HTTP only, which is what the pod chain ships and what production runs.
+        // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
+        // left out rather than guarded: its files import GRPC and NIO
+        // unconditionally, and so do the tests excluded below.
         .target(
             name: "MobileCoin",
             dependencies: [
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-                .product(name: "LibMobileCoinCore", package: "libmobilecoin"),
+                .product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin"),
             ],
-            path: "Sources"
+            path: "Sources",
+            // GRPC is excluded as well as left out of sources, otherwise
+            // SwiftPM warns about its 25 files on every graph load.
+            exclude: ["GRPC"],
+            sources: [
+                "Common",
+                "HTTPS",
+            ]
          ),
         .testTarget(
             name: "MobileCoinTests",
-            dependencies: ["MobileCoin"],
+            // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
+            // does not carry them, so the test target asks for them by name.
+            // Without this `canImport(LibMobileCoinTestVector)` is false and the
+            // tests read vectors this target never copies.
+            dependencies: [
+                "MobileCoin",
+                .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
+            ],
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",
+                "ProtocolSpecific/Grpc",
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),

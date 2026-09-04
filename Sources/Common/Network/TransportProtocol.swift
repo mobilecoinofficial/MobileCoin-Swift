@@ -10,7 +10,7 @@ typealias ConnectionWrapperFactory = (TransportProtocol.Option)
                                         ConnectionProtocol
                                     >
 
-public struct TransportProtocol {
+public struct TransportProtocol: Sendable {
     public static let grpc = TransportProtocol(option: .grpc)
     public static let http = TransportProtocol(option: .http)
 

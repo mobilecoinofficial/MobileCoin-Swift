@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct TokenId {
+public struct TokenId: Sendable {
     public let value: UInt64
     public var name: String {
         Self.names[self] ?? "TokenId \(self.value)"
@@ -24,9 +24,9 @@ public struct TokenId {
 }
 
 extension TokenId {
-    public static var MOB = TokenId(0)
-    public static var MOBUSD = TokenId(1)
-    public static var TestToken = TokenId(8192)
+    public static let MOB = TokenId(0)
+    public static let MOBUSD = TokenId(1)
+    public static let TestToken = TokenId(8192)
 }
 
 extension TokenId: CustomStringConvertible {
@@ -34,7 +34,7 @@ extension TokenId: CustomStringConvertible {
         self.name
     }
 
-    static var names: [TokenId: String] = {
+    static let names: [TokenId: String] = {
         [
             .MOB: "MOB",
             .MOBUSD: "MOBUSD",
@@ -42,7 +42,7 @@ extension TokenId: CustomStringConvertible {
         ]
     }()
 
-    static var significantDigits: [TokenId: UInt8] = {
+    static let significantDigits: [TokenId: UInt8] = {
         [
             .MOB: 12,
             .MOBUSD: 6,
