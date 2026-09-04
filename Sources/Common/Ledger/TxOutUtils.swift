@@ -234,7 +234,7 @@ enum TxOutUtils {
                             // supplied incorrectly.
                             logger.fatalError("error: \(redacting: error)")
                         default:
-                            // Safety: mc_fog_resolver_add_report_response should not throw
+                            // Safety: mc_tx_out_get_subaddress_spend_public_key should not throw
                             // non-documented errors.
                             logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
                         }
@@ -279,10 +279,10 @@ enum TxOutUtils {
                             return nil
                         case .invalidInput:
                             // Safety: This condition indicates a programming error and can only
-                            // happen if arguments to mc_tx_out_get_value are supplied incorrectly.
+                            // happen if arguments to mc_tx_out_get_amount are supplied incorrectly.
                             logger.fatalError("error: \(redacting: error)")
                         default:
-                            // Safety: mc_tx_out_get_value should not throw non-documented errors.
+                            // Safety: mc_tx_out_get_amount should not throw non-documented errors.
                             logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
                         }
                     }

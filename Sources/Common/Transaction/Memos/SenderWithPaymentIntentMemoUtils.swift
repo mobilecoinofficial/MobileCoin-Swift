@@ -118,13 +118,14 @@ enum SenderWithPaymentIntentMemoUtils {
                         switch error.errorCode {
                         case .invalidInput:
                             // Safety: This condition indicates a programming error and can only
-                            // happen if arguments to mc_tx_out_reconstruct_commitment are
-                            // supplied incorrectly.
+                            // happen if arguments to
+                            // mc_memo_sender_with_payment_intent_memo_create are supplied
+                            // incorrectly.
                             logger.warning("error: \(redacting: error)")
                             return nil
                         default:
-                            // Safety: mc_tx_out_reconstruct_commitment should not throw
-                            // non-documented errors.
+                            // Safety: mc_memo_sender_with_payment_intent_memo_create should
+                            // not throw non-documented errors.
                             logger.warning("Unhandled LibMobileCoin error: \(redacting: error)")
                             return nil
                         }

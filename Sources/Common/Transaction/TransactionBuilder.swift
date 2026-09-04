@@ -81,7 +81,7 @@ final class TransactionBuilder {
                     case .invalidInput:
                         return .invalidInput("\(redacting: $0.description)")
                     default:
-                        // Safety: mc_transaction_builder_add_input should not throw
+                        // Safety: mc_transaction_builder_create should not throw
                         // non-documented errors.
                         logger.fatalError("Unhandled LibMobileCoin error: \(redacting: $0)")
                     }
