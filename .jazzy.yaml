@@ -2,6 +2,10 @@ module_version: latest
 
 source_directory: Sources
 
+# `docs/` holds the authored GitBook guide, so the generated API reference goes
+# to an ignored path instead of overwriting it.
+output: output/api-docs
+
 github_url: https://github.com/mobilecoinofficial/MobileCoin-Swift
 github_file_prefix: https://github.com/mobilecoinofficial/MobileCoin-Swift/tree/master/Sources
 
