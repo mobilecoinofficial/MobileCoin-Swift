@@ -16,21 +16,17 @@ final class DefaultServiceProvider: ServiceProvider {
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
     private let mistyswap: MistyswapConnection?
-    private let grpcConnectionFactory: GrpcProtocolConnectionFactory
     private let httpConnectionFactory: HttpProtocolConnectionFactory
 
     init(
         networkConfig: NetworkConfig,
         targetQueue: DispatchQueue?,
-        grpcConnectionFactory: GrpcProtocolConnectionFactory,
         httpConnectionFactory: HttpProtocolConnectionFactory
     ) {
-        self.grpcConnectionFactory = grpcConnectionFactory
         self.httpConnectionFactory = httpConnectionFactory
 
         let inner = Inner(
                 httpFactory: httpConnectionFactory,
-                grpcFactory: grpcConnectionFactory,
                 targetQueue: targetQueue,
                 transportProtocolOption: networkConfig.transportProtocol.option)
 
@@ -38,44 +34,36 @@ final class DefaultServiceProvider: ServiceProvider {
 
         self.consensus = ConsensusConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
         self.blockchain = BlockchainConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
         self.view = FogViewConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
         self.merkleProof = FogMerkleProofConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
         self.keyImage = FogKeyImageConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
         self.block = FogBlockConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
         self.untrustedTxOut = FogUntrustedTxOutConnection(
             httpFactory: self.httpConnectionFactory,
-            grpcFactory: self.grpcConnectionFactory,
             config: networkConfig,
             targetQueue: targetQueue)
 
         if networkConfig.mistyswapConfig() != nil {
             self.mistyswap = MistyswapConnection(
                 httpFactory: self.httpConnectionFactory,
-                grpcFactory: self.grpcConnectionFactory,
                 config: networkConfig,
                 targetQueue: targetQueue)
         } else {
@@ -134,7 +122,6 @@ final class DefaultServiceProvider: ServiceProvider {
 extension DefaultServiceProvider {
     private struct Inner {
         private let httpFactory: HttpProtocolConnectionFactory
-        private let grpcFactory: GrpcProtocolConnectionFactory
         private let targetQueue: DispatchQueue?
 
         private var reportUrlToReportConnection: [FogUrl: FogReportConnection] = [:]
@@ -142,12 +129,10 @@ extension DefaultServiceProvider {
 
         init(
             httpFactory: HttpProtocolConnectionFactory,
-            grpcFactory: GrpcProtocolConnectionFactory,
             targetQueue: DispatchQueue?,
             transportProtocolOption: TransportProtocol.Option
         ) {
             self.httpFactory = httpFactory
-            self.grpcFactory = grpcFactory
             self.targetQueue = targetQueue
             self.transportProtocolOption = transportProtocolOption
         }
@@ -156,7 +141,6 @@ extension DefaultServiceProvider {
             guard let reportConnection = reportUrlToReportConnection[fogReportUrl] else {
                 let reportConnection = FogReportConnection(
                     httpFactory: httpFactory,
-                    grpcFactory: grpcFactory,
                     url: fogReportUrl,
                     transportProtocolOption: transportProtocolOption,
                     targetQueue: targetQueue)

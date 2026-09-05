@@ -765,7 +765,6 @@ class MobileCoinClientPublicApiIntTestsTransacting: XCTestCase, @unchecked Senda
     }
 
     func testWrongConsensusTrustRootReturnsError() async throws {
-        // Skipped because gRPC currently keeps retrying connection errors indefinitely.
         try XCTSkipIf(true)
 
         let description = "Submitting transaction"

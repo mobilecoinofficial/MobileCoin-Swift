@@ -227,10 +227,8 @@ extension FogMerkleProofConnectionIntTests {
     ) -> FogMerkleProofConnection {
         let httpFactory = HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogMerkleProofConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             config: networkConfig,
             targetQueue: DispatchQueue.main)
     }

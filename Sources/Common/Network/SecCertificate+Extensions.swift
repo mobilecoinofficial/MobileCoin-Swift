@@ -100,7 +100,7 @@ extension SecTrust {
         }
     }
 
-    /// Shared implementation of cert-pinning validation for HTTP and GRPC requesters.
+    /// Shared implementation of cert-pinning validation for HTTP requesters.
     ///
     /// The `self` SecTrust object is the "server trust" certificate chain
     /// The `pinnedKeys` are `[SecKey]`s we get from the pinned certificates stored on the client

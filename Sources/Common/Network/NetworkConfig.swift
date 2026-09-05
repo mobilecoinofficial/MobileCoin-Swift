@@ -160,29 +160,8 @@ struct NetworkConfig {
     var fogReportAttestation: Attestation { attestation.fogReport }
 
     private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
-    private func validatedCertificates(
-        _ trustRoots: [Data]
-    ) -> (grpc: PossibleCertificates, http: PossibleCertificates) {
-        let grpc = TransportProtocol.grpc.certificateValidator.validate(trustRoots)
-        let http = TransportProtocol.http.certificateValidator.validate(trustRoots)
-        return (grpc, http)
-    }
-
-    private func currentProtocolValidation(grpc: PossibleCertificates, http: PossibleCertificates)
-        -> Result<(), InvalidInputError>
-    {
-        switch (transportProtocol, grpc, http) {
-        case (.grpc, .success, _):
-            return .success(())
-        case (.grpc, .failure(let error), _):
-            return .failure(error)
-        case (.http, _, .success):
-            return .success(())
-        case (.http, _, .failure(let error)):
-            return .failure(error)
-        case (_, _, _):
-            return .failure(InvalidInputError("Empty certificates"))
-        }
+    private func validatedCertificates(_ trustRoots: [Data]) -> PossibleCertificates {
+        TransportProtocol.http.certificateValidator.validate(trustRoots)
     }
 }
 
@@ -190,25 +169,23 @@ extension NetworkConfig {
     @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
-        let (grpc, http) = validatedCertificates(trustRoots)
+        let http = validatedCertificates(trustRoots)
 
-        self.consensusTrustRoots[.grpc] = try? grpc.get()
         self.consensusTrustRoots[.http] = try? http.get()
         self.httpRequester?.setConsensusTrustRoots(try? http.get() as? SecSSLCertificates)
 
-        return currentProtocolValidation(grpc: grpc, http: http)
+        return http.map { _ in () }
     }
 
     @discardableResult mutating public func setFogTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
-        let (grpc, http) = validatedCertificates(trustRoots)
+        let http = validatedCertificates(trustRoots)
 
-        self.fogTrustRoots[.grpc] = try? grpc.get()
         self.fogTrustRoots[.http] = try? http.get()
         self.httpRequester?.setFogTrustRoots(try? http.get() as? SecSSLCertificates)
 
-        return currentProtocolValidation(grpc: grpc, http: http)
+        return http.map { _ in () }
     }
 
 }

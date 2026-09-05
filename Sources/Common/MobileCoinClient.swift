@@ -54,14 +54,12 @@ public final class MobileCoinClient {
         self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
-        let grpcFactory = GrpcProtocolConnectionFactory()
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: config.networkConfig.httpRequester)
 
         self.serviceProvider = DefaultServiceProvider(
             networkConfig: config.networkConfig,
             targetQueue: serialQueue,
-            grpcConnectionFactory: grpcFactory,
             httpConnectionFactory: httpFactory)
 
         self.fogResolverManager = FogResolverManager(
