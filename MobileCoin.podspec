@@ -38,14 +38,18 @@ Pod::Spec.new do |s|
 
   s.test_spec 'IntegrationTransactingTests' do |test_spec|
     test_spec.source_files = "Tests/{Common,Integration/Transacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*",
-    test_spec.resource = "Tests/Common/Secrets/process_info.json"
+    test_spec.resources = [
+      "Tests/Common/FixtureData/**/*",
+      "Tests/Common/Secrets/process_info.json",
+    ]
   end
 
   s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
     test_spec.source_files = "Tests/{Common,Integration/NonTransacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*",
-    test_spec.resource = "Tests/Common/Secrets/process_info.json"
+    test_spec.resources = [
+      "Tests/Common/FixtureData/**/*",
+      "Tests/Common/Secrets/process_info.json",
+    ]
   end
 
   s.test_spec 'PerformanceTests' do |test_spec|
