@@ -238,11 +238,9 @@ extension IntegrationTestFixtures {
         let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return DefaultServiceProvider(
             networkConfig: networkConfig,
             targetQueue: DispatchQueue.main,
-            grpcConnectionFactory: grpcFactory,
             httpConnectionFactory: httpFactory)
     }
 
@@ -284,11 +282,9 @@ extension IntegrationTestFixtures {
             fogUrlLoadBalancer: fogUrlLoadBalancer)
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return DefaultServiceProvider(
             networkConfig: networkConfig,
             targetQueue: DispatchQueue.main,
-            grpcConnectionFactory: grpcFactory,
             httpConnectionFactory: httpFactory)
     }
 }
@@ -329,63 +325,65 @@ extension IntegrationTestFixtures {
             fatalError("Unable to create seed32 from seedData")
         }
 
+        // The array position selects the account derived from the seed, so every
+        // entry stays where it is. Only the HTTP rows are looked up.
         let clientNames = [
             "0_HTTP_transactionDoubleSubmissionFails_Client",
             "1_HTTP_transactionDoubleSubmissionFails_Recipient",
-            "2_GRPC_transactionDoubleSubmissionFails_Client",
-            "3_GRPC_transactionDoubleSubmissionFails_Recipient",
+            "2_UNUSED_transactionDoubleSubmissionFails_Client",
+            "3_UNUSED_transactionDoubleSubmissionFails_Recipient",
             "4_HTTP_transactionStatusFailsWhenInputIsAlreadySpent_Client",
             "5_HTTP_transactionStatusFailsWhenInputIsAlreadySpent_Recipient",
-            "6_GRPC_transactionStatusFailsWhenInputIsAlreadySpent_Client",
-            "7_GRPC_transactionStatusFailsWhenInputIsAlreadySpent_Recipient",
+            "6_UNUSED_transactionStatusFailsWhenInputIsAlreadySpent_Client",
+            "7_UNUSED_transactionStatusFailsWhenInputIsAlreadySpent_Recipient",
             "8_HTTP_submitTransaction_Client",
             "9_HTTP_submitTransaction_Recipient",
-            "10_GRPC_submitTransaction_Client",
-            "11_GRPC_submitTransaction_Recipient",
+            "10_UNUSED_submitTransaction_Client",
+            "11_UNUSED_submitTransaction_Recipient",
             "12_HTTP_submitMobUSDTransaction_Client",
             "13_HTTP_submitMobUSDTransaction_Recipient",
-            "14_GRPC_submitMobUSDTransaction_Client",
-            "15_GRPC_submitMobUSDTransaction_Recipient",
+            "14_UNUSED_submitMobUSDTransaction_Client",
+            "15_UNUSED_submitMobUSDTransaction_Recipient",
             "16_HTTP_cancelSignedContingentInput_Creator",
             "17_HTTP_cancelSignedContingentInput_Consumer",
-            "18_GRPC_cancelSignedContingentInput_Creator",
-            "19_GRPC_cancelSignedContingentInput_Consumer",
+            "18_UNUSED_cancelSignedContingentInput_Creator",
+            "19_UNUSED_cancelSignedContingentInput_Consumer",
             "20_HTTP_submitSignedContingentInputTransaction_Creator",
             "21_HTTP_submitSignedContingentInputTransaction_Consumer",
-            "22_GRPC_submitSignedContingentInputTransaction_Creator",
-            "23_GRPC_submitSignedContingentInputTransaction_Consumer",
+            "22_UNUSED_submitSignedContingentInputTransaction_Creator",
+            "23_UNUSED_submitSignedContingentInputTransaction_Consumer",
             "24_HTTP_selfPaymentBalanceChange_Client",
-            "25_GRPC_selfPaymentBalanceChange_Client",
+            "25_UNUSED_selfPaymentBalanceChange_Client",
             "26_HTTP_selfPaymentBalanceChangeFeeLevel_Client",
-            "27_GRPC_selfPaymentBalanceChangeFeeLevel_Client",
+            "27_UNUSED_selfPaymentBalanceChangeFeeLevel_Client",
             "28_HTTP_transactionStatus_Client",
             "29_HTTP_transactionStatus_Recipient",
-            "30_GRPC_transactionStatus_Client",
-            "31_GRPC_transactionStatus_Recipient",
+            "30_UNUSED_transactionStatus_Client",
+            "31_UNUSED_transactionStatus_Recipient",
             "32_HTTP_transactionTxOutStatus_Client",
             "33_HTTP_transactionTxOutStatus_Recipient",
-            "34_GRPC_transactionTxOutStatus_Client",
-            "35_GRPC_transactionTxOutStatus_Recipient",
+            "34_UNUSED_transactionTxOutStatus_Client",
+            "35_UNUSED_transactionTxOutStatus_Recipient",
             "36_HTTP_receiptStatus_Client",
             "37_HTTP_receiptStatus_Recipient",
-            "38_GRPC_receiptStatus_Client",
-            "39_GRPC_receiptStatus_Recipient",
+            "38_UNUSED_receiptStatus_Client",
+            "39_UNUSED_receiptStatus_Recipient",
             "40_HTTP_consensusTrustRootWorks_Client",
             "41_HTTP_consensusTrustRootWorks_Recipient",
-            "42_GRPC_consensusTrustRootWorks_Client",
-            "43_GRPC_consensusTrustRootWorks_Recipient",
+            "42_UNUSED_consensusTrustRootWorks_Client",
+            "43_UNUSED_consensusTrustRootWorks_Recipient",
             "44_HTTP_extraConsensusTrustRootWorks_Client",
             "45_HTTP_extraConsensusTrustRootWorks_Recipient",
-            "46_GRPC_extraConsensusTrustRootWorks_Client",
-            "47_GRPC_extraConsensusTrustRootWorks_Recipient",
+            "46_UNUSED_extraConsensusTrustRootWorks_Client",
+            "47_UNUSED_extraConsensusTrustRootWorks_Recipient",
             "48_HTTP_wrongConsensusTrustRootReturnsError_Client",
             "49_HTTP_wrongConsensusTrustRootReturnsError_Recipient",
-            "50_GRPC_wrongConsensusTrustRootReturnsError_Client",
-            "51_GRPC_wrongConsensusTrustRootReturnsError_Recipient",
+            "50_UNUSED_wrongConsensusTrustRootReturnsError_Client",
+            "51_UNUSED_wrongConsensusTrustRootReturnsError_Recipient",
             "52_HTTP_idempotenceDoubleSubmissionFailure_Client",
             "53_HTTP_idempotenceDoubleSubmissionFailure_Recipient",
-            "54_GRPC_idempotenceDoubleSubmissionFailure_Client",
-            "55_GRPC_idempotenceDoubleSubmissionFailure_Recipient",
+            "54_UNUSED_idempotenceDoubleSubmissionFailure_Client",
+            "55_UNUSED_idempotenceDoubleSubmissionFailure_Recipient",
         ]
 
         let testNamePrefix = testName.components(separatedBy: "(")[0]

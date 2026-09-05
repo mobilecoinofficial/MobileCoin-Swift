@@ -14,8 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Mistyswap integration tests. Every case built an `XCTSkip` value without
   throwing it, so every case ran against the gRPC transport. The suite carries
   no HTTP variant.
+- `TransportProtocol.grpc`, the last public name for a transport the package
+  cannot build. `TransportProtocol.http` is the only case left.
+- `ConnectionOptionWrapper`, the `Sources/Common/Network/ProtocolSpecific` tree,
+  and the eight `Empty*` service stand-ins the HTTP factory makes unreachable.
 
-Neither removal touches public API.
+The first two removals leave public API untouched. Removing
+`TransportProtocol.grpc` breaks a caller that names it.
 
 ## [6.1.0] - 2026-09-01
 

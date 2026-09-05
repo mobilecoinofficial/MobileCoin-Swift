@@ -9,43 +9,28 @@ import LibMobileCoinCommon
 #endif
 
 final class FogBlockConnection: Connection<
-        GrpcProtocolConnectionFactory.FogBlockServiceProvider,
         HttpProtocolConnectionFactory.FogBlockServiceProvider
     >,
     FogBlockService
 {
     private let httpFactory: HttpProtocolConnectionFactory
-    private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
-        grpcFactory: GrpcProtocolConnectionFactory,
         config: NetworkConfig,
         targetQueue: DispatchQueue?
     ) {
         self.httpFactory = httpFactory
-        self.grpcFactory = grpcFactory
         self.config = config
         self.targetQueue = targetQueue
 
         super.init(
-            connectionOptionWrapperFactory: { transportProtocolOption in
-                let rotatedConfig = config.fogBlockConfig()
-                switch transportProtocolOption {
-                case .grpc:
-                    return .grpc(
-                        grpcService:
-                            grpcFactory.makeFogBlockService(
-                                config: rotatedConfig,
-                                targetQueue: targetQueue))
-                case .http:
-                    return .http(httpService:
-                            httpFactory.makeFogBlockService(
-                                config: rotatedConfig,
-                                targetQueue: targetQueue))
-                }
+            serviceFactory: { _ in
+                httpFactory.makeFogBlockService(
+                    config: config.fogBlockConfig(),
+                    targetQueue: targetQueue)
             },
             transportProtocolOption: config.fogBlockConfig().transportProtocolOption,
             targetQueue: targetQueue)
@@ -55,11 +40,6 @@ final class FogBlockConnection: Connection<
         request: FogLedger_BlockRequest,
         completion: @escaping (Result<FogLedger_BlockResponse, ConnectionError>) -> Void
     ) {
-        switch connectionOptionWrapper {
-        case .grpc(let grpcConnection):
-            grpcConnection.getBlocks(request: request, completion: rotateURLOnError(completion))
-        case .http(let httpConnection):
-            httpConnection.getBlocks(request: request, completion: rotateURLOnError(completion))
-        }
+        service.getBlocks(request: request, completion: rotateURLOnError(completion))
     }
 }

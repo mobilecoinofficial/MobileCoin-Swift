@@ -4,40 +4,37 @@
 
 import Foundation
 
-class ArbitraryConnection<GrpcService, HttpService> {
+class ArbitraryConnection<HttpService> {
     private let inner: SerialDispatchLock<Inner>
 
-    private let connectionOptionWrapperFactory: (TransportProtocol.Option)
-        -> ConnectionOptionWrapper<GrpcService, HttpService>
+    private let serviceFactory: (TransportProtocol.Option) -> HttpService
 
     init(
-        connectionOptionWrapperFactory: @escaping (TransportProtocol.Option)
-            -> ConnectionOptionWrapper<GrpcService, HttpService>,
+        serviceFactory: @escaping (TransportProtocol.Option) -> HttpService,
         transportProtocolOption: TransportProtocol.Option,
         targetQueue: DispatchQueue?
     ) {
-        self.connectionOptionWrapperFactory = connectionOptionWrapperFactory
-        let connectionOptionWrapper = connectionOptionWrapperFactory(transportProtocolOption)
-        let inner = Inner(connectionOptionWrapper: connectionOptionWrapper)
+        self.serviceFactory = serviceFactory
+        let inner = Inner(service: serviceFactory(transportProtocolOption))
         self.inner = .init(inner, targetQueue: targetQueue)
     }
 
     func setTransportProtocolOption(_ transportProtocolOption: TransportProtocol.Option) {
-        let connectionOptionWrapper = connectionOptionWrapperFactory(transportProtocolOption)
-        inner.accessAsync { $0.connectionOptionWrapper = connectionOptionWrapper }
+        let service = serviceFactory(transportProtocolOption)
+        inner.accessAsync { $0.service = service }
     }
 
-    var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService> {
-        inner.accessWithoutLocking.connectionOptionWrapper
+    var service: HttpService {
+        inner.accessWithoutLocking.service
     }
 }
 
 extension ArbitraryConnection {
     private struct Inner {
-        var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService>
+        var service: HttpService
 
-        init(connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService>) {
-            self.connectionOptionWrapper = connectionOptionWrapper
+        init(service: HttpService) {
+            self.service = service
         }
     }
 }

@@ -4,14 +4,7 @@
 
 import Foundation
 
-typealias ConnectionWrapperFactory = (TransportProtocol.Option)
-                                    -> ConnectionOptionWrapper<
-                                        ConnectionProtocol,
-                                        ConnectionProtocol
-                                    >
-
 public struct TransportProtocol: Sendable {
-    public static let grpc = TransportProtocol(option: .grpc)
     public static let http = TransportProtocol(option: .http)
 
     let option: Option
@@ -19,7 +12,6 @@ public struct TransportProtocol: Sendable {
 
 extension TransportProtocol {
     enum Option {
-        case grpc
         case http
     }
 }
@@ -27,8 +19,6 @@ extension TransportProtocol {
 extension TransportProtocol: CustomStringConvertible {
     public var description: String {
         switch option {
-        case .grpc:
-            return "GRPC"
         case .http:
             return "HTTP"
         }
@@ -40,12 +30,11 @@ extension TransportProtocol: Hashable { }
 
 extension TransportProtocol {
     var certificateValidator: SSLCertificateValidator {
-        switch self.option {
-        case .grpc:
-            return WrappedNIOSSLCertificateValidator()
-        case .http:
-            return SecSSLCertificateValidator()
-        }
+        SecSSLCertificateValidator()
+    }
+
+    var timeoutInSeconds: Double {
+        DefaultHttpRequester.defaultConfiguration.timeoutIntervalForRequest
     }
 }
 
@@ -53,6 +42,6 @@ protocol SupportedProtocols {
     static var supportedProtocols: [TransportProtocol] { get }
 }
 
-extension SupportedProtocols {
-    public static var supportedProtocols: [TransportProtocol] { [] }
+extension TransportProtocol: SupportedProtocols {
+    public static var supportedProtocols: [TransportProtocol] { [.http] }
 }
