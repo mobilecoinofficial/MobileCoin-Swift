@@ -68,9 +68,12 @@ lint-all: lint
 # Release
 
 # The podspec is the version source for the tag.
+# `jq -e` stops on a null or unreadable version, and `-n` stops on an empty
+# string, so the `&&` chain never reaches the tag block without a version.
 .PHONY: tag-release
 tag-release:
-	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
+	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -er '.version')" && \
+		[ -n "$$VERSION" ] && \
 		if git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null 2>&1; then \
 			echo "Tag v$$VERSION already exists."; \
 		else \
