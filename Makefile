@@ -63,10 +63,7 @@ autocorrect:
 .PHONY: lint-all
 # `lint-docs` is out of this list because the Gemfile keeps jazzy commented out,
 # so it cannot generate the output it checks.
-lint-all: lint lint-podspec
-
-.PHONY: publish
-publish: tag-release publish-podspec
+lint-all: lint
 
 # Release
 
