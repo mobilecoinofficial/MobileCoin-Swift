@@ -4,7 +4,6 @@
 
 import Foundation
 
-// Can import GRPC so we want the full GRPC Version
 #if canImport(LibMobileCoinGRPC)
 class GrpcProtocolConnectionFactory: ProtocolConnectionFactory {
 

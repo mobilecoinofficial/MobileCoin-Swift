@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+
+- `Sources/GRPC` and `Tests/ProtocolSpecific/Grpc`. No product or subspec
+  compiled either tree.
+- The Mistyswap integration tests. Every case built an `XCTSkip` value without
+  throwing it, so every case ran against the gRPC transport. The suite carries
+  no HTTP variant.
+
+Neither removal touches public API.
+
 ## [6.1.0] - 2026-09-01
 
 ### Changed

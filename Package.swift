@@ -27,9 +27,7 @@ let package = Package(
     ],
     targets: [
         // HTTP only, which is what the pod chain ships and what production runs.
-        // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
-        // left out rather than guarded: its files import GRPC and NIO
-        // unconditionally, and so do the tests excluded below.
+        // The file list mirrors the podspec CoreHTTP subspec.
         .target(
             name: "MobileCoin",
             dependencies: [
@@ -37,9 +35,6 @@ let package = Package(
                 .product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin"),
             ],
             path: "Sources",
-            // GRPC is excluded as well as left out of sources, otherwise
-            // SwiftPM warns about its 25 files on every graph load.
-            exclude: ["GRPC"],
             sources: [
                 "Common",
                 "HTTPS",
@@ -56,10 +51,7 @@ let package = Package(
                 .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
             ],
             path: "Tests",
-            exclude: [
-                "Common/Secrets/secrets.json.sample",
-                "ProtocolSpecific/Grpc",
-            ],
+            exclude: ["Common/Secrets/secrets.json.sample"],
             resources: [
                 .copy("Common/FixtureData/Transaction"),
                 .copy("Common/Secrets/secrets.json"),
