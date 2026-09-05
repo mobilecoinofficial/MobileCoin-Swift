@@ -110,6 +110,16 @@ extension SecTrust {
     ) {
         let matches: [ChainOfTrustKey]
         let serverTrust = self
+
+        // Pinning narrows which system-trusted chains are acceptable.
+        var trustError: CFError?
+        guard SecTrustEvaluateWithError(serverTrust, &trustError) else {
+            let reason = trustError.map { CFErrorCopyDescription($0) as String } ?? "unknown"
+            completion(.failure(SSLTrustError(
+                "Failure: the server's chain of trust failed system evaluation: \(reason)")))
+            return
+        }
+
         let trustChainEnumerated = serverTrust.publicKeyTrustChain.enumerated()
         matches = trustChainEnumerated
             .map { chain -> ChainOfTrustKeyMatch in

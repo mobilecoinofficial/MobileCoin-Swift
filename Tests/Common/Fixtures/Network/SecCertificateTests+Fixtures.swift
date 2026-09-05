@@ -20,17 +20,47 @@ enum SecCertificateTests {
         })
     }
 
-    static func createSecTrust(_ certificateChain: [SecCertificate]) throws -> SecTrust {
+    /// A date inside the validity window every fixture chain shares.
+    ///
+    /// Every fixture leaf expires in 2023, so evaluation at the current date
+    /// refuses all of them.
+    static let fixtureVerifyDate = Date(timeIntervalSince1970: 1_680_307_200)
+
+    static func createSecTrust(
+        _ certificateChain: [SecCertificate],
+        verifyDate: Date? = fixtureVerifyDate,
+        host: String? = nil,
+        anchorOverride: SecCertificate? = nil
+    ) throws -> SecTrust {
         var secTrust: SecTrust?
+        let policy = host.map { SecPolicyCreateSSL(true, $0 as CFString) }
+            ?? SecPolicyCreateBasicX509()
         guard
             SecTrustCreateWithCertificates(
                 certificateChain as AnyObject,
-                SecPolicyCreateBasicX509(),
+                policy,
                 &secTrust
             ) == errSecSuccess,
             let serverTrust = secTrust
         else {
             throw SSLTrustError("Cannot create SecTrust from Server Certificates")
+        }
+
+        if let verifyDate {
+            guard SecTrustSetVerifyDate(serverTrust, verifyDate as CFDate) == errSecSuccess else {
+                throw SSLTrustError("Cannot set the verify date on the SecTrust")
+            }
+        }
+
+        // Anchoring keeps every verdict independent of what the system trust
+        // store holds, and an anchor from outside the chain leaves it no trusted path.
+        if let anchor = anchorOverride ?? certificateChain.last {
+            guard
+                SecTrustSetAnchorCertificates(serverTrust, [anchor] as CFArray) == errSecSuccess,
+                SecTrustSetAnchorCertificatesOnly(serverTrust, true) == errSecSuccess
+            else {
+                throw SSLTrustError("Cannot anchor the SecTrust on the given certificate")
+            }
         }
 
         return serverTrust

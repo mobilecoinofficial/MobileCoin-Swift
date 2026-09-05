@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `SecTrust.validateAgainst(pinnedKeys:completion:)` asks the system to judge
+  the chain before it compares any key, and fails the result when the system
+  refuses. This is a breaking change. `DefaultHttpRequester` is the only
+  shipped caller. A consumer that pins a CA the device does not trust can no
+  longer connect there. That path carries no flag to turn the check off. A
+  consumer that supplies its own `HttpRequester` replaces
+  `DefaultHttpRequester` outright, so its traffic never reaches this code. The
+  protocol's default trust-root setters do nothing, and they report no error.
+- A private CA the device trusts is an anchor like any other, so a chain under
+  it is judged like any other.
+- `validateAgainst` reads the chain the system built. A server that presents a
+  bare leaf under a pinned CA satisfies the pin once the system completes the
+  chain.
+
+### Fixed
+
+- Certificate pinning no longer stands in for system trust evaluation. An
+  expired chain and a chain built on an untrusted root are refused even when a
+  pinned key matches. Where the caller hands over a host-bound trust, which is
+  what `URLSession` supplies, a chain issued for another host is refused too.
+  A CA pin is matched by any certificate that CA issues, so the host check
+  is what separates the intended server from a sibling.
+
 ## [6.1.0] - 2026-09-01
 
 ### Changed

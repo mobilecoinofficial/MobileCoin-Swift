@@ -38,6 +38,60 @@ class CertificateTests: XCTestCase {
         }
     }
 
+    // The fixture chains carry expired leaves, so evaluating one at the current
+    // date is what separates a matching key from an acceptable connection.
+    func testExpiredChainIsRefusedWhenAPinnedKeyMatches() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
+
+        let atTheCurrentDate = try SecCertificateTests.createSecTrust(
+            fixture.certificateChain,
+            verifyDate: nil)
+
+        atTheCurrentDate.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertFailure(result)
+        }
+    }
+
+    // The pinned key is an intermediate CA key, so it matches every certificate
+    // that CA issues. Only the host in the policy separates the two evaluations.
+    func testChainIssuedForAnotherHostIsRefusedWhenAPinnedKeyMatches() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
+
+        let forItsOwnHost = try SecCertificateTests.createSecTrust(
+            fixture.certificateChain,
+            host: "fog.alpha.development.mobilecoin.com")
+
+        forItsOwnHost.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertSuccess(result)
+        }
+
+        let forAnotherHost = try SecCertificateTests.createSecTrust(
+            fixture.certificateChain,
+            host: "fog.prod.mobilecoin.com")
+
+        forAnotherHost.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertFailure(result)
+        }
+    }
+
+    // Anchoring on another chain's top certificate leaves this chain with no
+    // path to a trusted anchor, which is what an untrusted root looks like.
+    func testChainOnAnUntrustedRootIsRefusedWhenAPinnedKeyMatches() throws {
+        let alphaNet = try SecCertificateTests.Fixtures.AlphaNet()
+        let testNet = try SecCertificateTests.Fixtures.TestNet()
+        let pinnedKeys = [try alphaNet.validIntermediate.asPublicKey().get()]
+
+        let onAForeignAnchor = try SecCertificateTests.createSecTrust(
+            alphaNet.certificateChain,
+            anchorOverride: try XCTUnwrap(testNet.certificateChain.last))
+
+        onAForeignAnchor.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            XCTAssertFailure(result)
+        }
+    }
+
     func testInvalidIntermediateAgainstCertificateChain() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
 
@@ -51,7 +105,6 @@ class CertificateTests: XCTestCase {
     // The four below drive both delegate shims and each covers one of `handle`'s
     // outcomes.
 
-    // The fixture chain is expired, and pinning accepts it anyway.
     func testServerTrustMatchingAPinnedKeyIsAccepted() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
