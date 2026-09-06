@@ -135,8 +135,8 @@ class FogBlockConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func doSGetBlocks(transportProtocol: TransportProtocol) throws {
-        // The 100 requests below are identical and reach the shared integration
-        // fog ledger, so every run of the suite would load it for each protocol.
+        // The loop below sends many requests to the live shared fog ledger, so
+        // running the loop will put load on that ledger.
         try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
