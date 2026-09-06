@@ -18,8 +18,8 @@ extension SecCertificate {
         if let trust = trust, trustCreationStatus == errSecSuccess {
             publicKey = SecTrustCopyPublicKey(trust)
         } else {
-            // The status code names why the trust object refused the
-            // certificate, so the certificate bytes add nothing to the text.
+            // The status carries what SecTrustCreateWithCertificates
+            // reported, so the certificate bytes add nothing to the text.
             let error = SecurityError(trustCreationStatus, message: "root certificate")
             return .failure(error)
         }
