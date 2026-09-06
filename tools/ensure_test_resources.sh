@@ -11,6 +11,7 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 for sample in \
     "$REPO_ROOT/Tests/Common/Secrets/secrets.json.sample" \
+    "$REPO_ROOT/Tests/Common/Secrets/process_info.json.sample" \
     "$REPO_ROOT/tools/TestSetupClient/TestSetupClientTests/process_info.json.sample"
 do
     target="${sample%.sample}"

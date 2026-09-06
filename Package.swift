@@ -55,6 +55,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",
+                "Common/Secrets/process_info.json.sample",
                 "ProtocolSpecific/Grpc",
             ],
             resources: [
