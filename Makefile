@@ -67,15 +67,23 @@ lint-all: lint-strict
 
 # Release
 
-# The podspec is the version source for the tag.
-# `jq -e` stops on a null or unreadable version, and `-n` stops on an empty
-# string, so the `&&` chain never reaches the tag block without a version.
+# The podspec is the version source for the tag. `jq -e` stops a null or
+# unreadable version, and `[ -n ]` stops an empty string.
+# `git ls-remote --exit-code` exits 2 for an absent tag and 128 when it cannot
+# read origin. The branch reads the code, so a failure is never an absence.
 .PHONY: tag-release
 tag-release:
 	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -er '.version')" && \
 		[ -n "$$VERSION" ] && \
-		if git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null 2>&1; then \
-			echo "Tag v$$VERSION already exists."; \
+		{ git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null; LOOKUP=$$?; } && \
+		if [ $$LOOKUP -eq 0 ]; then \
+			echo "Tag v$$VERSION already exists on origin."; \
+		elif [ $$LOOKUP -ne 2 ]; then \
+			echo "Cannot read the tags on origin. git exited $$LOOKUP and made no tag." >&2; \
+			exit $$LOOKUP; \
+		elif git rev-parse -q --verify "refs/tags/v$$VERSION" >/dev/null; then \
+			echo "Tag v$$VERSION already exists in this clone and not on origin." >&2; \
+			exit 1; \
 		else \
 			git tag "v$$VERSION" && \
 			git push origin "refs/tags/v$$VERSION"; \
