@@ -11,7 +11,7 @@ check_dependencies -exit_on_install > /dev/null
 
 # One decryption for all six lookups. The assignment carries the age exit
 # status, so a failure stops the script before jq truncates secrets.json.
-SECRETS="$(decrypt_secrets | sed 's/export //')"
+SECRETS="$(decrypt_secrets | sed 's/^export //')"
 
 DEV_NETWORK_AUTH_USERNAME="$(lookup DEV_NETWORK_AUTH_USERNAME "$SECRETS" | xargs)"
 DEV_NETWORK_AUTH_PASSWORD="$(lookup DEV_NETWORK_AUTH_PASSWORD "$SECRETS" | xargs)"

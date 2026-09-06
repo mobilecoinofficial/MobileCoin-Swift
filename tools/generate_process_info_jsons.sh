@@ -11,7 +11,7 @@ check_dependencies -exit_on_install > /dev/null
 
 TEST_ACCOUNT_SEED="$(security find-generic-password -w -s swift-repo-public | head -c32 | base64)"
 
-SECRETS="$(decrypt_secrets | sed 's/export //')"
+SECRETS="$(decrypt_secrets | sed 's/^export //')"
 SRC_ACCT_ENTROPY_STRING="$(lookup SRC_ACCT_ENTROPY_STRING "$SECRETS")"
 
 # test account seed will be 32 bytes of your contribution key
