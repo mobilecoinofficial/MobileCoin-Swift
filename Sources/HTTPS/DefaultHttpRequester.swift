@@ -74,12 +74,20 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
         task.resume()
     }
 
-    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
+    @discardableResult
+    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?)
+        -> Result<(), InvalidInputError>
+    {
         pinningDelegate.setConsensusTrustRoots(trustRoots)
+        return .success(())
     }
 
-    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
+    @discardableResult
+    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?)
+        -> Result<(), InvalidInputError>
+    {
         pinningDelegate.setFogTrustRoots(trustRoots)
+        return .success(())
     }
 }
 
@@ -124,7 +132,7 @@ final class CertificatePinningDelegate: NSObject {
     ) {
         guard
             let trust = challenge.protectionSpace.serverTrust,
-            SecTrustGetCertificateCount(trust) > 0
+            trust.certificateTrustChain.isNotEmpty
         else {
             // This case will probably get handled by ATS, but still...
             completionHandler(.cancelAuthenticationChallenge, nil)
