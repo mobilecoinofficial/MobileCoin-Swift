@@ -49,9 +49,6 @@ test-example-http:
 clean-example-http: clean-docs
 	@$(MAKE) --directory=ExampleHTTP clean
 
-.PHONY: lint
-lint: swiftlint
-
 .PHONY: lint-strict
 lint-strict: 
 	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict --quiet
@@ -62,7 +59,7 @@ autocorrect:
 
 .PHONY: lint-all
 # `lint-docs` is out of this list because the Gemfile keeps jazzy commented out,
-# so it cannot generate the output it checks.
+# so it cannot generate the output it checks. It rejoins when jazzy comes back.
 lint-all: lint-strict
 
 # Release
