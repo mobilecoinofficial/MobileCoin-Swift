@@ -54,13 +54,8 @@ public final class MobileCoinClient {
         self.mixinSelectionStrategy = config.mixinSelectionStrategy
         self.fogQueryScalingStrategy = config.fogQueryScalingStrategy
 
-        // The factory builds a requester of its own when it is given none, and
-        // that requester holds no trust roots. Setting one here sends the
-        // config's own roots to the requester the connections use.
         var networkConfig = config.networkConfig
-        if networkConfig.httpRequester == nil {
-            networkConfig.httpRequester = DefaultHttpRequester()
-        }
+        networkConfig.fillHttpRequester()
 
         let grpcFactory = GrpcProtocolConnectionFactory()
         let httpFactory = HttpProtocolConnectionFactory(

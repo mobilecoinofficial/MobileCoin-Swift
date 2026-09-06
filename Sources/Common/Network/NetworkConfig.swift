@@ -52,9 +52,15 @@ struct NetworkConfig {
         }
     }
 
-    // A property setter answers with nothing, so a requester that refuses the
-    // stored roots says so in the log. Absent roots stay absent, so a requester
-    // keeps the roots it already holds.
+    // A config that holds no requester gives itself one, so that the roots it
+    // stores will reach the connections built from it.
+    mutating func fillHttpRequester() {
+        guard httpRequester == nil else { return }
+        httpRequester = DefaultHttpRequester()
+    }
+
+    // A property setter answers with nothing, so a refusal only goes to the
+    // log. Roots the config doesn't hold leave the requester's own in place.
     private func pushStoredTrustRoots() {
         guard let requester = httpRequester else { return }
         if let fog = fogTrustRoots[.http] as? SecSSLCertificates,
@@ -218,8 +224,7 @@ extension NetworkConfig {
     }
 
     // The requester takes the roots before the dictionary keeps them, so a
-    // refusal leaves the roots that are already pinned in place. A config with
-    // no requester yet keeps the roots for the requester it is given later.
+    // refusal will leave the roots that are already pinned in place.
     private mutating func setTrustRoots(
         _ trustRoots: [Data],
         into roots: WritableKeyPath<NetworkConfig, [TransportProtocol: SSLCertificates]>,

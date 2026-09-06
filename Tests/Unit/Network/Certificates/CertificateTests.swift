@@ -143,24 +143,63 @@ class CertificateTests: XCTestCase {
         XCTAssertEqual(message, SecTrust.pinnedKeyMatched + "[\(index)]")
     }
 
-    // Roots set before the requester reach it as soon as it arrives, because the
-    // config sends what it holds to each requester it is given.
+    // Distinct fog and consensus roots are what make a swap of the two setters
+    // visible, because each one lands in a field of its own on the mock.
     func testTrustRootsSetBeforeTheRequesterReachIt() throws {
         var config = try NetworkConfigFixtures.create(using: .http)
         let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        config.httpRequester = nil
         XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
-        XCTAssertSuccess(config.setFogTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
 
         let requester = MockFailingHttpRequester()
         config.httpRequester = requester
 
-        let stored = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
-        XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, stored.publicKeys)
-        XCTAssertEqual(requester.fogTrustRoots?.publicKeys, stored.publicKeys)
+        let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertNotEqual(consensus.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, consensus.publicKeys)
+        XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
     }
 
-    // A requester that refuses the roots leaves the config holding the roots it
-    // had, so a caller reading the failure reads the roots that are pinned.
+    // The config's setters and the requester's share their names, so distinct
+    // roots pushed through a live requester are what will catch a swapped pair.
+    func testEachConfigSetterPushesToItsOwnRequesterField() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        let requester = MockFailingHttpRequester()
+        config.httpRequester = requester
+
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
+
+        let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertNotEqual(consensus.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, consensus.publicKeys)
+        XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
+    }
+
+    // A config with no requester of its own gets a DefaultHttpRequester, which
+    // then holds the roots the config was given before it.
+    func testAConfigWithNoRequesterFillsInOneThatTakesItsRoots() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        config.httpRequester = nil
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+
+        config.fillHttpRequester()
+
+        let requester = try XCTUnwrap(config.httpRequester as? DefaultHttpRequester)
+        let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertEqual(
+            try pinningDelegate(of: requester).pinnedKeys,
+            fog.publicKeys + consensus.publicKeys)
+    }
+
+    // A refused set leaves the config holding the roots the call before it
+    // stored, so a failure won't replace them with roots nothing accepted.
     func testRefusedTrustRootsLeaveThePinnedRootsInPlace() throws {
         var config = try NetworkConfigFixtures.create(using: .http)
         let fixture = try NetworkConfig.Fixtures.TrustRoots()

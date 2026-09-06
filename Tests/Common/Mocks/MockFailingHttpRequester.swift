@@ -23,8 +23,6 @@ public final class MockFailingHttpRequester: NSObject, HttpRequester {
         completion(.failure(ConnectionError.invalidServerResponse("Mock Http Request set to fail")))
     }
 
-    // The roots are kept, so a success here names a root this mock can answer
-    // for, and a test can read which root arrived.
     public private(set) var consensusTrustRoots: SecSSLCertificates?
     public private(set) var fogTrustRoots: SecSSLCertificates?
 
