@@ -51,6 +51,8 @@ class FogBlockConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func getBlockZero(transportProtocol: TransportProtocol) throws {
+        // The body needs block 0 to carry outputs and a `globalTxoCount`
+        // equal to its own output count.
         try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
@@ -133,6 +135,8 @@ class FogBlockConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func doSGetBlocks(transportProtocol: TransportProtocol) throws {
+        // The 100 requests below are identical and reach the shared integration
+        // fog ledger, so every run of the suite would load it for each protocol.
         try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")

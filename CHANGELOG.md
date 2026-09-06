@@ -29,9 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ignores case and trailing dots.
 - `DefaultHttpRequester` judges a host that no such set names against every
   root it holds, which is the fallback and is what it did for every host
-  before. A lookup keeps a naming set only while it carries keys, so it takes
-  that fallback for a host that keyless sets alone name. A consumer that names
-  the hosts of one setter alone leaves the other setter's hosts there too.
+  before. A lookup keeps a naming set only while it carries keys, so the
+  lookup takes that fallback for a host that keyless sets alone name. A
+  consumer that names the hosts of one setter alone leaves the other setter's
+  hosts there too.
 - `SecTrust.publicKeyTrustChain` returns a `Result` and carries the error of
   the certificate it could not read. `asPublicKeyTrustChain` is gone.
 - `SecTrust.certificateTrustChain` reads the chain with
