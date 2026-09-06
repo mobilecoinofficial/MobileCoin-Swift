@@ -67,13 +67,13 @@ lint-all: lint-strict
 
 # Release
 
-# The podspec is the version source for the tag. `jq -e` stops a null or
-# unreadable version, and `[ -n ]` stops an empty string.
+# The podspec is the version source for the tag. `jq -e` stops a null,
+# unreadable or non-string version, and `[ -n ]` stops an empty string.
 # `git ls-remote --exit-code` exits 2 for an absent tag and 128 when it cannot
 # read origin. The branch reads the code, so a failure is never an absence.
 .PHONY: tag-release
 tag-release:
-	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -er '.version')" && \
+	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -er '.version | select(type == "string")')" && \
 		[ -n "$$VERSION" ] && \
 		{ git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null; LOOKUP=$$?; } && \
 		if [ $$LOOKUP -eq 0 ]; then \
