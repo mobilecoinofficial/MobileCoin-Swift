@@ -27,6 +27,9 @@ node_modules/
 # spm build folder
 .build
 
+# SwiftLint, downloaded by tools/swiftlint.sh
+/.tools/
+
 # stale submodule checkout an existing clone still holds
 /Vendor/
 

@@ -51,11 +51,11 @@ clean-example-http: clean-docs
 
 .PHONY: lint-strict
 lint-strict: 
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict --quiet
+	@tools/swiftlint.sh --strict --quiet
 
 .PHONY: autocorrect
 autocorrect: 
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
+	@tools/swiftlint.sh --fix
 
 .PHONY: lint-all
 # `lint-docs` is out of this list because the Gemfile keeps jazzy commented out,
@@ -118,7 +118,7 @@ lint-docs:
 
 .PHONY: swiftlint
 swiftlint:
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint
+	@tools/swiftlint.sh
 
 # Maintenance
 

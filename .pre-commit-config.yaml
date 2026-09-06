@@ -3,13 +3,13 @@ repos:
     hooks:
       - id: autocorrect
         name: autocorrect
-        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --fix --force-exclude"
+        entry: "tools/swiftlint.sh --fix --force-exclude"
         language: script
         files: \.swift$
   - repo: local
     hooks:
       - id: lint
         name: lint
-        entry: "ExampleHTTP/Pods/SwiftLint/swiftlint --strict --quiet --force-exclude"
+        entry: "tools/swiftlint.sh --strict --quiet --force-exclude"
         language: script
         files: \.swift$
