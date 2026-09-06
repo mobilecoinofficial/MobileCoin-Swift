@@ -141,6 +141,21 @@ build-spm:
 	tools/ensure_test_resources.sh
 	swift build --build-tests
 
+# The offline test lane, and the parity replacement for the ExampleHTTP
+# schemes. It runs every suite those schemes compiled, against the sample
+# fixtures, so it needs no credential and no network.
+# The skips are the suites that do need them: the whole of Tests/Integration,
+# whose 22 classes these three patterns cover exactly, and the account funding
+# tool, which reads a real seed from process_info.json.
+.PHONY: test-spm
+test-spm:
+	tools/ensure_test_resources.sh
+	swift test \
+		--skip "IntTests" \
+		--skip "MistyswapTests" \
+		--skip "TransactionIdempotenceTests" \
+		--skip "TestSetupClientTests"
+
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:
 	tools/ensure_test_resources.sh
