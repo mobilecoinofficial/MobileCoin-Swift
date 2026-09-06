@@ -14,19 +14,18 @@ extension SecCertificate {
         let policy = SecPolicyCreateBasicX509()
         var trust: SecTrust?
         let trustCreationStatus = SecTrustCreateWithCertificates(certificate, policy, &trust)
-        let data = certificate.data
 
         if let trust = trust, trustCreationStatus == errSecSuccess {
             publicKey = SecTrustCopyPublicKey(trust)
         } else {
-            let message = "root certificate: \(data.base64EncodedString())"
-            let error = SecurityError(trustCreationStatus, message: message)
+            // The certificate itself is key material and stays out of the text.
+            // The status says why the trust object refused it.
+            let error = SecurityError(trustCreationStatus, message: "root certificate")
             return .failure(error)
         }
 
         guard let key = publicKey else {
-            let message = ", root certificate: \(data.base64EncodedString())"
-            return .failure(SecurityError(nil, message: SecurityError.nilPublicKey + message))
+            return .failure(SecurityError(nil, message: SecurityError.nilPublicKey))
         }
 
         return .success(key)
@@ -77,9 +76,13 @@ extension SecTrust {
         certificateTrustChain.count
     }
 
+    // SecTrustCopyCertificateChain is nullable and documents no chain for a
+    // trust it has yet to evaluate. SecTrustGetCertificateAtIndex documents the
+    // leaf as always present, so it answers whenever the newer call gives nil.
     public var certificateTrustChain: [SecCertificate] {
-        if #available(iOS 15.0, macOS 12.0, *) {
-            return SecTrustCopyCertificateChain(self) as? [SecCertificate] ?? []
+        if #available(iOS 15.0, macOS 12.0, *),
+           let chain = SecTrustCopyCertificateChain(self) as? [SecCertificate] {
+            return chain
         }
         return [Int](0..<SecTrustGetCertificateCount(self)).compactMap {
             SecTrustGetCertificateAtIndex(self, $0)
@@ -149,8 +152,7 @@ extension SecTrust {
         }
     }
 
-    // Named so a test can assert which refusal it read, rather than only that
-    // the check refused.
+    // Each refusal carries its own name, so a test can assert which one it read.
     static let systemEvaluationFailure =
         "Failure: the server's chain of trust failed system evaluation, code "
     static let unreadablePublicKey =

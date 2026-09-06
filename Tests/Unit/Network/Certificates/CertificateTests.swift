@@ -126,8 +126,7 @@ class CertificateTests: XCTestCase {
         XCTAssertEqual(reason.components(separatedBy: "\n").count, 1)
     }
 
-    // Exact equality is what proves the message carries no key material, rather
-    // than a search for one encoding of the key.
+    // Exact equality proves the message carries the index alone.
     func testAMatchIsReportedByIndexAndNotByKey() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
@@ -144,13 +143,36 @@ class CertificateTests: XCTestCase {
         XCTAssertEqual(message, SecTrust.pinnedKeyMatched + "[\(index)]")
     }
 
-    // A requester that stores no trust roots takes the protocol's own setters,
-    // and a caller that reads success there believes roots are pinned.
-    func testARequesterWithoutTrustRootStorageReportsAFailure() {
-        let requester = RequestOnlyHttpRequester()
+    // Roots set before the requester reach it as soon as it arrives, because the
+    // config sends what it holds to each requester it is given.
+    func testTrustRootsSetBeforeTheRequesterReachIt() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots(fixture.trustRootsBytes))
 
-        XCTAssertFailure(requester.setFogTrustRoots(nil))
-        XCTAssertFailure(requester.setConsensusTrustRoots(nil))
+        let requester = MockFailingHttpRequester()
+        config.httpRequester = requester
+
+        let stored = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, stored.publicKeys)
+        XCTAssertEqual(requester.fogTrustRoots?.publicKeys, stored.publicKeys)
+    }
+
+    // A requester that refuses the roots leaves the config holding the roots it
+    // had, so a caller reading the failure reads the roots that are pinned.
+    func testRefusedTrustRootsLeaveThePinnedRootsInPlace() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        let pinned = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+
+        config.httpRequester = RefusingHttpRequester()
+
+        XCTAssertFailure(config.setConsensusTrustRoots([fixture.wrongTrustRootBytes]))
+        XCTAssertEqual(
+            (config.consensusTrustRoots[.http] as? SecSSLCertificates)?.publicKeys,
+            pinned.publicKeys)
     }
 
     // Roots that fail to parse leave the pinned roots in place, because a config
@@ -355,9 +377,8 @@ private final class TrustingProtectionSpace: URLProtectionSpace, @unchecked Send
     override var serverTrust: SecTrust? { trust }
 }
 
-// A requester that implements only `request` takes the protocol's default
-// trust-root setters.
-private struct RequestOnlyHttpRequester: HttpRequester {
+// A requester that keeps no trust roots and says so.
+private final class RefusingHttpRequester: HttpRequester {
     func request(
         url: URL,
         method: HTTPMethod,
@@ -366,6 +387,16 @@ private struct RequestOnlyHttpRequester: HttpRequester {
         completion: @escaping (Result<HTTPResponse, Error>) -> Void
     ) {
         completion(.failure(ConnectionError.invalidServerResponse("unused")))
+    }
+
+    func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) -> Result<(), InvalidInputError> {
+        .failure(InvalidInputError("This requester keeps no fog trust roots"))
+    }
+
+    func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?)
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This requester keeps no consensus trust roots"))
     }
 }
 

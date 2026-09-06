@@ -16,14 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   longer connect there. That path carries no flag to turn the check off. A
   consumer that supplies its own `HttpRequester` replaces
   `DefaultHttpRequester` outright, so its traffic never reaches this code.
-- The `HttpRequester` default trust-root setters store nothing and return a
-  failure. This is a breaking change for a consumer that reads the result as
-  proof the roots are pinned.
+- `HttpRequester` requires both trust-root setters and answers each with a
+  `Result`. The protocol carries no default, so a requester that stores no
+  roots fails to compile. This is a breaking change.
 - `SecTrust.publicKeyTrustChain` returns a `Result` and carries the error of
   the certificate it could not read. `asPublicKeyTrustChain` is gone.
 - `SecTrust.certificateTrustChain` reads the chain with
-  `SecTrustCopyCertificateChain` on iOS 15 and macOS 12. Older systems keep the
-  deprecated calls.
+  `SecTrustCopyCertificateChain` on iOS 15 and macOS 12. The deprecated calls
+  answer on an older system and wherever that call gives nil.
 - A private CA the device trusts is an anchor like any other, so a chain under
   it is judged like any other.
 - `validateAgainst` reads the chain the system built. A server that presents a
@@ -44,7 +44,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The pinning success line names the index of the certificate that matched in
   place of its public key.
 - `NetworkConfig.setConsensusTrustRoots` and `setFogTrustRoots` keep the roots
-  already set when the new roots fail to parse.
+  already set when the new roots fail to parse, and they keep the new roots
+  only once the requester has taken them.
+- `MobileCoinClient` gives a config that carries no requester a
+  `DefaultHttpRequester`, so the trust roots on that config reach the
+  connections it opens. Before this the connection factory built its own
+  requester, which held no roots and pinned nothing.
+- `SecCertificate.publicKey(for:)` names the certificate in place of printing
+  its bytes.
 
 ## [6.1.0] - 2026-09-01
 

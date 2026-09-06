@@ -48,8 +48,22 @@ struct NetworkConfig {
 
     var httpRequester: HttpRequester? {
         didSet {
-            httpRequester?.setFogTrustRoots(fogTrustRoots[.http] as? SecSSLCertificates)
-            httpRequester?.setConsensusTrustRoots(consensusTrustRoots[.http] as? SecSSLCertificates)
+            pushStoredTrustRoots()
+        }
+    }
+
+    // A property setter answers with nothing, so a requester that refuses the
+    // stored roots says so in the log. Absent roots stay absent, so a requester
+    // keeps the roots it already holds.
+    private func pushStoredTrustRoots() {
+        guard let requester = httpRequester else { return }
+        if let fog = fogTrustRoots[.http] as? SecSSLCertificates,
+           case .failure(let error) = requester.setFogTrustRoots(fog) {
+            logger.error("Fog trust roots stay unpinned: \(error)", logFunction: false)
+        }
+        if let consensus = consensusTrustRoots[.http] as? SecSSLCertificates,
+           case .failure(let error) = requester.setConsensusTrustRoots(consensus) {
+            logger.error("Consensus trust roots stay unpinned: \(error)", logFunction: false)
         }
     }
 
@@ -190,55 +204,47 @@ extension NetworkConfig {
     @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
-        let (grpc, http) = validatedCertificates(trustRoots)
-
-        if let certificates = try? grpc.get() {
-            self.consensusTrustRoots[.grpc] = certificates
+        setTrustRoots(trustRoots, into: \.consensusTrustRoots) { requester, certificates in
+            requester.setConsensusTrustRoots(certificates)
         }
-        if let certificates = try? http.get() {
-            self.consensusTrustRoots[.http] = certificates
-            if case .failure(let error) = pushConsensusTrustRoots(certificates) {
-                return .failure(error)
-            }
-        }
-
-        return currentProtocolValidation(grpc: grpc, http: http)
     }
 
     @discardableResult mutating public func setFogTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
+        setTrustRoots(trustRoots, into: \.fogTrustRoots) { requester, certificates in
+            requester.setFogTrustRoots(certificates)
+        }
+    }
+
+    // The requester takes the roots before the dictionary keeps them, so a
+    // refusal leaves the roots that are already pinned in place. A config with
+    // no requester yet keeps the roots for the requester it is given later.
+    private mutating func setTrustRoots(
+        _ trustRoots: [Data],
+        into roots: WritableKeyPath<NetworkConfig, [TransportProtocol: SSLCertificates]>,
+        pushedBy push: (HttpRequester, SecSSLCertificates) -> Result<(), InvalidInputError>
+    ) -> Result<(), InvalidInputError> {
         let (grpc, http) = validatedCertificates(trustRoots)
 
         if let certificates = try? grpc.get() {
-            self.fogTrustRoots[.grpc] = certificates
+            self[keyPath: roots][.grpc] = certificates
         }
         if let certificates = try? http.get() {
-            self.fogTrustRoots[.http] = certificates
-            if case .failure(let error) = pushFogTrustRoots(certificates) {
+            // A requester takes only Sec certificates, and nil there clears the
+            // roots it holds, so a cast that fails answers as a failure.
+            guard let httpCertificates = certificates as? SecSSLCertificates else {
+                return .failure(InvalidInputError("HTTP trust roots hold another type"))
+            }
+            if let requester = httpRequester,
+               case .failure(let error) = push(requester, httpCertificates) {
                 return .failure(error)
             }
+            self[keyPath: roots][.http] = certificates
         }
 
         return currentProtocolValidation(grpc: grpc, http: http)
     }
-
-    // A requester that discards the roots reports it, and a config with no
-    // requester yet has nothing to discard them.
-    private func pushConsensusTrustRoots(_ certificates: SSLCertificates)
-        -> Result<(), InvalidInputError>
-    {
-        guard let requester = httpRequester else { return .success(()) }
-        return requester.setConsensusTrustRoots(certificates as? SecSSLCertificates)
-    }
-
-    private func pushFogTrustRoots(_ certificates: SSLCertificates)
-        -> Result<(), InvalidInputError>
-    {
-        guard let requester = httpRequester else { return .success(()) }
-        return requester.setFogTrustRoots(certificates as? SecSSLCertificates)
-    }
-
 }
 
 extension NetworkConfig {

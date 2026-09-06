@@ -125,6 +125,11 @@ extension SecCertificateTests.Fixtures {
     struct ForgedCommonName {
         static let commonName = "evil.example.com\nforged-log-line"
 
+        /// This certificate is valid from 2026-09-06 to 2036-09-03, so it holds
+        /// its own date. A pinned date keeps the refusal a matter of the anchor
+        /// at every future run.
+        static let verifyDate = Date(timeIntervalSince1970: 1_893_456_000)
+
         let secTrust: SecTrust
 
         init() throws {
@@ -134,7 +139,7 @@ extension SecCertificateTests.Fixtures {
             )
             self.secTrust = try SecCertificateTests.createSecTrust(
                 [leaf],
-                verifyDate: nil,
+                verifyDate: Self.verifyDate,
                 anchorOverride: foreignAnchor
             )
         }
