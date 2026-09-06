@@ -1,16 +1,6 @@
 # Xcode
 xcuserdata/
 
-# Fastlane
-test_output/
-
-# Bundler
-.bundle/
-.vendor/
-
-# CocoaPods
-Pods/
-
 # Jazzy
 #/docs/
 

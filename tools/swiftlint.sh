@@ -1,8 +1,8 @@
 #!/bin/bash
 # Runs the pinned SwiftLint, downloading it first when it is absent.
 #
-# The version matches the one ExampleHTTP's Pods vendored, so the rule set and
-# the results do not move. SwiftLint 0.58.2 reports 219 violations on this tree.
+# The pin is deliberate. This tree is clean under 0.47.1 and not under newer
+# releases, so a bump is a change of its own.
 set -euo pipefail
 
 VERSION="0.47.1"

@@ -1,53 +1,14 @@
 .PHONY: default
-default: setup bootstrap build test
+default: build-spm test-spm
 
 # Commands
 
-.PHONY: setup
-setup:
-	bundle install
-	@$(MAKE) --directory=ExampleHTTP setup
-
-.PHONY: bootstrap
-bootstrap:
-	@$(MAKE) --directory=ExampleHTTP bootstrap
-
+# `build` and `test` are the names the README and years of muscle memory use.
 .PHONY: build
-build:
-	@$(MAKE) --directory=ExampleHTTP build
+build: build-spm
 
 .PHONY: test
-test:
-	@$(MAKE) --directory=ExampleHTTP test
-
-.PHONY: lock
-lock:
-	$(info making locks with setup & boostrap)
-	$(info ExampleHTTP setup)
-	@$(MAKE) --directory=ExampleHTTP setup
-	$(info ExampleHTTP bootstrap)
-	@$(MAKE) --directory=ExampleHTTP bootstrap
-
-.PHONY: setup-example-http
-setup-example-http:
-	bundle install
-	@$(MAKE) --directory=ExampleHTTP setup
-
-.PHONY: bootstrap-example-http
-bootstrap-example-http:
-	@$(MAKE) --directory=ExampleHTTP bootstrap
-
-.PHONY: build-example-http
-build-example-http:
-	@$(MAKE) --directory=ExampleHTTP build
-
-.PHONY: test-example-http
-test-example-http:
-	@$(MAKE) --directory=ExampleHTTP test
-
-.PHONY: clean-example-http
-clean-example-http: clean-docs
-	@$(MAKE) --directory=ExampleHTTP clean
+test: test-spm
 
 .PHONY: lint-strict
 lint-strict: 
@@ -58,7 +19,7 @@ autocorrect:
 	@tools/swiftlint.sh --fix
 
 .PHONY: lint-all
-# `lint-docs` is out of this list because the Gemfile keeps jazzy commented out,
+# `lint-docs` is out of this list because no route in this repo installs jazzy,
 # so it cannot generate the output it checks. It rejoins when jazzy comes back.
 lint-all: lint-strict
 
@@ -98,7 +59,7 @@ API_DOCS = output/api-docs
 
 .PHONY: docs
 docs:
-	bundle exec jazzy
+	jazzy
 
 .PHONY: clean-docs
 clean-docs:
@@ -126,28 +87,21 @@ swiftlint:
 
 # Maintenance
 
-.PHONY: upgrade-deps
-upgrade-deps:
-	bundle update
-	$(MAKE) -C ExampleHTTP upgrade-deps
-
 .PHONY: generate-local-process-info
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
 
 # Builds every target in Package.swift, test targets included. Plain `swift
 # build` skips those, so a test target that cannot compile still goes green.
-# Unlike `run-all-tests-spm` this needs no secrets, so it is the one SPM check
-# CI can run today. The test targets declare generated resources, which from
-# tools 6.0 must exist before the build, hence the ensure step.
+# The test targets declare generated resources, which from tools 6.0 must exist
+# before the build, hence the ensure step.
 .PHONY: build-spm
 build-spm:
 	tools/ensure_test_resources.sh
 	swift build --build-tests
 
-# The offline test lane, and the parity replacement for the ExampleHTTP
-# schemes. It runs every suite those schemes compiled, against the sample
-# fixtures, so it needs no credential and no network.
+# The offline test lane. It runs against the sample fixtures, so it needs no
+# credential and no network.
 # The skips are the suites that do need them: the whole of Tests/Integration,
 # whose 22 classes these three patterns cover exactly, and the account funding
 # tool, which reads a real seed from process_info.json.

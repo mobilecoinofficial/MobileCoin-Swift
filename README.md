@@ -42,7 +42,6 @@ Please check your country's laws before downloading or using this software.
 |Directory |Description |
 | :-- | :-- |
 | [Docs](./docs) | Integration Guide. |
-| [ExampleHTTP](./ExampleHTTP) | Example "HTTP Only" application. |
 | [scripts](./scripts) | Scripts used by this repo. |
 | [secrets](./secrets) | Secrets file for contributors, and their public keys. |
 | [Sources](./Sources) | Sources for the MobileCoin Swift SDK. |
@@ -52,26 +51,9 @@ Please check your country's laws before downloading or using this software.
 
 ### Toolchain
 
-The two routes have different compiler floors, and only SwiftPM's manifest enforces its own:
-
-|Route |Minimum |Why |
-| :-- | :-- | :-- |
-| SwiftPM | Swift 6.1, Xcode 16.3 | `Package.swift` declares `swift-tools-version:6.1`, which an older SwiftPM rejects before it reads anything else. |
-| CocoaPods | Swift 5.10, Xcode 15.3 | `MobileCoinLogging` uses `nonisolated(unsafe)`, which no earlier compiler parses. |
-
-The podspec's `swift_version` is a language mode rather than a compiler floor. An `#error` guard in `MobileCoinLogging` reports the CocoaPods floor rather than setting it.
+Swift 6.1 with Xcode 16.3 or newer. `Package.swift` declares `swift-tools-version:6.1`, and an older SwiftPM rejects the manifest before it reads anything else.
 
 ### Setup
-
-The workspace can be built with `make`.
-
-1. Install Ruby 3.1.x
-
-1. Install the gem bundler
-
-    ```
-    gem install bundler
-    ```
 
 1. Install pre-commit
 
@@ -80,13 +62,13 @@ The workspace can be built with `make`.
     pre-commit install
     ```
 
-1. Build the MobileCoin Swift SDK
+1. Build the MobileCoin Swift SDK and run its offline tests
 
     ```
     make
     ```
 
-Note: `LibMobileCoin` resolves from the [libmobilecoin](https://github.com/mobilecoinofficial/libmobilecoin) release, so no local build of it is needed.
+`make` needs no other tool. `tools/swiftlint.sh` downloads the pinned SwiftLint on first use, and `LibMobileCoin` resolves from the [libmobilecoin](https://github.com/mobilecoinofficial/libmobilecoin) release, so neither needs a local build.
 
 ## Secrets
 

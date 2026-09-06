@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -e
-
-scriptdir="$( dirname -- "$BASH_SOURCE"; )";
-source "$scriptdir/secrets_manager"
-
-generate_and_rename_cocoapodkeys $1

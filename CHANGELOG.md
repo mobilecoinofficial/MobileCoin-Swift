@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+
+- `MobileCoin.podspec` and the `ExampleHTTP` app it existed to feed. The
+  package is the only description of this library now. Tags published before
+  this change keep resolving, so a Podfile pinning `MobileCoin/CoreHTTP` by git
+  tag is unaffected.
+- The Ruby bundle, `.github/actions/setup-macos-ci` and the cocoapods-keys
+  helpers in `scripts/`. Nothing in the repo runs `pod` or `bundle` any more.
+
+### Changed
+
+- CI runs two jobs, `Swift package tests` and `SwiftLint`. The first runs the
+  offline SwiftPM lane, which covers every suite the ExampleHTTP schemes used
+  to compile. Branch protection needs the old job names replaced.
+- SwiftLint comes from `tools/swiftlint.sh`, which downloads the pinned 0.47.1
+  and checks it against a sha256.
+- `make tag-release` reads the version from the newest released heading in this
+  file rather than from the podspec.
+
 ## [6.1.0] - 2026-09-01
 
 ### Changed
