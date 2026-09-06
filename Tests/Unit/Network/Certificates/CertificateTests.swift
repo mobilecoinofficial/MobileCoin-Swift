@@ -143,8 +143,8 @@ class CertificateTests: XCTestCase {
         XCTAssertEqual(message, SecTrust.pinnedKeyMatched + "[\(index)]")
     }
 
-    // Distinct fog and consensus roots are what make a swap of the two setters
-    // visible, because each one lands in a field of its own on the mock.
+    // Roots the config stored with no requester present reach the first
+    // requester it is given, each in the field its own setter names.
     func testTrustRootsSetBeforeTheRequesterReachIt() throws {
         var config = try NetworkConfigFixtures.create(using: .http)
         let fixture = try NetworkConfig.Fixtures.TrustRoots()
@@ -163,7 +163,7 @@ class CertificateTests: XCTestCase {
     }
 
     // The config's setters and the requester's share their names, so distinct
-    // roots pushed through a live requester are what will catch a swapped pair.
+    // roots are what will catch a swapped pair once a requester is present.
     func testEachConfigSetterPushesToItsOwnRequesterField() throws {
         var config = try NetworkConfigFixtures.create(using: .http)
         let fixture = try NetworkConfig.Fixtures.TrustRoots()
@@ -180,26 +180,53 @@ class CertificateTests: XCTestCase {
         XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
     }
 
-    // A config with no requester of its own gets a DefaultHttpRequester, which
-    // then holds the roots the config was given before it.
+    // `pinnedKeys` reads fog before consensus, so an ordered comparison against
+    // distinct roots will show that each field arrives with its own keys.
     func testAConfigWithNoRequesterFillsInOneThatTakesItsRoots() throws {
         var config = try NetworkConfigFixtures.create(using: .http)
         let fixture = try NetworkConfig.Fixtures.TrustRoots()
         config.httpRequester = nil
         XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
 
-        config.fillHttpRequester()
+        let requester = try XCTUnwrap(config.filledHttpRequester() as? DefaultHttpRequester)
 
-        let requester = try XCTUnwrap(config.httpRequester as? DefaultHttpRequester)
         let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
         let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertNotEqual(fog.publicKeys, consensus.publicKeys)
         XCTAssertEqual(
             try pinningDelegate(of: requester).pinnedKeys,
             fog.publicKeys + consensus.publicKeys)
     }
 
-    // A refused set leaves the config holding the roots the call before it
-    // stored, so a failure won't replace them with roots nothing accepted.
+    // A consumer's own requester decides how the connections handle TLS, so the
+    // fill answers with that one and keeps it in the config.
+    func testAConfigKeepsTheRequesterItAlreadyHolds() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let requester = MockFailingHttpRequester()
+        config.httpRequester = requester
+
+        XCTAssertTrue((config.filledHttpRequester() as? MockFailingHttpRequester) === requester)
+        XCTAssertTrue((config.httpRequester as? MockFailingHttpRequester) === requester)
+    }
+
+    // Roots the config doesn't hold leave the requester's own in place, so a
+    // requester that arrives with keys keeps pinning against them.
+    func testAConfigWithNoRootsLeavesTheRequestersOwnInPlace() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        config.consensusTrustRoots[.http] = nil
+        config.fogTrustRoots[.http] = nil
+        let requester = DefaultHttpRequester()
+        let roots = try alphaNetCertificates(.valid)
+        requester.setFogTrustRoots(roots)
+
+        config.httpRequester = requester
+
+        XCTAssertEqual(try pinningDelegate(of: requester).pinnedKeys, roots.publicKeys)
+    }
+
+    // A refused set keeps the pinned http roots the call before it stored, so a
+    // failure won't replace them with roots nothing accepted.
     func testRefusedTrustRootsLeaveThePinnedRootsInPlace() throws {
         var config = try NetworkConfigFixtures.create(using: .http)
         let fixture = try NetworkConfig.Fixtures.TrustRoots()

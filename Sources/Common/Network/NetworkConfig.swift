@@ -52,11 +52,15 @@ struct NetworkConfig {
         }
     }
 
-    // A config that holds no requester gives itself one, so that the roots it
-    // stores will reach the connections built from it.
-    mutating func fillHttpRequester() {
-        guard httpRequester == nil else { return }
-        httpRequester = DefaultHttpRequester()
+    // Answers with the config's own requester, and gives the config a
+    // DefaultHttpRequester first whenever it holds none.
+    mutating func filledHttpRequester() -> HttpRequester {
+        if let requester = httpRequester {
+            return requester
+        }
+        let requester = DefaultHttpRequester()
+        httpRequester = requester
+        return requester
     }
 
     // A property setter answers with nothing, so a refusal only goes to the
@@ -223,8 +227,8 @@ extension NetworkConfig {
         }
     }
 
-    // The requester takes the roots before the dictionary keeps them, so a
-    // refusal will leave the roots that are already pinned in place.
+    // The requester takes the http roots before the dictionary keeps them, so
+    // a refusal will leave the http roots that are already pinned in place.
     private mutating func setTrustRoots(
         _ trustRoots: [Data],
         into roots: WritableKeyPath<NetworkConfig, [TransportProtocol: SSLCertificates]>,
