@@ -64,14 +64,18 @@ lint-all: lint-strict
 
 # Release
 
-# The podspec is the version source for the tag. `jq -e` stops a null,
-# unreadable or non-string version, and `[ -n ]` stops an empty string.
+# The changelog's newest released heading is the version source for the tag.
+# The pattern takes a `## [x.y.z] - date` line and nothing else, so an
+# unreleased or malformed heading yields no version and the recipe says so.
 # `git ls-remote --exit-code` exits 2 for an absent tag and 128 when it cannot
 # read origin. The branch reads the code, so a failure is never an absence.
 .PHONY: tag-release
 tag-release:
-	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -er '.version | select(type == "string")')" && \
-		[ -n "$$VERSION" ] && \
+	VERSION="$$(sed -n 's/^## \[\([0-9][^]]*\)\] - .*/\1/p' CHANGELOG.md | head -1)" && \
+		{ [ -n "$$VERSION" ] || { \
+			echo "No released version heading in CHANGELOG.md. The newest one must read '## [6.1.0] - 2026-09-01'." >&2; \
+			exit 1; \
+		}; } && \
 		{ git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null; LOOKUP=$$?; } && \
 		if [ $$LOOKUP -eq 0 ]; then \
 			echo "Tag v$$VERSION already exists on origin."; \
