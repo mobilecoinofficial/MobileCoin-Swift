@@ -21,15 +21,24 @@ public protocol HttpRequester {
         body: Data?,
         completion: @escaping (Result<HTTPResponse, Error>) -> Void)
     
-    func setFogTrustRoots(_ trustRoots: SecSSLCertificates?)
-    func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?)
+    @discardableResult
+    func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) -> Result<(), InvalidInputError>
+    @discardableResult
+    func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) -> Result<(), InvalidInputError>
 }
 
+// A requester that does not store trust roots answers with a failure, so a
+// caller cannot read a discarded root as a root that is pinned.
 extension HttpRequester {
-    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
-        logger.debug("setting fog trust roots not implemented")
+    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?)
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This HttpRequester does not store fog trust roots"))
     }
-    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
-        logger.debug("setting consensus trust roots not implemented")
+
+    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?)
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This HttpRequester does not store consensus trust roots"))
     }
 }

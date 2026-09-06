@@ -192,9 +192,15 @@ extension NetworkConfig {
     {
         let (grpc, http) = validatedCertificates(trustRoots)
 
-        self.consensusTrustRoots[.grpc] = try? grpc.get()
-        self.consensusTrustRoots[.http] = try? http.get()
-        self.httpRequester?.setConsensusTrustRoots(try? http.get() as? SecSSLCertificates)
+        if let certificates = try? grpc.get() {
+            self.consensusTrustRoots[.grpc] = certificates
+        }
+        if let certificates = try? http.get() {
+            self.consensusTrustRoots[.http] = certificates
+            if case .failure(let error) = pushConsensusTrustRoots(certificates) {
+                return .failure(error)
+            }
+        }
 
         return currentProtocolValidation(grpc: grpc, http: http)
     }
@@ -204,11 +210,33 @@ extension NetworkConfig {
     {
         let (grpc, http) = validatedCertificates(trustRoots)
 
-        self.fogTrustRoots[.grpc] = try? grpc.get()
-        self.fogTrustRoots[.http] = try? http.get()
-        self.httpRequester?.setFogTrustRoots(try? http.get() as? SecSSLCertificates)
+        if let certificates = try? grpc.get() {
+            self.fogTrustRoots[.grpc] = certificates
+        }
+        if let certificates = try? http.get() {
+            self.fogTrustRoots[.http] = certificates
+            if case .failure(let error) = pushFogTrustRoots(certificates) {
+                return .failure(error)
+            }
+        }
 
         return currentProtocolValidation(grpc: grpc, http: http)
+    }
+
+    // A requester that discards the roots reports it, and a config with no
+    // requester yet has nothing to discard them.
+    private func pushConsensusTrustRoots(_ certificates: SSLCertificates)
+        -> Result<(), InvalidInputError>
+    {
+        guard let requester = httpRequester else { return .success(()) }
+        return requester.setConsensusTrustRoots(certificates as? SecSSLCertificates)
+    }
+
+    private func pushFogTrustRoots(_ certificates: SSLCertificates)
+        -> Result<(), InvalidInputError>
+    {
+        guard let requester = httpRequester else { return .success(()) }
+        return requester.setFogTrustRoots(certificates as? SecSSLCertificates)
     }
 
 }
