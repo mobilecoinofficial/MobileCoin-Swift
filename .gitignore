@@ -23,6 +23,12 @@ node_modules/
 # stale submodule checkout an existing clone still holds
 /Vendor/
 
+# stale build output an existing clone still holds, from the Ruby and pod route
+test_output/
+.bundle/
+.vendor/
+Pods/
+
 # secrets JSON 
 Tests/Common/Secrets/secrets.json
 

@@ -6,7 +6,9 @@ All contributors to this repo will create a public/private keypair which will be
 
 > Most importantly, how do we use these secrets ? 
 
-`tools/generate_secrets_json.sh` decrypts them into `Tests/Common/Secrets/secrets.json`, and `tools/generate_process_info_jsons.sh` decrypts them into `tools/TestSetupClient/TestSetupClientTests/process_info.json`. The integration tests and the account funding tool read those two files at runtime. Both are gitignored.
+`tools/generate_secrets_json.sh` decrypts them into `Tests/Common/Secrets/secrets.json`, which is gitignored. `tools/generate_process_info_jsons.sh` decrypts them into two files: `tools/TestSetupClient/TestSetupClientTests/process_info.json`, which is gitignored, and `Tests/Common/Secrets/process_info.json`, which is tracked. The integration tests and the account funding tool read them at runtime.
+
+Running the second script leaves `Tests/Common/Secrets/process_info.json` modified in your working tree, holding a seed derived from your own keychain. `./scripts/check_dirty_git` fails while it sits there. Restore it with `git checkout -- Tests/Common/Secrets/process_info.json` before you commit.
 
 ### Notes
 
@@ -75,6 +77,8 @@ $ scripts/decrypt_secrets
 Each of these decrypts the secrets and writes the file its tests read.
 
 ```bash
-$ make run-all-tests-spm          # writes secrets.json, then runs the full suite
-$ make generate-local-process-info # writes process_info.json only
+$ make run-all-tests-spm           # writes both, then runs the full suite
+$ make generate-local-process-info # writes the two process_info.json files only
 ```
+
+Both dirty the tracked `Tests/Common/Secrets/process_info.json`, as described above.

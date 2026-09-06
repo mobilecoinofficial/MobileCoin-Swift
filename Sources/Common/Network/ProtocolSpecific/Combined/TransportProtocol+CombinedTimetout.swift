@@ -3,8 +3,7 @@
 //
 import Foundation
 
-// LibMobileCoinGRPC is the SwiftPM GRPC module, GRPC is the CocoaPods one.
-// Either means GrpcChannelManager is compiled in and can supply the timeout.
+// Either module means GrpcChannelManager is compiled in and can supply the timeout.
 #if canImport(LibMobileCoinGRPC) || canImport(GRPC)
 extension TransportProtocol {
     static let grpcTimeout: Double = {

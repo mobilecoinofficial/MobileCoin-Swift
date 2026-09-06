@@ -3,7 +3,7 @@ default: build-spm test-spm
 
 # Commands
 
-# `build` and `test` are the names the README and years of muscle memory use.
+# `build` and `test` are the names the README uses.
 .PHONY: build
 build: build-spm
 
@@ -100,11 +100,9 @@ build-spm:
 	tools/ensure_test_resources.sh
 	swift build --build-tests
 
-# The offline test lane. It runs against the sample fixtures, so it needs no
-# credential and no network.
-# The skips are the suites that do need them: the whole of Tests/Integration,
-# whose 22 classes these three patterns cover exactly, and the account funding
-# tool, which reads a real seed from process_info.json.
+# The credential-free test lane. The first three patterns skip every suite
+# under Tests/Integration, and the fourth skips the account funding tool.
+# Those are the suites that read a real seed or reach the network.
 .PHONY: test-spm
 test-spm:
 	tools/ensure_test_resources.sh
@@ -113,6 +111,12 @@ test-spm:
 		--skip "MistyswapTests" \
 		--skip "TransactionIdempotenceTests" \
 		--skip "TestSetupClientTests"
+
+# `swift build` targets the host only. This is the iOS slice, which is the one
+# every consumer actually links.
+.PHONY: build-ios
+build-ios:
+	xcodebuild build -scheme MobileCoin -destination 'generic/platform=iOS'
 
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:

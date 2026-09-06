@@ -4,3 +4,9 @@ updates:
 - package-ecosystem: github-actions
   directory: "/"
   schedule: { interval: "daily" }
+
+# Package.swift is the only description of this library, so its two
+# dependencies are watched here or nowhere.
+- package-ecosystem: swift
+  directory: "/"
+  schedule: { interval: "daily" }

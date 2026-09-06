@@ -10,21 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - `MobileCoin.podspec` and the `ExampleHTTP` app it existed to feed. The
-  package is the only description of this library now. Tags published before
-  this change keep resolving, so a Podfile pinning `MobileCoin/CoreHTTP` by git
-  tag is unaffected.
+  package is the only description of this library now. CocoaPods trunk carries
+  MobileCoin through 6.0.7 and those podspecs are immutable, so every existing
+  consumer keeps resolving the version it already pins.
 - The Ruby bundle, `.github/actions/setup-macos-ci` and the cocoapods-keys
   helpers in `scripts/`. Nothing in the repo runs `pod` or `bundle` any more.
+- The TestSetupClient Xcode project and its SwiftUI shell. The package builds
+  the same sources, and `make fund-test-wallets-spm` runs them headless.
 
 ### Changed
 
 - CI runs two jobs, `Swift package tests` and `SwiftLint`. The first runs the
-  offline SwiftPM lane, which covers every suite the ExampleHTTP schemes used
-  to compile. Branch protection needs the old job names replaced.
+  credential-free SwiftPM lane and then compiles the package for iOS. Branch
+  protection needs the old job names replaced before this reaches master.
 - SwiftLint comes from `tools/swiftlint.sh`, which downloads the pinned 0.47.1
   and checks it against a sha256.
 - `make tag-release` reads the version from the newest released heading in this
   file rather than from the podspec.
+- Dependabot watches `swift` as well as `github-actions`, so the two package
+  dependencies are covered now that no Gemfile is left to watch.
 
 ## [6.1.0] - 2026-09-01
 

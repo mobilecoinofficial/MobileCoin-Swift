@@ -19,7 +19,7 @@ permissions:
 jobs:
 
   # `swift test` compiles every target in the package, the skipped suites
-  # included, so this covers what the old build-only job proved as well.
+  # included, so a target that cannot compile fails here even when it never runs.
   swift-test:
     name: Swift package tests
     runs-on: macos-26
@@ -28,10 +28,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # No `.build` cache on purpose: the entry would be the whole build tree,
-      # about 660 MiB compressed, against 143 MiB of cache in this repo total.
+      # No `.build` cache on purpose. The entry would be the whole build tree,
+      # which is large against this repo's cache budget.
       - name: Test
         run: make test-spm
+
+      # `swift test` builds for the host. The only consumer of this SDK is an
+      # iOS app, so the iOS slice needs its own compile.
+      - name: Build for iOS
+        run: make build-ios
 
       # The build rewrites Package.resolved when the declared dependencies and
       # the committed resolution disagree. The two fixtures the recipe seeds

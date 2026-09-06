@@ -15,7 +15,7 @@ BIN="$REPO_ROOT/.tools/swiftlint/swiftlint"
 install_swiftlint() {
     local tmp
     tmp="$(mktemp -d)"
-    trap 'rm -rf "$tmp"' RETURN
+    trap 'rm -rf "$tmp"' RETURN EXIT
 
     curl --fail --location --silent --show-error --output "$tmp/swiftlint.zip" "$URL"
 

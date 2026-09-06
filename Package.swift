@@ -26,10 +26,9 @@ let package = Package(
         ),
     ],
     targets: [
-        // HTTP only, which is what the pod chain ships and what production runs.
-        // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
-        // left out rather than guarded: its files import GRPC and NIO
-        // unconditionally, and so do the tests excluded below.
+        // HTTP only, which is what production runs. Sources/GRPC is left out:
+        // its files import GRPC and NIO unconditionally, and so do the tests
+        // excluded below.
         .target(
             name: "MobileCoin",
             dependencies: [
@@ -69,14 +68,7 @@ let package = Package(
         .target(
             name: "TestSetupClient",
             dependencies: ["MobileCoin"],
-            path: "tools/TestSetupClient/TestSetupClient",
-            exclude: [
-                "Assets.xcassets",
-                "Preview Content/Preview Assets.xcassets",
-            ],
-            swiftSettings: [
-                .define("SPM_BUILD"),
-            ]
+            path: "tools/TestSetupClient/TestSetupClient"
          ),
         .testTarget(
             name: "TestSetupClientTests",
