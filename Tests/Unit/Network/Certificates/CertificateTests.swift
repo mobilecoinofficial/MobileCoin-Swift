@@ -2,6 +2,11 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
+import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+import LibMobileCoinHTTP
+#endif
 @testable import MobileCoin
 import XCTest
 
@@ -48,9 +53,9 @@ class CertificateTests: XCTestCase {
             fixture.certificateChain,
             verifyDate: nil)
 
-        atTheCurrentDate.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertTrue(
+            try refusal(of: atTheCurrentDate, against: pinnedKeys)
+                .hasPrefix(SecTrust.systemEvaluationFailure))
     }
 
     // The pinned key is an intermediate CA key, so it matches every certificate
@@ -71,9 +76,9 @@ class CertificateTests: XCTestCase {
             fixture.certificateChain,
             host: "fog.prod.mobilecoin.com")
 
-        forAnotherHost.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertTrue(
+            try refusal(of: forAnotherHost, against: pinnedKeys)
+                .hasPrefix(SecTrust.systemEvaluationFailure))
     }
 
     // Anchoring on another chain's top certificate leaves this chain with no
@@ -87,9 +92,9 @@ class CertificateTests: XCTestCase {
             alphaNet.certificateChain,
             anchorOverride: try XCTUnwrap(testNet.certificateChain.last))
 
-        onAForeignAnchor.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertTrue(
+            try refusal(of: onAForeignAnchor, against: pinnedKeys)
+                .hasPrefix(SecTrust.systemEvaluationFailure))
     }
 
     func testInvalidIntermediateAgainstCertificateChain() throws {
@@ -97,9 +102,71 @@ class CertificateTests: XCTestCase {
 
         let pinnedKeys = [try fixture.wrongIntermediate.asPublicKey().get()]
 
+        XCTAssertEqual(
+            try refusal(of: fixture.secTrust, against: pinnedKeys),
+            SecTrust.noPinnedKeyMatched)
+    }
+
+    // The system quotes the server's own common name in its error description,
+    // so a refusal that repeats it lets the server write the client's log.
+    func testARefusalCarriesTheCodeAndNotTheServersCommonName() throws {
+        let fixture = try SecCertificateTests.Fixtures.ForgedCommonName()
+
+        var systemError: CFError?
+        XCTAssertFalse(SecTrustEvaluateWithError(fixture.secTrust, &systemError))
+        let systemDescription = CFErrorCopyDescription(try XCTUnwrap(systemError)) as String
+        XCTAssertTrue(
+            systemDescription.contains(SecCertificateTests.Fixtures.ForgedCommonName.commonName))
+
+        let reason = try refusal(of: fixture.secTrust, against: [])
+
+        XCTAssertEqual(
+            reason,
+            SecTrust.systemEvaluationFailure + "\(CFErrorGetCode(try XCTUnwrap(systemError)))")
+        XCTAssertEqual(reason.components(separatedBy: "\n").count, 1)
+    }
+
+    // Exact equality is what proves the message carries no key material, rather
+    // than a search for one encoding of the key.
+    func testAMatchIsReportedByIndexAndNotByKey() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
+
+        var message: String?
         fixture.secTrust.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
+            message = try? result.get()
         }
+
+        let index = try XCTUnwrap(
+            fixture.secTrust.certificateTrustChain.firstIndex {
+                $0.data == fixture.validIntermediate.data
+            })
+        XCTAssertEqual(message, SecTrust.pinnedKeyMatched + "[\(index)]")
+    }
+
+    // A requester that stores no trust roots takes the protocol's own setters,
+    // and a caller that reads success there believes roots are pinned.
+    func testARequesterWithoutTrustRootStorageReportsAFailure() {
+        let requester = RequestOnlyHttpRequester()
+
+        XCTAssertFailure(requester.setFogTrustRoots(nil))
+        XCTAssertFailure(requester.setConsensusTrustRoots(nil))
+    }
+
+    // Roots that fail to parse leave the pinned roots in place, because a config
+    // with no roots falls through to the system's own handling.
+    func testAFailedParseKeepsTheTrustRootsAlreadySet() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        let pinned = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+
+        XCTAssertFailure(config.setConsensusTrustRoots([fixture.invalidTrustRootBytes]))
+
+        XCTAssertEqual(
+            (config.consensusTrustRoots[.http] as? SecSSLCertificates)?.publicKeys,
+            pinned.publicKeys)
     }
 
     // The four below drive both delegate shims and each covers one of `handle`'s
@@ -203,6 +270,18 @@ class CertificateTests: XCTestCase {
         return try XCTUnwrap(try SecSSLCertificates(trustRootBytes: [bytes]))
     }
 
+    // `validateAgainst` calls back on the calling thread, so the reason is set
+    // before this returns.
+    private func refusal(of trust: SecTrust, against pinnedKeys: [SecKey]) throws -> String {
+        var reason: String?
+        trust.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            if case .failure(let error) = result {
+                reason = error.reason
+            }
+        }
+        return try XCTUnwrap(reason)
+    }
+
     private func pinningDelegate(
         of requester: DefaultHttpRequester
     ) throws -> CertificatePinningDelegate {
@@ -274,6 +353,20 @@ private final class TrustingProtectionSpace: URLProtectionSpace, @unchecked Send
     required init?(coder: NSCoder) { fatalError("unused") }
 
     override var serverTrust: SecTrust? { trust }
+}
+
+// A requester that implements only `request` takes the protocol's default
+// trust-root setters.
+private struct RequestOnlyHttpRequester: HttpRequester {
+    func request(
+        url: URL,
+        method: HTTPMethod,
+        headers: [String: String]?,
+        body: Data?,
+        completion: @escaping (Result<HTTPResponse, Error>) -> Void
+    ) {
+        completion(.failure(ConnectionError.invalidServerResponse("unused")))
+    }
 }
 
 // URLAuthenticationChallenge demands a sender. Nothing under test calls back
