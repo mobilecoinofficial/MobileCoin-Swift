@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 source "$REPO_ROOT/scripts/secrets_manager"
@@ -20,11 +20,12 @@ lookup() {
 if [[ -z "$1" ]] ; then
   echo ""
 else
-  awk -v "id=$1" 'BEGIN { FS = "=" } $1 == id { print $2 ; exit }' $2
+  awk -v "id=$1" 'BEGIN { FS = "=" } $1 == id { print $2 ; exit }' <<< "$2"
 fi
 }
 
-SRC_ACCT_ENTROPY_STRING=$(lookup SRC_ACCT_ENTROPY_STRING <(decrypt_secrets| sed 's/export //'))
+SECRETS="$(decrypt_secrets | sed 's/export //')"
+SRC_ACCT_ENTROPY_STRING="$(lookup SRC_ACCT_ENTROPY_STRING "$SECRETS")"
 
 jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
