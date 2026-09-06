@@ -5,10 +5,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinHTTP
 import LibMobileCoinCommon
-#endif
 
 
 final class FogBlockHttpConnection: HttpConnection, FogBlockService {

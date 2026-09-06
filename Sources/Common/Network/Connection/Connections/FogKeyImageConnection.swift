@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 final class FogKeyImageConnection: Connection<
         GrpcProtocolConnectionFactory.FogKeyImageServiceProvider,

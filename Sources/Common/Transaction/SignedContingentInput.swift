@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 public struct SignedContingentInput: Sendable {
     fileprivate let proto: External_SignedContingentInput

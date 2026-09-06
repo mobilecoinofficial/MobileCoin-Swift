@@ -48,8 +48,6 @@ let package = Package(
             name: "MobileCoinTests",
             // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
             // does not carry them, so the test target asks for them by name.
-            // Without this `canImport(LibMobileCoinTestVector)` is false and the
-            // tests read vectors this target never copies.
             dependencies: [
                 "MobileCoin",
                 .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),

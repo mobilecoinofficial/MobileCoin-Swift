@@ -4,9 +4,7 @@
 // swiftlint:disable file_length multiline_function_chains force_unwrapping function_body_length
 
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 @testable import MobileCoin
 import XCTest
 
@@ -1485,13 +1483,9 @@ extension Transaction.Fixtures.ExactChange {
 extension Transaction.Fixtures.Serialization {
 
     fileprivate static func serializedData() throws -> Data {
-        #if canImport(LibMobileCoinHTTP)
         try Data(
             contentsOf: Bundle.testDataModuleUrl("TransactionSerializedData", withExtension: "bin")
         )
-        #else
-        try Data(contentsOf: Bundle.url("TransactionSerializedData", "bin"))
-        #endif
     }
 
 }
