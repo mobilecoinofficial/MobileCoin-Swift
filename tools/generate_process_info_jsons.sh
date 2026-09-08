@@ -11,23 +11,15 @@ check_dependencies -exit_on_install > /dev/null
 
 TEST_ACCOUNT_SEED="$(security find-generic-password -w -s swift-repo-public | head -c32 | base64)"
 
+SECRETS="$(decrypt_secrets | sed 's/^export //')"
+SRC_ACCT_ENTROPY_STRING="$(lookup SRC_ACCT_ENTROPY_STRING "$SECRETS" | xargs)"
+
 # test account seed will be 32 bytes of your contribution key
 jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
   '{ "testAccountSeed": $TEST_ACCOUNT_SEED }' > $REPO_ROOT/Tests/Common/Secrets/process_info.json
 
-lookup() {
-if [[ -z "$1" ]] ; then
-  echo ""
-else
-  awk -v "id=$1" 'BEGIN { FS = "=" } $1 == id { print $2 ; exit }' <<< "$2"
-fi
-}
-
-SECRETS="$(decrypt_secrets | sed 's/export //')"
-SRC_ACCT_ENTROPY_STRING="$(lookup SRC_ACCT_ENTROPY_STRING "$SECRETS")"
-
 jq --null-input \
   --arg TEST_ACCOUNT_SEED "$TEST_ACCOUNT_SEED" \
-  --arg SRC_ACCT_ENTROPY_STRING "$(echo $SRC_ACCT_ENTROPY_STRING | xargs)" \
+  --arg SRC_ACCT_ENTROPY_STRING "$SRC_ACCT_ENTROPY_STRING" \
   '{ "testAccountSeed": $TEST_ACCOUNT_SEED, "srcAcctEntropyString": $SRC_ACCT_ENTROPY_STRING }' > $REPO_ROOT/tools/TestSetupClient/TestSetupClientTests/process_info.json

@@ -9,24 +9,16 @@ source "$REPO_ROOT/scripts/secrets_manager"
 # and exit if any dependencies are installed
 check_dependencies -exit_on_install > /dev/null
 
-lookup() {
-if [[ -z "$1" ]] ; then
-  echo ""
-else
-  awk -v "id=$1" 'BEGIN { FS = "=" } $1 == id { print $2 ; exit }' <<< "$2"
-fi
-}
-
 # One decryption for all six lookups. The assignment carries the age exit
 # status, so a failure stops the script before jq truncates secrets.json.
-SECRETS="$(decrypt_secrets | sed 's/export //')"
+SECRETS="$(decrypt_secrets | sed 's/^export //')"
 
-DEV_NETWORK_AUTH_USERNAME=$(echo $(lookup DEV_NETWORK_AUTH_USERNAME "$SECRETS")|xargs)
-DEV_NETWORK_AUTH_PASSWORD=$(echo $(lookup DEV_NETWORK_AUTH_PASSWORD "$SECRETS")|xargs)
-TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED=$(echo $(lookup TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED "$SECRETS")|xargs)
-MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED=$(echo $(lookup MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED "$SECRETS")|xargs)
-DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED=$(echo $(lookup DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED "$SECRETS")|xargs)
-DYNAMIC_FOG_AUTHORITY_SPKI=$(echo $(lookup DYNAMIC_FOG_AUTHORITY_SPKI "$SECRETS") | sed 's/"//')
+DEV_NETWORK_AUTH_USERNAME="$(lookup DEV_NETWORK_AUTH_USERNAME "$SECRETS" | xargs)"
+DEV_NETWORK_AUTH_PASSWORD="$(lookup DEV_NETWORK_AUTH_PASSWORD "$SECRETS" | xargs)"
+TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED="$(lookup TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED "$SECRETS" | xargs)"
+MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED="$(lookup MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED "$SECRETS" | xargs)"
+DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED="$(lookup DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED "$SECRETS" | xargs)"
+DYNAMIC_FOG_AUTHORITY_SPKI="$(lookup DYNAMIC_FOG_AUTHORITY_SPKI "$SECRETS" | xargs)"
 
 jq --null-input \
   --arg DEV_NETWORK_AUTH_USERNAME "$DEV_NETWORK_AUTH_USERNAME" \
