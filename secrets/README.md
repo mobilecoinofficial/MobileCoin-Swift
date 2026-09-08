@@ -75,6 +75,7 @@ $ scripts/decrypt_secrets
 Each of these decrypts the secrets and writes the file its tests read.
 
 ```bash
-$ make run-all-tests-spm           # writes both, then runs the full suite
+$ make init-secrets                # writes all three, runs no tests
+$ make run-all-tests-spm           # writes all three, then runs the MobileCoinTests suite
 $ make generate-local-process-info # writes the two process_info.json files only
 ```
