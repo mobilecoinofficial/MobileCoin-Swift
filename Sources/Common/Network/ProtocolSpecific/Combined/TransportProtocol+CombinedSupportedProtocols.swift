@@ -5,7 +5,6 @@
 import Foundation
 
 // LibMobileCoinGRPC is the SwiftPM GRPC module, GRPC is the CocoaPods one.
-// Either means the grpc transport is compiled in.
 #if canImport(LibMobileCoinGRPC) || canImport(GRPC)
 extension TransportProtocol: SupportedProtocols {
     public static var supportedProtocols: [TransportProtocol] {
