@@ -68,11 +68,13 @@ struct NetworkConfig {
     private func pushStoredTrustRoots() {
         guard let requester = httpRequester else { return }
         if let fog = fogTrustRoots[.http] as? SecSSLCertificates,
-           case .failure(let error) = requester.setFogTrustRoots(fog) {
+           case .failure(let error) = requester.setFogTrustRoots(
+            fog, hosts: fogUrls.map(\.host)) {
             logger.error("Fog trust roots stay unpinned: \(error)", logFunction: false)
         }
         if let consensus = consensusTrustRoots[.http] as? SecSSLCertificates,
-           case .failure(let error) = requester.setConsensusTrustRoots(consensus) {
+           case .failure(let error) = requester.setConsensusTrustRoots(
+            consensus, hosts: consensusUrls.map(\.host)) {
             logger.error("Consensus trust roots stay unpinned: \(error)", logFunction: false)
         }
     }
@@ -214,16 +216,18 @@ extension NetworkConfig {
     @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
-        setTrustRoots(trustRoots, into: \.consensusTrustRoots) { requester, certificates in
-            requester.setConsensusTrustRoots(certificates)
+        let hosts = consensusUrls.map(\.host)
+        return setTrustRoots(trustRoots, into: \.consensusTrustRoots) { requester, certificates in
+            requester.setConsensusTrustRoots(certificates, hosts: hosts)
         }
     }
 
     @discardableResult mutating public func setFogTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
-        setTrustRoots(trustRoots, into: \.fogTrustRoots) { requester, certificates in
-            requester.setFogTrustRoots(certificates)
+        let hosts = fogUrls.map(\.host)
+        return setTrustRoots(trustRoots, into: \.fogTrustRoots) { requester, certificates in
+            requester.setFogTrustRoots(certificates, hosts: hosts)
         }
     }
 

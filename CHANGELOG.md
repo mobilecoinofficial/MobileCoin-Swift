@@ -17,8 +17,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   consumer that supplies its own `HttpRequester` replaces
   `DefaultHttpRequester` outright, so its traffic never reaches this code.
 - `HttpRequester` requires both trust-root setters and answers each with a
-  `Result`. The protocol carries no default, so a requester that stores no
-  roots fails to compile. This is a breaking change.
+  `Result`. The protocol doesn't carry a default, so a conformer must
+  implement both setters. This is a breaking change.
+- Both `HttpRequester` trust-root setters take `hosts: [String]`, naming the
+  endpoints that set of roots pins. This is a breaking change for a caller of
+  either setter and for a conformer outside this package.
+  `DefaultHttpRequester` judges a challenged host against the roots of every
+  set that names it and carries keys. A consensus host will be judged against
+  the pinned consensus roots alone when the consensus set is the only such set
+  for that host. Both setters store a host in the form a lookup uses, which
+  ignores case and trailing dots.
+- `DefaultHttpRequester` judges a host that no such set names against every
+  root it holds, which is the fallback and is what it did for every host
+  before. A lookup keeps a naming set only while it carries keys, so the
+  lookup takes that fallback for a host that keyless sets alone name. A
+  consumer that names the hosts of one setter alone leaves the other setter's
+  hosts there too.
 - `SecTrust.publicKeyTrustChain` returns a `Result` and carries the error of
   the certificate it could not read. `asPublicKeyTrustChain` is gone.
 - `SecTrust.certificateTrustChain` reads the chain with
