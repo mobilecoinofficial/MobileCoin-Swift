@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Cheap and first, so a broken secret lookup fails before the build.
       - name: Check the secret lookup helper
@@ -54,7 +54,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # `tools/swiftlint.sh` downloads its own pinned binary, so this job needs
       # no toolchain of its own.
