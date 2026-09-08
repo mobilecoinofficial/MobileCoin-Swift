@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `HttpRequester` requires both trust-root setters and answers each with a
   `Result`. The protocol doesn't carry a default, so a conformer must
   implement both setters. This is a breaking change.
+- `SSLCertificates.make(trustRootBytes:)` answers with a `Result` carrying the
+  conforming type, so `SecSSLCertificates.make(trustRootBytes:)` carries
+  `SecSSLCertificates`. This is a breaking change for a caller that annotates
+  the result with the protocol type.
+- `SSLCertificates` requires `init?(trustRootBytes:)`. The protocol doesn't
+  carry a default, so a conformer must implement it. This is a breaking change.
 - Both `HttpRequester` trust-root setters take `hosts: [String]`, naming the
   endpoints that set of roots pins. This is a breaking change for a caller of
   either setter and for a conformer outside this package.
