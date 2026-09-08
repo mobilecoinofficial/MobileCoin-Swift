@@ -765,6 +765,9 @@ class MobileCoinClientPublicApiIntTestsTransacting: XCTestCase, @unchecked Senda
     }
 
     func testWrongConsensusTrustRootReturnsError() async throws {
+        // The requester pins fog and consensus against one merged key set. This
+        // case sets a wrong consensus root and leaves fog unset, so the balance
+        // read fails ahead of the submit.
         try XCTSkipIf(true)
 
         let description = "Submitting transaction"

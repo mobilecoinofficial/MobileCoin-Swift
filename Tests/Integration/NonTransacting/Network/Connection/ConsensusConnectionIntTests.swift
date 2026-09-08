@@ -167,6 +167,8 @@ class ConsensusConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func wrongTrustRootFails(transportProtocol: TransportProtocol) throws {
+        // A wrong trust root cancels the URLSession challenge, so the call over
+        // HTTP fails with `connectionFailure`, and that fails this case.
         try XCTSkipIf(true)
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection =
@@ -188,7 +190,7 @@ class ConsensusConnectionIntTests: XCTestCase, @unchecked Sendable {
             }
             expect.fulfill()
         })
-        waitForExpectations(timeout: .infinity)
+        waitForExpectations(timeout: 40)
     }
 
 }
