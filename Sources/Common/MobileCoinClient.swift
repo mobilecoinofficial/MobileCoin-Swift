@@ -57,13 +57,11 @@ public final class MobileCoinClient {
         var networkConfig = config.networkConfig
         let httpRequester = networkConfig.filledHttpRequester()
 
-        let grpcFactory = GrpcProtocolConnectionFactory()
         let httpFactory = HttpProtocolConnectionFactory(httpRequester: httpRequester)
 
         self.serviceProvider = DefaultServiceProvider(
             networkConfig: networkConfig,
             targetQueue: serialQueue,
-            grpcConnectionFactory: grpcFactory,
             httpConnectionFactory: httpFactory)
 
         self.fogResolverManager = FogResolverManager(

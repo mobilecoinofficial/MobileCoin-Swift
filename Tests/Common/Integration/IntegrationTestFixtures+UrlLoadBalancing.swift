@@ -26,7 +26,6 @@ extension IntegrationTestFixtures {
         let fogView = FogViewConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -51,7 +50,6 @@ extension IntegrationTestFixtures {
         let fogUntrustedTxOut = FogUntrustedTxOutConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -76,7 +74,6 @@ extension IntegrationTestFixtures {
         let fogMerkleProof = FogMerkleProofConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -101,7 +98,6 @@ extension IntegrationTestFixtures {
         let fogKeyImage = FogKeyImageConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -126,7 +122,6 @@ extension IntegrationTestFixtures {
         let fogBlock = FogBlockConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -150,7 +145,6 @@ extension IntegrationTestFixtures {
         let blockchain = BlockchainConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -174,7 +168,6 @@ extension IntegrationTestFixtures {
         let consensus = ConsensusConnection(
             httpFactory: HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.filledHttpRequester()),
-            grpcFactory: GrpcProtocolConnectionFactory(),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -192,10 +185,8 @@ extension IntegrationTestFixtures {
     static func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return ConsensusConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
@@ -210,10 +201,8 @@ extension IntegrationTestFixtures {
     static func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
         let httpFactory = HttpProtocolConnectionFactory(
             httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogBlockConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             config: networkConfig,
             targetQueue: DispatchQueue.main)
     }

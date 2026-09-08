@@ -186,29 +186,8 @@ struct NetworkConfig {
     var fogReportAttestation: Attestation { attestation.fogReport }
 
     private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
-    private func validatedCertificates(
-        _ trustRoots: [Data]
-    ) -> (grpc: PossibleCertificates, http: PossibleCertificates) {
-        let grpc = TransportProtocol.grpc.certificateValidator.validate(trustRoots)
-        let http = TransportProtocol.http.certificateValidator.validate(trustRoots)
-        return (grpc, http)
-    }
-
-    private func currentProtocolValidation(grpc: PossibleCertificates, http: PossibleCertificates)
-        -> Result<(), InvalidInputError>
-    {
-        switch (transportProtocol, grpc, http) {
-        case (.grpc, .success, _):
-            return .success(())
-        case (.grpc, .failure(let error), _):
-            return .failure(error)
-        case (.http, _, .success):
-            return .success(())
-        case (.http, _, .failure(let error)):
-            return .failure(error)
-        case (_, _, _):
-            return .failure(InvalidInputError("Empty certificates"))
-        }
+    private func validatedCertificates(_ trustRoots: [Data]) -> PossibleCertificates {
+        TransportProtocol.http.certificateValidator.validate(trustRoots)
     }
 }
 
@@ -238,11 +217,8 @@ extension NetworkConfig {
         into roots: WritableKeyPath<NetworkConfig, [TransportProtocol: SSLCertificates]>,
         pushedBy push: (HttpRequester, SecSSLCertificates) -> Result<(), InvalidInputError>
     ) -> Result<(), InvalidInputError> {
-        let (grpc, http) = validatedCertificates(trustRoots)
+        let http = validatedCertificates(trustRoots)
 
-        if let certificates = try? grpc.get() {
-            self[keyPath: roots][.grpc] = certificates
-        }
         if let certificates = try? http.get() {
             // A requester takes only Sec certificates, and nil there clears the
             // roots it holds, so a cast that fails answers as a failure.
@@ -256,7 +232,7 @@ extension NetworkConfig {
             self[keyPath: roots][.http] = certificates
         }
 
-        return currentProtocolValidation(grpc: grpc, http: http)
+        return http.map { _ in () }
     }
 }
 

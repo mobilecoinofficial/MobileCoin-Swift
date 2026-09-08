@@ -167,7 +167,8 @@ class ConsensusConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func wrongTrustRootFails(transportProtocol: TransportProtocol) throws {
-        // Skipped because gRPC currently keeps retrying connection errors indefinitely.
+        // A wrong trust root cancels the URLSession challenge, so the call over
+        // HTTP fails with `connectionFailure`, and that fails this case.
         try XCTSkipIf(true)
         let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
         let connection =
@@ -189,7 +190,7 @@ class ConsensusConnectionIntTests: XCTestCase, @unchecked Sendable {
             }
             expect.fulfill()
         })
-        waitForExpectations(timeout: .infinity)
+        waitForExpectations(timeout: 40)
     }
 
 }
@@ -223,10 +224,8 @@ extension ConsensusConnectionIntTests {
     func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
         let httpFactory = HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return ConsensusConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
