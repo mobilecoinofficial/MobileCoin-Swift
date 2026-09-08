@@ -6,9 +6,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 public enum VersionedCryptoBoxError: Error, Sendable {
     case invalidInput(String)

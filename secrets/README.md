@@ -6,17 +6,11 @@ All contributors to this repo will create a public/private keypair which will be
 
 > Most importantly, how do we use these secrets ? 
 
-They're used by `cocoapod-keys` to "generate" `MobileCoinKeys.h,MobileCoinKeys.m` files which we pull from at runtime for integration & unit testing. Assuming a contributor has already gone through "New Contributor" steps and the secrets have been re-encrypted, they can re-initialize the project with:
-
-```
-$ scripts/reinitialize_keys
-```
+`tools/generate_secrets_json.sh` decrypts them into `Tests/Common/Secrets/secrets.json`. `tools/generate_process_info_jsons.sh` writes two `process_info.json` files, one under `Tests/Common/Secrets` and one under `tools/TestSetupClient/TestSetupClientTests`. Each holds a `testAccountSeed` cut from your own age public key, and the second also holds a decrypted `srcAcctEntropyString`. All three paths are gitignored, and `tools/ensure_test_resources.sh` seeds them from the committed samples. The integration tests and the account funding tool read them at runtime.
 
 ### Notes
 
 Im using this tool [$ age](https://github.com/FiloSottile/age) to do the encryption and decryption. The scripts will attempt to install it with brew (if necc.)
-
-Additionally, the utility `rename` is required. The scripts will attempt to install it with brew (if necc.)
 
 ### Workflows
 
@@ -74,12 +68,14 @@ To decrypt the secrets, and print them to `STDOUT`
 $ scripts/decrypt_secrets
 ```
 
-#### Re-initialize the project 
+#### Write the local test resources
 
 > Assume you've gone through new contributor flow
 
-Run the following, which will do all the steps necc to decrypt the secrets, regenerate the files we use at runtime with `cocoapod-keys`, and then re-build the xcode project with `make lock`.
+Each of these decrypts the secrets and writes the file its tests read.
 
 ```bash
-$ scripts/reinitialize_keys; make lock;
+$ make init-secrets                # writes all three, runs no tests
+$ make run-all-tests-spm           # writes all three, then runs the MobileCoinTests suite
+$ make generate-local-process-info # writes the two process_info.json files only
 ```

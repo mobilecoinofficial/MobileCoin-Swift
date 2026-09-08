@@ -6,9 +6,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 enum AttestAkeError: Error, Sendable {
     case invalidInput(String)

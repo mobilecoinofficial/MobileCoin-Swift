@@ -6,9 +6,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 extension String {
     init(mcString: UnsafeMutablePointer<CChar>) {

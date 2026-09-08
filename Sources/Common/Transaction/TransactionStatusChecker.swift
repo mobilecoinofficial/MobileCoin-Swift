@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 struct TransactionStatusChecker {
     private let account: ReadWriteDispatchLock<Account>

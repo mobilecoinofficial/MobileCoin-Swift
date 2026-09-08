@@ -26,10 +26,9 @@ let package = Package(
         ),
     ],
     targets: [
-        // HTTP only, which is what the pod chain ships and what production runs.
-        // The file list mirrors the podspec CoreHTTP subspec. Sources/GRPC is
-        // left out rather than guarded: its files import GRPC and NIO
-        // unconditionally, and so do the tests excluded below.
+        // HTTP only, which is what production runs. Sources/GRPC is left out:
+        // its files import GRPC and NIO unconditionally, and so do the tests
+        // excluded below.
         .target(
             name: "MobileCoin",
             dependencies: [
@@ -49,8 +48,6 @@ let package = Package(
             name: "MobileCoinTests",
             // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
             // does not carry them, so the test target asks for them by name.
-            // Without this `canImport(LibMobileCoinTestVector)` is false and the
-            // tests read vectors this target never copies.
             dependencies: [
                 "MobileCoin",
                 .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
@@ -58,6 +55,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "Common/Secrets/secrets.json.sample",
+                "Common/Secrets/process_info.json.sample",
                 "ProtocolSpecific/Grpc",
             ],
             resources: [
@@ -69,14 +67,7 @@ let package = Package(
         .target(
             name: "TestSetupClient",
             dependencies: ["MobileCoin"],
-            path: "tools/TestSetupClient/TestSetupClient",
-            exclude: [
-                "Assets.xcassets",
-                "Preview Content/Preview Assets.xcassets",
-            ],
-            swiftSettings: [
-                .define("SPM_BUILD"),
-            ]
+            path: "tools/TestSetupClient/TestSetupClient"
          ),
         .testTarget(
             name: "TestSetupClientTests",
