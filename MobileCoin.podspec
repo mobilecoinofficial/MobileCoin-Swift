@@ -37,15 +37,19 @@ Pod::Spec.new do |s|
   end
 
   s.test_spec 'IntegrationTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Integration/Common,Integration/Transacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*",
-    test_spec.resource = "Tests/Common/Secrets/process_info.json"
+    test_spec.source_files = "Tests/{Common,Integration/Transacting}/**/*.swift"
+    test_spec.resources = [
+      "Tests/Common/FixtureData/**/*",
+      "Tests/Common/Secrets/process_info.json",
+    ]
   end
 
   s.test_spec 'IntegrationNonTransactingTests' do |test_spec|
-    test_spec.source_files = "Tests/{Common,Util,Integration/Common,Integration/NonTransacting}/**/*.swift"
-    test_spec.resource = "Tests/Common/FixtureData/**/*",
-    test_spec.resource = "Tests/Common/Secrets/process_info.json"
+    test_spec.source_files = "Tests/{Common,Integration/NonTransacting}/**/*.swift"
+    test_spec.resources = [
+      "Tests/Common/FixtureData/**/*",
+      "Tests/Common/Secrets/process_info.json",
+    ]
   end
 
   s.test_spec 'PerformanceTests' do |test_spec|
@@ -70,7 +74,6 @@ Pod::Spec.new do |s|
 
     subspec.test_spec 'HttpProtocolUnitTests' do |test_spec|
       test_spec.source_files = "Tests/ProtocolSpecific/Http/**/*.swift"
-      test_spec.resource = "Tests/ProtocolSpecific/Http/FixtureData/**/*"
     end
 
     unless ENV["MC_ENABLE_SWIFTLINT_SCRIPT"].nil?
