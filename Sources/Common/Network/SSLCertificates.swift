@@ -11,8 +11,9 @@ public protocol SSLCertificates {
 }
 
 extension SSLCertificates {
-    /// Parses `trustRootBytes` into the conforming certificate type, and answers
-    /// with a failure when the bytes carry no certificate.
+    /// Parses `trustRootBytes` into the conforming certificate type. Answers with a
+    /// failure when an element of `trustRootBytes` won't parse as a certificate. An
+    /// empty `trustRootBytes` answers with a success.
     public static func make(trustRootBytes: [Data]) -> Result<Self, InvalidInputError> {
         do {
             let certificate = try Self(trustRootBytes: trustRootBytes)
