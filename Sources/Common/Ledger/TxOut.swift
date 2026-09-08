@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 struct TxOut: TxOutProtocol {
     typealias Keys = (publicKey: RistrettoPublic, targetKey: RistrettoPublic)

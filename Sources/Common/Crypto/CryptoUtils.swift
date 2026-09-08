@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 enum CryptoUtils {
     static func ristrettoPrivateValidate(_ bytes: Data) -> Bool {

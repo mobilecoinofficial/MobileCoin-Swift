@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 /// An attested channel to a Mistysign enclave whose transport is owned by the
 /// caller.

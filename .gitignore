@@ -34,3 +34,4 @@ Tests/Common/Secrets/secrets.json
 
 # process info JSON
 tools/TestSetupClient/TestSetupClientTests/process_info.json
+Tests/Common/Secrets/process_info.json

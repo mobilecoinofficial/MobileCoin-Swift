@@ -8,9 +8,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 protocol MistyswapService {
     func initiateOfframp(

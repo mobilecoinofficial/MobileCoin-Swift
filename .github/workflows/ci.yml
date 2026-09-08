@@ -28,6 +28,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Cheap and first, so a broken secret lookup fails before the build.
+      - name: Check the secret lookup helper
+        run: tools/lookup_test.sh
+
       # No `.build` cache on purpose. The entry would be the whole build tree,
       # which is large against this repo's cache budget.
       - name: Test
