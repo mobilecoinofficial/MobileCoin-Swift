@@ -91,6 +91,13 @@ swiftlint:
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
 
+# Writes the three generated test resources. The target decrypts, so it needs
+# your age keys in the keychain.
+.PHONY: init-secrets
+init-secrets:
+	tools/generate_process_info_jsons.sh
+	tools/generate_secrets_json.sh
+
 # Builds every target in Package.swift, test targets included. Plain `swift
 # build` skips those, so a test target that cannot compile still goes green.
 # The test targets declare generated resources, which from tools 6.0 must exist
