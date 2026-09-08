@@ -183,8 +183,9 @@ extension IntegrationTestFixtures {
     }
 
     static func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-            httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+            httpRequester: networkConfig.filledHttpRequester())
         return ConsensusConnection(
             httpFactory: httpFactory,
             config: networkConfig,
@@ -199,8 +200,9 @@ extension IntegrationTestFixtures {
     }
 
     static func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-            httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+            httpRequester: networkConfig.filledHttpRequester())
         return FogBlockConnection(
             httpFactory: httpFactory,
             config: networkConfig,

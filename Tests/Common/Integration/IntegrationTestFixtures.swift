@@ -235,9 +235,9 @@ extension IntegrationTestFixtures {
 
     static func createServiceProvider(transportProtocol: TransportProtocol)
     throws -> ServiceProvider {
-        let networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
+        var networkConfig = try NetworkConfigFixtures.create(using: transportProtocol)
         let httpFactory = HttpProtocolConnectionFactory(
-            httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+            httpRequester: networkConfig.filledHttpRequester())
         return DefaultServiceProvider(
             networkConfig: networkConfig,
             targetQueue: DispatchQueue.main,
@@ -276,12 +276,12 @@ extension IntegrationTestFixtures {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
     ) throws -> ServiceProvider {
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
         let httpFactory = HttpProtocolConnectionFactory(
-            httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+            httpRequester: networkConfig.filledHttpRequester())
         return DefaultServiceProvider(
             networkConfig: networkConfig,
             targetQueue: DispatchQueue.main,
