@@ -51,6 +51,8 @@ class FogBlockConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func getBlockZero(transportProtocol: TransportProtocol) throws {
+        // The body needs block 0 to carry outputs and a `globalTxoCount`
+        // equal to its own output count.
         try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")
@@ -133,6 +135,8 @@ class FogBlockConnectionIntTests: XCTestCase, @unchecked Sendable {
     }
 
     func doSGetBlocks(transportProtocol: TransportProtocol) throws {
+        // The loop below sends many requests to the live shared fog ledger, so
+        // running the loop will put load on that ledger.
         try XCTSkipIf(true)
 
         let expect = expectation(description: "Fog GetBlocks request")

@@ -18,13 +18,14 @@ extension IntegrationTestFixtures {
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
             .validUrlsConsensusUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let fogView = FogViewConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -41,13 +42,14 @@ extension IntegrationTestFixtures {
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
             .validUrlsConsensusUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let fogUntrustedTxOut = FogUntrustedTxOutConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -64,13 +66,14 @@ extension IntegrationTestFixtures {
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
             .validUrlsConsensusUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let fogMerkleProof = FogMerkleProofConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -87,13 +90,14 @@ extension IntegrationTestFixtures {
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
             .validUrlsConsensusUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let fogKeyImage = FogKeyImageConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -110,13 +114,14 @@ extension IntegrationTestFixtures {
         let consensusUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration()
             .validUrlsConsensusUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let fogBlock = FogBlockConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -132,13 +137,14 @@ extension IntegrationTestFixtures {
 
         let fogUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsFogUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let blockchain = BlockchainConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 
@@ -154,13 +160,14 @@ extension IntegrationTestFixtures {
 
         let fogUrlLoadBalancer = try UrlLoadBalancerFixturesIntegration().validUrlsFogUrlBalancer
 
-        let networkConfig = try NetworkConfigFixtures.create(
+        var networkConfig = try NetworkConfigFixtures.create(
             transportProtocol: transportProtocol,
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer)
 
         let consensus = ConsensusConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(
+                httpRequester: networkConfig.filledHttpRequester()),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
 

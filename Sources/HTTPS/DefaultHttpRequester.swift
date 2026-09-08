@@ -74,12 +74,20 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
         task.resume()
     }
 
-    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
-        pinningDelegate.setConsensusTrustRoots(trustRoots)
+    @discardableResult
+    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        pinningDelegate.setConsensusTrustRoots(trustRoots, hosts: hosts)
+        return .success(())
     }
 
-    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
-        pinningDelegate.setFogTrustRoots(trustRoots)
+    @discardableResult
+    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        pinningDelegate.setFogTrustRoots(trustRoots, hosts: hosts)
+        return .success(())
     }
 }
 
@@ -95,27 +103,51 @@ extension DefaultHttpRequester {
 // URLSession calls this back on its own queue while the SDK can be setting
 // trust roots from another thread, so both roots sit behind one lock.
 final class CertificatePinningDelegate: NSObject {
+    private struct PinnedRoots {
+        var certificates: SecSSLCertificates?
+        var hosts: Set<String> = []
+
+        var keys: [SecKey] { certificates?.publicKeys ?? [] }
+    }
+
     private struct TrustRoots {
-        var fog: SecSSLCertificates?
-        var consensus: SecSSLCertificates?
+        var fog = PinnedRoots()
+        var consensus = PinnedRoots()
     }
 
     private let trustRoots = ReadWriteDispatchLock(TrustRoots())
 
-    // Internal so a test can prove each setter writes its own field. `handle`
-    // merges the two, so nothing downstream can tell a swap apart.
-    var pinnedKeys: [SecKey] {
-        trustRoots.readSync { [$0.fog, $0.consensus] }
-            .compactMap { $0?.publicKeys }
-            .flatMap { $0 }
+    /// Answers with the keys of each set that names `host` and carries keys.
+    /// A host no such set names gets the keys of every set.
+    func pinnedKeys(for host: String) -> [SecKey] {
+        let name = CertificatePinningDelegate.normalized(host)
+        let roots = trustRoots.readSync { [$0.fog, $0.consensus] }
+        let named = roots.filter { $0.hosts.contains(name) && $0.keys.isNotEmpty }
+        return (named.isNotEmpty ? named : roots).flatMap { $0.keys }
     }
 
-    func setFogTrustRoots(_ certificates: SecSSLCertificates?) {
-        trustRoots.writeSync { $0.fog = certificates }
+    /// Answers the stored form of `host`, so that a case difference or
+    /// trailing dots can't make a lookup miss the set that names that host.
+    private static func normalized(_ host: String) -> String {
+        var name = host.lowercased()
+        while name.hasSuffix(".") {
+            name = String(name.dropLast())
+        }
+        return name
     }
 
-    func setConsensusTrustRoots(_ certificates: SecSSLCertificates?) {
-        trustRoots.writeSync { $0.consensus = certificates }
+    func setFogTrustRoots(_ certificates: SecSSLCertificates?, hosts: [String]) {
+        let names = Set(hosts.map(CertificatePinningDelegate.normalized))
+        trustRoots.writeSync {
+            $0.fog = PinnedRoots(certificates: certificates, hosts: names)
+        }
+    }
+
+    func setConsensusTrustRoots(_ certificates: SecSSLCertificates?, hosts: [String]) {
+        let names = Set(hosts.map(CertificatePinningDelegate.normalized))
+        trustRoots.writeSync {
+            $0.consensus = PinnedRoots(certificates: certificates, hosts: names)
+        }
     }
 
     func handle(
@@ -124,21 +156,19 @@ final class CertificatePinningDelegate: NSObject {
     ) {
         guard
             let trust = challenge.protectionSpace.serverTrust,
-            SecTrustGetCertificateCount(trust) > 0
+            trust.certificateTrustChain.isNotEmpty
         else {
             // This case will probably get handled by ATS, but still...
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
 
-        let pinnedKeys = self.pinnedKeys
+        let pinnedKeys = self.pinnedKeys(for: challenge.protectionSpace.host)
         guard DefaultHttpRequester.certPinningEnabled && pinnedKeys.isNotEmpty else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
 
-        // `validateAgainst` matches public keys and never evaluates trust, so a
-        // pinned chain is accepted whether or not the system would accept it.
         trust.validateAgainst(pinnedKeys: pinnedKeys) { result in
             switch result {
             case .success(let message):

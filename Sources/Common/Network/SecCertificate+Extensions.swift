@@ -14,19 +14,18 @@ extension SecCertificate {
         let policy = SecPolicyCreateBasicX509()
         var trust: SecTrust?
         let trustCreationStatus = SecTrustCreateWithCertificates(certificate, policy, &trust)
-        let data = certificate.data
 
         if let trust = trust, trustCreationStatus == errSecSuccess {
             publicKey = SecTrustCopyPublicKey(trust)
         } else {
-            let message = "root certificate: \(data.base64EncodedString())"
-            let error = SecurityError(trustCreationStatus, message: message)
+            // The status carries what SecTrustCreateWithCertificates
+            // reported, so the certificate bytes add nothing to the text.
+            let error = SecurityError(trustCreationStatus, message: "root certificate")
             return .failure(error)
         }
 
         guard let key = publicKey else {
-            let message = ", root certificate: \(data.base64EncodedString())"
-            return .failure(SecurityError(nil, message: SecurityError.nilPublicKey + message))
+            return .failure(SecurityError(nil, message: SecurityError.nilPublicKey))
         }
 
         return .success(key)
@@ -74,22 +73,23 @@ extension SecTrust {
     private typealias ChainOfTrustKey = (index: Int, key: SecKey)
 
     public var certificateCount: Int {
-        SecTrustGetCertificateCount(self)
+        certificateTrustChain.count
     }
 
+    // SecTrustCopyCertificateChain is nullable and documents no chain for a
+    // trust it has yet to evaluate. SecTrustGetCertificateAtIndex documents the
+    // leaf as always present, so it answers whenever the newer call gives nil.
     public var certificateTrustChain: [SecCertificate] {
-        [Int](0..<certificateCount).compactMap {
+        if #available(iOS 15.0, macOS 12.0, *),
+           let chain = SecTrustCopyCertificateChain(self) as? [SecCertificate] {
+            return chain
+        }
+        return [Int](0..<SecTrustGetCertificateCount(self)).compactMap {
             SecTrustGetCertificateAtIndex(self, $0)
         }
     }
 
-    public var publicKeyTrustChain: [SecKey] {
-        certificateTrustChain.compactMap {
-            try? $0.asPublicKey().get()
-        }
-    }
-
-    public var asPublicKeyTrustChain: Result<[SecKey], Error> {
+    public var publicKeyTrustChain: Result<[SecKey], Error> {
         do {
             let keys = try certificateTrustChain.map {
                 try $0.asPublicKey().get()
@@ -110,7 +110,24 @@ extension SecTrust {
     ) {
         let matches: [ChainOfTrustKey]
         let serverTrust = self
-        let trustChainEnumerated = serverTrust.publicKeyTrustChain.enumerated()
+
+        // Pinning narrows which system-trusted chains are acceptable. The system
+        // error description quotes the server's own certificate, so the code
+        // stands in for it and the line stays free of server text.
+        var trustError: CFError?
+        guard SecTrustEvaluateWithError(serverTrust, &trustError) else {
+            let code = trustError.map { "\(CFErrorGetCode($0))" } ?? "unknown"
+            completion(.failure(SSLTrustError(
+                Self.systemEvaluationFailure + code)))
+            return
+        }
+
+        guard let trustChain = try? serverTrust.publicKeyTrustChain.get() else {
+            completion(.failure(SSLTrustError(Self.unreadablePublicKey)))
+            return
+        }
+
+        let trustChainEnumerated = trustChain.enumerated()
         matches = trustChainEnumerated
             .map { chain -> ChainOfTrustKeyMatch in
                 let serverCertificateKey = chain.element
@@ -122,22 +139,28 @@ extension SecTrust {
 
         switch matches.isNotEmpty {
         case true:
+            // The index says which certificate matched. The key itself is
+            // material and stays out of the log.
             let indexes = matches.map { "\($0.index)" }
-            let keys = matches.compactMap { $0.key.data }.map { "\($0.base64EncodedString() )" }
-            let message = """
-                    Success: pinned certificates matched with server's chain of trust
-                    at index(es): [\(indexes.joined(separator: ", "))] \
-                    with key(s): \(keys.joined(separator: ", \n"))
-                    """
+            let message = Self.pinnedKeyMatched + "[\(indexes.joined(separator: ", "))]"
             completion(.success(message))
         case false:
             /// Failing here means that the public key of the server does not match the stored one.
             /// This can either indicate a MITM attack, or that the backend certificate and the
             /// private key changed, most likely due to expiration.
-            let message = "Failure: no pinned certificate matched in the server's chain of trust"
-            completion(.failure(SSLTrustError(message)))
+            completion(.failure(SSLTrustError(Self.noPinnedKeyMatched)))
         }
     }
+
+    // Each refusal carries its own name, so a test can assert which one it read.
+    static let systemEvaluationFailure =
+        "Failure: the server's chain of trust failed system evaluation, code "
+    static let unreadablePublicKey =
+        "Failure: the server's chain of trust holds a certificate with no readable public key"
+    static let noPinnedKeyMatched =
+        "Failure: no pinned certificate matched in the server's chain of trust"
+    static let pinnedKeyMatched =
+        "Success: pinned certificates matched with the server's chain of trust at index(es): "
 }
 
 extension SecKey {

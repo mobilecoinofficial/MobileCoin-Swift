@@ -52,7 +52,7 @@ enum UnitTestFixtures {
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogView = FogViewConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         fogUrlLoadBalancer.rotationEnabled = true
@@ -72,7 +72,7 @@ enum UnitTestFixtures {
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogUntrustedTxOut = FogUntrustedTxOutConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         fogUrlLoadBalancer.rotationEnabled = true
@@ -92,7 +92,7 @@ enum UnitTestFixtures {
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogMerkleProof = FogMerkleProofConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         fogUrlLoadBalancer.rotationEnabled = true
@@ -112,7 +112,7 @@ enum UnitTestFixtures {
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogKeyImage = FogKeyImageConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         fogUrlLoadBalancer.rotationEnabled = true
@@ -132,7 +132,7 @@ enum UnitTestFixtures {
 
         fogUrlLoadBalancer.rotationEnabled = false
         let fogBlock = FogBlockConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         fogUrlLoadBalancer.rotationEnabled = true
@@ -152,7 +152,7 @@ enum UnitTestFixtures {
 
         consensusUrlLoadBalancer.rotationEnabled = false
         let blockchain = BlockchainConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         consensusUrlLoadBalancer.rotationEnabled = true
@@ -172,7 +172,7 @@ enum UnitTestFixtures {
 
         consensusUrlLoadBalancer.rotationEnabled = false
         let consensus = ConsensusConnection(
-            httpFactory: HttpProtocolConnectionFactory(httpRequester: networkConfig.httpRequester),
+            httpFactory: HttpProtocolConnectionFactory(httpRequester: httpRequester),
             config: networkConfig,
             targetQueue: DispatchQueue.main)
         consensusUrlLoadBalancer.rotationEnabled = true

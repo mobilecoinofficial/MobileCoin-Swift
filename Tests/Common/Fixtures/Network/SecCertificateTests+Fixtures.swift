@@ -20,17 +20,47 @@ enum SecCertificateTests {
         })
     }
 
-    static func createSecTrust(_ certificateChain: [SecCertificate]) throws -> SecTrust {
+    /// A date inside the validity window every fixture chain shares.
+    ///
+    /// Every fixture leaf expires in 2023, so evaluation at the current date
+    /// refuses all of them.
+    static let fixtureVerifyDate = Date(timeIntervalSince1970: 1_680_307_200)
+
+    static func createSecTrust(
+        _ certificateChain: [SecCertificate],
+        verifyDate: Date? = fixtureVerifyDate,
+        host: String? = nil,
+        anchorOverride: SecCertificate? = nil
+    ) throws -> SecTrust {
         var secTrust: SecTrust?
+        let policy = host.map { SecPolicyCreateSSL(true, $0 as CFString) }
+            ?? SecPolicyCreateBasicX509()
         guard
             SecTrustCreateWithCertificates(
                 certificateChain as AnyObject,
-                SecPolicyCreateBasicX509(),
+                policy,
                 &secTrust
             ) == errSecSuccess,
             let serverTrust = secTrust
         else {
             throw SSLTrustError("Cannot create SecTrust from Server Certificates")
+        }
+
+        if let verifyDate {
+            guard SecTrustSetVerifyDate(serverTrust, verifyDate as CFDate) == errSecSuccess else {
+                throw SSLTrustError("Cannot set the verify date on the SecTrust")
+            }
+        }
+
+        // Anchoring keeps every verdict independent of what the system trust
+        // store holds, and an anchor from outside the chain leaves it no trusted path.
+        if let anchor = anchorOverride ?? certificateChain.last {
+            guard
+                SecTrustSetAnchorCertificates(serverTrust, [anchor] as CFArray) == errSecSuccess,
+                SecTrustSetAnchorCertificatesOnly(serverTrust, true) == errSecSuccess
+            else {
+                throw SSLTrustError("Cannot anchor the SecTrust on the given certificate")
+            }
         }
 
         return serverTrust
@@ -87,6 +117,45 @@ extension SecCertificateTests.Fixtures {
             )
         }
     }
+
+    /// A self-signed certificate whose common name holds a literal newline.
+    ///
+    /// The system quotes that name in its own error description, so this is the
+    /// text a refusal must keep out of the client log.
+    struct ForgedCommonName {
+        static let commonName = "evil.example.com\nforged-log-line"
+
+        /// 2030-01-01, inside this certificate's window of 2026-09-06 to
+        /// 2036-09-03, so the refusal stays a matter of the anchor at every run.
+        static let verifyDate = Date(timeIntervalSince1970: 1_893_456_000)
+
+        let secTrust: SecTrust
+
+        init() throws {
+            let leaf = try SecCertificateTests.createCertificate(Self.certificateBase64)
+            let foreignAnchor = try SecCertificateTests.createCertificate(
+                SecCertificateTests.Fixtures.AlphaNet.wrongIntermediateCertificateBase64
+            )
+            self.secTrust = try SecCertificateTests.createSecTrust(
+                [leaf],
+                verifyDate: Self.verifyDate,
+                anchorOverride: foreignAnchor
+            )
+        }
+    }
+}
+
+extension SecCertificateTests.Fixtures.ForgedCommonName {
+    static let certificateBase64 = """
+        MIIBqzCCAVGgAwIBAgIUFZKsAIXLRa5nN4fRbRiMG0JrWwwwCgYIKoZIzj0EAwIwKzEpMCcGA1UEAwwg\
+        ZXZpbC5leGFtcGxlLmNvbQpmb3JnZWQtbG9nLWxpbmUwHhcNMjYwOTA2MTY1MjUyWhcNMzYwOTAzMTY1\
+        MjUyWjArMSkwJwYDVQQDDCBldmlsLmV4YW1wbGUuY29tCmZvcmdlZC1sb2ctbGluZTBZMBMGByqGSM49\
+        AgEGCCqGSM49AwEHA0IABIgX6AXI58Ol3o9faHwiekhrlToaNGQ+sTLwCnLiBmLhTJshSWObZthAO5H6\
+        MFctWjMfH5NMGIIwFTTjn4eay46jUzBRMB0GA1UdDgQWBBTq5kNFPSIxzvXpZM01uXHi6ShbeDAfBgNV\
+        HSMEGDAWgBTq5kNFPSIxzvXpZM01uXHi6ShbeDAPBgNVHRMBAf8EBTADAQH/MAoGCCqGSM49BAMCA0gA\
+        MEUCIQD71wlZjLj8rfl2Cg8ZQb8LIfgz+f0PP+m0H47CGnznQwIgA04CDdEnqCm/gjEaSfDe0I4naW27\
+        fkCFXMiTqVtVYEs=
+        """
 }
 
 extension SecCertificateTests.Fixtures.TestNet {
