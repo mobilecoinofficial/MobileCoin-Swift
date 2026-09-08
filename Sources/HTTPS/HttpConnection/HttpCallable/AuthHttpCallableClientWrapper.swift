@@ -5,10 +5,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinHTTP
 import LibMobileCoinCommon
-#endif
 
 
 protocol AuthQueryHttpCalleeAndClient : QueryHttpCallee, AuthHttpCallee, HTTPClient {}

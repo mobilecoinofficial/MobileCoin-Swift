@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 import SwiftProtobuf
 
 final class BlockchainConnection: Connection<

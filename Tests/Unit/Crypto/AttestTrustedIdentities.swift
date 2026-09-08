@@ -3,10 +3,8 @@
 //
 
 @testable import LibMobileCoin
-@testable import MobileCoin
-#if canImport(LibMobileCoinCommon)
 @testable import LibMobileCoinCommon
-#endif
+@testable import MobileCoin
 import XCTest
 
 final class AttestTrustedIdentities: XCTestCase {

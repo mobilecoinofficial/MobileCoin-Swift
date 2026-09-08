@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 public struct Transaction: Sendable {
     fileprivate let proto: External_Tx

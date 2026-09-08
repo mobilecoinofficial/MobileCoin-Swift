@@ -7,10 +7,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinCommon
 import LibMobileCoinHTTP
-#endif
 
 enum AttestedHttpConnectionError: Error, Sendable {
     case connectionError(ConnectionError)

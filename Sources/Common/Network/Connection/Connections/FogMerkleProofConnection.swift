@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 final class FogMerkleProofConnection: Connection<
         HttpProtocolConnectionFactory.FogMerkleProofServiceProvider

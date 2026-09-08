@@ -26,8 +26,7 @@ let package = Package(
         ),
     ],
     targets: [
-        // HTTP only, which is what the pod chain ships and what production runs.
-        // The file list mirrors the podspec CoreHTTP subspec.
+        // HTTP only, which is what production runs.
         .target(
             name: "MobileCoin",
             dependencies: [
@@ -44,14 +43,15 @@ let package = Package(
             name: "MobileCoinTests",
             // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
             // does not carry them, so the test target asks for them by name.
-            // Without this `canImport(LibMobileCoinTestVector)` is false and the
-            // tests read vectors this target never copies.
             dependencies: [
                 "MobileCoin",
                 .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
             ],
             path: "Tests",
-            exclude: ["Common/Secrets/secrets.json.sample"],
+            exclude: [
+                "Common/Secrets/secrets.json.sample",
+                "Common/Secrets/process_info.json.sample",
+            ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),
                 .copy("Common/Secrets/secrets.json"),
@@ -61,14 +61,7 @@ let package = Package(
         .target(
             name: "TestSetupClient",
             dependencies: ["MobileCoin"],
-            path: "tools/TestSetupClient/TestSetupClient",
-            exclude: [
-                "Assets.xcassets",
-                "Preview Content/Preview Assets.xcassets",
-            ],
-            swiftSettings: [
-                .define("SPM_BUILD"),
-            ]
+            path: "tools/TestSetupClient/TestSetupClient"
          ),
         .testTarget(
             name: "TestSetupClientTests",

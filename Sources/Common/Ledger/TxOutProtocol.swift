@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 protocol TxOutProtocol {
     var encryptedMemo: Data66 { get }

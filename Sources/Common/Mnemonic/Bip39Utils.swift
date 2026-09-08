@@ -6,9 +6,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 enum Bip39Utils {
     static func mnemonic(fromEntropy entropy: Data32) -> Mnemonic {

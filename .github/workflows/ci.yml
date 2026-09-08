@@ -16,104 +16,35 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  FASTLANE_SKIP_UPDATE_CHECK: "1"
-  # cocoapods-keys resolves these from the environment before consulting the
-  # keychain, so exporting them here is enough for `pod install`.
-  devNetworkAuthUsername: ${{ secrets.DEV_NETWORK_AUTH_USERNAME }}
-  devNetworkAuthPassword: ${{ secrets.DEV_NETWORK_AUTH_PASSWORD }}
-  testNetTestAccountMnemonicsCommaSeparated: ${{ secrets.TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
-  mobileDevTestAccountMnemonicsCommaSeparated: ${{ secrets.MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
-  dynamicTestAccountSeedEntropiesCommaSeparated: ${{ secrets.DYNAMIC_TEST_ACCOUNT_ENTROPIES_COMMA_SEPARATED }}
-  dynamicFogAuthoritySpki: ${{ secrets.DYNAMIC_FOG_AUTHORITY_SPKI }}
-
 jobs:
 
-  build-and-test-example-http:
-    name: Example app integration tests
+  # `swift test` compiles every target in the package, the skipped suites
+  # included, so a target that cannot compile fails here even when it never runs.
+  swift-test:
+    name: Swift package tests
     runs-on: macos-26
-    timeout-minutes: 120
-    env:
-      FL_BUILDLOG_PATH: ../output/buildlogs
-      SCAN_OUTPUT_DIRECTORY: ../output/scan
-      SCAN_OUTPUT_TYPES: junit
-      # Pinned with an explicit OS version: a versionless name sends fastlane
-      # 2.225 through scan's default_os_version lookup, which crashes on
-      # Xcode 26 (fixed upstream, but cocoapods-binary's xcpretty pin caps
-      # fastlane below the fix). Update it when the image rotates simulators.
-      IOS_SIM_DEVICE: "iPhone 17 (26.5)"
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # A blank secret reaches the build as an empty key rather than an error,
-      # so this runs ahead of everything that consumes one.
-      - name: Report test credential availability
-        run: |
-          set -euo pipefail
-          missing=""
-          for key in devNetworkAuthUsername devNetworkAuthPassword \
-                     testNetTestAccountMnemonicsCommaSeparated \
-                     mobileDevTestAccountMnemonicsCommaSeparated \
-                     dynamicTestAccountSeedEntropiesCommaSeparated \
-                     dynamicFogAuthoritySpki; do
-            if [[ -z "${!key:-}" ]]; then
-              missing="${missing:+${missing}, }${key}"
-            fi
-          done
-          if [[ -n "${missing}" ]]; then
-            echo "::notice title=Blank test credentials::${missing}"
-          fi
+      # Cheap and first, so a broken secret lookup fails before the build.
+      - name: Check the secret lookup helper
+        run: tools/lookup_test.sh
 
-      - name: Setup
-        uses: ./.github/actions/setup-macos-ci
-
-      - name: Build
-        run: make build-example-http
-
+      # No `.build` cache on purpose. The entry would be the whole build tree,
+      # which is large against this repo's cache budget.
       - name: Test
-        run: make test-example-http
+        run: make test-spm
 
-      # `output` holds gym's buildlogs (FL_BUILDLOG_PATH) and scan's junit
-      # (SCAN_OUTPUT_DIRECTORY); scan writes its raw xcodebuild logs to
-      # ~/Library/Logs/scan instead, which is where per-target build details
-      # (archs, module paths) live when a compile fails.
-      - name: Upload build and test output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: example-http-output
-          path: |
-            output
-            ~/Library/Logs/scan
-          if-no-files-found: ignore
-
-      - name: Upload crash reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: example-http-diagnostics
-          path: ~/Library/Logs/DiagnosticReports
-          if-no-files-found: ignore
-
-  # Proves SPM consumers can resolve libmobilecoin without the CocoaPods
-  # toolchain, so this job skips the setup action on purpose. Test targets
-  # compile but do not run: secrets.json needs a macOS-keychain identity.
-  build-spm:
-    name: Swift package build
-    runs-on: macos-26
-    timeout-minutes: 30
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # No `.build` cache on purpose: the entry would be the whole build tree,
-      # about 660 MiB compressed, against 143 MiB of cache in this repo total.
-      - name: Build
-        run: make build-spm
+      # `swift test` builds for the host. The only consumer of this SDK is an
+      # iOS app, so the iOS slice needs its own compile.
+      - name: Build for iOS
+        run: make build-ios
 
       # The build rewrites Package.resolved when the declared dependencies and
-      # the committed resolution disagree.
+      # the committed resolution disagree. The two fixtures the recipe seeds
+      # are ignored, so they must not show up here either.
       - name: Check for uncommitted changes
         run: ./scripts/check_dirty_git
 
@@ -125,11 +56,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup
-        uses: ./.github/actions/setup-macos-ci
-
-      # `make lint-strict` runs the SwiftLint binary vendored into
-      # ExampleHTTP/Pods, which is why this job still needs `pod install`.
+      # `tools/swiftlint.sh` downloads its own pinned binary, so this job needs
+      # no toolchain of its own.
       - name: Lint
         run: make lint-strict
 

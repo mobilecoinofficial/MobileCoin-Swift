@@ -4,10 +4,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinCommon
 import LibMobileCoinHTTP
-#endif
 
 // The pinning delegate is a separate object now, so the session is a `let`
 // built in init rather than a racy `lazy var`.

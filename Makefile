@@ -1,81 +1,51 @@
 .PHONY: default
-default: setup bootstrap build test
+default: build-spm test-spm
 
 # Commands
 
-.PHONY: setup
-setup:
-	bundle install
-	@$(MAKE) --directory=ExampleHTTP setup
-
-.PHONY: bootstrap
-bootstrap:
-	@$(MAKE) --directory=ExampleHTTP bootstrap
-
+# `build` and `test` are the names the README uses.
 .PHONY: build
-build:
-	@$(MAKE) --directory=ExampleHTTP build
+build: build-spm
 
 .PHONY: test
-test:
-	@$(MAKE) --directory=ExampleHTTP test
-
-.PHONY: lock
-lock:
-	$(info making locks with setup & boostrap)
-	$(info ExampleHTTP setup)
-	@$(MAKE) --directory=ExampleHTTP setup
-	$(info ExampleHTTP bootstrap)
-	@$(MAKE) --directory=ExampleHTTP bootstrap
-
-.PHONY: setup-example-http
-setup-example-http:
-	bundle install
-	@$(MAKE) --directory=ExampleHTTP setup
-
-.PHONY: bootstrap-example-http
-bootstrap-example-http:
-	@$(MAKE) --directory=ExampleHTTP bootstrap
-
-.PHONY: build-example-http
-build-example-http:
-	@$(MAKE) --directory=ExampleHTTP build
-
-.PHONY: test-example-http
-test-example-http:
-	@$(MAKE) --directory=ExampleHTTP test
-
-.PHONY: clean-example-http
-clean-example-http: clean-docs
-	@$(MAKE) --directory=ExampleHTTP clean
-
-.PHONY: lint
-lint: swiftlint
+test: test-spm
 
 .PHONY: lint-strict
 lint-strict: 
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --strict --quiet
+	@tools/swiftlint.sh --strict --quiet
 
 .PHONY: autocorrect
 autocorrect: 
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint --fix
+	@tools/swiftlint.sh --fix
 
 .PHONY: lint-all
-# `lint-docs` is out of this list because the Gemfile keeps jazzy commented out,
-# so it cannot generate the output it checks.
-lint-all: lint lint-podspec
-
-.PHONY: publish
-publish: tag-release publish-podspec
+# `lint-docs` is out of this list because no route in this repo installs jazzy,
+# so it cannot generate the output it checks. It rejoins when jazzy comes back.
+lint-all: lint-strict
 
 # Release
 
-# The podspec is the version source for the tag.
+# The changelog's newest released heading is the version source for the tag.
+# The pattern takes a `## [x.y.z] - date` line and nothing else, so an
+# unreleased or malformed heading yields no version and the recipe says so.
+# `git ls-remote --exit-code` exits 2 for an absent tag and 128 when it cannot
+# read origin. The branch reads the code, so a failure is never an absence.
 .PHONY: tag-release
 tag-release:
-	VERSION="$$(bundle exec pod ipc spec MobileCoin.podspec | jq -r '.version')" && \
-		if git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null 2>&1; then \
-			echo "Tag v$$VERSION already exists."; \
+	VERSION="$$(sed -n 's/^## \[\([0-9][^]]*\)\] - .*/\1/p' CHANGELOG.md | head -1)" && \
+		{ [ -n "$$VERSION" ] || { \
+			echo "No released version heading in CHANGELOG.md. The newest one must read '## [6.1.0] - 2026-09-01'." >&2; \
+			exit 1; \
+		}; } && \
+		{ git ls-remote --exit-code --tags origin "refs/tags/v$$VERSION" >/dev/null; LOOKUP=$$?; } && \
+		if [ $$LOOKUP -eq 0 ]; then \
+			echo "Tag v$$VERSION already exists on origin."; \
+		elif [ $$LOOKUP -ne 2 ]; then \
+			echo "Cannot read the tags on origin. git exited $$LOOKUP and made no tag." >&2; \
+			exit $$LOOKUP; \
+		elif git rev-parse -q --verify "refs/tags/v$$VERSION" >/dev/null; then \
+			echo "Tag v$$VERSION already exists in this clone and not on origin." >&2; \
+			exit 1; \
 		else \
 			git tag "v$$VERSION" && \
 			git push origin "refs/tags/v$$VERSION"; \
@@ -89,7 +59,7 @@ API_DOCS = output/api-docs
 
 .PHONY: docs
 docs:
-	bundle exec jazzy
+	jazzy
 
 .PHONY: clean-docs
 clean-docs:
@@ -113,28 +83,47 @@ lint-docs:
 
 .PHONY: swiftlint
 swiftlint:
-	@PATH="./ExampleHTTP/Pods/SwiftLint:$$PATH" swiftlint
+	@tools/swiftlint.sh
 
 # Maintenance
-
-.PHONY: upgrade-deps
-upgrade-deps:
-	bundle update
-	$(MAKE) -C ExampleHTTP upgrade-deps
 
 .PHONY: generate-local-process-info
 generate-local-process-info:
 	tools/generate_process_info_jsons.sh
 
+# Writes the three generated test resources. The target decrypts, so it needs
+# your age keys in the keychain.
+.PHONY: init-secrets
+init-secrets:
+	tools/generate_process_info_jsons.sh
+	tools/generate_secrets_json.sh
+
 # Builds every target in Package.swift, test targets included. Plain `swift
 # build` skips those, so a test target that cannot compile still goes green.
-# Unlike `run-all-tests-spm` this needs no secrets, so it is the one SPM check
-# CI can run today. The test targets declare generated resources, which from
-# tools 6.0 must exist before the build, hence the ensure step.
+# The test targets declare generated resources, which from tools 6.0 must exist
+# before the build, hence the ensure step.
 .PHONY: build-spm
 build-spm:
 	tools/ensure_test_resources.sh
 	swift build --build-tests
+
+# The credential-free test lane. The first three patterns skip every suite
+# under Tests/Integration, and the fourth skips the account funding tool.
+# Those are the suites that read a real seed or reach the network.
+.PHONY: test-spm
+test-spm:
+	tools/ensure_test_resources.sh
+	swift test \
+		--skip "IntTests" \
+		--skip "MistyswapTests" \
+		--skip "TransactionIdempotenceTests" \
+		--skip "TestSetupClientTests"
+
+# `swift build` targets the host only. This is the iOS slice, which is the one
+# every consumer actually links.
+.PHONY: build-ios
+build-ios:
+	xcodebuild build -scheme MobileCoin -destination 'generic/platform=iOS'
 
 .PHONY: fund-test-wallets-spm
 fund-test-wallets-spm:

@@ -4,10 +4,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinCommon
 import LibMobileCoinHTTP
-#endif
 
 public class RestApiRequester {
     let requester: HttpRequester

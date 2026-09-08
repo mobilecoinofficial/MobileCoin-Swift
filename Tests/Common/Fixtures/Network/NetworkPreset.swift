@@ -6,10 +6,6 @@
 @testable import MobileCoin
 import XCTest
 
-#if canImport(Keys)
-import Keys
-#endif
-
 enum NetworkPreset {
     /// MainNet (MobileCoin Consensus node1 + MobileCoin Fog)
     case mainNet
@@ -62,12 +58,7 @@ struct DynamicNetworkConfig {
 
 extension DynamicNetworkConfig {
 
-    #if canImport(Keys)
-        private static let dynamicFogAuthoritySpki =
-            MobileCoinKeys().dynamicFogAuthoritySpki
-    #else
-        private static let dynamicFogAuthoritySpki = ""
-    #endif
+    private static let dynamicFogAuthoritySpki = ""
 
     enum AlphaDevelopment {
         static let user = ""
@@ -864,50 +855,25 @@ extension NetworkPreset {
         }
     }
 
-#if canImport(Keys)
-    private static let devNetworkAuthUsername =
-        MobileCoinKeys().devNetworkAuthUsername
-#else
     private static let devNetworkAuthUsername = {
         (try? TestSecrets.load().DEV_NETWORK_AUTH_USERNAME) ?? ""
     }()
-#endif
 
-#if canImport(Keys)
-    private static let devNetworkAuthPassword =
-        MobileCoinKeys().devNetworkAuthPassword
-#else
     private static let devNetworkAuthPassword = {
         (try? TestSecrets.load().DEV_NETWORK_AUTH_PASSWORD) ?? ""
     }()
-#endif
 
-#if canImport(Keys)
-    private static let testNetTestAccountMnemonicsCommaSeparated =
-        MobileCoinKeys().testNetTestAccountMnemonicsCommaSeparated
-#else
     private static let testNetTestAccountMnemonicsCommaSeparated = {
         (try? TestSecrets.load().TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED) ?? ""
     }()
-#endif
 
-#if canImport(Keys)
-    private static let mobileDevTestAccountMnemonicsCommaSeparated =
-        MobileCoinKeys().mobileDevTestAccountMnemonicsCommaSeparated
-#else
     private static let mobileDevTestAccountMnemonicsCommaSeparated = {
         (try? TestSecrets.load().MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED) ?? ""
     }()
-#endif
 
-#if canImport(Keys)
-    private static let dynamicTestAccountSeedEntropiesCommaSeparated =
-        MobileCoinKeys().dynamicTestAccountSeedEntropiesCommaSeparated
-#else
     private static let dynamicTestAccountSeedEntropiesCommaSeparated = {
         (try? TestSecrets.load().DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED) ?? ""
     }()
-#endif
 
     // swiftlint:disable force_unwrapping
     var testAccountsPrivateKeys:

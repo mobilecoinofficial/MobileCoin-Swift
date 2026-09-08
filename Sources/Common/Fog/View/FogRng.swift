@@ -6,9 +6,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 enum FogRngError: Error, Sendable {
     case invalidKey(String)

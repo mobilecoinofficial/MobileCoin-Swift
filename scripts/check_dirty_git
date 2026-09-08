@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Fails if the working tree has uncommitted changes. Used by CI to catch
-# generated files (e.g. Xcode project changes from `pod install`) that should
+# generated files, such as a `Package.resolved` the build rewrote, that should
 # have been committed.
 
 set -e
