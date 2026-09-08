@@ -7,8 +7,8 @@ import Foundation
 class HttpProtocolConnectionFactory: ProtocolConnectionFactory {
     let requester: HttpRequester
 
-    init(httpRequester: HttpRequester?) {
-        self.requester = httpRequester ?? DefaultHttpRequester()
+    init(httpRequester: HttpRequester) {
+        self.requester = httpRequester
     }
 
     func makeConsensusService(

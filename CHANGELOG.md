@@ -15,8 +15,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shipped caller. A consumer that pins a CA the device does not trust can no
   longer connect there. That path carries no flag to turn the check off. A
   consumer that supplies its own `HttpRequester` replaces
-  `DefaultHttpRequester` outright, so its traffic never reaches this code. The
-  protocol's default trust-root setters do nothing, and they report no error.
+  `DefaultHttpRequester` outright, so its traffic never reaches this code.
+- `HttpRequester` requires both trust-root setters and answers each with a
+  `Result`. The protocol doesn't carry a default, so a conformer must
+  implement both setters. This is a breaking change.
+- Both `HttpRequester` trust-root setters take `hosts: [String]`, naming the
+  endpoints that set of roots pins. This is a breaking change for a caller of
+  either setter and for a conformer outside this package.
+  `DefaultHttpRequester` judges a challenged host against the roots of every
+  set that names it and carries keys. A consensus host will be judged against
+  the pinned consensus roots alone when the consensus set is the only such set
+  for that host. Both setters store a host in the form a lookup uses, which
+  ignores case and trailing dots.
+- `DefaultHttpRequester` judges a host that no such set names against every
+  root it holds, which is the fallback and is what it did for every host
+  before. A lookup keeps a naming set only while it carries keys, so the
+  lookup takes that fallback for a host that keyless sets alone name. A
+  consumer that names the hosts of one setter alone leaves the other setter's
+  hosts there too.
+- `SecTrust.publicKeyTrustChain` returns a `Result` and carries the error of
+  the certificate it could not read. `asPublicKeyTrustChain` is gone.
+- `SecTrust.certificateTrustChain` reads the chain with
+  `SecTrustCopyCertificateChain` on iOS 15 and macOS 12. The deprecated calls
+  answer on an older system and wherever that call gives nil.
 - A private CA the device trusts is an anchor like any other, so a chain under
   it is judged like any other.
 - `validateAgainst` reads the chain the system built. A server that presents a
@@ -31,6 +52,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   what `URLSession` supplies, a chain issued for another host is refused too.
   A CA pin is matched by any certificate that CA issues, so the host check
   is what separates the intended server from a sibling.
+- The pinning failure line carries the system's error code in place of its
+  description. The description quotes the server's own common name, so a name
+  holding a newline could forge a client log line.
+- The pinning success line names the index of the certificate that matched in
+  place of its public key.
+- `NetworkConfig.setConsensusTrustRoots` and `setFogTrustRoots` keep the roots
+  already set when the new roots fail to parse, and they keep the new roots
+  only once the requester has taken them.
+- `MobileCoinClient` gives a config that carries no requester a
+  `DefaultHttpRequester`, so the trust roots on that config reach the
+  connections it opens. Before this the connection factory built its own
+  requester, which held no roots and pinned nothing.
+- `SecCertificate.publicKey(for:)` names the certificate in place of printing
+  its bytes.
 
 ## [6.1.0] - 2026-09-01
 

@@ -23,9 +23,26 @@ public final class MockFailingHttpRequester: NSObject, HttpRequester {
         completion(.failure(ConnectionError.invalidServerResponse("Mock Http Request set to fail")))
     }
 
-    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?) {
+    public private(set) var consensusTrustRoots: SecSSLCertificates?
+    public private(set) var consensusHosts: [String] = []
+    public private(set) var fogTrustRoots: SecSSLCertificates?
+    public private(set) var fogHosts: [String] = []
+
+    @discardableResult
+    public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        consensusTrustRoots = trustRoots
+        consensusHosts = hosts
+        return .success(())
     }
 
-    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?) {
+    @discardableResult
+    public func setFogTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        fogTrustRoots = trustRoots
+        fogHosts = hosts
+        return .success(())
     }
 }

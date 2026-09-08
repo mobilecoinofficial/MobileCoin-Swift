@@ -2,8 +2,21 @@
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
 
+import LibMobileCoin
+#if canImport(LibMobileCoinCommon)
+import LibMobileCoinCommon
+import LibMobileCoinHTTP
+#endif
 @testable import MobileCoin
 import XCTest
+
+// The hosts a test pins against. `pinned` covers a case where one host is
+// enough, and `fog` and `consensus` separate the two setters' roots.
+private enum TestHost {
+    static let pinned = "example.com"
+    static let fog = "fog.example.com"
+    static let consensus = "consensus.example.com"
+}
 
 class CertificateTests: XCTestCase {
 
@@ -48,9 +61,9 @@ class CertificateTests: XCTestCase {
             fixture.certificateChain,
             verifyDate: nil)
 
-        atTheCurrentDate.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertTrue(
+            try refusal(of: atTheCurrentDate, against: pinnedKeys)
+                .hasPrefix(SecTrust.systemEvaluationFailure))
     }
 
     // The pinned key is an intermediate CA key, so it matches every certificate
@@ -71,9 +84,9 @@ class CertificateTests: XCTestCase {
             fixture.certificateChain,
             host: "fog.prod.mobilecoin.com")
 
-        forAnotherHost.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertTrue(
+            try refusal(of: forAnotherHost, against: pinnedKeys)
+                .hasPrefix(SecTrust.systemEvaluationFailure))
     }
 
     // Anchoring on another chain's top certificate leaves this chain with no
@@ -87,9 +100,9 @@ class CertificateTests: XCTestCase {
             alphaNet.certificateChain,
             anchorOverride: try XCTUnwrap(testNet.certificateChain.last))
 
-        onAForeignAnchor.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertTrue(
+            try refusal(of: onAForeignAnchor, against: pinnedKeys)
+                .hasPrefix(SecTrust.systemEvaluationFailure))
     }
 
     func testInvalidIntermediateAgainstCertificateChain() throws {
@@ -97,18 +110,176 @@ class CertificateTests: XCTestCase {
 
         let pinnedKeys = [try fixture.wrongIntermediate.asPublicKey().get()]
 
-        fixture.secTrust.validateAgainst(pinnedKeys: pinnedKeys) { result in
-            XCTAssertFailure(result)
-        }
+        XCTAssertEqual(
+            try refusal(of: fixture.secTrust, against: pinnedKeys),
+            SecTrust.noPinnedKeyMatched)
     }
 
-    // The four below drive both delegate shims and each covers one of `handle`'s
-    // outcomes.
+    // The system quotes the server's own common name in its error description,
+    // so a refusal that repeats it lets the server write the client's log.
+    func testARefusalCarriesTheCodeAndNotTheServersCommonName() throws {
+        let fixture = try SecCertificateTests.Fixtures.ForgedCommonName()
+
+        var systemError: CFError?
+        XCTAssertFalse(SecTrustEvaluateWithError(fixture.secTrust, &systemError))
+        let systemDescription = CFErrorCopyDescription(try XCTUnwrap(systemError)) as String
+        XCTAssertTrue(
+            systemDescription.contains(SecCertificateTests.Fixtures.ForgedCommonName.commonName))
+
+        let reason = try refusal(of: fixture.secTrust, against: [])
+
+        XCTAssertEqual(
+            reason,
+            SecTrust.systemEvaluationFailure + "\(CFErrorGetCode(try XCTUnwrap(systemError)))")
+        XCTAssertEqual(reason.components(separatedBy: "\n").count, 1)
+    }
+
+    // Exact equality proves the message carries the index alone.
+    func testAMatchIsReportedByIndexAndNotByKey() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let pinnedKeys = [try fixture.validIntermediate.asPublicKey().get()]
+
+        var message: String?
+        fixture.secTrust.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            message = try? result.get()
+        }
+
+        let index = try XCTUnwrap(
+            fixture.secTrust.certificateTrustChain.firstIndex {
+                $0.data == fixture.validIntermediate.data
+            })
+        XCTAssertEqual(message, SecTrust.pinnedKeyMatched + "[\(index)]")
+    }
+
+    // Roots the config stored with no requester present reach the first
+    // requester it is given, each in the field its own setter names.
+    func testTrustRootsSetBeforeTheRequesterReachIt() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        config.httpRequester = nil
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
+
+        let requester = MockFailingHttpRequester()
+        config.httpRequester = requester
+
+        let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertNotEqual(consensus.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, consensus.publicKeys)
+        XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.consensusHosts, config.consensusUrls.map(\.host))
+        XCTAssertEqual(requester.fogHosts, config.fogUrls.map(\.host))
+    }
+
+    // The config's setters and the requester's share their names, so distinct
+    // roots are what will catch a swapped pair once a requester is present.
+    func testEachConfigSetterPushesToItsOwnRequesterField() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        let requester = MockFailingHttpRequester()
+        config.httpRequester = requester
+
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
+
+        let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertNotEqual(consensus.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, consensus.publicKeys)
+        XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.consensusHosts, config.consensusUrls.map(\.host))
+        XCTAssertEqual(requester.fogHosts, config.fogUrls.map(\.host))
+    }
+
+    // The config's fog and consensus URLs name different hosts, so each host
+    // will answer with the keys its own setter pushed.
+    func testAConfigWithNoRequesterFillsInOneThatTakesItsRoots() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        config.httpRequester = nil
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
+
+        let requester = try XCTUnwrap(config.filledHttpRequester() as? DefaultHttpRequester)
+
+        let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+        XCTAssertNotEqual(fog.publicKeys, consensus.publicKeys)
+        let delegate = try pinningDelegate(of: requester)
+        let fogUrlHost = try XCTUnwrap(config.fogUrls.first).host
+        let consensusUrlHost = try XCTUnwrap(config.consensusUrls.first).host
+        XCTAssertNotEqual(fogUrlHost, consensusUrlHost)
+        XCTAssertEqual(delegate.pinnedKeys(for: fogUrlHost), fog.publicKeys)
+        XCTAssertEqual(delegate.pinnedKeys(for: consensusUrlHost), consensus.publicKeys)
+    }
+
+    // A consumer's own requester decides how the connections handle TLS, so the
+    // fill answers with that one and keeps it in the config.
+    func testAConfigKeepsTheRequesterItAlreadyHolds() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let requester = MockFailingHttpRequester()
+        config.httpRequester = requester
+
+        XCTAssertTrue((config.filledHttpRequester() as? MockFailingHttpRequester) === requester)
+        XCTAssertTrue((config.httpRequester as? MockFailingHttpRequester) === requester)
+    }
+
+    // Roots the config doesn't hold leave the requester's own in place, so a
+    // requester that arrives with keys keeps pinning against them.
+    func testAConfigWithNoRootsLeavesTheRequestersOwnInPlace() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        config.consensusTrustRoots[.http] = nil
+        config.fogTrustRoots[.http] = nil
+        let requester = DefaultHttpRequester()
+        let roots = try alphaNetCertificates(.valid)
+        requester.setFogTrustRoots(roots, hosts: [TestHost.fog])
+
+        config.httpRequester = requester
+
+        XCTAssertEqual(
+            try pinningDelegate(of: requester).pinnedKeys(for: TestHost.fog),
+            roots.publicKeys)
+    }
+
+    // A refused set keeps the pinned http roots the call before it stored, so a
+    // failure won't replace them with roots nothing accepted.
+    func testRefusedTrustRootsLeaveThePinnedRootsInPlace() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        let pinned = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+
+        config.httpRequester = RefusingHttpRequester()
+
+        XCTAssertFailure(config.setConsensusTrustRoots([fixture.wrongTrustRootBytes]))
+        XCTAssertEqual(
+            (config.consensusTrustRoots[.http] as? SecSSLCertificates)?.publicKeys,
+            pinned.publicKeys)
+    }
+
+    // Roots that fail to parse leave the pinned roots in place, because a config
+    // with no roots falls through to the system's own handling.
+    func testAFailedParseKeepsTheTrustRootsAlreadySet() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+
+        XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
+        let pinned = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
+
+        XCTAssertFailure(config.setConsensusTrustRoots([fixture.invalidTrustRootBytes]))
+
+        XCTAssertEqual(
+            (config.consensusTrustRoots[.http] as? SecSSLCertificates)?.publicKeys,
+            pinned.publicKeys)
+    }
+
+    // The cases below drive both delegate shims across `handle`'s outcomes.
 
     func testServerTrustMatchingAPinnedKeyIsAccepted() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
-        requester.setFogTrustRoots(try alphaNetCertificates(.valid))
+        requester.setFogTrustRoots(try alphaNetCertificates(.valid), hosts: [TestHost.pinned])
 
         let result = try answer(of: requester, against: fixture.secTrust)
 
@@ -116,16 +287,42 @@ class CertificateTests: XCTestCase {
         XCTAssertNotNil(result.credential)
     }
 
-    // The consensus root carries this one, so both roots take part in a
-    // challenge.
+    // The consensus roots pin this host and don't carry the fixture chain, so
+    // the challenge will be refused.
     func testServerTrustMatchingNoPinnedKeyIsCancelled() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
-        requester.setConsensusTrustRoots(try alphaNetCertificates(.wrong))
+        requester.setConsensusTrustRoots(try alphaNetCertificates(.wrong), hosts: [TestHost.pinned])
 
         XCTAssertEqual(
             try answer(of: requester, against: fixture.secTrust).disposition,
             .cancelAuthenticationChallenge)
+    }
+
+    // The fog roots carry this fixture chain and the consensus roots don't, so
+    // the consensus host will be refused while the fog host is accepted.
+    func testTheRootsOfOneHostDoNotPinAnother() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let requester = DefaultHttpRequester()
+        requester.setFogTrustRoots(try alphaNetCertificates(.valid), hosts: [TestHost.fog])
+        requester.setConsensusTrustRoots(
+            try alphaNetCertificates(.wrong), hosts: [TestHost.consensus])
+
+        let refused = try answer(
+            of: requester, against: fixture.secTrust, host: TestHost.consensus)
+        XCTAssertEqual(refused.disposition, .cancelAuthenticationChallenge)
+        let accepted = try answer(of: requester, against: fixture.secTrust, host: TestHost.fog)
+        XCTAssertEqual(accepted.disposition, .useCredential)
+    }
+
+    // Neither setter names the challenged host, so every pinned root takes part
+    // in its challenge.
+    func testAHostNoSetterNamedIsJudgedAgainstEveryPinnedRoot() throws {
+        let fixture = try SecCertificateTests.Fixtures.AlphaNet()
+        let requester = DefaultHttpRequester()
+        requester.setFogTrustRoots(try alphaNetCertificates(.valid), hosts: [TestHost.fog])
+        let judged = try answer(of: requester, against: fixture.secTrust, host: TestHost.consensus)
+        XCTAssertEqual(judged.disposition, .useCredential)
     }
 
     // With no roots set there is nothing to pin against, so the challenge goes
@@ -164,30 +361,39 @@ class CertificateTests: XCTestCase {
         XCTAssertNil(delegate)
     }
 
-    // `pinnedKeys` reads fog before consensus, so distinct certificates and an
-    // ordered comparison are what make a swap of the two setters visible.
-    func testEachTrustRootSetterWritesItsOwnField() throws {
+    // Distinct fog and consensus roots let each lookup below name the set or
+    // sets that answered it.
+    func testTheSetThatNamesAHostAnswersForIt() throws {
         let requester = DefaultHttpRequester()
         let delegate = try pinningDelegate(of: requester)
         let fog = try alphaNetCertificates(.valid)
         let consensus = try alphaNetCertificates(.wrong)
+        XCTAssertNotEqual(fog.publicKeys, consensus.publicKeys)
 
-        XCTAssertTrue(delegate.pinnedKeys.isEmpty)
+        requester.setFogTrustRoots(fog, hosts: [TestHost.fog.uppercased()])
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.consensus), fog.publicKeys)
 
-        requester.setFogTrustRoots(fog)
-        XCTAssertEqual(delegate.pinnedKeys, fog.publicKeys)
+        requester.setConsensusTrustRoots(consensus, hosts: [TestHost.consensus + "."])
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), fog.publicKeys)
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.consensus + ".."), consensus.publicKeys)
 
-        requester.setConsensusTrustRoots(consensus)
-        XCTAssertEqual(delegate.pinnedKeys, fog.publicKeys + consensus.publicKeys)
+        let noKeys = try XCTUnwrap(SecSSLCertificates(trustRootBytes: []))
+        requester.setFogTrustRoots(noKeys, hosts: [TestHost.fog])
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), consensus.publicKeys)
 
-        requester.setFogTrustRoots(nil)
-        XCTAssertEqual(delegate.pinnedKeys, consensus.publicKeys)
+        requester.setFogTrustRoots(nil, hosts: [])
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), consensus.publicKeys)
+
+        requester.setFogTrustRoots(fog, hosts: [TestHost.consensus])
+        XCTAssertEqual(
+            delegate.pinnedKeys(for: TestHost.consensus),
+            fog.publicKeys + consensus.publicKeys)
+        XCTAssertEqual(
+            delegate.pinnedKeys(for: TestHost.pinned),
+            fog.publicKeys + consensus.publicKeys)
     }
 
-    private enum AlphaNetIntermediate {
-        case valid
-        case wrong
-    }
+    private enum AlphaNetIntermediate { case valid, wrong }
 
     private func alphaNetCertificates(
         _ intermediate: AlphaNetIntermediate
@@ -203,6 +409,18 @@ class CertificateTests: XCTestCase {
         return try XCTUnwrap(try SecSSLCertificates(trustRootBytes: [bytes]))
     }
 
+    // `validateAgainst` calls back on the calling thread, so the reason is set
+    // before this returns.
+    private func refusal(of trust: SecTrust, against pinnedKeys: [SecKey]) throws -> String {
+        var reason: String?
+        trust.validateAgainst(pinnedKeys: pinnedKeys) { result in
+            if case .failure(let error) = result {
+                reason = error.reason
+            }
+        }
+        return try XCTUnwrap(reason)
+    }
+
     private func pinningDelegate(
         of requester: DefaultHttpRequester
     ) throws -> CertificatePinningDelegate {
@@ -213,14 +431,15 @@ class CertificateTests: XCTestCase {
     // the calling thread, so both shims answer before this returns.
     private func answer(
         of requester: DefaultHttpRequester,
-        against trust: SecTrust?
+        against trust: SecTrust?,
+        host: String = TestHost.pinned
     ) throws -> (disposition: URLSession.AuthChallengeDisposition?, credential: URLCredential?) {
         let space: URLProtectionSpace
         if let trust = trust {
-            space = TrustingProtectionSpace(trust: trust)
+            space = TrustingProtectionSpace(trust: trust, host: host)
         } else {
             space = URLProtectionSpace(
-                host: "example.com",
+                host: host,
                 port: 443,
                 protocol: NSURLProtectionSpaceHTTPS,
                 realm: nil,
@@ -253,33 +472,4 @@ class CertificateTests: XCTestCase {
         XCTAssertEqual(sessionDisposition, taskDisposition)
         return (sessionDisposition, credential)
     }
-}
-
-// `URLProtectionSpace` builds its own `serverTrust` from a live TLS handshake,
-// so a fixture chain reaches the delegate only through an override.
-private final class TrustingProtectionSpace: URLProtectionSpace, @unchecked Sendable {
-    private let trust: SecTrust
-
-    init(trust: SecTrust) {
-        self.trust = trust
-        super.init(
-            host: "example.com",
-            port: 443,
-            protocol: NSURLProtectionSpaceHTTPS,
-            realm: nil,
-            authenticationMethod: NSURLAuthenticationMethodServerTrust)
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("unused") }
-
-    override var serverTrust: SecTrust? { trust }
-}
-
-// URLAuthenticationChallenge demands a sender. Nothing under test calls back
-// into it.
-private final class NullChallengeSender: NSObject, URLAuthenticationChallengeSender {
-    func use(_ credential: URLCredential, for challenge: URLAuthenticationChallenge) {}
-    func continueWithoutCredential(for challenge: URLAuthenticationChallenge) {}
-    func cancel(_ challenge: URLAuthenticationChallenge) {}
 }
