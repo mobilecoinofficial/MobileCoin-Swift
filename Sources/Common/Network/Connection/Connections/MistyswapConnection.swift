@@ -1,7 +1,6 @@
 //
 //  Copyright (c) 2020-2021 MobileCoin. All rights reserved.
 //
-// swiftlint:disable closure_body_length
 
 import Foundation
 import LibMobileCoin
@@ -10,13 +9,11 @@ import LibMobileCoinCommon
 #endif
 
 final class MistyswapConnection: Connection<
-        GrpcProtocolConnectionFactory.MistyswapServiceProvider,
         HttpProtocolConnectionFactory.MistyswapServiceProvider
     >,
     MistyswapService
 {
     private let httpFactory: HttpProtocolConnectionFactory
-    private let grpcFactory: GrpcProtocolConnectionFactory
     private let config: NetworkConfig
     private let targetQueue: DispatchQueue?
     private let rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)?
@@ -24,21 +21,19 @@ final class MistyswapConnection: Connection<
 
     init(
         httpFactory: HttpProtocolConnectionFactory,
-        grpcFactory: GrpcProtocolConnectionFactory,
         config: NetworkConfig,
         targetQueue: DispatchQueue?,
         rng: (@convention(c) (UnsafeMutableRawPointer?) -> UInt64)? = securityRNG,
         rngContext: Any? = nil
     ) {
         self.httpFactory = httpFactory
-        self.grpcFactory = grpcFactory
         self.config = config
         self.targetQueue = targetQueue
         self.rng = rng
         self.rngContext = rngContext
 
         super.init(
-            connectionOptionWrapperFactory: { transportProtocolOption in
+            serviceFactory: { _ in
                 guard let rotatedConfig = config.mistyswapConfig() else {
                     logger.fatalError(
                         "This should never happen, no config passed to create a mistyswap" +
@@ -46,24 +41,11 @@ final class MistyswapConnection: Connection<
                         " Fix this by using valid mistyswap URLs and attestation")
                 }
 
-                switch transportProtocolOption {
-                case .grpc:
-                    return .grpc(
-                        grpcService:
-                            grpcFactory.makeMistyswapService(
-                                config: rotatedConfig,
-                                targetQueue: targetQueue,
-                                rng: rng,
-                                rngContext: rngContext))
-                case .http:
-                    return .http(
-                        httpService:
-                            httpFactory.makeMistyswapService(
-                                config: rotatedConfig,
-                                targetQueue: targetQueue,
-                                rng: rng,
-                                rngContext: rngContext))
-                }
+                return httpFactory.makeMistyswapService(
+                    config: rotatedConfig,
+                    targetQueue: targetQueue,
+                    rng: rng,
+                    rngContext: rngContext)
             },
             transportProtocolOption: config.fogViewConfig().transportProtocolOption,
             targetQueue: targetQueue)
@@ -84,16 +66,7 @@ final class MistyswapConnection: Connection<
             return
         }
 
-        switch connectionOptionWrapper {
-        case .grpc(let grpcConnection):
-            grpcConnection.initiateOfframp(
-                request: request,
-                completion: rotateURLOnError(completion))
-        case .http(let httpConnection):
-            httpConnection.initiateOfframp(
-                request: request,
-                completion: rotateURLOnError(completion))
-        }
+        service.initiateOfframp(request: request, completion: rotateURLOnError(completion))
     }
 
     func getOfframpStatus(
@@ -111,16 +84,7 @@ final class MistyswapConnection: Connection<
             return
         }
 
-        switch connectionOptionWrapper {
-        case .grpc(let grpcConnection):
-            grpcConnection.getOfframpStatus(
-                    request: request,
-                    completion: rotateURLOnError(completion))
-        case .http(let httpConnection):
-            httpConnection.getOfframpStatus(
-                    request: request,
-                    completion: rotateURLOnError(completion))
-        }
+        service.getOfframpStatus(request: request, completion: rotateURLOnError(completion))
     }
 
     func forgetOfframp(
@@ -138,16 +102,7 @@ final class MistyswapConnection: Connection<
             return
         }
 
-        switch connectionOptionWrapper {
-        case .grpc(let grpcConnection):
-            grpcConnection.forgetOfframp(
-                    request: request,
-                    completion: rotateURLOnError(completion))
-        case .http(let httpConnection):
-            httpConnection.forgetOfframp(
-                    request: request,
-                    completion: rotateURLOnError(completion))
-        }
+        service.forgetOfframp(request: request, completion: rotateURLOnError(completion))
     }
 
 }

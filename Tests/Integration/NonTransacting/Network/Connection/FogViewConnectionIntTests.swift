@@ -320,10 +320,8 @@ extension FogViewConnectionIntTests {
     func createFogViewConnection(networkConfig: NetworkConfig) -> FogViewConnection {
         let httpFactory = HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogViewConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
