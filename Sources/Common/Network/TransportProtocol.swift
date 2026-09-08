@@ -29,10 +29,6 @@ extension TransportProtocol: Equatable { }
 extension TransportProtocol: Hashable { }
 
 extension TransportProtocol {
-    var certificateValidator: SSLCertificateValidator {
-        SecSSLCertificateValidator()
-    }
-
     var timeoutInSeconds: Double {
         DefaultHttpRequester.defaultConfiguration.timeoutIntervalForRequest
     }

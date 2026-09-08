@@ -184,55 +184,54 @@ struct NetworkConfig {
     }
 
     var fogReportAttestation: Attestation { attestation.fogReport }
-
-    private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
-    private func validatedCertificates(_ trustRoots: [Data]) -> PossibleCertificates {
-        TransportProtocol.http.certificateValidator.validate(trustRoots)
-    }
 }
 
 extension NetworkConfig {
+    /// Pins `trustRoots` for the consensus hosts over HTTP. The requester takes
+    /// them before the dictionary keeps them, so a refusal will leave the roots
+    /// already pinned in place.
     @discardableResult mutating public func setConsensusTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
-        let hosts = consensusUrls.map(\.host)
-        return setTrustRoots(trustRoots, into: \.consensusTrustRoots) { requester, certificates in
-            requester.setConsensusTrustRoots(certificates, hosts: hosts)
+        let certificates: SecSSLCertificates
+        switch SecSSLCertificates.make(trustRootBytes: trustRoots) {
+        case .success(let parsed):
+            certificates = parsed
+        case .failure(let error):
+            return .failure(error)
         }
+
+        let hosts = consensusUrls.map(\.host)
+        if let requester = httpRequester,
+           case .failure(let error) = requester.setConsensusTrustRoots(certificates, hosts: hosts)
+        {
+            return .failure(error)
+        }
+        consensusTrustRoots[.http] = certificates
+        return .success(())
     }
 
+    /// Pins `trustRoots` for the fog hosts over HTTP. The requester takes them
+    /// before the dictionary keeps them, so a refusal will leave the roots
+    /// already pinned in place.
     @discardableResult mutating public func setFogTrustRoots(_ trustRoots: [Data])
         -> Result<(), InvalidInputError>
     {
+        let certificates: SecSSLCertificates
+        switch SecSSLCertificates.make(trustRootBytes: trustRoots) {
+        case .success(let parsed):
+            certificates = parsed
+        case .failure(let error):
+            return .failure(error)
+        }
+
         let hosts = fogUrls.map(\.host)
-        return setTrustRoots(trustRoots, into: \.fogTrustRoots) { requester, certificates in
-            requester.setFogTrustRoots(certificates, hosts: hosts)
+        if let requester = httpRequester,
+           case .failure(let error) = requester.setFogTrustRoots(certificates, hosts: hosts) {
+            return .failure(error)
         }
-    }
-
-    // The requester takes the http roots before the dictionary keeps them, so
-    // a refusal will leave the http roots that are already pinned in place.
-    private mutating func setTrustRoots(
-        _ trustRoots: [Data],
-        into roots: WritableKeyPath<NetworkConfig, [TransportProtocol: SSLCertificates]>,
-        pushedBy push: (HttpRequester, SecSSLCertificates) -> Result<(), InvalidInputError>
-    ) -> Result<(), InvalidInputError> {
-        let http = validatedCertificates(trustRoots)
-
-        if let certificates = try? http.get() {
-            // A requester takes only Sec certificates, and nil there clears the
-            // roots it holds, so a cast that fails answers as a failure.
-            guard let httpCertificates = certificates as? SecSSLCertificates else {
-                return .failure(InvalidInputError("HTTP trust roots hold another type"))
-            }
-            if let requester = httpRequester,
-               case .failure(let error) = push(requester, httpCertificates) {
-                return .failure(error)
-            }
-            self[keyPath: roots][.http] = certificates
-        }
-
-        return http.map { _ in () }
+        fogTrustRoots[.http] = certificates
+        return .success(())
     }
 }
 
