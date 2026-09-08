@@ -4,10 +4,8 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinCommon
 import LibMobileCoinHTTP
-#endif
 
 final class FogReportHttpConnection: ArbitraryHttpConnection, FogReportService {
     private let client: Report_ReportAPIRestClient

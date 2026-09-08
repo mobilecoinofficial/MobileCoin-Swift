@@ -7,9 +7,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 enum FogMerkleProofFetcherError: Error, Sendable {
     case connectionError(ConnectionError)

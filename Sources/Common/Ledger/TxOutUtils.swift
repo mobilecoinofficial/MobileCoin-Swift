@@ -5,9 +5,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 enum TxOutUtils {
     static func matchesSubaddress(

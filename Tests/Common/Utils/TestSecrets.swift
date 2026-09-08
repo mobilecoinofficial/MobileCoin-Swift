@@ -17,20 +17,11 @@ struct TestSecrets: Codable {
     }()
 
     static func load() throws -> Self {
-        // We're using SPM
-        var secretsFileUrl: URL?
-        #if canImport(LibMobileCoinHTTP)
-        secretsFileUrl = Bundle.module.url(
-            forResource: "secrets",
-            withExtension: "json"
-        )
-        #else
-        // We're using cocoapods
-        secretsFileUrl = try Bundle.url("secrets", "json")
-        #endif
-
         guard
-            let secretsFileUrl = secretsFileUrl,
+            let secretsFileUrl = Bundle.module.url(
+                forResource: "secrets",
+                withExtension: "json"
+            ),
             let secretsFileData = try? Data(contentsOf: secretsFileUrl)
         else {
             fatalError(

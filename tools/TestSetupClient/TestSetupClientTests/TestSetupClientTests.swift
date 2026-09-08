@@ -63,18 +63,11 @@ struct ProcessInfoLocal: Decodable {
     static let shared = try? Self.load()
 
     static func load() throws -> Self {
-        var processInfoFileUrl: URL?
-        #if canImport(LibMobileCoinHTTP)
-        processInfoFileUrl = Bundle.module.url(
-            forResource: "process_info",
-            withExtension: "json"
-        )
-        #else
-        processInfoFileUrl = try Bundle.url("process_info", "json")
-        #endif
-
         guard
-            let processInfoFileUrl = processInfoFileUrl,
+            let processInfoFileUrl = Bundle.module.url(
+                forResource: "process_info",
+                withExtension: "json"
+            ),
             let processInfoFileData = try? Data(contentsOf: processInfoFileUrl)
         else {
             fatalError(
@@ -86,30 +79,4 @@ struct ProcessInfoLocal: Decodable {
 
         return try JSONDecoder().decode(Self.self, from: processInfoFileData)
     }
-}
-
-struct TestingError: Error {
-    let reason: String
-
-    init(_ reason: String) {
-        self.reason = reason
-    }
-}
-
-extension TestingError: CustomStringConvertible {
-    var description: String {
-        "Testing error: \(reason)"
-    }
-}
-
-extension Bundle {
-    static func url(_ resource: String, _ ext: String) throws -> URL {
-        guard let url = Bundle(for: BundleType.self).url(forResource: resource, withExtension: ext)
-        else {
-            throw TestingError("Failed to get url for resource: \(resource).\(ext)")
-        }
-        return url
-    }
-
-    private final class BundleType {}
 }

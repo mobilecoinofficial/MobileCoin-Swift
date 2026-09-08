@@ -8,9 +8,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 struct FogViewQueryRequestWrapper {
     var requestAad = FogView_QueryRequestAAD()

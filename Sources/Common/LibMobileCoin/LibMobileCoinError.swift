@@ -4,9 +4,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 struct LibMobileCoinError: Error, Sendable {
     static func make(consuming error: UnsafeMutablePointer<McError>)

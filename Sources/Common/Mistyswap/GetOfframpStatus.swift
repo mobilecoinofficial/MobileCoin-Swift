@@ -5,9 +5,7 @@
 
 import Foundation
 import LibMobileCoin
-#if canImport(LibMobileCoinCommon)
 import LibMobileCoinCommon
-#endif
 
 extension MistyswapOfframp_GetOfframpStatusRequest {
 

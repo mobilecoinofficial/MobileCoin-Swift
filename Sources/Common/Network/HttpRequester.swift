@@ -5,13 +5,9 @@
 // swiftlint:disable all
 
 import Foundation
-import SwiftProtobuf
-#if canImport(LibMobileCoin)
 import LibMobileCoin
-#endif
-#if canImport(LibMobileCoinHTTP)
 import LibMobileCoinHTTP
-#endif
+import SwiftProtobuf
 
 public protocol HttpRequester {
     func request(
