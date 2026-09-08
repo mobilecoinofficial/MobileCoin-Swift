@@ -4,43 +4,40 @@
 
 import Foundation
 
-class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtocol> {
+class Connection<HttpService: ConnectionProtocol> {
     private let inner: SerialDispatchLock<Inner>
     private var transportProtocolOption: TransportProtocol.Option
 
-    private let connectionOptionWrapperFactory: (TransportProtocol.Option)
-        -> ConnectionOptionWrapper<GrpcService, HttpService>
+    private let serviceFactory: (TransportProtocol.Option) -> HttpService
 
     init(
-        connectionOptionWrapperFactory: @escaping (TransportProtocol.Option)
-            -> ConnectionOptionWrapper<GrpcService, HttpService>,
+        serviceFactory: @escaping (TransportProtocol.Option) -> HttpService,
         transportProtocolOption: TransportProtocol.Option,
         targetQueue: DispatchQueue?
     ) {
         self.transportProtocolOption = transportProtocolOption
-        self.connectionOptionWrapperFactory = connectionOptionWrapperFactory
-        let connectionOptionWrapper = connectionOptionWrapperFactory(transportProtocolOption)
-        let inner = Inner(connectionOptionWrapper: connectionOptionWrapper)
+        self.serviceFactory = serviceFactory
+        let inner = Inner(service: serviceFactory(transportProtocolOption))
         self.inner = .init(inner, targetQueue: targetQueue)
     }
 
     func rotateConnection() {
-        let connectionOptionWrapper = connectionOptionWrapperFactory(self.transportProtocolOption)
-        inner.accessAsync { $0.connectionOptionWrapper = connectionOptionWrapper }
+        let service = serviceFactory(self.transportProtocolOption)
+        inner.accessAsync { $0.service = service }
     }
 
     func setTransportProtocolOption(_ transportProtocolOption: TransportProtocol.Option) {
         self.transportProtocolOption = transportProtocolOption
-        let connectionOptionWrapper = connectionOptionWrapperFactory(transportProtocolOption)
-        inner.accessAsync { $0.connectionOptionWrapper = connectionOptionWrapper }
+        let service = serviceFactory(transportProtocolOption)
+        inner.accessAsync { $0.service = service }
     }
 
     func setAuthorization(credentials: BasicCredentials) {
         inner.accessAsync { $0.setAuthorization(credentials: credentials) }
     }
 
-    var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService> {
-        inner.accessWithoutLocking.connectionOptionWrapper
+    var service: HttpService {
+        inner.accessWithoutLocking.service
     }
 
     func rotateURLOnError<T>(
@@ -62,33 +59,23 @@ class Connection<GrpcService: ConnectionProtocol, HttpService: ConnectionProtoco
 
 extension Connection {
     private struct Inner {
-        var connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService> {
+        var service: HttpService {
             didSet {
                 if let credentials = authorizationCredentials {
-                    switch connectionOptionWrapper {
-                    case .grpc(grpcService: let grpcService):
-                        grpcService.setAuthorization(credentials: credentials)
-                    case .http(httpService: let httpService):
-                        httpService.setAuthorization(credentials: credentials)
-                    }
+                    service.setAuthorization(credentials: credentials)
                 }
             }
         }
 
         private var authorizationCredentials: BasicCredentials?
 
-        init(connectionOptionWrapper: ConnectionOptionWrapper<GrpcService, HttpService>) {
-            self.connectionOptionWrapper = connectionOptionWrapper
+        init(service: HttpService) {
+            self.service = service
         }
 
         mutating func setAuthorization(credentials: BasicCredentials) {
             self.authorizationCredentials = credentials
-            switch connectionOptionWrapper {
-            case .grpc(grpcService: let grpcService):
-                grpcService.setAuthorization(credentials: credentials)
-            case .http(httpService: let httpService):
-                httpService.setAuthorization(credentials: credentials)
-            }
+            service.setAuthorization(credentials: credentials)
         }
     }
 }

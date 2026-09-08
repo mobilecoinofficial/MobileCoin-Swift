@@ -26,9 +26,7 @@ let package = Package(
         ),
     ],
     targets: [
-        // HTTP only, which is what production runs. Sources/GRPC is left out:
-        // its files import GRPC and NIO unconditionally, and so do the tests
-        // excluded below.
+        // HTTP only, which is what production runs.
         .target(
             name: "MobileCoin",
             dependencies: [
@@ -36,9 +34,6 @@ let package = Package(
                 .product(name: "LibMobileCoinCoreHTTP", package: "libmobilecoin"),
             ],
             path: "Sources",
-            // GRPC is excluded as well as left out of sources, otherwise
-            // SwiftPM warns about its 25 files on every graph load.
-            exclude: ["GRPC"],
             sources: [
                 "Common",
                 "HTTPS",
@@ -56,7 +51,6 @@ let package = Package(
             exclude: [
                 "Common/Secrets/secrets.json.sample",
                 "Common/Secrets/process_info.json.sample",
-                "ProtocolSpecific/Grpc",
             ],
             resources: [
                 .copy("Common/FixtureData/Transaction"),

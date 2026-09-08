@@ -69,10 +69,8 @@ extension FogReportConnectionIntTests {
     ) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportShortUrl).get()
         let httpFactory = HttpProtocolConnectionFactory(httpRequester: DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogReportConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             url: url,
             transportProtocolOption: transportProtocol.option,
             targetQueue: DispatchQueue.main)
@@ -83,10 +81,8 @@ extension FogReportConnectionIntTests {
     ) throws -> FogReportConnection {
         let url = try FogUrl.make(string: IntegrationTestFixtures.network.fogReportUrl).get()
         let httpFactory = HttpProtocolConnectionFactory(httpRequester: DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogReportConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             url: url,
             transportProtocolOption: transportProtocol.option,
             targetQueue: DispatchQueue.main)

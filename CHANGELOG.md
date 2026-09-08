@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `Sources/GRPC` and `Tests/ProtocolSpecific/Grpc`. No product or subspec
+  compiled either tree.
+- The Mistyswap integration tests. Every case built an `XCTSkip` value without
+  throwing it, so every case ran against the gRPC transport. The suite carries
+  no HTTP variant.
+- `TransportProtocol.grpc`, the last public name for a transport the package
+  cannot build. `TransportProtocol.http` is the only case left.
+- `ConnectionOptionWrapper`, the `Sources/Common/Network/ProtocolSpecific` tree,
+  and the eight `Empty*` service stand-ins the HTTP factory makes unreachable.
 - `MobileCoin.podspec` and the `ExampleHTTP` app it existed to feed. The
   package is the only description of this library now. CocoaPods trunk carries
   MobileCoin through 6.0.7 and those podspecs are immutable, so every existing
@@ -17,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   helpers in `scripts/`. Nothing in the repo runs `pod` or `bundle` any more.
 - The TestSetupClient Xcode project and its SwiftUI shell. The package builds
   the same sources, and `make fund-test-wallets-spm` runs them headless.
+
+Removing `Sources/GRPC` and the Mistyswap integration tests leaves public
+API untouched. Removing `TransportProtocol.grpc` breaks a caller that names
+it.
 
 ### Changed
 

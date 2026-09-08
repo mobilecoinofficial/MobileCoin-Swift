@@ -163,10 +163,8 @@ extension FogKeyImageConnectionIntTests {
     func createFogKeyImageConnection(networkConfig: NetworkConfig) -> FogKeyImageConnection {
         let httpFactory = HttpProtocolConnectionFactory(
                 httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
-        let grpcFactory = GrpcProtocolConnectionFactory()
         return FogKeyImageConnection(
             httpFactory: httpFactory,
-            grpcFactory: grpcFactory,
             config: networkConfig,
             targetQueue: DispatchQueue.main)
     }
