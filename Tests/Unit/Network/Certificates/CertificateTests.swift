@@ -188,14 +188,18 @@ class CertificateTests: XCTestCase {
 
         XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
         XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
+        XCTAssertSuccess(config.setMistyswapTrustRoots(fixture.trustRootsBytes))
 
         let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
         let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+        let mistyswap = try XCTUnwrap(config.mistyswapTrustRoots[.http] as? SecSSLCertificates)
         XCTAssertNotEqual(consensus.publicKeys, fog.publicKeys)
         XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, consensus.publicKeys)
         XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
+        XCTAssertEqual(requester.mistyswapTrustRoots?.publicKeys, mistyswap.publicKeys)
         XCTAssertEqual(requester.consensusHosts, config.consensusUrls.map(\.host))
         XCTAssertEqual(requester.fogHosts, config.fogUrls.map(\.host))
+        XCTAssertEqual(requester.mistyswapHosts, config.mistyswapUrls.map(\.host))
     }
 
     // The config's fog and consensus URLs name different hosts, so each host
