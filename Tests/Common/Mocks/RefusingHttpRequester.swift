@@ -32,4 +32,10 @@ final class RefusingHttpRequester: HttpRequester {
     {
         .failure(InvalidInputError("This requester keeps no consensus trust roots"))
     }
+
+    func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This requester keeps no mistyswap trust roots"))
+    }
 }

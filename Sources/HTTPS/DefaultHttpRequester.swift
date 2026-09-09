@@ -87,6 +87,14 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
         pinningDelegate.setFogTrustRoots(trustRoots, hosts: hosts)
         return .success(())
     }
+
+    @discardableResult
+    public func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        pinningDelegate.setMistyswapTrustRoots(trustRoots, hosts: hosts)
+        return .success(())
+    }
 }
 
 extension DefaultHttpRequester {
@@ -111,6 +119,7 @@ final class CertificatePinningDelegate: NSObject {
     private struct TrustRoots {
         var fog = PinnedRoots()
         var consensus = PinnedRoots()
+        var mistyswap = PinnedRoots()
     }
 
     private let trustRoots = ReadWriteDispatchLock(TrustRoots())
@@ -119,7 +128,7 @@ final class CertificatePinningDelegate: NSObject {
     /// A host no such set names gets the keys of every set.
     func pinnedKeys(for host: String) -> [SecKey] {
         let name = CertificatePinningDelegate.normalized(host)
-        let roots = trustRoots.readSync { [$0.fog, $0.consensus] }
+        let roots = trustRoots.readSync { [$0.fog, $0.consensus, $0.mistyswap] }
         let named = roots.filter { $0.hosts.contains(name) && $0.keys.isNotEmpty }
         return (named.isNotEmpty ? named : roots).flatMap { $0.keys }
     }
@@ -145,6 +154,13 @@ final class CertificatePinningDelegate: NSObject {
         let names = Set(hosts.map(CertificatePinningDelegate.normalized))
         trustRoots.writeSync {
             $0.consensus = PinnedRoots(certificates: certificates, hosts: names)
+        }
+    }
+
+    func setMistyswapTrustRoots(_ certificates: SecSSLCertificates?, hosts: [String]) {
+        let names = Set(hosts.map(CertificatePinningDelegate.normalized))
+        trustRoots.writeSync {
+            $0.mistyswap = PinnedRoots(certificates: certificates, hosts: names)
         }
     }
 

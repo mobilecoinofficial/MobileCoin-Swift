@@ -23,4 +23,7 @@ public protocol HttpRequester {
     @discardableResult
     func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
         -> Result<(), InvalidInputError>
+    @discardableResult
+    func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
 }
