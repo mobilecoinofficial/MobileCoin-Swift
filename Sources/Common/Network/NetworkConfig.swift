@@ -196,6 +196,17 @@ struct NetworkConfig {
 }
 
 extension NetworkConfig {
+    // Empty bytes parse to a certificate holding zero keys, which pins
+    // against nothing while looking like a successful call.
+    private static func parseNonEmpty(_ trustRoots: [Data])
+        -> Result<SecSSLCertificates, InvalidInputError>
+    {
+        guard trustRoots.isNotEmpty else {
+            return .failure(InvalidInputError("Trust roots cannot be empty"))
+        }
+        return SecSSLCertificates.make(trustRootBytes: trustRoots)
+    }
+
     /// Pins `trustRoots` for the consensus hosts over HTTP. The requester takes
     /// them before the dictionary keeps them, so a refusal will leave the roots
     /// already pinned in place.
@@ -203,7 +214,7 @@ extension NetworkConfig {
         -> Result<(), InvalidInputError>
     {
         let certificates: SecSSLCertificates
-        switch SecSSLCertificates.make(trustRootBytes: trustRoots) {
+        switch NetworkConfig.parseNonEmpty(trustRoots) {
         case .success(let parsed):
             certificates = parsed
         case .failure(let error):
@@ -227,7 +238,7 @@ extension NetworkConfig {
         -> Result<(), InvalidInputError>
     {
         let certificates: SecSSLCertificates
-        switch SecSSLCertificates.make(trustRootBytes: trustRoots) {
+        switch NetworkConfig.parseNonEmpty(trustRoots) {
         case .success(let parsed):
             certificates = parsed
         case .failure(let error):
@@ -250,7 +261,7 @@ extension NetworkConfig {
         -> Result<(), InvalidInputError>
     {
         let certificates: SecSSLCertificates
-        switch SecSSLCertificates.make(trustRootBytes: trustRoots) {
+        switch NetworkConfig.parseNonEmpty(trustRoots) {
         case .success(let parsed):
             certificates = parsed
         case .failure(let error):
@@ -258,6 +269,9 @@ extension NetworkConfig {
         }
 
         let hosts = mistyswapUrls.map(\.host)
+        guard hosts.isNotEmpty else {
+            return .failure(InvalidInputError("There is no mistyswap host to pin trust roots to"))
+        }
         if let requester = httpRequester,
            case .failure(let error) = requester.setMistyswapTrustRoots(certificates, hosts: hosts) {
             return .failure(error)
