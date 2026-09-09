@@ -145,6 +145,23 @@ class CertificatePinningDelegateTests: XCTestCase {
             fog.publicKeys + consensus.publicKeys)
     }
 
+    // A Unicode host and its punycode form parse to the same host string, so
+    // a set built from either one pins the same challenge host.
+    func testAUnicodeHostAndItsPunycodeFormShareTheSamePin() throws {
+        let requester = DefaultHttpRequester()
+        let delegate = try pinningDelegate(of: requester)
+        let fog = try SecCertificateTests.Fixtures.AlphaNet.certificates(.valid)
+
+        let unicodeResult = MobileCoinUrl<FogScheme>.make(string: "fog://\u{4f8b}\u{3048}.jp")
+        let unicodeHost = try unicodeResult.get().host
+        let punycodeResult = MobileCoinUrl<FogScheme>.make(string: "fog://xn--r8jz45g.jp")
+        let punycodeHost = try punycodeResult.get().host
+        XCTAssertEqual(unicodeHost, punycodeHost)
+
+        requester.setFogTrustRoots(fog, hosts: [punycodeHost])
+        XCTAssertEqual(delegate.pinnedKeys(for: unicodeHost), fog.publicKeys)
+    }
+
     private func answer(
         of requester: DefaultHttpRequester,
         against trust: SecTrust?,
