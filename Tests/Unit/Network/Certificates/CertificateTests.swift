@@ -248,6 +248,23 @@ class CertificateTests: XCTestCase {
             roots.publicKeys)
     }
 
+    // A client built from a config carrying its own requester reaches the
+    // connection factory holding that exact instance.
+    func testTheClientReachesTheConfigsOwnRequester() throws {
+        var networkConfig = try NetworkConfigFixtures.create(using: .http)
+        let requester = MockFailingHttpRequester()
+        networkConfig.httpRequester = requester
+        let config = MobileCoinClient.Config(networkConfig: networkConfig)
+        let accountKey = try AccountKey.Fixtures.TestNet().accountKey
+
+        let client = try MobileCoinClient.make(accountKey: accountKey, config: config).get()
+        let serviceProvider = try XCTUnwrap(client.serviceProvider as? DefaultServiceProvider)
+
+        XCTAssertTrue(
+            (serviceProvider.httpConnectionFactory.requester as? MockFailingHttpRequester)
+                === requester)
+    }
+
     // A refused set keeps the pinned http roots the call before it stored, so a
     // failure won't replace them with roots nothing accepted.
     func testRefusedTrustRootsLeaveThePinnedRootsInPlace() throws {
