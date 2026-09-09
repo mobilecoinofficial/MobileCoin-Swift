@@ -24,6 +24,37 @@ func pinningDelegate(
     try XCTUnwrap(requester.session.delegate as? CertificatePinningDelegate)
 }
 
+// A requester that doesn't keep trust roots and says so.
+private final class RefusingHttpRequester: HttpRequester {
+    func request(
+        url: URL,
+        method: HTTPMethod,
+        headers: [String: String]?,
+        body: Data?,
+        completion: @escaping (Result<HTTPResponse, Error>) -> Void
+    ) {
+        completion(.failure(ConnectionError.invalidServerResponse("unused")))
+    }
+
+    func setFogTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This requester keeps no fog trust roots"))
+    }
+
+    func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This requester keeps no consensus trust roots"))
+    }
+
+    func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        .failure(InvalidInputError("This requester keeps no mistyswap trust roots"))
+    }
+}
+
 class CertificateTests: XCTestCase {
 
     func testValidTrustRoots() throws {
