@@ -198,8 +198,8 @@ final class CertificatePinningDelegate: NSObject {
         }
     }
 
-    // Shared by every setter, so a name that pins nothing is filtered exactly
-    // once rather than once per field.
+    // Normalizing lowercases each host name and drops its trailing dots, so the
+    // set keeps one entry per name.
     private static func apply(
         _ certificates: SecSSLCertificates?,
         _ hosts: [String],

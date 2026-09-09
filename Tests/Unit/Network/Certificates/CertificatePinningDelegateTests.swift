@@ -12,8 +12,6 @@ import XCTest
 
 class CertificatePinningDelegateTests: XCTestCase {
 
-    // The cases below drive both delegate shims across `handle`'s outcomes.
-
     func testServerTrustMatchingAPinnedKeyIsAccepted() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
         let requester = DefaultHttpRequester()
@@ -70,8 +68,8 @@ class CertificatePinningDelegateTests: XCTestCase {
         XCTAssertEqual(judged.disposition, .useCredential)
     }
 
-    // With no roots set there is nothing to pin against, so the challenge goes
-    // to the system rather than being refused.
+    // An empty root set gives nothing to pin against, so the system will
+    // handle the challenge.
     func testServerTrustWithoutPinnedKeysFallsThroughToDefaultHandling() throws {
         let fixture = try SecCertificateTests.Fixtures.AlphaNet()
 
@@ -96,8 +94,8 @@ class CertificatePinningDelegateTests: XCTestCase {
             XCTAssertNotNil(delegate)
         }
 
-        // Invalidation is asynchronous, so the release lands on the session's own
-        // queue rather than on this one.
+        // Invalidation is asynchronous, so the release will land on the session's
+        // own queue.
         let deadline = Date().addingTimeInterval(5)
         while delegate != nil && Date() < deadline {
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
@@ -106,8 +104,8 @@ class CertificatePinningDelegateTests: XCTestCase {
         XCTAssertNil(delegate)
     }
 
-    // Distinct fog and consensus roots let each lookup below name the set or
-    // sets that answered it.
+    // Distinct fog and consensus roots let each lookup name the set or sets
+    // that answered it.
     func testTheSetThatNamesAHostAnswersForIt() throws {
         let requester = DefaultHttpRequester()
         let delegate = try pinningDelegate(of: requester)
