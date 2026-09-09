@@ -72,10 +72,6 @@ extension SecTrust {
     private typealias ChainOfTrustKeyMatch = (match: Bool, index: Int, key: SecKey)
     private typealias ChainOfTrustKey = (index: Int, key: SecKey)
 
-    public var certificateCount: Int {
-        certificateTrustChain.count
-    }
-
     // SecTrustCopyCertificateChain is nullable and documents no chain for a
     // trust it has yet to evaluate. SecTrustGetCertificateAtIndex documents the
     // leaf as always present, so it answers whenever the newer call gives nil.
