@@ -125,7 +125,8 @@ final class CertificatePinningDelegate: NSObject {
     private let trustRoots = ReadWriteDispatchLock(TrustRoots())
 
     /// Answers with the keys of each set that names `host` and carries keys.
-    /// A host no such set names gets the keys of every set.
+    /// A host no such set names gets the keys of every set. A host both fog
+    /// and consensus name gets both sets' keys merged.
     func pinnedKeys(for host: String) -> [SecKey] {
         let name = CertificatePinningDelegate.normalized(host)
         let roots = trustRoots.readSync { [$0.fog, $0.consensus, $0.mistyswap] }
