@@ -29,7 +29,7 @@ public final class MobileCoinClient {
     private let mixinSelectionStrategy: MixinSelectionStrategy
     private let fogQueryScalingStrategy: FogQueryScalingStrategy
 
-    private let serviceProvider: ServiceProvider
+    let serviceProvider: ServiceProvider
     private let fogResolverManager: FogResolverManager
     private let metaFetcher: BlockchainMetaFetcher
 
