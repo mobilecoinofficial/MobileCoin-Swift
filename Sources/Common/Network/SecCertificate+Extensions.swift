@@ -47,7 +47,7 @@ extension Data {
             return .success(pinnedCertificate)
         } else {
             let errorMessage = "Error parsing trust root certificate: " +
-                "\(data.base64EncodedString())"
+                "\(data.count) bytes"
             logger.error(errorMessage, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
