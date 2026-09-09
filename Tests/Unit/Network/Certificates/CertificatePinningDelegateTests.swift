@@ -163,7 +163,7 @@ class CertificatePinningDelegateTests: XCTestCase {
     }
 
     // A nil field leaves the requester's own root in place, while a named
-    // field replaces it.
+    // field pins its own set.
     func testSetAllTrustRootsLeavesAnUnnamedFieldInPlace() throws {
         let requester = DefaultHttpRequester()
         let delegate = try pinningDelegate(of: requester)
@@ -179,6 +179,28 @@ class CertificatePinningDelegateTests: XCTestCase {
 
         XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), fog.publicKeys)
         XCTAssertEqual(delegate.pinnedKeys(for: TestHost.consensus), consensus.publicKeys)
+    }
+
+    // A named field overwrites the set already pinned for its host, and each of
+    // the three fields carries its own set.
+    func testSetAllTrustRootsOverwritesEveryNamedField() throws {
+        let requester = DefaultHttpRequester()
+        let delegate = try pinningDelegate(of: requester)
+        let stale = try SecCertificateTests.Fixtures.AlphaNet.certificates(.wrong)
+        let fresh = try SecCertificateTests.Fixtures.AlphaNet.certificates(.valid)
+        XCTAssertNotEqual(stale.publicKeys, fresh.publicKeys)
+
+        requester.setFogTrustRoots(stale, hosts: [TestHost.fog])
+        requester.setConsensusTrustRoots(stale, hosts: [TestHost.consensus])
+        requester.setMistyswapTrustRoots(stale, hosts: [TestHost.mistyswap])
+        requester.setAllTrustRoots(
+            fog: (certificates: fresh, hosts: [TestHost.fog]),
+            consensus: (certificates: fresh, hosts: [TestHost.consensus]),
+            mistyswap: (certificates: fresh, hosts: [TestHost.mistyswap]))
+
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), fresh.publicKeys)
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.consensus), fresh.publicKeys)
+        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.mistyswap), fresh.publicKeys)
     }
 
     private func answer(

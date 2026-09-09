@@ -16,6 +16,7 @@ enum TestHost {
     static let pinned = "example.com"
     static let fog = "fog.example.com"
     static let consensus = "consensus.example.com"
+    static let mistyswap = "mistyswap.example.com"
 }
 
 func pinningDelegate(
