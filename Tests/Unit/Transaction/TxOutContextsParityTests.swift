@@ -49,7 +49,7 @@ class TxOutContextsParityTests: XCTestCase {
         4qH01VXBOwPw0m+z/Z4bb8ZjoyAUaHjbtcAG7NLjSVVLR2/Niw==
         """
 
-    /// What the two seeds above must produce, on either platform.
+    /// What the inputs above must produce, on either platform.
     private static let expectedPayloadKeyB64 = "xArSo1TSmrdSOO5z/ChxT1A/asuGT7z3/4I0tTylKH4="
     private static let expectedChangeKeyB64 = "vnTuxXXogiaGAWcaU5HUZ1VYzaP+mjnJbMudemo3qAA="
 
