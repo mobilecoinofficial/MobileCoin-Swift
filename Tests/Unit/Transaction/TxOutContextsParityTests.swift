@@ -76,11 +76,11 @@ class TxOutContextsParityTests: XCTestCase {
         let derived = try XCTUnwrapSuccess(TransactionBuilder.txOutContexts(
             context: TransactionBuilder.Context(
                 accountKey: accountKey,
-                blockVersion: fixture.blockVersion,
+                blockVersion: .versionOne,
                 fogResolver: fixture.fogResolver,
                 memoType: .recoverable,
                 tombstoneBlockIndex: fixture.tombstoneBlockIndex,
-                fee: fixture.fee,
+                fee: Amount(0, in: .MOB),
                 rngSeed: builderSeed),
             recipient: recipient))
 
