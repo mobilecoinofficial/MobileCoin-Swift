@@ -25,6 +25,8 @@ public final class MockFailingHttpRequester: NSObject, HttpRequester {
     public private(set) var consensusHosts: [String] = []
     public private(set) var fogTrustRoots: SecSSLCertificates?
     public private(set) var fogHosts: [String] = []
+    public private(set) var mistyswapTrustRoots: SecSSLCertificates?
+    public private(set) var mistyswapHosts: [String] = []
 
     @discardableResult
     public func setConsensusTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
@@ -41,6 +43,15 @@ public final class MockFailingHttpRequester: NSObject, HttpRequester {
     {
         fogTrustRoots = trustRoots
         fogHosts = hosts
+        return .success(())
+    }
+
+    @discardableResult
+    public func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
+        -> Result<(), InvalidInputError>
+    {
+        mistyswapTrustRoots = trustRoots
+        mistyswapHosts = hosts
         return .success(())
     }
 }

@@ -16,7 +16,7 @@ final class DefaultServiceProvider: ServiceProvider {
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
     private let mistyswap: MistyswapConnection?
-    private let httpConnectionFactory: HttpProtocolConnectionFactory
+    let httpConnectionFactory: HttpProtocolConnectionFactory
 
     init(
         networkConfig: NetworkConfig,
