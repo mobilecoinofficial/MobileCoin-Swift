@@ -111,9 +111,15 @@ extension DefaultHttpRequester {
 final class CertificatePinningDelegate: NSObject {
     private struct PinnedRoots {
         var certificates: SecSSLCertificates?
-        var hosts: Set<String> = []
+        var hosts: Set<String>
 
         var keys: [SecKey] { certificates?.publicKeys ?? [] }
+
+        // An empty name pins nothing, so it never earns a place in the set.
+        init(certificates: SecSSLCertificates? = nil, hosts: Set<String> = []) {
+            self.certificates = certificates
+            self.hosts = hosts.filter { $0.isNotEmpty }
+        }
     }
 
     private struct TrustRoots {
