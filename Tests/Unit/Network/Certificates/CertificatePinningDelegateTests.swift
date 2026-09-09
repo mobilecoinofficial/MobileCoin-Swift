@@ -136,6 +136,13 @@ class CertificatePinningDelegateTests: XCTestCase {
         XCTAssertEqual(
             delegate.pinnedKeys(for: TestHost.pinned),
             fog.publicKeys + consensus.publicKeys)
+
+        // An empty or all-dots host name pins nothing, so fog still answers
+        // as part of the union for the empty host.
+        requester.setFogTrustRoots(fog, hosts: ["", "."])
+        XCTAssertEqual(
+            delegate.pinnedKeys(for: ""),
+            fog.publicKeys + consensus.publicKeys)
     }
 
     private func answer(
