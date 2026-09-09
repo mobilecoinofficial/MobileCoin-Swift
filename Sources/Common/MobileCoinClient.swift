@@ -36,8 +36,6 @@ public final class MobileCoinClient {
     private let defaultRng = MobileCoinDefaultRng()
     private let fogSyncChecker: FogSyncCheckable
 
-    let mistyswap: Mistyswap
-
     static let latestBlockVersion = BlockVersion.legacy
 
     init(accountKey: AccountKeyWithFog, config: Config) {
@@ -74,9 +72,6 @@ public final class MobileCoinClient {
             metaCacheTTL: config.metaCacheTTL,
             targetQueue: serialQueue)
 
-        self.mistyswap = Mistyswap(
-            mistyswap: serviceProvider.mistyswapService
-        )
     }
 
     public var balances: Balances {

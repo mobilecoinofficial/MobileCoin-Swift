@@ -54,11 +54,5 @@ extension FogLedger_CheckKeyImagesResponse: InfallibleDataSerializable {}
 
 // MARK: - Misty Swap
 
-extension MistyswapOfframp_InitiateOfframpRequest: InfallibleDataSerializable {}
-extension MistyswapOfframp_InitiateOfframpResponse: InfallibleDataSerializable {}
 
-extension MistyswapOfframp_GetOfframpStatusRequest: InfallibleDataSerializable {}
-extension MistyswapOfframp_GetOfframpStatusResponse: InfallibleDataSerializable {}
 
-extension MistyswapOfframp_ForgetOfframpRequest: InfallibleDataSerializable {}
-extension MistyswapOfframp_ForgetOfframpResponse: InfallibleDataSerializable {}

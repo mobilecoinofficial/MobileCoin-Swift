@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Breaking.** Mistyswap. `MobileCoinClient.mistyswap`, the `Config.make`
+  overloads taking `mistyswapUrl`/`mistyswapAttestation`, `MistyswapUrl`,
+  `MistyswapConnection`, `MistyswapService`, `MistyswapError`, the
+  `mistyswap` field on `NetworkConfig.AttestationConfig`, the
+  `mistyswapLoadBalancer` argument on `NetworkConfig`, and the `MISTYSWAP_*`
+  constants are all gone. The remaining `Config.make` overloads are unchanged,
+  so a caller that never named Mistyswap needs no edit.
+- Mistysign is unaffected. `MistysignAttestedSession` shares no code with the
+  removed surface and takes its `mrEnclaves`/`mrSigners` from the caller.
+  Note for the future: a Mistysign enclave is a repurposed Mistyswap build, so
+  a caller that ever pins it by MRSIGNER rather than MRENCLAVE needs product id
+  2 and minimum security version 6 — the values `MISTYSWAP_PRODUCT_ID` and
+  `MISTYSWAP_SECURITY_VERSION` held. They are removed here because only test
+  fixtures referenced them.
+
 ### Changed
 
 - `SecTrust.validateAgainst(pinnedKeys:completion:)` asks the system to judge

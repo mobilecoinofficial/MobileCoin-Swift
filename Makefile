@@ -115,7 +115,6 @@ test-spm:
 	tools/ensure_test_resources.sh
 	swift test \
 		--skip "IntTests" \
-		--skip "MistyswapTests" \
 		--skip "TransactionIdempotenceTests" \
 		--skip "TestSetupClientTests"
 

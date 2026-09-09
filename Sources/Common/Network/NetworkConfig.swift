@@ -10,21 +10,18 @@ struct NetworkConfig {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol,
-        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>? = nil
+        transportProtocol: TransportProtocol
     ) -> Result<NetworkConfig, InvalidInputError> {
         .success(NetworkConfig(
                     consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                     fogUrlLoadBalancer: fogUrlLoadBalancer,
                     attestation: attestation,
-                    transportProtocol: transportProtocol,
-                    mistyswapLoadBalancer: mistyswapLoadBalancer))
+                    transportProtocol: transportProtocol))
     }
 
     private let attestation: AttestationConfig
     private let consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>
     private let fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
-    private let mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>?
 
     var consensusUrls: [ConsensusUrl] {
         consensusUrlLoadBalancer.urlsTyped
@@ -38,14 +35,9 @@ struct NetworkConfig {
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]
     var fogTrustRoots: [TransportProtocol: SSLCertificates] = [:]
-    var mistyswapTrustRoots: [TransportProtocol: SSLCertificates] = [:]
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?
-    var mistyswapUserAuthorization: BasicCredentials? {
-        fogUserAuthorization // TODO - revisit if we will need this
-    }
-
     var httpRequester: HttpRequester? {
         didSet {
             pushStoredTrustRoots()
@@ -83,14 +75,12 @@ struct NetworkConfig {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol,
-        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>? = nil
+        transportProtocol: TransportProtocol
     ) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
         self.consensusUrlLoadBalancer = consensusUrlLoadBalancer
         self.fogUrlLoadBalancer = fogUrlLoadBalancer
-        self.mistyswapLoadBalancer = mistyswapLoadBalancer
     }
 
     func consensusConfig() -> AttestedConnectionConfig<ConsensusUrl> {
@@ -153,36 +143,6 @@ struct NetworkConfig {
             authorization: fogUserAuthorization)
     }
 
-    func mistyswapConfig() -> AttestedConnectionConfig<MistyswapUrl>? {
-        guard
-            let mistyswapLoadBalancer = mistyswapLoadBalancer,
-            let mistyswapAttestation = attestation.mistyswap
-        else {
-            return nil
-        }
-
-        return AttestedConnectionConfig(
-            url: mistyswapLoadBalancer.nextUrl(),
-            transportProtocolOption: transportProtocol.option,
-            attestation: mistyswapAttestation,
-            trustRoots: mistyswapTrustRoots,
-            authorization: mistyswapUserAuthorization)
-    }
-
-    func mistyswapUntrustedConfig() -> ConnectionConfig<MistyswapUrl>? {
-        guard
-            let mistyswapLoadBalancer = mistyswapLoadBalancer
-        else {
-            return nil
-        }
-
-        return ConnectionConfig(
-            url: mistyswapLoadBalancer.nextUrl(),
-            transportProtocolOption: transportProtocol.option,
-            trustRoots: mistyswapTrustRoots,
-            authorization: mistyswapUserAuthorization)
-    }
-
     var fogReportAttestation: Attestation { attestation.fogReport }
 
     private typealias PossibleCertificates = Result<SSLCertificates, InvalidInputError>
@@ -243,6 +203,5 @@ extension NetworkConfig {
         let fogKeyImage: Attestation
         let fogMerkleProof: Attestation
         let fogReport: Attestation
-        let mistyswap: Attestation?
     }
 }

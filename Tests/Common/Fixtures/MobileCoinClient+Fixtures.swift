@@ -15,7 +15,6 @@ extension MobileCoinClient.Config.Fixtures {
     struct Init {
         let consensusUrl = "mc://node1.fake.mobilecoin.com"
         let fogUrl = "fog://fog.fake.mobilecoin.com"
-        let mistyswapUrl = "insecure-mistyswap://34.133.197.146:4040/"
 
         let trustRootsBytes: [Data]
 
@@ -27,7 +26,6 @@ extension MobileCoinClient.Config.Fixtures {
         let fogMerkleProofAttestation = Attestation()
         let fogKeyImageAttestation = Attestation()
         let fogReportAttestation = Attestation()
-        let mistyswapAttestation = Attestation()
 
         init() throws {
             let trustRootsFixture = try NetworkConfig.Fixtures.TrustRoots()
@@ -52,8 +50,6 @@ extension MobileCoinClient.Config.Fixtures {
                 fogKeyImageAttestation: initFixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: initFixture.fogMerkleProofAttestation,
                 fogReportAttestation: initFixture.fogReportAttestation,
-                mistyswapUrl: initFixture.mistyswapUrl,
-                mistyswapAttestation: initFixture.mistyswapAttestation,
                 transportProtocol: TransportProtocol.http).get()
         }
     }
