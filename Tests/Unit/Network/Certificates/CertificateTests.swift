@@ -317,6 +317,37 @@ class CertificateTests: XCTestCase {
             pinned.publicKeys)
     }
 
+    // Empty bytes parse to a certificate holding zero keys, so a setter taking
+    // them would pin against nothing while reporting success.
+    func testEmptyTrustRootBytesAreRefused() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+
+        XCTAssertFailure(config.setConsensusTrustRoots([]))
+        XCTAssertFailure(config.setFogTrustRoots([]))
+        XCTAssertFailure(config.setMistyswapTrustRoots([]))
+    }
+
+    // A config built with no mistyswap load balancer has no host to pin
+    // mistyswap trust roots to.
+    func testMistyswapTrustRootsAreRefusedWithNoHostToPin() throws {
+        let preset = NetworkConfigFixtures.network
+        let consensusUrls = try ConsensusUrl.make(strings: [preset.consensusUrl]).get()
+        let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
+        let fogUrls = try FogUrl.make(strings: [preset.fogUrl]).get()
+        let fogUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: fogUrls).get()
+
+        let result = NetworkConfig.make(
+            consensusUrlLoadBalancer: consensusUrlLoadBalancer,
+            fogUrlLoadBalancer: fogUrlLoadBalancer,
+            attestation: try preset.attestationConfig(),
+            transportProtocol: .http,
+            mistyswapLoadBalancer: nil)
+        var config = try result.get()
+
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        XCTAssertFailure(config.setMistyswapTrustRoots(fixture.trustRootsBytes))
+    }
+
     // `validateAgainst` calls back on the calling thread, so the reason is set
     // before this returns.
     private func refusal(of trust: SecTrust, against pinnedKeys: [SecKey]) throws -> String {
