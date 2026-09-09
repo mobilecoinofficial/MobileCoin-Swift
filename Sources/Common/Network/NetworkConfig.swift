@@ -34,6 +34,10 @@ struct NetworkConfig {
         fogUrlLoadBalancer.urlsTyped
     }
 
+    var mistyswapUrls: [MistyswapUrl] {
+        mistyswapLoadBalancer?.urlsTyped ?? []
+    }
+
     var transportProtocol: TransportProtocol
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]
@@ -76,6 +80,11 @@ struct NetworkConfig {
            case .failure(let error) = requester.setConsensusTrustRoots(
             consensus, hosts: consensusUrls.map(\.host)) {
             logger.error("Consensus trust roots stay unpinned: \(error)", logFunction: false)
+        }
+        if let mistyswap = mistyswapTrustRoots[.http] as? SecSSLCertificates,
+           case .failure(let error) = requester.setMistyswapTrustRoots(
+            mistyswap, hosts: mistyswapUrls.map(\.host)) {
+            logger.error("Mistyswap trust roots stay unpinned: \(error)", logFunction: false)
         }
     }
 
@@ -231,6 +240,29 @@ extension NetworkConfig {
             return .failure(error)
         }
         fogTrustRoots[.http] = certificates
+        return .success(())
+    }
+
+    /// Pins `trustRoots` for the mistyswap hosts over HTTP. The requester takes
+    /// them before the dictionary keeps them, so a refusal will leave the roots
+    /// already pinned in place.
+    @discardableResult mutating public func setMistyswapTrustRoots(_ trustRoots: [Data])
+        -> Result<(), InvalidInputError>
+    {
+        let certificates: SecSSLCertificates
+        switch SecSSLCertificates.make(trustRootBytes: trustRoots) {
+        case .success(let parsed):
+            certificates = parsed
+        case .failure(let error):
+            return .failure(error)
+        }
+
+        let hosts = mistyswapUrls.map(\.host)
+        if let requester = httpRequester,
+           case .failure(let error) = requester.setMistyswapTrustRoots(certificates, hosts: hosts) {
+            return .failure(error)
+        }
+        mistyswapTrustRoots[.http] = certificates
         return .success(())
     }
 }
