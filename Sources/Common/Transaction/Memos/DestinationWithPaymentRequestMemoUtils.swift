@@ -57,7 +57,8 @@ enum DestinationWithPaymentRequestMemoUtils {
         destinationPublicAddress: PublicAddress,
         numberOfRecipients: PositiveUInt8,
         fee: UInt64,
-        totalOutlay: UInt64
+        totalOutlay: UInt64,
+        paymentRequestId: UInt64
     ) -> Data64? {
         destinationPublicAddress.withUnsafeCStructPointer { destinationPublicAddressPtr in
             switch Data64.make(withMcMutableBuffer: { bufferPtr, errorPtr in
@@ -66,6 +67,7 @@ enum DestinationWithPaymentRequestMemoUtils {
                     numberOfRecipients.value,
                     fee,
                     totalOutlay,
+                    paymentRequestId,
                     bufferPtr,
                     &errorPtr)
             }) {

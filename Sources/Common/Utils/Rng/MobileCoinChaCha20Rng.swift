@@ -68,26 +68,22 @@ public final class MobileCoinChaCha20Rng: MobileCoinRng {
     }
 
     public func wordPos() -> Data {
-        let wordPosData = Data16()
-        wordPosData.asMcBuffer { buffer in
-            switch withMcError({ errorPtr in
-                mc_chacha20_rng_get_word_pos(ptr, buffer, &errorPtr)
-            }) {
-            case .success:
-                break
-            case .failure(let error):
-                switch error.errorCode {
-                case .panic:
-                    logger.fatalError(
-                        "LibMobileCoin panic error: \(redacting: error.description)")
-                default:
-                    // Safety: mc_chacha20_rng_get_word_pos should not throw
-                    // non-documented errors.
-                    logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
-                }
+        switch Data16.make(withMcMutableBuffer: { bufferPtr, errorPtr in
+            mc_chacha20_rng_get_word_pos(ptr, bufferPtr, &errorPtr)
+        }) {
+        case .success(let wordPosData):
+            return wordPosData.data
+        case .failure(let error):
+            switch error.errorCode {
+            case .panic:
+                logger.fatalError(
+                    "LibMobileCoin panic error: \(redacting: error.description)")
+            default:
+                // Safety: mc_chacha20_rng_get_word_pos should not throw
+                // non-documented errors.
+                logger.fatalError("Unhandled LibMobileCoin error: \(redacting: error)")
             }
         }
-        return wordPosData.data
     }
 
     public func setWordPos(_ wordPos: Data) {
