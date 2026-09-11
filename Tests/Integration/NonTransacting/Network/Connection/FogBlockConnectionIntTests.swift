@@ -213,8 +213,9 @@ extension FogBlockConnectionIntTests {
     }
 
     func createFogBlockConnection(networkConfig: NetworkConfig) -> FogBlockConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+                httpRequester: networkConfig.filledHttpRequester())
         return FogBlockConnection(
             httpFactory: httpFactory,
             config: networkConfig,

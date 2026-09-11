@@ -161,8 +161,9 @@ extension FogKeyImageConnectionIntTests {
     }
 
     func createFogKeyImageConnection(networkConfig: NetworkConfig) -> FogKeyImageConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+                httpRequester: networkConfig.filledHttpRequester())
         return FogKeyImageConnection(
             httpFactory: httpFactory,
             config: networkConfig,

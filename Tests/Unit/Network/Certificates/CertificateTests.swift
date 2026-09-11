@@ -258,6 +258,22 @@ class CertificateTests: XCTestCase {
             pinned.publicKeys)
     }
 
+    // A refused fog set keeps the pinned fog roots the call before it stored, so
+    // a failure won't replace them with roots nothing accepted.
+    func testRefusedFogTrustRootsLeaveThePinnedRootsInPlace() throws {
+        var config = try NetworkConfigFixtures.create(using: .http)
+        let fixture = try NetworkConfig.Fixtures.TrustRoots()
+        XCTAssertSuccess(config.setFogTrustRoots(fixture.trustRootsBytes))
+        let pinned = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
+
+        config.httpRequester = RefusingHttpRequester()
+
+        XCTAssertFailure(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
+        XCTAssertEqual(
+            (config.fogTrustRoots[.http] as? SecSSLCertificates)?.publicKeys,
+            pinned.publicKeys)
+    }
+
     // Roots that fail to parse leave the pinned roots in place, because a config
     // with no roots falls through to the system's own handling.
     func testAFailedParseKeepsTheTrustRootsAlreadySet() throws {

@@ -223,8 +223,9 @@ extension FogMerkleProofConnectionIntTests {
     func createFogMerkleProofConnection(
         networkConfig: NetworkConfig
     ) -> FogMerkleProofConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+                httpRequester: networkConfig.filledHttpRequester())
         return FogMerkleProofConnection(
             httpFactory: httpFactory,
             config: networkConfig,
