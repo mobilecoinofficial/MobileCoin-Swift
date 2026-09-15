@@ -177,14 +177,16 @@ enum SignedContingentInputBuilderUtils {
         func ffiCall(
             sciDataPtr: UnsafePointer<McBuffer>
         ) -> Bool {
+            var isValid = false
             let result = withMcError { errorPtr in
                 mc_signed_contingent_input_data_is_valid(
                     sciDataPtr,
+                    &isValid,
                     &errorPtr)
             }
             switch result {
             case .success:
-                return true
+                return isValid
             case .failure(let error):
                 switch error.errorCode {
                 case .invalidInput:
