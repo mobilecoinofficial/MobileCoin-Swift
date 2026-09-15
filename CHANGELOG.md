@@ -12,13 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SecTrust.validateAgainst(pinnedKeys:completion:)` asks the system to judge
   the chain before it compares any key, and fails the result when the system
   refuses. This is a breaking change. `DefaultHttpRequester` is the only
-  shipped caller. A consumer that pins a CA the device does not trust can no
-  longer connect there. That path carries no flag to turn the check off. A
+  shipped caller. A consumer that pins a CA the device doesn't trust will fail
+  to connect there. That path carries no flag to turn the check off. A
   consumer that supplies its own `HttpRequester` replaces
   `DefaultHttpRequester` outright, so its traffic never reaches this code.
 - `HttpRequester` requires both trust-root setters and answers each with a
   `Result`. The protocol doesn't carry a default, so a conformer must
   implement both setters. This is a breaking change.
+- `SSLCertificates.make(trustRootBytes:)` answers with a `Result` carrying the
+  conforming type, so `SecSSLCertificates.make(trustRootBytes:)` carries
+  `SecSSLCertificates`. This is a breaking change for a caller that annotates
+  the result with the protocol type.
+- `SSLCertificates` requires `init?(trustRootBytes:)`. The protocol doesn't
+  carry a default, so a conformer must implement it. This is a breaking change.
 - Both `HttpRequester` trust-root setters take `hosts: [String]`, naming the
   endpoints that set of roots pins. This is a breaking change for a caller of
   either setter and for a conformer outside this package.
@@ -43,16 +49,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `validateAgainst` reads the chain the system built. A server that presents a
   bare leaf under a pinned CA satisfies the pin once the system completes the
   chain.
+- CI runs two jobs, `Swift package tests` and `SwiftLint`. The first runs the
+  credential-free SwiftPM lane and then compiles the package for iOS.
+- SwiftLint comes from `tools/swiftlint.sh`, which downloads the pinned 0.47.1
+  and checks it against a sha256.
+- `make tag-release` reads the version from the newest released heading in this
+  file.
+- Dependabot watches `swift` as well as `github-actions`, so the two package
+  dependencies are covered now that no Gemfile is left to watch.
 
 ### Removed
 
 - `Sources/GRPC` and `Tests/ProtocolSpecific/Grpc`. No product or subspec
-  compiled either tree.
+  compiled either tree, so public API stays as it is.
 - The Mistyswap integration tests. Every case built an `XCTSkip` value without
   throwing it, so every case ran against the gRPC transport. The suite carries
-  no HTTP variant.
+  no HTTP variant, so public API stays as it is.
 - `TransportProtocol.grpc`, the last public name for a transport the package
-  cannot build. `TransportProtocol.http` is the only case left.
+  cannot build. `TransportProtocol.http` is the only case left. This is a
+  breaking change for a caller that names it.
 - `ConnectionOptionWrapper`, the `Sources/Common/Network/ProtocolSpecific` tree,
   and the eight `Empty*` service stand-ins the HTTP factory makes unreachable.
 - `MobileCoin.podspec` and the `ExampleHTTP` app it existed to feed. The
@@ -64,25 +79,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The TestSetupClient Xcode project and its SwiftUI shell. The package builds
   the same sources, and `make fund-test-wallets-spm` runs them headless.
 
-Removing `Sources/GRPC` and the Mistyswap integration tests leaves public
-API untouched. Removing `TransportProtocol.grpc` breaks a caller that names
-it.
-
-### Changed
-
-- CI runs two jobs, `Swift package tests` and `SwiftLint`. The first runs the
-  credential-free SwiftPM lane and then compiles the package for iOS. Branch
-  protection needs the old job names replaced before this reaches master.
-- SwiftLint comes from `tools/swiftlint.sh`, which downloads the pinned 0.47.1
-  and checks it against a sha256.
-- `make tag-release` reads the version from the newest released heading in this
-  file rather than from the podspec.
-- Dependabot watches `swift` as well as `github-actions`, so the two package
-  dependencies are covered now that no Gemfile is left to watch.
-
 ### Fixed
 
-- Certificate pinning no longer stands in for system trust evaluation. An
+- The system judges a chain before certificate pinning compares a key. An
   expired chain and a chain built on an untrusted root are refused even when a
   pinned key matches. Where the caller hands over a host-bound trust, which is
   what `URLSession` supplies, a chain issued for another host is refused too.
@@ -95,7 +94,8 @@ it.
   place of its public key.
 - `NetworkConfig.setConsensusTrustRoots` and `setFogTrustRoots` keep the roots
   already set when the new roots fail to parse, and they keep the new roots
-  only once the requester has taken them.
+  only once the requester has taken them. A set that fails leaves the requester
+  pinning the roots it already holds.
 - `MobileCoinClient` gives a config that carries no requester a
   `DefaultHttpRequester`, so the trust roots on that config reach the
   connections it opens. Before this the connection factory built its own

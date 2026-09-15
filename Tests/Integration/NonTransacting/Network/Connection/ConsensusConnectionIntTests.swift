@@ -220,8 +220,9 @@ extension ConsensusConnectionIntTests {
     }
 
     func createConsensusConnection(networkConfig: NetworkConfig) -> ConsensusConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+                httpRequester: networkConfig.filledHttpRequester())
         return ConsensusConnection(
             httpFactory: httpFactory,
             config: networkConfig,
