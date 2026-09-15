@@ -16,29 +16,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to connect there. That path carries no flag to turn the check off. A
   consumer that supplies its own `HttpRequester` replaces
   `DefaultHttpRequester` outright, so its traffic never reaches this code.
-- `HttpRequester` requires both trust-root setters and answers each with a
-  `Result`. The protocol doesn't carry a default, so a conformer must
-  implement both setters. This is a breaking change.
+- `HttpRequester` requires a fog, a consensus and a mistyswap trust-root
+  setter, and answers each with a `Result`. The protocol doesn't carry a
+  default, so a conformer must implement all three. This is a breaking change.
 - `SSLCertificates.make(trustRootBytes:)` answers with a `Result` carrying the
   conforming type, so `SecSSLCertificates.make(trustRootBytes:)` carries
   `SecSSLCertificates`. This is a breaking change for a caller that annotates
   the result with the protocol type.
 - `SSLCertificates` requires `init?(trustRootBytes:)`. The protocol doesn't
   carry a default, so a conformer must implement it. This is a breaking change.
-- Both `HttpRequester` trust-root setters take `hosts: [String]`, naming the
+- Every `HttpRequester` trust-root setter takes `hosts: [String]`, naming the
   endpoints that set of roots pins. This is a breaking change for a caller of
-  either setter and for a conformer outside this package.
+  any setter and for a conformer outside this package.
   `DefaultHttpRequester` judges a challenged host against the roots of every
   set that names it and carries keys. A consensus host will be judged against
   the pinned consensus roots alone when the consensus set is the only such set
-  for that host. Both setters store a host in the form a lookup uses, which
+  for that host. Every setter stores a host in the form a lookup uses, which
   ignores case and trailing dots.
 - `DefaultHttpRequester` judges a host that no such set names against every
   root it holds, which is the fallback and is what it did for every host
   before. A lookup keeps a naming set only while it carries keys, so the
   lookup takes that fallback for a host that keyless sets alone name. A
-  consumer that names the hosts of one setter alone leaves the other setter's
+  consumer that names the hosts of one setter alone leaves the other setters'
   hosts there too.
+- `MobileCoinClient.Config` refuses an empty trust-root array on every setter
+  and answers with an `InvalidInputError`. Empty bytes parsed to a certificate
+  holding zero keys, so the call pinned against nothing and still succeeded.
+  This is a breaking change for a caller that passes an empty array.
 - `SecTrust.publicKeyTrustChain` returns a `Result` and carries the error of
   the certificate it could not read. `asPublicKeyTrustChain` is gone.
 - `SecTrust.certificateTrustChain` reads the chain with
@@ -57,6 +61,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   file.
 - Dependabot watches `swift` as well as `github-actions`, so the two package
   dependencies are covered now that no Gemfile is left to watch.
+
+### Added
+
+- `MobileCoinClient.Config.setMistyswapTrustRoots(_:)` pins trust roots for the
+  mistyswap hosts over HTTP, the way the fog and consensus setters do. It
+  refuses a call the config holds no mistyswap host for.
 
 ### Removed
 
@@ -78,6 +88,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   helpers in `scripts/`. Nothing in the repo runs `pod` or `bundle` any more.
 - The TestSetupClient Xcode project and its SwiftUI shell. The package builds
   the same sources, and `make fund-test-wallets-spm` runs them headless.
+- `SecTrust.certificateCount`. No caller in the package read it, and
+  `certificateTrustChain.count` answers the same question. This is a breaking
+  change for a caller that names it.
 
 ### Fixed
 
@@ -92,16 +105,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   holding a newline could forge a client log line.
 - The pinning success line names the index of the certificate that matched in
   place of its public key.
-- `NetworkConfig.setConsensusTrustRoots` and `setFogTrustRoots` keep the roots
-  already set when the new roots fail to parse, and they keep the new roots
-  only once the requester has taken them. A set that fails leaves the requester
-  pinning the roots it already holds.
+- `NetworkConfig.setConsensusTrustRoots`, `setFogTrustRoots` and
+  `setMistyswapTrustRoots` keep the roots already set when the new roots fail
+  to parse, and they keep the new roots only once the requester has taken them.
+  A set that fails leaves the requester pinning the roots it already holds.
 - `MobileCoinClient` gives a config that carries no requester a
   `DefaultHttpRequester`, so the trust roots on that config reach the
   connections it opens. Before this the connection factory built its own
   requester, which held no roots and pinned nothing.
 - `SecCertificate.publicKey(for:)` names the certificate in place of printing
   its bytes.
+- The trust-root parse failure names the byte count of its input in place of
+  the certificate. `InvalidInputError` carries that message, so the bytes stay
+  out of a caller's log too.
 
 ## [6.1.0] - 2026-09-01
 
