@@ -416,3 +416,20 @@ extension SecCertificateTests.Fixtures.AlphaNet {
         """
     }
 }
+
+extension SecCertificateTests.Fixtures.AlphaNet {
+    enum Intermediate { case valid, wrong }
+
+    static func certificates(_ intermediate: Intermediate) throws -> SecSSLCertificates {
+        let base64 = intermediate == .valid
+            ? intermediateCertificateBase64
+            : wrongIntermediateCertificateBase64
+        guard let bytes = Data(base64Encoded: base64) else {
+            throw SSLTrustError("Bad data, cannot create SecSSLCertificates")
+        }
+        guard let certificates = try SecSSLCertificates(trustRootBytes: [bytes]) else {
+            throw SSLTrustError("The trust root bytes carry no certificate")
+        }
+        return certificates
+    }
+}

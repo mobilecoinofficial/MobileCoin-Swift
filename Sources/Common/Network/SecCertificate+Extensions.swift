@@ -47,7 +47,7 @@ extension Data {
             return .success(pinnedCertificate)
         } else {
             let errorMessage = "Error parsing trust root certificate: " +
-                "\(data.base64EncodedString())"
+                "\(data.count) bytes"
             logger.error(errorMessage, logFunction: false)
             return .failure(InvalidInputError(errorMessage))
         }
@@ -71,10 +71,6 @@ extension Data {
 extension SecTrust {
     private typealias ChainOfTrustKeyMatch = (match: Bool, index: Int, key: SecKey)
     private typealias ChainOfTrustKey = (index: Int, key: SecKey)
-
-    public var certificateCount: Int {
-        certificateTrustChain.count
-    }
 
     // SecTrustCopyCertificateChain is nullable and documents no chain for a
     // trust it has yet to evaluate. SecTrustGetCertificateAtIndex documents the
