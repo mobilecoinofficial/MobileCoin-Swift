@@ -26,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The libmobilecoin floor is 7.0.0, up from 6.1.0. 7.0.0 is where the
+  `mistyswap_common`/`mistyswap_offramp`/`mistyswap_onramp` generated types
+  were deleted, so it is the first release this package can build against
+  once it stops naming them. The prebuilt xcframework is byte-identical to
+  6.2.0's -- only Swift sources were removed, no Rust changed -- so the bump
+  costs a consumer nothing at run time. A consumer pinning libmobilecoin
+  itself has to move with it; the major bump means a `from: "6.x"` pin will
+  not resolve 7.0.0 on its own.
 - `SecTrust.validateAgainst(pinnedKeys:completion:)` asks the system to judge
   the chain before it compares any key, and fails the result when the system
   refuses. This is a breaking change. `DefaultHttpRequester` is the only

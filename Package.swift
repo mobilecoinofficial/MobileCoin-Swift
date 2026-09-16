@@ -18,7 +18,7 @@ let package = Package(
         // and from where they can be fetched:
         .package(
             url: "https://github.com/mobilecoinofficial/libmobilecoin.git",
-            from: "6.1.0"
+            from: "7.0.0"
         ),
         .package(
             url: "https://github.com/apple/swift-protobuf.git",
@@ -41,8 +41,8 @@ let package = Package(
          ),
         .testTarget(
             name: "MobileCoinTests",
-            // 6.1.0 keeps the vectors out of LibMobileCoinCore so a shipping app
-            // does not carry them, so the test target asks for them by name.
+            // LibMobileCoinCore does not carry the test vectors, so a shipping
+            // app does not either. The test target asks for them by name.
             dependencies: [
                 "MobileCoin",
                 .product(name: "LibMobileCoinTestVectors", package: "libmobilecoin"),
