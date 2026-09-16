@@ -16,7 +16,6 @@ enum TestHost {
     static let pinned = "example.com"
     static let fog = "fog.example.com"
     static let consensus = "consensus.example.com"
-    static let mistyswap = "mistyswap.example.com"
 }
 
 func pinningDelegate(
@@ -47,12 +46,6 @@ private final class RefusingHttpRequester: HttpRequester {
         -> Result<(), InvalidInputError>
     {
         .failure(InvalidInputError("This requester keeps no consensus trust roots"))
-    }
-
-    func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
-        -> Result<(), InvalidInputError>
-    {
-        .failure(InvalidInputError("This requester keeps no mistyswap trust roots"))
     }
 }
 
@@ -220,18 +213,14 @@ class CertificateTests: XCTestCase {
 
         XCTAssertSuccess(config.setConsensusTrustRoots(fixture.trustRootsBytes))
         XCTAssertSuccess(config.setFogTrustRoots([fixture.wrongTrustRootBytes]))
-        XCTAssertSuccess(config.setMistyswapTrustRoots(fixture.trustRootsBytes))
 
         let consensus = try XCTUnwrap(config.consensusTrustRoots[.http] as? SecSSLCertificates)
         let fog = try XCTUnwrap(config.fogTrustRoots[.http] as? SecSSLCertificates)
-        let mistyswap = try XCTUnwrap(config.mistyswapTrustRoots[.http] as? SecSSLCertificates)
         XCTAssertNotEqual(consensus.publicKeys, fog.publicKeys)
         XCTAssertEqual(requester.consensusTrustRoots?.publicKeys, consensus.publicKeys)
         XCTAssertEqual(requester.fogTrustRoots?.publicKeys, fog.publicKeys)
-        XCTAssertEqual(requester.mistyswapTrustRoots?.publicKeys, mistyswap.publicKeys)
         XCTAssertEqual(requester.consensusHosts, config.consensusUrls.map(\.host))
         XCTAssertEqual(requester.fogHosts, config.fogUrls.map(\.host))
-        XCTAssertEqual(requester.mistyswapHosts, config.mistyswapUrls.map(\.host))
     }
 
     // The config's fog and consensus URLs name different hosts, so each host
@@ -356,28 +345,6 @@ class CertificateTests: XCTestCase {
 
         XCTAssertFailure(config.setConsensusTrustRoots([]))
         XCTAssertFailure(config.setFogTrustRoots([]))
-        XCTAssertFailure(config.setMistyswapTrustRoots([]))
-    }
-
-    // A config built with no mistyswap load balancer has no host to pin
-    // mistyswap trust roots to.
-    func testMistyswapTrustRootsAreRefusedWithNoHostToPin() throws {
-        let preset = NetworkConfigFixtures.network
-        let consensusUrls = try ConsensusUrl.make(strings: [preset.consensusUrl]).get()
-        let consensusUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: consensusUrls).get()
-        let fogUrls = try FogUrl.make(strings: [preset.fogUrl]).get()
-        let fogUrlLoadBalancer = try RandomUrlLoadBalancer.make(urls: fogUrls).get()
-
-        let result = NetworkConfig.make(
-            consensusUrlLoadBalancer: consensusUrlLoadBalancer,
-            fogUrlLoadBalancer: fogUrlLoadBalancer,
-            attestation: try preset.attestationConfig(),
-            transportProtocol: .http,
-            mistyswapLoadBalancer: nil)
-        var config = try result.get()
-
-        let fixture = try NetworkConfig.Fixtures.TrustRoots()
-        XCTAssertFailure(config.setMistyswapTrustRoots(fixture.trustRootsBytes))
     }
 
     // `validateAgainst` calls back on the calling thread, so the reason is set

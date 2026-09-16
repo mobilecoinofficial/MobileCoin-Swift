@@ -30,85 +30,6 @@ extension MobileCoinClient {
                       transportProtocol: transportProtocol)
         }
 
-        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl or `mistyswapUrl` are not well-formed URLs
-        ///     with the appropriate schemes.
-        public static func make(
-            consensusUrl: String,
-            consensusAttestation: Attestation,
-            fogUrl: String,
-            fogViewAttestation: Attestation,
-            fogKeyImageAttestation: Attestation,
-            fogMerkleProofAttestation: Attestation,
-            fogReportAttestation: Attestation,
-            mistyswapUrl: String,
-            mistyswapAttestation: Attestation,
-            transportProtocol: TransportProtocol
-        ) -> Result<Config, InvalidInputError> {
-            Self.make(consensusUrls: [consensusUrl],
-                      consensusAttestation: consensusAttestation,
-                      fogUrls: [fogUrl],
-                      fogViewAttestation: fogViewAttestation,
-                      fogKeyImageAttestation: fogKeyImageAttestation,
-                      fogMerkleProofAttestation: fogMerkleProofAttestation,
-                      fogReportAttestation: fogReportAttestation,
-                      mistyswapUrls: [mistyswapUrl],
-                      mistyswapAttestation: mistyswapAttestation,
-                      transportProtocol: transportProtocol)
-        }
-
-        /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
-        ///     with the appropriate schemes.
-        public static func make(
-            consensusUrls: [String],
-            consensusAttestation: Attestation,
-            fogUrls: [String],
-            fogViewAttestation: Attestation,
-            fogKeyImageAttestation: Attestation,
-            fogMerkleProofAttestation: Attestation,
-            fogReportAttestation: Attestation,
-            mistyswapUrls: [String],
-            mistyswapAttestation: Attestation,
-            transportProtocol: TransportProtocol
-        ) -> Result<Config, InvalidInputError> {
-
-            ConsensusUrl.make(strings: consensusUrls).flatMap { consensusUrls in
-                RandomUrlLoadBalancer<ConsensusUrl>.make(
-                    urls: consensusUrls
-                ).flatMap { consensusUrlLoadBalancer in
-                    FogUrl.make(strings: fogUrls).flatMap { fogUrls in
-                        RandomUrlLoadBalancer<FogUrl>.make(
-                            urls: fogUrls
-                        ).flatMap { fogUrlLoadBalancer in
-                            MistyswapUrl.make(strings: mistyswapUrls).flatMap { mistyswapUrls in
-                                NonRotatingUrlLoadBalancer<MistyswapUrl>.make(
-                                    urls: mistyswapUrls
-                                ).map { mistyswapLoadBalancer in
-
-                                    let attestationConfig = NetworkConfig.AttestationConfig(
-                                        consensus: consensusAttestation,
-                                        fogView: fogViewAttestation,
-                                        fogKeyImage: fogKeyImageAttestation,
-                                        fogMerkleProof: fogMerkleProofAttestation,
-                                        fogReport: fogReportAttestation,
-                                        mistyswap: mistyswapAttestation
-                                    )
-
-                                    let networkConfig = NetworkConfig(
-                                        consensusUrlLoadBalancer: consensusUrlLoadBalancer,
-                                        fogUrlLoadBalancer: fogUrlLoadBalancer,
-                                        attestation: attestationConfig,
-                                        transportProtocol: transportProtocol,
-                                        mistyswapLoadBalancer: mistyswapLoadBalancer)
-
-                                    return Config(networkConfig: networkConfig)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         /// - Returns: `InvalidInputError` when `consensusUrl` or `fogUrl` are not well-formed URLs
         ///     with the appropriate schemes.
         public static func make(
@@ -130,23 +51,19 @@ extension MobileCoinClient {
                         RandomUrlLoadBalancer<FogUrl>.make(
                             urls: fogUrls
                         ).flatMap { fogUrlLoadBalancer in
-
                             let attestationConfig = NetworkConfig.AttestationConfig(
                                 consensus: consensusAttestation,
                                 fogView: fogViewAttestation,
                                 fogKeyImage: fogKeyImageAttestation,
                                 fogMerkleProof: fogMerkleProofAttestation,
-                                fogReport: fogReportAttestation,
-                                mistyswap: nil
+                                fogReport: fogReportAttestation
                             )
 
                             let networkConfig = NetworkConfig(
                                 consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                                 fogUrlLoadBalancer: fogUrlLoadBalancer,
                                 attestation: attestationConfig,
-                                transportProtocol: transportProtocol,
-                                mistyswapLoadBalancer: nil
-                            )
+                                transportProtocol: transportProtocol)
 
                             return .success(Config(networkConfig: networkConfig))
                         }
@@ -191,12 +108,6 @@ extension MobileCoinClient {
             networkConfig.setFogTrustRoots(trustRoots)
         }
 
-        public mutating func setMistyswapTrustRoots(_ trustRoots: [Data])
-            -> Result<(), InvalidInputError>
-        {
-            networkConfig.setMistyswapTrustRoots(trustRoots)
-        }
-
         public mutating func setConsensusBasicAuthorization(username: String, password: String) {
             networkConfig.consensusAuthorization =
                 BasicCredentials(username: username, password: password)
@@ -218,9 +129,6 @@ extension MobileCoinClient {
     static func configDescription(accountKey: AccountKeyWithFog, config: Config) -> String {
         let fogInfo = accountKey.fogInfo
 
-        let mistyswapInfo = config.networkConfig.mistyswapConfig()?.attestation.description
-            ?? "none"
-
         return """
             Consensus urls: \(config.networkConfig.consensusUrls)
             Fog urls: \(config.networkConfig.fogUrls)
@@ -234,7 +142,6 @@ extension MobileCoinClient {
             Fog KeyImage attestation: \(config.networkConfig.fogKeyImageConfig().attestation)
             Fog MerkleProof attestation: \(config.networkConfig.fogMerkleProofConfig().attestation)
             Fog Report attestation: \(config.networkConfig.fogReportAttestation)
-            Mistyswap attestation: \(mistyswapInfo)
             """
     }
 }

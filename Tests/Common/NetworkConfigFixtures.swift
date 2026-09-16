@@ -44,8 +44,7 @@ extension NetworkConfigFixtures {
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
             attestation: attestationConfig,
-            transportProtocol: transportProtocol,
-            mistyswapLoadBalancer: NetworkPreset.eranDevNetworkMistyswapLoadBalancers()
+            transportProtocol: transportProtocol
         ).get()
 
         networkConfig.httpRequester = DefaultHttpRequester()
@@ -70,9 +69,7 @@ extension NetworkConfigFixtures {
                             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                             fogUrlLoadBalancer: fogUrlLoadBalancer,
                             attestation: attestationConfig,
-                            transportProtocol: transportProtocol,
-                            mistyswapLoadBalancer: try! NetworkPreset
-                                .eranDevNetworkMistyswapLoadBalancers()
+                            transportProtocol: transportProtocol
                         )
                     }
                 }

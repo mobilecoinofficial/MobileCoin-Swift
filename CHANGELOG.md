@@ -7,8 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Breaking.** Mistyswap. `MobileCoinClient.mistyswap`, the `Config.make`
+  overloads taking `mistyswapUrl`/`mistyswapAttestation`, `MistyswapUrl`,
+  `MistyswapConnection`, `MistyswapService`, `MistyswapError`, the
+  `mistyswap` field on `NetworkConfig.AttestationConfig`, the
+  `mistyswapLoadBalancer` argument on `NetworkConfig`, and the `MISTYSWAP_*`
+  constants are all gone. The remaining `Config.make` overloads are unchanged,
+  so a caller that never named Mistyswap needs no edit.
+- The Mistyswap trust-root pinning surface, which landed on master in parallel
+  with this removal and never shipped in a release:
+  `MobileCoinClient.Config.setMistyswapTrustRoots(_:)`,
+  `NetworkConfig.setMistyswapTrustRoots(_:)` and its `mistyswapTrustRoots`
+  dictionary, the `setMistyswapTrustRoots` requirement on `HttpRequester`, and
+  the mistyswap lane through `DefaultHttpRequester` and
+  `CertificatePinningDelegate`. `setAllTrustRoots` now takes fog and consensus
+  alone. Pinning is unchanged for the hosts that remain: an unset lane names no
+  host, so it was never selected, and it contributed no keys to the
+  every-set fallback either.
+- `NonRotatingUrlLoadBalancer`. Mistyswap was its only caller. It is internal,
+  so no public API moves.
+- Mistysign is unaffected. `MistysignAttestedSession` shares no code with the
+  removed surface and takes its `mrEnclaves`/`mrSigners` from the caller.
+  Note for the future: a Mistysign enclave is a repurposed Mistyswap build, so
+  a caller that ever pins it by MRSIGNER rather than MRENCLAVE needs product id
+  2 and minimum security version 6 — the values `MISTYSWAP_PRODUCT_ID` and
+  `MISTYSWAP_SECURITY_VERSION` held. They are removed here because only test
+  fixtures referenced them.
+
 ### Changed
 
+- The libmobilecoin floor is 7.0.0, up from 6.1.0. 7.0.0 is where the
+  `mistyswap_common`/`mistyswap_offramp`/`mistyswap_onramp` generated types
+  were deleted, so it is the first release this package can build against
+  once it stops naming them. The prebuilt xcframework is byte-identical to
+  6.2.0's -- only Swift sources were removed, no Rust changed -- so the bump
+  costs a consumer nothing at run time. A consumer pinning libmobilecoin
+  itself has to move with it; the major bump means a `from: "6.x"` pin will
+  not resolve 7.0.0 on its own.
 - `SecTrust.validateAgainst(pinnedKeys:completion:)` asks the system to judge
   the chain before it compares any key, and fails the result when the system
   refuses. This is a breaking change. `DefaultHttpRequester` is the only
@@ -16,9 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to connect there. That path carries no flag to turn the check off. A
   consumer that supplies its own `HttpRequester` replaces
   `DefaultHttpRequester` outright, so its traffic never reaches this code.
-- `HttpRequester` requires a fog, a consensus and a mistyswap trust-root
-  setter, and answers each with a `Result`. The protocol doesn't carry a
-  default, so a conformer must implement all three. This is a breaking change.
+- `HttpRequester` requires a fog and a consensus trust-root setter, and
+  answers each with a `Result`. The protocol doesn't carry a default, so a
+  conformer must implement both. This is a breaking change.
 - `SSLCertificates.make(trustRootBytes:)` answers with a `Result` carrying the
   conforming type, so `SecSSLCertificates.make(trustRootBytes:)` carries
   `SecSSLCertificates`. This is a breaking change for a caller that annotates
@@ -64,9 +101,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `MobileCoinClient.Config.setMistyswapTrustRoots(_:)` pins trust roots for the
-  mistyswap hosts over HTTP, the way the fog and consensus setters do. It
-  refuses a call the config holds no mistyswap host for.
 
 ### Removed
 
@@ -105,9 +139,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   holding a newline could forge a client log line.
 - The pinning success line names the index of the certificate that matched in
   place of its public key.
-- `NetworkConfig.setConsensusTrustRoots`, `setFogTrustRoots` and
-  `setMistyswapTrustRoots` keep the roots already set when the new roots fail
-  to parse, and they keep the new roots only once the requester has taken them.
+- `NetworkConfig.setConsensusTrustRoots` and `setFogTrustRoots` keep the roots
+  already set when the new roots fail to parse, and they keep the new roots
+  only once the requester has taken them.
   A set that fails leaves the requester pinning the roots it already holds.
 - `MobileCoinClient` gives a config that carries no requester a
   `DefaultHttpRequester`, so the trust roots on that config reach the

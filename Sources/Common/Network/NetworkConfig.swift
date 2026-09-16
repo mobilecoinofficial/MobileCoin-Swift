@@ -10,21 +10,18 @@ struct NetworkConfig {
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol,
-        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>? = nil
+        transportProtocol: TransportProtocol
     ) -> Result<NetworkConfig, InvalidInputError> {
         .success(NetworkConfig(
                     consensusUrlLoadBalancer: consensusUrlLoadBalancer,
                     fogUrlLoadBalancer: fogUrlLoadBalancer,
                     attestation: attestation,
-                    transportProtocol: transportProtocol,
-                    mistyswapLoadBalancer: mistyswapLoadBalancer))
+                    transportProtocol: transportProtocol))
     }
 
     private let attestation: AttestationConfig
     private let consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>
     private let fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>
-    private let mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>?
 
     var consensusUrls: [ConsensusUrl] {
         consensusUrlLoadBalancer.urlsTyped
@@ -34,21 +31,13 @@ struct NetworkConfig {
         fogUrlLoadBalancer.urlsTyped
     }
 
-    var mistyswapUrls: [MistyswapUrl] {
-        mistyswapLoadBalancer?.urlsTyped ?? []
-    }
-
     var transportProtocol: TransportProtocol
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]
     var fogTrustRoots: [TransportProtocol: SSLCertificates] = [:]
-    var mistyswapTrustRoots: [TransportProtocol: SSLCertificates] = [:]
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?
-    var mistyswapUserAuthorization: BasicCredentials? {
-        fogUserAuthorization // TODO - revisit if we will need this
-    }
 
     var httpRequester: HttpRequester? {
         didSet {
@@ -76,13 +65,11 @@ struct NetworkConfig {
             .map { (certificates: $0, hosts: fogUrls.map(\.host)) }
         let consensus = (consensusTrustRoots[.http] as? SecSSLCertificates)
             .map { (certificates: $0, hosts: consensusUrls.map(\.host)) }
-        let mistyswap = (mistyswapTrustRoots[.http] as? SecSSLCertificates)
-            .map { (certificates: $0, hosts: mistyswapUrls.map(\.host)) }
 
         // A same-module requester takes every held root under one lock, so a
         // concurrent read never observes only some of them applied.
         if let requester = requester as? DefaultHttpRequester {
-            requester.setAllTrustRoots(fog: fog, consensus: consensus, mistyswap: mistyswap)
+            requester.setAllTrustRoots(fog: fog, consensus: consensus)
             return
         }
 
@@ -94,24 +81,18 @@ struct NetworkConfig {
             consensus.certificates, hosts: consensus.hosts) {
             logger.error("Consensus trust roots stay unpinned: \(error)", logFunction: false)
         }
-        if let mistyswap = mistyswap, case .failure(let error) = requester.setMistyswapTrustRoots(
-            mistyswap.certificates, hosts: mistyswap.hosts) {
-            logger.error("Mistyswap trust roots stay unpinned: \(error)", logFunction: false)
-        }
     }
 
     init(
         consensusUrlLoadBalancer: UrlLoadBalancer<ConsensusUrl>,
         fogUrlLoadBalancer: UrlLoadBalancer<FogUrl>,
         attestation: AttestationConfig,
-        transportProtocol: TransportProtocol,
-        mistyswapLoadBalancer: UrlLoadBalancer<MistyswapUrl>? = nil
+        transportProtocol: TransportProtocol
     ) {
         self.attestation = attestation
         self.transportProtocol = transportProtocol
         self.consensusUrlLoadBalancer = consensusUrlLoadBalancer
         self.fogUrlLoadBalancer = fogUrlLoadBalancer
-        self.mistyswapLoadBalancer = mistyswapLoadBalancer
     }
 
     func consensusConfig() -> AttestedConnectionConfig<ConsensusUrl> {
@@ -172,36 +153,6 @@ struct NetworkConfig {
             transportProtocolOption: transportProtocol.option,
             trustRoots: fogTrustRoots,
             authorization: fogUserAuthorization)
-    }
-
-    func mistyswapConfig() -> AttestedConnectionConfig<MistyswapUrl>? {
-        guard
-            let mistyswapLoadBalancer = mistyswapLoadBalancer,
-            let mistyswapAttestation = attestation.mistyswap
-        else {
-            return nil
-        }
-
-        return AttestedConnectionConfig(
-            url: mistyswapLoadBalancer.nextUrl(),
-            transportProtocolOption: transportProtocol.option,
-            attestation: mistyswapAttestation,
-            trustRoots: mistyswapTrustRoots,
-            authorization: mistyswapUserAuthorization)
-    }
-
-    func mistyswapUntrustedConfig() -> ConnectionConfig<MistyswapUrl>? {
-        guard
-            let mistyswapLoadBalancer = mistyswapLoadBalancer
-        else {
-            return nil
-        }
-
-        return ConnectionConfig(
-            url: mistyswapLoadBalancer.nextUrl(),
-            transportProtocolOption: transportProtocol.option,
-            trustRoots: mistyswapTrustRoots,
-            authorization: mistyswapUserAuthorization)
     }
 
     var fogReportAttestation: Attestation { attestation.fogReport }
@@ -265,32 +216,6 @@ extension NetworkConfig {
         fogTrustRoots[.http] = certificates
         return .success(())
     }
-
-    /// Pins `trustRoots` for the mistyswap hosts over HTTP. The requester takes
-    /// them before the dictionary keeps them, so a refusal will leave the roots
-    /// already pinned in place.
-    @discardableResult mutating public func setMistyswapTrustRoots(_ trustRoots: [Data])
-        -> Result<(), InvalidInputError>
-    {
-        let certificates: SecSSLCertificates
-        switch NetworkConfig.parseNonEmpty(trustRoots) {
-        case .success(let parsed):
-            certificates = parsed
-        case .failure(let error):
-            return .failure(error)
-        }
-
-        let hosts = mistyswapUrls.map(\.host)
-        guard hosts.isNotEmpty else {
-            return .failure(InvalidInputError("There is no mistyswap host to pin trust roots to"))
-        }
-        if let requester = httpRequester,
-           case .failure(let error) = requester.setMistyswapTrustRoots(certificates, hosts: hosts) {
-            return .failure(error)
-        }
-        mistyswapTrustRoots[.http] = certificates
-        return .success(())
-    }
 }
 
 extension NetworkConfig {
@@ -300,6 +225,5 @@ extension NetworkConfig {
         let fogKeyImage: Attestation
         let fogMerkleProof: Attestation
         let fogReport: Attestation
-        let mistyswap: Attestation?
     }
 }

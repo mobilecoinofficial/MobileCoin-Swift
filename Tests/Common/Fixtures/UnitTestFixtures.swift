@@ -7,12 +7,10 @@ import XCTest
 enum UnitTestFixtures {
     static let invalidConsensusUrl = "mc://invalid.mobilecoin.com"
     static let invalidFogUrl = "fog://invalid.mobilecoin.com"
-    static let invalidMistyswapUrl = "mistyswap://invalid.mobilecoin.com"
 
     static func failingHttpNetworkConfig(
         _ fogUrlLoadBalancer: SequentialUrlLoadBalancer<FogUrl>,
         _ consensusUrlLoadBalancer: SequentialUrlLoadBalancer<ConsensusUrl>,
-        _ mistyswapUrlLoadBalancer: SequentialUrlLoadBalancer<MistyswapUrl>,
         _ httpRequester: HttpRequester
     ) throws -> NetworkConfig {
         let attestation = Attestation(
@@ -24,15 +22,13 @@ enum UnitTestFixtures {
             fogView: attestation,
             fogKeyImage: attestation,
             fogMerkleProof: attestation,
-            fogReport: attestation,
-            mistyswap: attestation)
+            fogReport: attestation)
 
         var networkConfig = try NetworkConfig.make(
             consensusUrlLoadBalancer: consensusUrlLoadBalancer,
             fogUrlLoadBalancer: fogUrlLoadBalancer,
             attestation: attestationConfig,
-            transportProtocol: .http,
-            mistyswapLoadBalancer: mistyswapUrlLoadBalancer
+            transportProtocol: .http
         )
             .get()
 
@@ -47,7 +43,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
             UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
@@ -67,7 +62,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
             UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
@@ -87,7 +81,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
             UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
@@ -107,7 +100,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
             UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
@@ -127,7 +119,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             fogUrlLoadBalancer,
             UrlLoadBalancerFixtures().invalidConsensusUrlBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         fogUrlLoadBalancer.rotationEnabled = false
@@ -147,7 +138,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             UrlLoadBalancerFixtures().invalidFogUrlBalancer,
             consensusUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         consensusUrlLoadBalancer.rotationEnabled = false
@@ -167,7 +157,6 @@ enum UnitTestFixtures {
         let networkConfig = try failingHttpNetworkConfig(
             UrlLoadBalancerFixtures().invalidFogUrlBalancer,
             consensusUrlLoadBalancer,
-            UrlLoadBalancerFixtures().invalidMistyswapUrlBalancer,
             httpRequester)
 
         consensusUrlLoadBalancer.rotationEnabled = false

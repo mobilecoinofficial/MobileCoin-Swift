@@ -17,8 +17,6 @@ class MobileCoinClientPublicApiTests: XCTestCase {
             fogKeyImageAttestation: fixture.fogKeyImageAttestation,
             fogMerkleProofAttestation: fixture.fogMerkleProofAttestation,
             fogReportAttestation: fixture.fogReportAttestation,
-            mistyswapUrl: fixture.mistyswapUrl,
-            mistyswapAttestation: fixture.mistyswapAttestation,
             transportProtocol: TransportProtocol.http))
     }
 
@@ -38,8 +36,6 @@ class MobileCoinClientPublicApiTests: XCTestCase {
                 fogKeyImageAttestation: fixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: fixture.fogMerkleProofAttestation,
                 fogReportAttestation: fixture.fogReportAttestation,
-                mistyswapUrl: fixture.mistyswapUrl,
-                mistyswapAttestation: fixture.mistyswapAttestation,
                 transportProtocol: TransportProtocol.http))
         }
     }
@@ -61,8 +57,6 @@ class MobileCoinClientPublicApiTests: XCTestCase {
                 fogKeyImageAttestation: fixture.fogKeyImageAttestation,
                 fogMerkleProofAttestation: fixture.fogMerkleProofAttestation,
                 fogReportAttestation: fixture.fogReportAttestation,
-                mistyswapUrl: fixture.mistyswapUrl,
-                mistyswapAttestation: fixture.mistyswapAttestation,
                 transportProtocol: TransportProtocol.http))
         }
     }

@@ -88,22 +88,13 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
         return .success(())
     }
 
-    @discardableResult
-    public func setMistyswapTrustRoots(_ trustRoots: SecSSLCertificates?, hosts: [String])
-        -> Result<(), InvalidInputError>
-    {
-        pinningDelegate.setMistyswapTrustRoots(trustRoots, hosts: hosts)
-        return .success(())
-    }
-
     // A single lock acquisition applies every root the config holds, so a
-    // concurrent read never observes only some of the three fields updated.
+    // concurrent read never observes only one of the two fields updated.
     func setAllTrustRoots(
         fog: (certificates: SecSSLCertificates, hosts: [String])?,
-        consensus: (certificates: SecSSLCertificates, hosts: [String])?,
-        mistyswap: (certificates: SecSSLCertificates, hosts: [String])?
+        consensus: (certificates: SecSSLCertificates, hosts: [String])?
     ) {
-        pinningDelegate.setAllTrustRoots(fog: fog, consensus: consensus, mistyswap: mistyswap)
+        pinningDelegate.setAllTrustRoots(fog: fog, consensus: consensus)
     }
 }
 
@@ -135,7 +126,6 @@ final class CertificatePinningDelegate: NSObject {
     private struct TrustRoots {
         var fog = PinnedRoots()
         var consensus = PinnedRoots()
-        var mistyswap = PinnedRoots()
     }
 
     private let trustRoots = ReadWriteDispatchLock(TrustRoots())
@@ -145,7 +135,7 @@ final class CertificatePinningDelegate: NSObject {
     /// and consensus name gets both sets' keys merged.
     func pinnedKeys(for host: String) -> [SecKey] {
         let name = CertificatePinningDelegate.normalized(host)
-        let roots = trustRoots.readSync { [$0.fog, $0.consensus, $0.mistyswap] }
+        let roots = trustRoots.readSync { [$0.fog, $0.consensus] }
         let named = roots.filter { $0.hosts.contains(name) && $0.keys.isNotEmpty }
         return (named.isNotEmpty ? named : roots).flatMap { $0.keys }
     }
@@ -170,18 +160,11 @@ final class CertificatePinningDelegate: NSObject {
         }
     }
 
-    func setMistyswapTrustRoots(_ certificates: SecSSLCertificates?, hosts: [String]) {
-        trustRoots.writeSync {
-            CertificatePinningDelegate.apply(certificates, hosts, \.mistyswap, &$0)
-        }
-    }
-
     // Every field the config holds lands in the same write, so a concurrent
-    // read never observes only some of the three fields updated.
+    // read never observes only one of the two fields updated.
     func setAllTrustRoots(
         fog: (certificates: SecSSLCertificates, hosts: [String])?,
-        consensus: (certificates: SecSSLCertificates, hosts: [String])?,
-        mistyswap: (certificates: SecSSLCertificates, hosts: [String])?
+        consensus: (certificates: SecSSLCertificates, hosts: [String])?
     ) {
         trustRoots.writeSync {
             if let fog = fog {
@@ -190,10 +173,6 @@ final class CertificatePinningDelegate: NSObject {
             if let consensus = consensus {
                 CertificatePinningDelegate.apply(
                     consensus.certificates, consensus.hosts, \.consensus, &$0)
-            }
-            if let mistyswap = mistyswap {
-                CertificatePinningDelegate.apply(
-                    mistyswap.certificates, mistyswap.hosts, \.mistyswap, &$0)
             }
         }
     }

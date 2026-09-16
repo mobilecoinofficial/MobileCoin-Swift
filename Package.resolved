@@ -1,13 +1,13 @@
 {
-  "originHash" : "8cdd7f86cc864cf8073f49fc2434f50c4ee379a28afb93e91accce6834481382",
+  "originHash" : "c5e6a47b5a007d1a12705c3735028a9c3272ee402917ea3a525e3f3fe046dd41",
   "pins" : [
     {
       "identity" : "libmobilecoin",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mobilecoinofficial/libmobilecoin.git",
       "state" : {
-        "revision" : "d30fc09e0603fd84f738f6242bd886e919a82ddb",
-        "version" : "6.2.0"
+        "revision" : "0f48804da481a54f21d9711d4c7fd070b2491fc5",
+        "version" : "7.0.0"
       }
     },
     {
