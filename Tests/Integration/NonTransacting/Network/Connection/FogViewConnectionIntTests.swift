@@ -316,8 +316,9 @@ extension FogViewConnectionIntTests {
     }
 
     func createFogViewConnection(networkConfig: NetworkConfig) -> FogViewConnection {
+        var networkConfig = networkConfig
         let httpFactory = HttpProtocolConnectionFactory(
-                httpRequester: networkConfig.httpRequester ?? DefaultHttpRequester())
+                httpRequester: networkConfig.filledHttpRequester())
         return FogViewConnection(
             httpFactory: httpFactory,
             config: networkConfig,

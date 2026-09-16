@@ -15,7 +15,7 @@ final class DefaultServiceProvider: ServiceProvider {
     private let keyImage: FogKeyImageConnection
     private let block: FogBlockConnection
     private let untrustedTxOut: FogUntrustedTxOutConnection
-    private let httpConnectionFactory: HttpProtocolConnectionFactory
+    let httpConnectionFactory: HttpProtocolConnectionFactory
 
     init(
         networkConfig: NetworkConfig,
