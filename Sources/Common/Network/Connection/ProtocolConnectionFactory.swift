@@ -15,6 +15,7 @@ protocol ProtocolConnectionFactory {
     associatedtype FogBlockServiceProvider: FogBlockServiceConnection
     associatedtype FogUntrustedTxOutServiceProvider: FogUntrustedTxOutServiceConnection
     associatedtype FogReportServiceProvider: FogReportService
+
     func makeConsensusService(
         config: AttestedConnectionConfig<ConsensusUrl>,
         targetQueue: DispatchQueue?,

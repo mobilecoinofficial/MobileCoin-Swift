@@ -179,10 +179,6 @@ extension McConstants {
     static let CONSENSUS_DEFAULT_INSECURE_PORT = 3223
 
     /// The part before the '://' of a URL.
-
-    /// Default port numbers
-
-    /// The part before the '://' of a URL.
     static let FOG_SCHEME_SECURE = "fog"
     static let FOG_SCHEME_INSECURE = "insecure-fog"
 
