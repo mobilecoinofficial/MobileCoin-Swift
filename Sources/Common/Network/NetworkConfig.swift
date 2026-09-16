@@ -31,10 +31,6 @@ struct NetworkConfig {
         fogUrlLoadBalancer.urlsTyped
     }
 
-    var mistyswapUrls: [MistyswapUrl] {
-        mistyswapLoadBalancer?.urlsTyped ?? []
-    }
-
     var transportProtocol: TransportProtocol
 
     var consensusTrustRoots: [TransportProtocol: SSLCertificates] = [:]
@@ -42,6 +38,7 @@ struct NetworkConfig {
 
     var consensusAuthorization: BasicCredentials?
     var fogUserAuthorization: BasicCredentials?
+
     var httpRequester: HttpRequester? {
         didSet {
             pushStoredTrustRoots()
@@ -68,13 +65,11 @@ struct NetworkConfig {
             .map { (certificates: $0, hosts: fogUrls.map(\.host)) }
         let consensus = (consensusTrustRoots[.http] as? SecSSLCertificates)
             .map { (certificates: $0, hosts: consensusUrls.map(\.host)) }
-        let mistyswap = (mistyswapTrustRoots[.http] as? SecSSLCertificates)
-            .map { (certificates: $0, hosts: mistyswapUrls.map(\.host)) }
 
         // A same-module requester takes every held root under one lock, so a
         // concurrent read never observes only some of them applied.
         if let requester = requester as? DefaultHttpRequester {
-            requester.setAllTrustRoots(fog: fog, consensus: consensus, mistyswap: mistyswap)
+            requester.setAllTrustRoots(fog: fog, consensus: consensus)
             return
         }
 
@@ -85,10 +80,6 @@ struct NetworkConfig {
         if let consensus = consensus, case .failure(let error) = requester.setConsensusTrustRoots(
             consensus.certificates, hosts: consensus.hosts) {
             logger.error("Consensus trust roots stay unpinned: \(error)", logFunction: false)
-        }
-        if let mistyswap = mistyswap, case .failure(let error) = requester.setMistyswapTrustRoots(
-            mistyswap.certificates, hosts: mistyswap.hosts) {
-            logger.error("Mistyswap trust roots stay unpinned: \(error)", logFunction: false)
         }
     }
 
@@ -223,32 +214,6 @@ extension NetworkConfig {
             return .failure(error)
         }
         fogTrustRoots[.http] = certificates
-        return .success(())
-    }
-
-    /// Pins `trustRoots` for the mistyswap hosts over HTTP. The requester takes
-    /// them before the dictionary keeps them, so a refusal will leave the roots
-    /// already pinned in place.
-    @discardableResult mutating public func setMistyswapTrustRoots(_ trustRoots: [Data])
-        -> Result<(), InvalidInputError>
-    {
-        let certificates: SecSSLCertificates
-        switch NetworkConfig.parseNonEmpty(trustRoots) {
-        case .success(let parsed):
-            certificates = parsed
-        case .failure(let error):
-            return .failure(error)
-        }
-
-        let hosts = mistyswapUrls.map(\.host)
-        guard hosts.isNotEmpty else {
-            return .failure(InvalidInputError("There is no mistyswap host to pin trust roots to"))
-        }
-        if let requester = httpRequester,
-           case .failure(let error) = requester.setMistyswapTrustRoots(certificates, hosts: hosts) {
-            return .failure(error)
-        }
-        mistyswapTrustRoots[.http] = certificates
         return .success(())
     }
 }

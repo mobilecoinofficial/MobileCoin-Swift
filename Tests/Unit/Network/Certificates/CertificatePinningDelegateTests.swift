@@ -172,15 +172,14 @@ class CertificatePinningDelegateTests: XCTestCase {
         requester.setConsensusTrustRoots(consensus, hosts: [TestHost.consensus])
         requester.setAllTrustRoots(
             fog: (certificates: fog, hosts: [TestHost.fog]),
-            consensus: nil,
-            mistyswap: nil)
+            consensus: nil)
 
         XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), fog.publicKeys)
         XCTAssertEqual(delegate.pinnedKeys(for: TestHost.consensus), consensus.publicKeys)
     }
 
     // A named field overwrites the set already pinned for its host, and each of
-    // the three fields carries its own set.
+    // the two fields carries its own set.
     func testSetAllTrustRootsOverwritesEveryNamedField() throws {
         let requester = DefaultHttpRequester()
         let delegate = try pinningDelegate(of: requester)
@@ -190,15 +189,12 @@ class CertificatePinningDelegateTests: XCTestCase {
 
         requester.setFogTrustRoots(stale, hosts: [TestHost.fog])
         requester.setConsensusTrustRoots(stale, hosts: [TestHost.consensus])
-        requester.setMistyswapTrustRoots(stale, hosts: [TestHost.mistyswap])
         requester.setAllTrustRoots(
             fog: (certificates: fresh, hosts: [TestHost.fog]),
-            consensus: (certificates: fresh, hosts: [TestHost.consensus]),
-            mistyswap: (certificates: fresh, hosts: [TestHost.mistyswap]))
+            consensus: (certificates: fresh, hosts: [TestHost.consensus]))
 
         XCTAssertEqual(delegate.pinnedKeys(for: TestHost.fog), fresh.publicKeys)
         XCTAssertEqual(delegate.pinnedKeys(for: TestHost.consensus), fresh.publicKeys)
-        XCTAssertEqual(delegate.pinnedKeys(for: TestHost.mistyswap), fresh.publicKeys)
     }
 
     private func answer(
