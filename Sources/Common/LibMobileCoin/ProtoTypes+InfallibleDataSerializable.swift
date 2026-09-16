@@ -51,8 +51,3 @@ extension FogLedger_GetOutputsResponse: InfallibleDataSerializable {}
 
 extension FogLedger_CheckKeyImagesRequest: InfallibleDataSerializable {}
 extension FogLedger_CheckKeyImagesResponse: InfallibleDataSerializable {}
-
-// MARK: - Misty Swap
-
-
-

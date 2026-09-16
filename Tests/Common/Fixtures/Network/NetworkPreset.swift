@@ -247,7 +247,6 @@ extension NetworkPreset {
         }
     }
 
-
     private static let mainNetConsensusMrEnclaveHex =
         "82c14d06951a2168763c8ddb9c34174f7d2059564146650661da26ab62224b8a"
     private static let mainNetFogViewMrEnclaveHex =
