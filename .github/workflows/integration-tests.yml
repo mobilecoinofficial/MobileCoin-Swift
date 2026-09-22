@@ -1,0 +1,96 @@
+name: integration-tests
+
+# A fork pull request gets no repository secrets, and every step needs one,
+# so that this workflow has no pull_request trigger.
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: integration-tests
+
+permissions:
+  contents: read
+
+jobs:
+  integration-tests:
+    name: Integration tests
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Generate a test account seed
+        id: seed
+        run: |
+          seed="$(head -c32 </dev/urandom | base64)"
+          if [ -z "$seed" ]; then
+            echo "::error::Generated an empty test account seed."
+            exit 1
+          fi
+          echo "::add-mask::$seed"
+          echo "seed=$seed" >> "$GITHUB_OUTPUT"
+
+      - name: Create the gitignored test resources from their samples
+        run: tools/ensure_test_resources.sh
+
+      # tools/generate_secrets_json.sh needs age keys in a keychain that this runner
+      # doesn't have, so this step writes the six values from the repository secrets.
+      - name: Write secrets.json
+        env:
+          DEV_NETWORK_AUTH_USERNAME: ${{ secrets.DEV_NETWORK_AUTH_USERNAME }}
+          DEV_NETWORK_AUTH_PASSWORD: ${{ secrets.DEV_NETWORK_AUTH_PASSWORD }}
+          TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED: ${{ secrets.TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+          MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED: ${{ secrets.MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPARATED }}
+          DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED: ${{ secrets.DYNAMIC_TEST_ACCOUNT_ENTROPIES_COMMA_SEPARATED }}
+          DYNAMIC_FOG_AUTHORITY_SPKI: ${{ secrets.DYNAMIC_FOG_AUTHORITY_SPKI }}
+        run: |
+          jq --null-input \
+            --arg DEV_NETWORK_AUTH_USERNAME "$DEV_NETWORK_AUTH_USERNAME" \
+            --arg DEV_NETWORK_AUTH_PASSWORD "$DEV_NETWORK_AUTH_PASSWORD" \
+            --arg TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED "$TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED" \
+            --arg MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED "$MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED" \
+            --arg DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED "$DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED" \
+            --arg DYNAMIC_FOG_AUTHORITY_SPKI "$DYNAMIC_FOG_AUTHORITY_SPKI" \
+            '{
+              DEV_NETWORK_AUTH_USERNAME: $DEV_NETWORK_AUTH_USERNAME,
+              DEV_NETWORK_AUTH_PASSWORD: $DEV_NETWORK_AUTH_PASSWORD,
+              TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED: $TESTNET_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED,
+              MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED: $MOBILEDEV_TEST_ACCOUNT_MNEMONICS_COMMA_SEPERATED,
+              DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED: $DYNAMIC_TEST_ACCOUNT_SEED_ENTROPIES_COMMA_SEPARATED,
+              DYNAMIC_FOG_AUTHORITY_SPKI: $DYNAMIC_FOG_AUTHORITY_SPKI
+            }' > Tests/Common/Secrets/secrets.json
+
+      - name: Confirm the secrets step resolved every value
+        run: |
+          empty="$(jq -r 'to_entries | map(select(.value == "")) | map(.key) | join(", ")' Tests/Common/Secrets/secrets.json)"
+          if [ -n "$empty" ]; then
+            echo "::error::secrets.json has empty values for: $empty"
+            exit 1
+          fi
+
+      - name: Fund the test account
+        env:
+          testAccountSeed: ${{ steps.seed.outputs.seed }}
+          srcAcctEntropyString: ${{ secrets.DYNAMIC_SOURCE_ACCOUNT_ENTROPY }}
+        run: |
+          if [ -z "$testAccountSeed" ] || [ -z "$srcAcctEntropyString" ]; then
+            echo "::error::testAccountSeed or srcAcctEntropyString is empty; refusing to fund."
+            exit 1
+          fi
+          if swift test --filter "TestSetupClientTests" > funding.log 2>&1; then
+            rm -f funding.log
+          else
+            exit_status=$?
+            echo "::error::TestSetupClientTests failed (exit $exit_status). Output withheld, since it may hold account entropy."
+            rm -f funding.log
+            exit "$exit_status"
+          fi
+
+      # The funding step's seed goes to this step, so that the suites spend from the account it funded.
+      - name: Run the integration suites
+        env:
+          testAccountSeed: ${{ steps.seed.outputs.seed }}
+        run: swift test --filter "IntTests|TransactionIdempotenceTests"
