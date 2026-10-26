@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.1.0] - 2026-10-26
+
+### Added
+
+- `DefaultHttpRequester.init` takes `requestTimeout` and `resourceTimeout`, and
+  `defaultRequestTimeout`/`defaultResourceTimeout` expose the historical
+  40 seconds both default to. `timeoutIntervalForRequest` is an idle timeout
+  and `timeoutIntervalForResource` is the budget for one whole transfer, so
+  holding them equal left a transfer no room to be slow without also being
+  idle: a fog query that is still arriving on a slow link gets cut off, and one
+  failed round trip fails the whole scan. A host whose users hold heavy
+  accounts can now widen the resource timeout without forking the SDK, since
+  `MobileCoinClient.Config.httpRequester` was already public.
+  `DefaultHttpRequester()` builds the same session it did before.
+
 ## [7.0.0] - 2026-09-16
 
 ### Removed
