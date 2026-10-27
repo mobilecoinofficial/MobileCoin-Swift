@@ -15,12 +15,23 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
 
     static let certPinningEnabled = true
 
-    static let defaultConfiguration: URLSessionConfiguration = {
+    /// How long a request may go without receiving any data.
+    public static let defaultRequestTimeout: TimeInterval = 40
+
+    /// The budget for one whole transfer, start to finish.
+    public static let defaultResourceTimeout: TimeInterval = 40
+
+    static func configuration(
+        requestTimeout: TimeInterval = defaultRequestTimeout,
+        resourceTimeout: TimeInterval = defaultResourceTimeout
+    ) -> URLSessionConfiguration {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 40
-        config.timeoutIntervalForResource = 40
+        config.timeoutIntervalForRequest = requestTimeout
+        config.timeoutIntervalForResource = resourceTimeout
         return config
-    }()
+    }
+
+    static let defaultConfiguration = configuration()
 
     private static let operationQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -28,9 +39,20 @@ public final class DefaultHttpRequester: NSObject, HttpRequester {
         return queue
     }()
 
-    override public init() {
+    /// Builds a requester, optionally with timeouts of its own.
+    ///
+    /// An integrator whose users hold heavy accounts, or who runs on links
+    /// slower than the defaults assume, can widen either without forking the
+    /// SDK. See `defaultRequestTimeout` and `defaultResourceTimeout` for
+    /// what each one governs.
+    public init(
+        requestTimeout: TimeInterval = defaultRequestTimeout,
+        resourceTimeout: TimeInterval = defaultResourceTimeout
+    ) {
         session = URLSession(
-            configuration: DefaultHttpRequester.defaultConfiguration,
+            configuration: DefaultHttpRequester.configuration(
+                requestTimeout: requestTimeout,
+                resourceTimeout: resourceTimeout),
             delegate: pinningDelegate,
             delegateQueue: Self.operationQueue)
         super.init()
